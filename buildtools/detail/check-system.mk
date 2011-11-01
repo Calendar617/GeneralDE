@@ -1,7 +1,7 @@
 ORIGN_OS_NAME:=$(shell uname -s)
 
 ifeq ($(ORIGN_OS_NAME),Linux)
-OS_NAME:=linux
+OS_NAME:=linux32
 endif
 
 ifeq ($(ORIGN_OS_NAME),Darwin)
