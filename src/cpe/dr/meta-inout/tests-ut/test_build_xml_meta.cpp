@@ -1,0 +1,131 @@
+#include "cpe/dr/dr_ctypes_info.h"
+#include "BuildFromXmlTest.hpp"
+
+class BuildFromXmlMetaTest : public BuildFromXmlTest {
+};
+
+TEST_F(BuildFromXmlMetaTest, struct_data) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='PkgHead' desc='PkgHead.desc' version='1' id='33'/>"
+        "</metalib>"
+        );
+
+    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
+    ASSERT_TRUE(meta) << "get meta fail!";
+
+    EXPECT_STREQ("PkgHead", dr_get_meta_name(meta));
+    EXPECT_STREQ("PkgHead.desc", dr_get_meta_desc(meta));
+    EXPECT_EQ(CPE_DR_TYPE_STRUCT, dr_get_meta_type(meta));
+    EXPECT_EQ(33, dr_get_meta_id(meta));
+    EXPECT_EQ(1, dr_get_meta_based_version(meta));
+    EXPECT_EQ(1, dr_get_meta_current_version(meta));
+    EXPECT_EQ(0, dr_get_entry_num(meta));
+}
+
+TEST_F(BuildFromXmlMetaTest, union_data) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <union name='PkgHead' desc='PkgHead.desc' version='1'>"
+        "    </union>"
+        "</metalib>"
+        );
+
+    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
+    ASSERT_TRUE(meta) << "get meta fail!";
+
+    EXPECT_STREQ("PkgHead", dr_get_meta_name(meta));
+    EXPECT_STREQ("PkgHead.desc", dr_get_meta_desc(meta));
+    EXPECT_EQ(CPE_DR_TYPE_UNION, dr_get_meta_type(meta));
+    EXPECT_EQ(1, dr_get_meta_based_version(meta));
+    EXPECT_EQ(1, dr_get_meta_current_version(meta));
+    EXPECT_EQ(0, dr_get_entry_num(meta));
+}
+
+TEST_F(BuildFromXmlMetaTest, by_name) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='A1' version='1'/>"
+        "    <struct name='A2' version='1'/>"
+        "</metalib>"
+        );
+
+    EXPECT_TRUE(dr_get_meta_by_name(m_metaLib, "A1") != NULL) << "A1 should exist!";
+    EXPECT_TRUE(dr_get_meta_by_name(m_metaLib, "A2") != NULL) << "A2 should exist!";
+
+    //now change input order
+
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='A2' version='1'/>"
+        "    <struct name='A1' version='1'/>"
+        "</metalib>"
+        );
+
+    EXPECT_TRUE(dr_get_meta_by_name(m_metaLib, "A1") != NULL) << "A1 should exist!";
+    EXPECT_TRUE(dr_get_meta_by_name(m_metaLib, "A2") != NULL) << "A2 should exist!";
+}
+
+TEST_F(BuildFromXmlMetaTest, by_id) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='A1' version='1' id='1'/>"
+        "    <struct name='A2' version='1' id='2'/>"
+        "</metalib>"
+        );
+
+    EXPECT_TRUE(dr_get_meta_by_id(m_metaLib, 1) != NULL) << "id 1 should exist!";
+    EXPECT_TRUE(dr_get_meta_by_id(m_metaLib, 2) != NULL) << "id 2 should exist!";
+
+    //now change input order
+
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='A2' version='1' id='2'/>"
+        "    <struct name='A1' version='1' id='1'/>"
+        "</metalib>"
+        );
+
+    EXPECT_TRUE(dr_get_meta_by_id(m_metaLib, 1) != NULL) << "id 1 should exist!";
+    EXPECT_TRUE(dr_get_meta_by_id(m_metaLib, 2) != NULL) << "id 2 should exist!";
+}
+
+TEST_F(BuildFromXmlMetaTest, version_default) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='A1'/>"
+        "</metalib>"
+        );
+
+    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "A1");
+    ASSERT_TRUE(meta) << "get meta fail!";
+
+    EXPECT_EQ(10, dr_get_meta_based_version(meta));
+    EXPECT_EQ(10, dr_get_meta_current_version(meta));
+}
+
+TEST_F(BuildFromXmlMetaTest, duplicate_name) {
+    parseMeta(
+        "<?xml version='1.0' standalone='yes' ?>"
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='A1'/>"
+        "    <struct name='A1'/>"
+        "</metalib>"
+        );
+
+    ASSERT_TRUE(dr_get_meta_by_name(m_metaLib, "A1"));
+    ASSERT_TRUE(haveError(CPE_DR_ERROR_META_NAME_CONFLICT));
+}
+
+TEST_F(BuildFromXmlMetaTest, duplicate_id) {
+    parseMeta(
+        "<?xml version='1.0' standalone='yes' ?>"
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='A1' id='3'/>"
+        "    <struct name='A2' id='3'/>"
+        "</metalib>"
+        );
+
+    ASSERT_TRUE(dr_get_meta_by_id(m_metaLib, 3));
+    ASSERT_TRUE(haveError(CPE_DR_ERROR_META_ID_CONFLICT));
+}
