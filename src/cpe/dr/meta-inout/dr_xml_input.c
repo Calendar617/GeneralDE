@@ -4,6 +4,7 @@
 #include "cpe/dr/dr_metalib_xml.h"
 #include "cpe/dr/dr_error.h"
 #include "../dr_internal_types.h"
+#include "../dr_ctype_ops.h"
 #include "dr_inbuild.h"
 #include "dr_XMLtags.h"
 
@@ -263,6 +264,7 @@ static void dr_build_xml_process_entry(
 {
     const int INTEGER_BUF_LEN = 10;
     char buf[INTEGER_BUF_LEN];
+    const struct tagDRCTypeInfo * ctypeInfo = NULL;
     int indexAttribute = 0;
     int index = 0;
     int version = -1;
@@ -308,15 +310,20 @@ static void dr_build_xml_process_entry(
                 (char const *)valueBegin,
                 len > CPE_DR_DESC_LEN ? CPE_DR_DESC_LEN : len);
         }
-        /* else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) { */
-        /*     strncpy( */
-        /*         buf, */
-        /*         (char const *)valueBegin, */
-        /*         len >= INTEGER_BUF_LEN ? INTEGER_BUF_LEN - 1 : len); */
-        /*     sscanf(buf, "%d", &version); */
-        /* } */
+        else if (strcmp((char const *)localname, CPE_DR_TAG_TYPE) == 0) {
+            ctypeInfo = dr_find_ctype_info_by_name(valueBegin, len);
+        }
         else {
         }
+    }
+
+    if (ctypeInfo == NULL) {
+        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_ENTRY_NO_TYPE, NULL);
+        haveError = 1;
+    }
+    else {
+        newEntry->m_data.m_type = ctypeInfo->m_id;
+        newEntry->m_data.m_unitsize = ctypeInfo->m_size;
     }
 
     if (strlen(newEntry->m_name) == 0) {

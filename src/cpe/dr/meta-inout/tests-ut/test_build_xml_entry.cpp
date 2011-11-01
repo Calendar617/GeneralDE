@@ -27,6 +27,7 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
     EXPECT_STREQ("a1", dr_get_entry_name(entry));
     EXPECT_STREQ("a1.desc", dr_get_entry_desc(entry));
     EXPECT_STREQ("a1.cname", dr_get_entry_cname(entry));
+    EXPECT_EQ(CPE_DR_TYPE_SMALLINT, dr_get_entry_type(entry));
 }
 
 TEST_F(BuildFromXmlEntryTest, no_name) {
@@ -43,4 +44,20 @@ TEST_F(BuildFromXmlEntryTest, no_name) {
 
     EXPECT_EQ(0, dr_get_entry_num(meta));
     EXPECT_TRUE(haveError(CPE_DR_ERROR_META_NO_NAME));
+}
+
+TEST_F(BuildFromXmlEntryTest, no_type) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='PkgHead'>"
+        "	     <entry name='a1'\n/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
+    ASSERT_TRUE(meta) << "get meta fail!";
+
+    EXPECT_EQ(0, dr_get_entry_num(meta));
+    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_NO_TYPE));
 }
