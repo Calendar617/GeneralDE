@@ -16,6 +16,11 @@ CPED_BUILD_DETAIL_DIR:=$(CPDE_ROOT)/buildtools/detail
 include $(CPED_BUILD_DETAIL_DIR)/check-system.mk
 include $(CPED_BUILD_DETAIL_DIR)/utils.mk
 include $(CPED_BUILD_DETAIL_DIR)/change-root.mk
+
+-include $(CPDE_ROOT)/dev-env.mk
+dev-env?=$(OS_NAME)
+include $(CPED_BUILD_DETAIL_DIR)/dev-env-$(dev-env).mk
+
 include $(CPED_BUILD_DETAIL_DIR)/product-def.mk
 include $(CPED_BUILD_DETAIL_DIR)/product-def-c.mk
 include $(CPED_BUILD_DETAIL_DIR)/product-def-install.mk
@@ -29,3 +34,4 @@ include $(addsuffix /config.mk,$(modules))
 -include $(foreach p,$(project_repository), $(r.$p.makefile.include))
 
 include $(CPED_BUILD_DETAIL_DIR)/create-dirs.mk
+
