@@ -87,6 +87,7 @@ struct tagDRMacrosGroup {
 };
 
 struct tagDRCTypeInfo {
+    int m_id;
     char m_name[32];
     size_t m_size;
 };
@@ -102,7 +103,5 @@ struct tagDRMetaIdxByName {
 };
 
 #pragma pack(pop)
-
-extern struct tagDRCTypeInfo g_dr_ctypeinfos[CPE_DR_TYPE_MAX + 1];
 
 #endif

@@ -134,11 +134,6 @@ typedef struct tagDRMacro		*LPDRMACRO;
 typedef struct tagDRMacrosGroup		*LPDRMACROSGROUP;
 
 
-/**
- * This is the pointer type info for c/c++ base date type info.
- */
-typedef struct tagDRCTypeInfo	*LPDRCTYPEINFO;
-
 /**生成c/c++ 头文件规则结构声明
 */
 typedef struct tagDRHppRule DRHPPRULE;
