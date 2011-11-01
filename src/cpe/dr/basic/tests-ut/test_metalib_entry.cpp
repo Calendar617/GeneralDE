@@ -155,6 +155,8 @@ TEST_P(MetaLibManagerEntryTest, CheckData) {
 
     ASSERT_EQ(entry.count, dr_get_entry_count(pEntry));
 
+    ASSERT_EQ(1, dr_get_entry_count(pEntry));
+
     ASSERT_TRUE(dr_get_entry_type_meta(m_lib, pEntry) == m_pMeta) << "get meta from entry error!";
 }
 

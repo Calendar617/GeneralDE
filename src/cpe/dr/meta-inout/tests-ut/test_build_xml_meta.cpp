@@ -90,26 +90,34 @@ TEST_F(BuildFromXmlMetaTest, by_id) {
     EXPECT_TRUE(dr_get_meta_by_id(m_metaLib, 2) != NULL) << "id 2 should exist!";
 }
 
-TEST_F(BuildFromXmlMetaTest, version_default) {
+TEST_F(BuildFromXmlMetaTest, version_not_exist) {
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'>"
         "    <struct name='A1'/>"
         "</metalib>"
         );
 
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "A1");
-    ASSERT_TRUE(meta) << "get meta fail!";
+    EXPECT_FALSE(dr_get_meta_by_name(m_metaLib, "A1"));
+    EXPECT_TRUE(haveError(CPE_DR_ERROR_NO_VERSION));
+}
 
-    EXPECT_EQ(10, dr_get_meta_based_version(meta));
-    EXPECT_EQ(10, dr_get_meta_current_version(meta));
+TEST_F(BuildFromXmlMetaTest, version_bigger) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='A1' version='11'/>"
+        "</metalib>"
+        );
+
+    EXPECT_FALSE(dr_get_meta_by_name(m_metaLib, "A1"));
+    EXPECT_TRUE(haveError(CPE_DR_ERROR_INVALID_VERSION));
 }
 
 TEST_F(BuildFromXmlMetaTest, duplicate_name) {
     parseMeta(
         "<?xml version='1.0' standalone='yes' ?>"
         "<metalib tagsetversion='1' name='net'  version='10'>"
-        "    <struct name='A1'/>"
-        "    <struct name='A1'/>"
+        "    <struct name='A1' version='1'/>"
+        "    <struct name='A1' version='1'/>"
         "</metalib>"
         );
 
@@ -121,8 +129,8 @@ TEST_F(BuildFromXmlMetaTest, duplicate_id) {
     parseMeta(
         "<?xml version='1.0' standalone='yes' ?>"
         "<metalib tagsetversion='1' name='net'  version='10'>"
-        "    <struct name='A1' id='3'/>"
-        "    <struct name='A2' id='3'/>"
+        "    <struct name='A1' version='1' id='3'/>"
+        "    <struct name='A2' version='1' id='3'/>"
         "</metalib>"
         );
 

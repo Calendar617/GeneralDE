@@ -243,15 +243,24 @@ static void dr_build_xml_process_meta(
         }
     }
 
+
+    if (version < 0) {
+        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NO_VERSION, NULL);
+        haveError = 1;
+    }
+    else if (version > ctx->m_metaLib->m_data.iVersion) {
+        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_INVALID_VERSION, NULL);
+        haveError = 1;
+    }
+    else {
+        newMeta->m_data.m_based_version = version;
+        newMeta->m_data.m_current_version = version;
+    }
+
     if (haveError) {
         dr_inbuild_metalib_remove_meta(ctx->m_metaLib, newMeta);
         return;
     }
-
-    newMeta->m_data.m_current_version =
-        version == -1 ? ctx->m_metaLib->m_data.iVersion : version;
-
-    newMeta->m_data.m_based_version = newMeta->m_data.m_current_version;
 
     ctx->m_state = PS_InMeta;
     ctx->m_curentMeta = newMeta;
@@ -313,9 +322,26 @@ static void dr_build_xml_process_entry(
         else if (strcmp((char const *)localname, CPE_DR_TAG_TYPE) == 0) {
             ctypeInfo = dr_find_ctype_info_by_name(valueBegin, len);
         }
+        else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
+            strncpy(
+                buf,
+                (char const *)valueBegin,
+                len >= INTEGER_BUF_LEN ? INTEGER_BUF_LEN - 1 : len);
+            sscanf(buf, "%d", &version);
+        }
         else {
         }
     }
+
+    if (version < 0) {
+        version = ctx->m_curentMeta->m_data.m_based_version;
+    }
+    else if (version > ctx->m_metaLib->m_data.iVersion) {
+        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_INVALID_VERSION, NULL);
+        haveError = 1;
+    }
+
+    newEntry->m_data.m_version = version;
 
     if (ctypeInfo == NULL) {
         dr_build_xml_notify_error(ctx, CPE_DR_ERROR_ENTRY_NO_TYPE, NULL);

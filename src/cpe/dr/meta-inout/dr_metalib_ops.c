@@ -234,6 +234,9 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuil
     newEntry->m_self_to_meta_pos = (char*)newEntry - (char*)meta;
 
     meta->m_data_size += newEntry->m_unitsize;
+    if (newEntry->m_version > meta->m_current_version) {
+        meta->m_current_version = newEntry->m_version;
+    }
 
     return newEntry;
 }

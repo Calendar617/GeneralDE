@@ -59,7 +59,8 @@ struct tagDRMeta {
 
 struct tagDRMetaEntry {
     /*000*/ int32_t m_id;
-    int8_t reserve_1[4];
+    //int8_t reserve_1[4];
+    int32_t m_version;
     /*008*/ int32_t m_type;
     /*012*/ int32_t m_name_pos;
     /*016*/ int32_t m_unitsize;
