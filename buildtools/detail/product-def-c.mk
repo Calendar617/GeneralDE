@@ -3,15 +3,6 @@ CC:=$(GCC)
 
 $(call assert-not-null,GCC)
 
-CPPFLAGS+=-I$(CPDE_ROOT)/include
-CFLAGS+=-ggdb
-CXXFLAGS+=-ggdb
-
-linux.ld.lib:= --shared -z defs
-linux.ld.progn:=
-mac.ld.lib:= --shared
-mac..ld.progn:=
-
 product-support-types+=clib cpplib objclib cprogn cppprogn objcprogn
 product-def-all-items+= libraries sources product.include product.lib flags.cpp flags.ld
 
@@ -80,7 +71,7 @@ $1: $(CPDE_OUTPUT_ROOT)/$(r.$1.product)
 
 $(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.sources))
 	$$(call with_message,linking $(r.$1.product) ...)$(if $(filter cpp%,$2),$$(LINK.c),$$(LINK.cc)) $$^ $$(LOADLIBES) \
-		$(if $(filter lib,$2),$($(OS_NAME).ld.lib),$($(OS_NAME).ld.progn))  -o $$@ $$(call c-generate-depend-ld-flags,$1) $(r.$1.flags.ld) 
+		$(if $(filter lib,$2),$(LDFLAGS.share))  -o $$@ $$(call c-generate-depend-ld-flags,$1) $(r.$1.flags.ld) 
 
 
 $(foreach f,$(r.$1.sources),$(call compile-rule$(suffix $f),$(call c-source-to-object,$f),$f,$1))
