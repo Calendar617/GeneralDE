@@ -50,6 +50,6 @@ $(product).sources := $(addprefix $(product-base), \
 
 $(product).product.include:=3rdTools/libxml2/include
 $(product).flags.cpp:=-DHAVE_CONFIG_H -D_REENTRANT -I$(product-base)$(OS_NAME)
-$(product).flags.ld:=-lm -lz -ldl
+$(product).flags.ld:=-lm -lz -ldl $(if $(dep.iconv),-liconv)
 
 $(eval $(call product-def,$(product)))
