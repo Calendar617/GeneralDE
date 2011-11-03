@@ -51,22 +51,25 @@ struct tagDRMeta {
     /*044*/ int32_t m_entry_count;
     int8_t reserve_4[12];
     /*060*/ int32_t m_self_pos;
-    int8_t reserve_5[68];
+    int8_t reserve_5[16];
+    /*080*/ int32_t m_align;
+    int8_t reserve_6[48];
     /*132*/ int32_t m_name_pos;
     /*136*/ int32_t m_desc_pos;
-    int8_t reserve_6[44];
+    int8_t reserve_7[44];
 };
 
 struct tagDRMetaEntry {
     /*000*/ int32_t m_id;
-    //int8_t reserve_1[4];
-    int32_t m_version;
+    /*004*/ int32_t m_version;
     /*008*/ int32_t m_type;
     /*012*/ int32_t m_name_pos;
     /*016*/ int32_t m_unitsize;
     int8_t reserve_2[16];
     /*036*/ int32_t m_count;
-    int8_t reserve_3[80];
+    /*040*/ int32_t m_data_start_pos_3; /*same as start pos?*/
+    /*044*/ int32_t m_data_start_pos;
+    int8_t reserve_3[72];
     /*120*/ int32_t m_ref_type_pos;
     int8_t reserve_4[20];
     /*144*/ int32_t m_desc_pos;

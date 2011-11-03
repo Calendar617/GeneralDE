@@ -12,16 +12,16 @@ struct tagDRCTypeInfo g_dr_ctypeinfos[] = {
     , {CPE_DR_TYPE_UINT, "uint", 4}
     , {CPE_DR_TYPE_LONG, "long", 4}
     , {CPE_DR_TYPE_ULONG, "ulong", 4}
-    , {CPE_DR_TYPE_LONGLONG, "longlong", 4}
-    , {CPE_DR_TYPE_ULONGLONG, "ulonglong", 4}
+    , {CPE_DR_TYPE_LONGLONG, "longlong", 8}
+    , {CPE_DR_TYPE_ULONGLONG, "ulonglong", 8}
     , {CPE_DR_TYPE_DATE, "date", 4}
     , {CPE_DR_TYPE_TIME, "time", 4}
-    , {CPE_DR_TYPE_DATETIME, "datetime", 4}
+    , {CPE_DR_TYPE_DATETIME, "datetime", 8}
     , {CPE_DR_TYPE_MONEY, "money", 4}
     , {CPE_DR_TYPE_FLOAT, "float", 4}
-    , {CPE_DR_TYPE_DOUBLE, "double", 4}
+    , {CPE_DR_TYPE_DOUBLE, "double", 8}
     , {CPE_DR_TYPE_IP, "ip", 4}
-    , {CPE_DR_TYPE_WCHAR, "wchar", 4}
+    , {CPE_DR_TYPE_WCHAR, "wchar", 2}
     , {CPE_DR_TYPE_STRING, "string", -1}
     , {CPE_DR_TYPE_WSTRING, "wstring", -1}
     , {CPE_DR_TYPE_VOID, "void", -1}
@@ -29,6 +29,18 @@ struct tagDRCTypeInfo g_dr_ctypeinfos[] = {
     /*same name types*/
     , {CPE_DR_TYPE_SMALLINT, "smallint", 2}
     , {CPE_DR_TYPE_SMALLUINT, "smalluint", 2}
+    , {CPE_DR_TYPE_CHAR, "int8", 2}
+    , {CPE_DR_TYPE_UCHAR, "uint8", 2}
+    , {CPE_DR_TYPE_CHAR, "tinyint", 1}
+    , {CPE_DR_TYPE_UCHAR, "tinyuint", 1}
+    , {CPE_DR_TYPE_LONGLONG, "bigint", 8}
+    , {CPE_DR_TYPE_ULONGLONG, "biguint", 8}
+    , {CPE_DR_TYPE_SHORT, "int16", 2}
+    , {CPE_DR_TYPE_USHORT, "uint16", 2}
+    , {CPE_DR_TYPE_INT, "int32", 4}
+    , {CPE_DR_TYPE_UINT, "uint32", 4}
+    , {CPE_DR_TYPE_LONGLONG, "int64", 4}
+    , {CPE_DR_TYPE_ULONGLONG, "uint64", 4}
 };
 
 static const int g_dr_ctypeinfos_count

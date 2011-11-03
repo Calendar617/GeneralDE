@@ -1,5 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
+#include "cpe/dr/dr_metalib_manage.h"
+#include "../dr_ctype_ops.h"
 #include "dr_metalib_ops.h"
 #include "dr_inbuild_error.h"
 
@@ -229,11 +231,43 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuil
         return NULL;
     }
 
+    //process type
+    if (entry->m_type <= CPE_DR_TYPE_COMPOSITE) {/*is composite type*/
+        LPDRMETA usedType = NULL;
+
+        if (entry->m_ref_type_pos < 0) {
+            DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
+            return NULL;
+        }
+
+        usedType = dr_get_meta_by_name(((LPDRMETALIB)base) - 1, base + entry->m_ref_type_pos);
+
+        if (usedType == NULL) {
+            DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
+            return NULL;
+        }
+
+        entry->m_unitsize = usedType->m_data_size;
+    }
+    else { /* is basic type */
+        const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(entry->m_type);
+        assert(typeInfo);
+
+        if (typeInfo->m_size > 0) {
+            entry->m_unitsize = typeInfo->m_size;
+        }
+        else {
+            //TODO: unknown how to process
+            assert(0);
+        }
+    }
+
     memcpy(newEntry, entry, sizeof(*newEntry));
 
     newEntry->m_self_to_meta_pos = (char*)newEntry - (char*)meta;
 
     meta->m_data_size += newEntry->m_unitsize;
+
     if (newEntry->m_version > meta->m_current_version) {
         meta->m_current_version = newEntry->m_version;
     }

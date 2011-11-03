@@ -16,6 +16,7 @@ CPE_DR_API const char *dr_get_meta_name(LPDRMETA meta);
 CPE_DR_API const char *dr_get_meta_desc(LPDRMETA meta);
 CPE_DR_API int dr_get_meta_id(LPDRMETA meta);
 CPE_DR_API size_t dr_get_meta_size(LPDRMETA meta);
+CPE_DR_API int dr_get_meta_align(LPDRMETA meta);
 CPE_DR_API int dr_get_entry_num(LPDRMETA meta);
 CPE_DR_API int dr_entry_path_to_off(LPDRMETA meta, LPDRMETAENTRY *addrOfEntry, DROFF *a_piHOff, const char *a_pszPath);
 CPE_DR_API char *dr_entry_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iBufSize);

@@ -11,8 +11,7 @@ TEST_F(BuildFromXmlMetaTest, struct_data) {
         "</metalib>"
         );
 
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
-    ASSERT_TRUE(meta) << "get meta fail!";
+    LPDRMETA meta = get_meta("PkgHead");
 
     EXPECT_STREQ("PkgHead", dr_get_meta_name(meta));
     EXPECT_STREQ("PkgHead.desc", dr_get_meta_desc(meta));
@@ -21,6 +20,7 @@ TEST_F(BuildFromXmlMetaTest, struct_data) {
     EXPECT_EQ(1, dr_get_meta_based_version(meta));
     EXPECT_EQ(1, dr_get_meta_current_version(meta));
     EXPECT_EQ(0, dr_get_entry_num(meta));
+    EXPECT_EQ(1, dr_get_meta_align(meta));
 }
 
 TEST_F(BuildFromXmlMetaTest, union_data) {
@@ -31,8 +31,7 @@ TEST_F(BuildFromXmlMetaTest, union_data) {
         "</metalib>"
         );
 
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
-    ASSERT_TRUE(meta) << "get meta fail!";
+    LPDRMETA meta = get_meta("PkgHead");
 
     EXPECT_STREQ("PkgHead", dr_get_meta_name(meta));
     EXPECT_STREQ("PkgHead.desc", dr_get_meta_desc(meta));
@@ -136,4 +135,15 @@ TEST_F(BuildFromXmlMetaTest, duplicate_id) {
 
     ASSERT_TRUE(dr_get_meta_by_id(m_metaLib, 3));
     ASSERT_TRUE(haveError(CPE_DR_ERROR_META_ID_CONFLICT));
+}
+
+TEST_F(BuildFromXmlMetaTest, set_align) {
+    parseMeta(
+        "<?xml version='1.0' standalone='yes' ?>"
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='A1' version='1' id='3' align='3'/>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ(3, dr_get_meta_align(get_meta("A1")));
 }

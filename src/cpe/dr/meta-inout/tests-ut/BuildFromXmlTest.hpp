@@ -18,6 +18,9 @@ public:
 
     int errorCount(void);
     bool haveError(int error);
+
+    LPDRMETA get_meta(const char * name);
+    LPDRMETAENTRY get_entry(const char * metaName, const char * entryName);
 };
 
 #endif

@@ -18,11 +18,7 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
         "</metalib>"
         );
 
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
-    ASSERT_TRUE(meta) << "get meta fail!";
-
-    LPDRMETAENTRY entry = dr_get_entryptr_by_name(meta, "a1");
-    ASSERT_TRUE(entry) << "get entry fail!";
+    LPDRMETAENTRY entry = get_entry("PkgHead", "a1");
 
     EXPECT_STREQ("a1", dr_get_entry_name(entry));
     EXPECT_STREQ("a1.desc", dr_get_entry_desc(entry));
@@ -40,8 +36,7 @@ TEST_F(BuildFromXmlEntryTest, no_name) {
         "</metalib>"
         );
 
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
-    ASSERT_TRUE(meta) << "get meta fail!";
+    LPDRMETA meta = get_meta("PkgHead");
 
     EXPECT_EQ(0, dr_get_entry_num(meta));
     EXPECT_TRUE(haveError(CPE_DR_ERROR_META_NO_NAME));
@@ -56,8 +51,7 @@ TEST_F(BuildFromXmlEntryTest, no_type) {
         "</metalib>"
         );
 
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
-    ASSERT_TRUE(meta) << "get meta fail!";
+    LPDRMETA meta = get_meta("PkgHead");
 
     EXPECT_EQ(0, dr_get_entry_num(meta));
     EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_NO_TYPE));
@@ -72,8 +66,7 @@ TEST_F(BuildFromXmlEntryTest, version_new) {
         "</metalib>"
         );
 
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
-    ASSERT_TRUE(meta) << "get meta fail!";
+    LPDRMETA meta = get_meta("PkgHead");
 
     EXPECT_EQ(1, dr_get_meta_based_version(meta));
     EXPECT_EQ(2, dr_get_meta_current_version(meta));
@@ -88,8 +81,7 @@ TEST_F(BuildFromXmlEntryTest, version_bigger) {
         "</metalib>"
         );
 
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, "PkgHead");
-    ASSERT_TRUE(meta) << "get meta fail!";
+    LPDRMETA meta = get_meta("PkgHead");
 
     EXPECT_EQ(0, dr_get_entry_num(meta));
     EXPECT_TRUE(haveError(CPE_DR_ERROR_INVALID_VERSION));

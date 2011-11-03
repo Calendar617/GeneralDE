@@ -53,3 +53,24 @@ int BuildFromXmlTest::parseMeta(const char * def) {
         this, dr_create_lib_from_xml_error_test_record);
 }
 
+LPDRMETA
+BuildFromXmlTest::get_meta(const char * name) {
+    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, name);
+
+    EXPECT_TRUE(meta != NULL) << "get meta " << name << " fail!";
+
+    return meta;
+}
+
+LPDRMETAENTRY
+BuildFromXmlTest::get_entry(const char * metaName, const char * entryName) {
+    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, metaName);
+    EXPECT_TRUE(meta != NULL)
+        << "get meta " << metaName << " fail!";
+
+    LPDRMETAENTRY entry = dr_get_entry_by_path(meta, entryName);
+    EXPECT_TRUE(entry != NULL)
+        << "get entry " << entryName << " of " << metaName << " fail!";
+
+    return entry;
+}

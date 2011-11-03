@@ -198,6 +198,7 @@ static void dr_build_xml_process_meta(
     }
 
     newMeta->m_data.m_type = metaType;
+    newMeta->m_data.m_align = 1;
 
     for(index = 0, indexAttribute = 0;
         indexAttribute < nb_attributes && !haveError;
@@ -238,6 +239,13 @@ static void dr_build_xml_process_meta(
                 (char const *)valueBegin,
                 len >= INTEGER_BUF_LEN ? INTEGER_BUF_LEN - 1 : len);
             sscanf(buf, "%d", &version);
+        }
+        else if (strcmp((char const *)localname, CPE_DR_TAG_ALIGN) == 0) {
+            strncpy(
+                buf,
+                (char const *)valueBegin,
+                len >= INTEGER_BUF_LEN ? INTEGER_BUF_LEN - 1 : len);
+            sscanf(buf, "%d", &newMeta->m_data.m_align);
         }
         else {
         }
