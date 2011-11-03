@@ -216,11 +216,26 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, void * userData, dr_inbu
     return newMeta;;
 }
 
+void dr_add_meta_entry_calc_align(
+    LPDRMETA meta, LPDRMETAENTRY newEntry, int entryAlign,
+    void * userData, dr_inbuild_log_fun_t errorProcessor)
+{
+    int align = entryAlign < meta->m_align ? entryAlign : meta->m_align;
+    int panding = meta->m_data_size % align;
+    if (panding) {
+        panding = align - panding;
+    }
+
+    newEntry->m_data_start_pos = meta->m_data_size + panding;
+    meta->m_data_size += meta->m_data_size + newEntry->m_unitsize;
+}
+
 LPDRMETAENTRY
 dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuild_log_fun_t errorProcessor) {
     char * base = (char*)(meta) - meta->m_self_pos;
     LPDRMETAENTRY newEntry =  (LPDRMETAENTRY)(meta + 1);
     int i;
+    int entryAlign = 0;
 
     //search the slot for newEntry
     for(i = 0; i < meta->m_entry_count && newEntry->m_name_pos != 0; ++i, ++newEntry) {
@@ -248,6 +263,7 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuil
         }
 
         entry->m_unitsize = usedType->m_data_size;
+        entryAlign = usedType->m_align;
     }
     else { /* is basic type */
         const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(entry->m_type);
@@ -255,6 +271,7 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuil
 
         if (typeInfo->m_size > 0) {
             entry->m_unitsize = typeInfo->m_size;
+            entryAlign = typeInfo->m_size;
         }
         else {
             //TODO: unknown how to process
@@ -266,7 +283,7 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuil
 
     newEntry->m_self_to_meta_pos = (char*)newEntry - (char*)meta;
 
-    meta->m_data_size += newEntry->m_unitsize;
+    dr_add_meta_entry_calc_align(meta, newEntry, entryAlign, userData, errorProcessor);
 
     if (newEntry->m_version > meta->m_current_version) {
         meta->m_current_version = newEntry->m_version;
