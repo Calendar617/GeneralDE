@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <stdio.h>
+#include <strings.h>
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_ctype_ops.h"
 #include "dr_metalib_ops.h"

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <strings.h>
 #include "cpe/dr/dr_error.h"
 #include "dr_inbuild.h"
 #include "dr_metalib_ops.h"

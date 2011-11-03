@@ -4,9 +4,9 @@
 
 struct MicroData {
     int index;
-    char * name;
+    const char * name;
     int value;
-    char * desc;
+    const char * desc;
 };
 
 class MetaLibManagerMicroTest : public ::testing::TestWithParam<MicroData>, public WithInputMetaLibTest {

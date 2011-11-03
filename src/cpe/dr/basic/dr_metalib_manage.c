@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_ctypes_info.h"
 #include "cpe/dr/dr_error.h"

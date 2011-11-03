@@ -1,3 +1,4 @@
+#include <string.h>
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
 #include "cpe/dr/dr_metalib_build.h"

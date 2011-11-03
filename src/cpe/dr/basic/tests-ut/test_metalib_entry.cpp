@@ -7,9 +7,9 @@
 struct EntryData {
     int idx;
     int id;
-    char * name;
-    char * desc;
-    char * cname;
+    const char * name;
+    const char * desc;
+    const char * cname;
     int type;
     int size;
     int count;

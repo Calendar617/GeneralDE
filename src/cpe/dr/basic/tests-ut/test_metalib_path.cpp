@@ -6,7 +6,7 @@
 struct Pos2PathCase {
     int size;
     int pos;
-    char * path;
+    const char * path;
 };
 
 class MetaLibManagerPathTest : public ::testing::TestWithParam<Pos2PathCase>, public WithInputMetaLibTest {

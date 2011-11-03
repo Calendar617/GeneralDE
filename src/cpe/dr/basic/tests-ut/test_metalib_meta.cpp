@@ -4,8 +4,8 @@
 #include "with_InputMetaLibTest.hpp"
 
 struct MetaData {
-    char * name;
-    char * desc;
+    const char * name;
+    const char * desc;
     int type;
     int size;
     int entry_num;
