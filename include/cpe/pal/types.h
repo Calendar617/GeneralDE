@@ -607,28 +607,5 @@ typedef UINT_PTR WPARAM;
 
 #endif /* WIN32 */
 
-
-
-
-#ifndef tmax
-#define tmax(x,y) (((x) > (y))? (x):(y))
-#endif
-
-#ifndef tmin
-#define tmin(x,y) (((x) > (y))? (y):(x))
-#endif
-
-
-
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus */
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
 #endif /* TTYPES_H */
 
