@@ -17,13 +17,6 @@ void mem_buffer_free(struct mem_buffer * buffer) {
     assert(buffer->m_size == 0);
 }
 
-void mem_buffer_swap(struct mem_buffer * l, struct mem_buffer * r) {
-    struct mem_buffer tmp;
-    memcpy(&tmp, l, sizeof(struct mem_buffer));
-    memcpy(l, r, sizeof(struct mem_buffer));
-    memcpy(r, &tmp, sizeof(struct mem_buffer));
-}
-
 size_t mem_buffer_size(struct mem_buffer * buffer) {
     return buffer->m_size;
 }
@@ -33,7 +26,7 @@ mem_buffer_append_trunk(struct mem_buffer * buffer, size_t capacity) {
     struct mem_buffer_trunk * trunk = mem_trunk_alloc(buffer->m_default_allocrator, capacity);
 
     if (trunk) {
-        TAILQ_INSERT_HEAD(&buffer->m_trunks, trunk, m_next);
+        TAILQ_INSERT_TAIL(&buffer->m_trunks, trunk, m_next);
     }
 
     return trunk;
@@ -59,8 +52,16 @@ size_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer) {
 
     struct mem_buffer_trunk * trunk = TAILQ_FIRST(&buffer->m_trunks);
 
-    while(readedSize < buffer->m_size && readedSize < size && trunk) {
-        //size_t readSize = 
+    while(readedSize < size && trunk != TAILQ_END(&trunk->m_trunks)) {
+        size_t readSize = size - readedSize;
+        if (readSize > trunk->m_size) {
+            readSize = trunk->m_size;
+        }
+
+        memcpy(buf + readedSize, mem_trunk_data(trunk), readSize);
+        readedSize += readSize;
+
+        trunk = TAILQ_NEXT(trunk, m_next);
     }
 
     return readedSize;
@@ -74,8 +75,8 @@ int mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size)
 
     trunk = TAILQ_LAST(&buffer->m_trunks, mem_buffer_trunk_list);
 
-    if (trunk != TAILQ_END(&buffer->m_trunks) && writedSize < size) {
-        writedSize += mem_trunk_append(buffer, trunk, buf + writedSize, size - writedSize);
+    if (trunk != TAILQ_END(&buffer->m_trunks)) {
+        writedSize += mem_trunk_append(buffer, trunk, buf, size);
     }
 
     newTrunkSize = size - writedSize;
@@ -95,7 +96,6 @@ int mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size)
 
 void * mem_buffer_make_continuous(struct mem_buffer * buffer) {
     struct mem_buffer_trunk * trunk = TAILQ_FIRST(&buffer->m_trunks);
-    struct mem_buffer tmpBuffer;
 
     if (trunk == TAILQ_END(&buffer->m_trunks)) {
         return NULL;
@@ -105,17 +105,18 @@ void * mem_buffer_make_continuous(struct mem_buffer * buffer) {
         return mem_trunk_data(trunk);
     }
 
-    mem_buffer_init(&tmpBuffer, buffer->m_default_allocrator);
-    trunk = mem_buffer_append_trunk(buffer, buffer->m_size);
-    if (trunk == 0) {
-        mem_buffer_free(&tmpBuffer);
+    trunk = mem_trunk_alloc(buffer->m_default_allocrator, buffer->m_size);
+    if (trunk == NULL) {
         return NULL;
     }
 
     mem_buffer_read(mem_trunk_data(trunk), buffer->m_size, buffer);
-    mem_trunk_set_size(&tmpBuffer, trunk, buffer->m_size);
 
-    mem_buffer_swap(&tmpBuffer, buffer);
-    mem_buffer_free(&tmpBuffer);
+    mem_buffer_free(buffer);
+
+    TAILQ_INSERT_HEAD(&buffer->m_trunks, trunk, m_next);
+
+    buffer->m_size = trunk->m_size;
+
     return mem_trunk_data(trunk);
 }

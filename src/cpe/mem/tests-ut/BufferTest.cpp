@@ -9,13 +9,18 @@ void BufferTest::TearDown() {
 }
 
 int BufferTest::append_string(const char * data) {
-    return mem_buffer_append(&m_buffer, data, strlen(data) + 1);
+    return mem_buffer_append(&m_buffer, data, strlen(data));
+}
+
+int BufferTest::append_zero() {
+    char buf = 0;
+    return mem_buffer_append(&m_buffer, &buf, 1);
 }
 
 struct mem_buffer_trunk *
 BufferTest::append_trunk(const char * data) {
     if (data) {
-        size_t capacity = strlen(data) + 1;
+        size_t capacity = strlen(data);
         struct mem_buffer_trunk * trunk =
             mem_buffer_append_trunk(&m_buffer, capacity);
         mem_trunk_append(&m_buffer, trunk, data, capacity);

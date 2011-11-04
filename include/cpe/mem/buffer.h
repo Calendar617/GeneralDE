@@ -51,7 +51,6 @@ void mem_buffer_at(struct mem_buffer_pos * pos, struct mem_buffer * buffer, size
 int mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size);
 size_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer);
 void * mem_buffer_make_continuous(struct mem_buffer * buffer);
-void mem_buffer_swap(struct mem_buffer * l, struct mem_buffer * r);
 
 #ifdef __cplusplus
 }

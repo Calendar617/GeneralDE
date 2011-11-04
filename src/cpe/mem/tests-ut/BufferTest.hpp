@@ -11,6 +11,7 @@ public:
     struct mem_buffer m_buffer;
 
     int append_string(const char * data);
+    int append_zero();
 
     struct mem_buffer_trunk *
     append_trunk(const char * data);
