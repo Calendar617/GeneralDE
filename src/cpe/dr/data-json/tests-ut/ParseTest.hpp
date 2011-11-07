@@ -1,5 +1,6 @@
 #ifndef CPE_DR_DATAJSON_TEST_PARSETEST_H
 #define CPE_DR_DATAJSON_TEST_PARSETEST_H
+#include <string.h>
 #include "gtest/gtest.h"
 #include "cpe/dr/dr_json.h"
 
@@ -13,7 +14,16 @@ public:
     struct mem_buffer m_buffer;
 
     void installMeta(const char * data);
-    int read(char * data, int version);
+    int read(const char * data, const char * typeName, int version);
+    void * result(void);
 };
+
+#define ASSERT_JSON_READ_RESULT(__expect)  do {                 \
+    ASSERT_TRUE(result()) << "no data output!";                 \
+    ASSERT_EQ(sizeof(__expect), mem_buffer_size(&m_buffer))     \
+        << "output size error!" ;                               \
+    ASSERT_EQ(0, memcmp(&__expect, result(), sizeof(__expect))) \
+        << "data error!";                                       \
+    } while(0)
 
 #endif

@@ -1,6 +1,7 @@
+#include "ParseTest.hpp"
+#include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_metalib_init.h"
 #include "cpe/dr/dr_metalib_xml.h"
-#include "ParseTest.hpp"
 
 ParseTest::ParseTest() : m_metaLib(0) {
 }
@@ -25,6 +26,12 @@ void ParseTest::installMeta(const char * def) {
         << "install meta error";
 }
 
-int ParseTest::read(char * data, int version) {
-    return dr_json_read(&m_buffer, data, m_metaLib, version);
+int ParseTest::read(const char * data, const char * typeName, int version) {
+    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, typeName);
+    EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
+    return dr_json_read(&m_buffer, data, meta, version);
+}
+
+void * ParseTest::result(void) {
+    return mem_buffer_make_continuous(&m_buffer);
 }

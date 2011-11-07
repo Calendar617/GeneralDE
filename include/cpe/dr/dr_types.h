@@ -165,16 +165,6 @@ struct tagDRLibParam
 };
 
 /**
-* struct of DR DRData
-*/
-struct tagDRData
-{
-	char* pszBuff;          /**< 保存DR数据的缓冲区指针*/
-	size_t iBuff;		/**< 保存DR数据的缓冲区大小 */
-};
-
-
-/**
 sizeinfo/sizetype属性
 */
 struct tagDRSizeInfo

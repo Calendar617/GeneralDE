@@ -29,6 +29,7 @@
  */
 #define CPE_DR_MAGIC		0x02D6      /**< 元数据二进制文件中的"魔数"*/
 
+#define CPE_DR_MAX_LEVEL    32          /*组合类型最大嵌套深度*/
 
 #define	CPE_DR_MAX_VERSION		0x7fffffff		/**< 元数据库最大版本号*/
 
