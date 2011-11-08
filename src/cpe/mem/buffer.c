@@ -120,3 +120,24 @@ void * mem_buffer_make_continuous(struct mem_buffer * buffer) {
 
     return mem_trunk_data(trunk);
 }
+
+void * mem_buffer_alloc(struct mem_buffer * buffer, size_t size) {
+    void * result = NULL;
+    struct mem_buffer_trunk * trunk = NULL;
+
+    trunk = TAILQ_LAST(&buffer->m_trunks, mem_buffer_trunk_list);
+    if (trunk == NULL || trunk->m_size + size > trunk->m_capacity) {
+        trunk = mem_buffer_append_trunk(buffer, size);
+    }
+
+    if (trunk == NULL) {
+        return NULL;
+    }
+
+    result = mem_trunk_data(trunk) + trunk->m_size;
+
+    trunk->m_size += size;
+    buffer->m_size += size;
+
+    return result;
+}

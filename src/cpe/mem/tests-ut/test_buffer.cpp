@@ -66,3 +66,18 @@ TEST_F(BufferTest, make_continuous_multi_trunk) {
 
     EXPECT_STREQ("abc", buf);
 }
+
+TEST_F(BufferTest, alloc_empty) {
+    void * p = mem_buffer_alloc(&m_buffer, 12);
+    EXPECT_TRUE(p);
+    EXPECT_EQ(12, mem_buffer_size(&m_buffer));
+
+    strncpy((char*)p, "abc", 12);
+    EXPECT_STREQ("abc", as_string());
+}
+
+TEST_F(BufferTest, alloc_empty_null) {
+    m_buffer.m_default_allocrator = mem_allocrator_null();
+    EXPECT_FALSE(mem_buffer_alloc(&m_buffer, 12));
+    EXPECT_EQ(0, mem_buffer_size(&m_buffer));
+}
