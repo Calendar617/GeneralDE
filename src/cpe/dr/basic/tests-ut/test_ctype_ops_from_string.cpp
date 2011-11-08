@@ -27,6 +27,9 @@ public:
     int16_t as_int16(void) { return *((int16_t*)m_buf); }
     uint16_t as_uint16(void) { return *((uint16_t*)m_buf); }
 
+    int32_t as_int32(void) { return *((int32_t*)m_buf); }
+    uint32_t as_uint32(void) { return *((uint32_t*)m_buf); }
+
     char m_buf[128];
 };
 
@@ -142,4 +145,50 @@ TEST_F(CtypeOpsFromStringTest, uint16_down_overflow) {
 
 TEST_F(CtypeOpsFromStringTest, uint16_end_with_char) {
     EXPECT_EQ(-1, parse("uint16", "15a"));
+}
+
+TEST_F(CtypeOpsFromStringTest, int32_min) {
+    EXPECT_EQ(0, parse("int32", "-2147483648"));
+    EXPECT_EQ(-2147483648, as_int32());
+}
+
+TEST_F(CtypeOpsFromStringTest, int32_max) {
+    EXPECT_EQ(0, parse("int32", "2147483647"));
+    EXPECT_EQ(2147483647, as_int32());
+}
+
+TEST_F(CtypeOpsFromStringTest, int32_up_overflow) {
+    EXPECT_EQ(0, parse("int32", "2147483648"));
+    EXPECT_EQ(-2147483648, as_int32());
+}
+
+TEST_F(CtypeOpsFromStringTest, int32_down_overflow) {
+    EXPECT_EQ(0, parse("int32", "-2147483649"));
+    EXPECT_EQ(0, parse("int32", "-2147483649"));
+}
+
+TEST_F(CtypeOpsFromStringTest, int32_end_with_char) {
+    EXPECT_EQ(-1, parse("int32", "15a"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uint32_min) {
+    EXPECT_EQ(0, parse("uint32", "0"));
+    EXPECT_EQ(0, as_uint32());
+}
+
+TEST_F(CtypeOpsFromStringTest, uint32_max) {
+    EXPECT_EQ(0, parse("uint32", "4294967295"));
+    EXPECT_EQ(0xFFFFFFFF, as_uint32());
+}
+
+TEST_F(CtypeOpsFromStringTest, uint32_up_overflow) {
+    EXPECT_EQ(-1, parse("uint32", "65536"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uint32_down_overflow) {
+    EXPECT_EQ(-1, parse("uint32", "-1"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uint32_end_with_char) {
+    EXPECT_EQ(-1, parse("uint32", "15a"));
 }
