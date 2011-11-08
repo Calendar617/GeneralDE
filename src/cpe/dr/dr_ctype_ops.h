@@ -6,6 +6,15 @@
 extern "C" {
 #endif
 
+struct tagDRCTypeInfo {
+    int m_id;
+    char m_name[32];
+    size_t m_size;
+
+    /*type operations*/
+    int (* read_from_string)(void * output, const char * input);
+};
+
 /*n: >= 0    name-length
      < 0     use strlen(name)
 */

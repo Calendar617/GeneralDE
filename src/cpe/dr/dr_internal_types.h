@@ -90,12 +90,6 @@ struct tagDRMacrosGroup {
     int8_t a;
 };
 
-struct tagDRCTypeInfo {
-    int m_id;
-    char m_name[32];
-    size_t m_size;
-};
-
 struct tagDRMetaIdxById {
     int32_t m_id;
     int32_t m_diff_to_base;
