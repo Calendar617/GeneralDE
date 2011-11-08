@@ -2,10 +2,25 @@
 #include <string.h>
 #include "yajl/yajl_parse.h"
 #include "cpe/dr/dr_json.h"
+#include "cpe/dr/dr_metalib_manage.h"
+#include "../dr_internal_types.h"
+#include "../dr_ctype_ops.h"
+
+#define JSON_PARSE_CTX_BUF_LEN CPE_DR_MACRO_LEN + 1
+
+#define JSON_PARSE_CTX_COPY_STR_TMP(__ctx, str, len) do {   \
+        size_t __len = len;                                 \
+        if (__len >= JSON_PARSE_CTX_BUF_LEN) {              \
+            __len = JSON_PARSE_CTX_BUF_LEN - 1;             \
+        }                                                   \
+        memcpy(__ctx->m_buf, str, __len);                   \
+        __ctx->m_buf[__len] = 0;                            \
+    } while(0)
 
 struct dr_json_parse_type_info {
     LPDRMETA m_meta;
-    void * m_data_base;
+    void * m_data;
+    LPDRMETAENTRY m_entry;
 };
 
 struct dr_json_parse_ctx {
@@ -13,10 +28,9 @@ struct dr_json_parse_ctx {
     int m_version;
 
     struct dr_json_parse_type_info m_typeStacks[CPE_DR_MAX_LEVEL];
-    int m_type_pos;
+    int m_typePos;
 
-    void * m_currentData;
-    LPDRMETAENTRY m_currentEntry;
+    char m_buf[JSON_PARSE_CTX_BUF_LEN]; //used to store tmp data
 };
 
 static int dr_json_null(void * ctx) {
@@ -31,7 +45,27 @@ static int dr_json_boolean(void * ctx, int boolean) {
 
 static int dr_json_number(void * ctx, const char * s, size_t l) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    return 1;
+    struct dr_json_parse_type_info * parseType = &c->m_typeStacks[c->m_typePos];
+
+    if (parseType->m_entry == NULL || parseType->m_data == NULL) {
+        return 0;
+    }
+
+    const struct tagDRCTypeInfo * cTypeInfo =
+        dr_find_ctype_info_by_type(parseType->m_entry->m_type);
+    if (cTypeInfo == NULL) {
+        return 0;
+    }
+
+    if (cTypeInfo->read_from_string) {
+        JSON_PARSE_CTX_COPY_STR_TMP(c, s, l);
+        return 0 == cTypeInfo->read_from_string(
+            parseType->m_data + parseType->m_entry->m_data_start_pos,
+            c->m_buf);
+    }
+    else {
+        return 0;
+    }
 }
 
 static int dr_json_string(void * ctx, const unsigned char * stringVal, size_t stringLen) {
@@ -41,19 +75,31 @@ static int dr_json_string(void * ctx, const unsigned char * stringVal, size_t st
 
 static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t stringLen) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    printf("mape-key\n");
+    struct dr_json_parse_type_info * typeInfo = &c->m_typeStacks[c->m_typePos];
+    int r;
+    int entryIdx;
+
+    JSON_PARSE_CTX_COPY_STR_TMP(c, stringVal, stringLen);
+
+    r = dr_get_entry_by_name(&entryIdx, typeInfo->m_meta, c->m_buf);
+    if (r < 0) {
+        return 0;
+    }
+
+    typeInfo->m_entry = dr_get_entry_by_index(typeInfo->m_meta, entryIdx);
+    if (typeInfo->m_entry == NULL) {
+        return 0;
+    }
+
     return 1;
 }
 
 static int dr_json_start_map(void * ctx) {
-    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    printf("start: \n");
     return 1;
 }
 
 static int dr_json_end_map(void * ctx) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    printf("end: \n");
     return 1;
 }
 
@@ -91,11 +137,9 @@ static void dr_json_parse_ctx_init(
     ctx->m_version = version;
 
     ctx->m_typeStacks[0].m_meta = meta;
-    ctx->m_typeStacks[0].m_data_base = 0; /*TODO: */
-    ctx->m_type_pos = 0;
-
-    ctx->m_currentData = NULL;
-    ctx->m_currentEntry = NULL;
+    ctx->m_typeStacks[0].m_data = mem_buffer_alloc(buffer, dr_get_meta_size(meta));
+    ctx->m_typeStacks[0].m_entry = NULL;
+    ctx->m_typePos = 0;
 }
 
 int dr_json_read(

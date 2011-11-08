@@ -5,7 +5,7 @@ TEST_F(ParseTest, metalib_basic) {
         "<?xml version='1.0' standalone='yes' ?>"
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='S' version='1'>"
-        "	     <entry name='a1' type='smallint'/>"
+        "	     <entry name='a1' type='int16'/>"
         "    </struct>"
         "</metalib>"
         );

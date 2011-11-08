@@ -1,0 +1,145 @@
+#include "gtest/gtest.h"
+#include "../../dr_ctype_ops.h"
+
+class CtypeOpsFromStringTest : public ::testing::Test {
+public:
+    int parse(const char * name, const char * data) {
+        const struct tagDRCTypeInfo * typeInfo =
+            dr_find_ctype_info_by_name(name, -1);
+
+        EXPECT_TRUE(typeInfo);
+        if (typeInfo == NULL) {
+            return -1;
+        }
+
+        EXPECT_TRUE(typeInfo->read_from_string);
+        if (typeInfo->read_from_string) {
+            return typeInfo->read_from_string(m_buf, data);
+        }
+        else {
+            return -1;
+        }
+    }
+
+    int8_t as_int8(void) { return *((int8_t*)m_buf); }
+    uint8_t as_uint8(void) { return *((uint8_t*)m_buf); }
+
+    int16_t as_int16(void) { return *((int16_t*)m_buf); }
+    uint16_t as_uint16(void) { return *((uint16_t*)m_buf); }
+
+    char m_buf[128];
+};
+
+TEST_F(CtypeOpsFromStringTest, char_basic) {
+    EXPECT_EQ(0, parse("char", "a"));
+    EXPECT_EQ('a', m_buf[0]);
+}
+
+TEST_F(CtypeOpsFromStringTest, char_too_many) {
+    EXPECT_EQ(-1, parse("char", "ab"));
+}
+
+TEST_F(CtypeOpsFromStringTest, char_empty) {
+    EXPECT_EQ(-1, parse("char", ""));
+}
+
+TEST_F(CtypeOpsFromStringTest, uchar_basic) {
+    EXPECT_EQ(0, parse("uchar", "a"));
+    EXPECT_EQ('a', m_buf[0]);
+}
+
+TEST_F(CtypeOpsFromStringTest, uchar_too_many) {
+    EXPECT_EQ(-1, parse("uchar", "ab"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uchar_empty) {
+    EXPECT_EQ(-1, parse("uchar", ""));
+}
+
+TEST_F(CtypeOpsFromStringTest, int8_min) {
+    EXPECT_EQ(0, parse("int8", "-128"));
+    EXPECT_EQ(-128, as_int8());
+}
+
+TEST_F(CtypeOpsFromStringTest, int8_max) {
+    EXPECT_EQ(0, parse("int8", "127"));
+    EXPECT_EQ(127, as_int8());
+}
+
+TEST_F(CtypeOpsFromStringTest, int8_up_overflow) {
+    EXPECT_EQ(-1, parse("int8", "128"));
+}
+
+TEST_F(CtypeOpsFromStringTest, int8_down_overflow) {
+    EXPECT_EQ(-1, parse("int8", "-129"));
+}
+
+TEST_F(CtypeOpsFromStringTest, int8_end_with_char) {
+    EXPECT_EQ(-1, parse("int8", "15a"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uint8_min) {
+    EXPECT_EQ(0, parse("uint8", "0"));
+    EXPECT_EQ(0, as_uint8());
+}
+
+TEST_F(CtypeOpsFromStringTest, uint8_max) {
+    EXPECT_EQ(0, parse("uint8", "255"));
+    EXPECT_EQ(255, as_uint8());
+}
+
+TEST_F(CtypeOpsFromStringTest, uint8_up_overflow) {
+    EXPECT_EQ(-1, parse("uint8", "256"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uint8_down_overflow) {
+    EXPECT_EQ(-1, parse("uint8", "-1"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uint8_end_with_char) {
+    EXPECT_EQ(-1, parse("uint8", "15a"));
+}
+
+TEST_F(CtypeOpsFromStringTest, int16_min) {
+    EXPECT_EQ(0, parse("int16", "-32768"));
+    EXPECT_EQ(-32768, as_int16());
+}
+
+TEST_F(CtypeOpsFromStringTest, int16_max) {
+    EXPECT_EQ(0, parse("int16", "32767"));
+    EXPECT_EQ(32767, as_int16());
+}
+
+TEST_F(CtypeOpsFromStringTest, int16_up_overflow) {
+    EXPECT_EQ(-1, parse("int16", "32768"));
+}
+
+TEST_F(CtypeOpsFromStringTest, int16_down_overflow) {
+    EXPECT_EQ(-1, parse("int16", "-32769"));
+}
+
+TEST_F(CtypeOpsFromStringTest, int16_end_with_char) {
+    EXPECT_EQ(-1, parse("int16", "15a"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uint16_min) {
+    EXPECT_EQ(0, parse("uint16", "0"));
+    EXPECT_EQ(0, as_uint16());
+}
+
+TEST_F(CtypeOpsFromStringTest, uint16_max) {
+    EXPECT_EQ(0, parse("uint16", "65535"));
+    EXPECT_EQ(65535, as_uint16());
+}
+
+TEST_F(CtypeOpsFromStringTest, uint16_up_overflow) {
+    EXPECT_EQ(-1, parse("uint16", "65536"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uint16_down_overflow) {
+    EXPECT_EQ(-1, parse("uint16", "-1"));
+}
+
+TEST_F(CtypeOpsFromStringTest, uint16_end_with_char) {
+    EXPECT_EQ(-1, parse("uint16", "15a"));
+}

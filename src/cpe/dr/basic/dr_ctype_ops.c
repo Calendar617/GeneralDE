@@ -2,7 +2,7 @@
 #include "../dr_ctype_ops.h"
 
 static int dr_type_read_char_from_string(void * output, const char * input) {
-    if (input[1] != 0) {
+    if (input[1] != 0 || input[0] == 0) {
         return -1;
     }
     else {
@@ -12,56 +12,60 @@ static int dr_type_read_char_from_string(void * output, const char * input) {
 }
 
 static int dr_type_read_int8_from_string(void * output, const char * input) {
-    int buf;
-    int readlen;
+    long buf;
+    char * endptr;
 
-    readlen = sscanf(input, "%d", &buf);
-    if (input[readlen] != 0 || buf < SCHAR_MIN || buf > SCHAR_MAX) {
+    buf = strtol(input, &endptr, 10);
+    if (*endptr != 0 || buf < SCHAR_MIN || buf > SCHAR_MAX) {
         return -1;
     }
     else {
-        *((char*)output) = buf;
+        *((int8_t*)output) = buf;
+        return 0;
     }
 }
 
 static int dr_type_read_uint8_from_string(void * output, const char * input) {
-    unsigned int buf;
-    int readlen;
+    long buf;
+    char * endptr;
 
-    readlen = sscanf(input, "%ud", &buf);
-    if (input[readlen] != 0 || buf > UCHAR_MAX) {
+    buf = strtol(input, &endptr, 10);
+    if (*endptr != 0 || buf < 0 || buf > UCHAR_MAX) {
         return -1;
     }
     else {
-        *((char*)output) = buf;
+        *((uint8_t*)output) = buf;
+        return 0;
     }
 }
 
 static int dr_type_read_int16_from_string(void * output, const char * input) {
-    int buf;
-    int readlen;
+    long buf;
+    char * endptr;
 
-    readlen = sscanf(input, "%d", &buf);
-    if (input[readlen] != 0 || buf < SHRT_MIN || buf > SHRT_MAX) {
+    buf = strtol(input, &endptr, 10);
+    if (*endptr != 0 || buf < SHRT_MIN || buf > SHRT_MAX) {
         return -1;
     }
     else {
         int16_t d = buf;
         memcpy(output, &d, sizeof(d));
+        return 0;
     }
 }
 
 static int dr_type_read_uint16_from_string(void * output, const char * input) {
-    unsigned int buf;
-    int readlen;
+    long buf;
+    char * endptr;
 
-    readlen = sscanf(input, "%d", &buf);
-    if (input[readlen] != 0 || buf < SHRT_MIN || buf > SHRT_MAX) {
+    buf = strtol(input, &endptr, 10);
+    if (*endptr != 0 || buf < 0 || buf > USHRT_MAX) {
         return -1;
     }
     else {
-        int16_t d = buf;
+        uint16_t d = buf;
         memcpy(output, &d, sizeof(d));
+        return 0;
     }
 }
 
@@ -75,6 +79,7 @@ static int dr_type_read_int32_from_string(void * output, const char * input) {
     }
     else {
         memcpy(output, &buf, sizeof(buf));
+        return 0;
     }
 }
 
@@ -88,6 +93,7 @@ static int dr_type_read_uint32_from_string(void * output, const char * input) {
     }
     else {
         memcpy(output, &buf, sizeof(buf));
+        return 0;
     }
 }
 
@@ -101,6 +107,7 @@ static int dr_type_read_int64_from_string(void * output, const char * input) {
     }
     else {
         memcpy(output, &buf, sizeof(buf));
+        return 0;
     }
 }
 
@@ -114,6 +121,7 @@ static int dr_type_read_uint64_from_string(void * output, const char * input) {
     }
     else {
         memcpy(output, &buf, sizeof(buf));
+        return 0;
     }
 }
 
@@ -157,8 +165,8 @@ struct tagDRCTypeInfo g_dr_ctypeinfos[] = {
     , {CPE_DR_TYPE_VOID, "void", -1, NULL}
 
     /*same name types*/
-    , {CPE_DR_TYPE_SMALLINT, "smallint", 1, dr_type_read_int8_from_string}
-    , {CPE_DR_TYPE_SMALLUINT, "smalluint", 1, dr_type_read_uint8_from_string}
+    , {CPE_DR_TYPE_SMALLINT, "smallint", 2, dr_type_read_int16_from_string}
+    , {CPE_DR_TYPE_SMALLUINT, "smalluint", 2, dr_type_read_uint16_from_string}
     , {CPE_DR_TYPE_CHAR, "int8", 1, dr_type_read_int8_from_string}
     , {CPE_DR_TYPE_UCHAR, "uint8", 1, dr_type_read_uint8_from_string}
     , {CPE_DR_TYPE_CHAR, "tinyint", 1, dr_type_read_int8_from_string}
