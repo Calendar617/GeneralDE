@@ -310,6 +310,17 @@ LPDRMETA dr_get_entry_type_meta(LPDRMETALIB a_pstLib, LPDRMETAENTRY a_pstEntry) 
     return (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
 }
 
+LPDRMETA dr_get_entry_ref_type(LPDRMETAENTRY a_pstEntry) {
+    if (a_pstEntry->m_type > CPE_DR_TYPE_COMPOSITE) {
+        return NULL;
+    }
+    else {
+        LPDRMETA pstMeta = (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
+        char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
+        return (LPDRMETA)(base + a_pstEntry->m_ref_type_pos);
+    }
+}
+
 LPDRMETAENTRY dr_get_entry_by_path(LPDRMETA meta, const char* a_pszEntryPath) {
     char * base;
     LPDRMETALIB pstLib;
@@ -353,6 +364,7 @@ LPDRMETAENTRY dr_get_entry_by_path(LPDRMETA meta, const char* a_pszEntryPath) {
 
 const char *dr_get_entry_customattr(LPDRMETALIB a_pstLib, LPDRMETAENTRY a_pstEntry) {
     //TODO
+    return NULL;
 }
 
 int dr_get_macro_value(OUT int *a_piID, LPDRMETALIB a_pstLib, const  char *a_pszName) {

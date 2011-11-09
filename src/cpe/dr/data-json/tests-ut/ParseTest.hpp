@@ -14,7 +14,7 @@ public:
     struct mem_buffer m_buffer;
 
     void installMeta(const char * data);
-    int read(const char * data, const char * typeName, int version);
+    int read(const char * data, const char * typeName);
     void * result(void);
 };
 

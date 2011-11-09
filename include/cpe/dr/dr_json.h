@@ -10,7 +10,7 @@ extern "C" {
 int dr_json_read(
     struct mem_buffer * result, 
     const char * input,
-    LPDRMETA meta, int version);
+    LPDRMETA meta);
 
 #ifdef __cplusplus
 }

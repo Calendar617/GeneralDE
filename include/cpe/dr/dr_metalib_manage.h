@@ -28,6 +28,7 @@ CPE_DR_API int dr_get_entry_version(LPDRMETAENTRY entry);
 CPE_DR_API const char *dr_get_entry_name(LPDRMETAENTRY entry);
 CPE_DR_API const char *dr_get_entry_cname(LPDRMETAENTRY entry);
 CPE_DR_API const char *dr_get_entry_desc(LPDRMETAENTRY entry);
+CPE_DR_API LPDRMETA dr_get_entry_ref_type(LPDRMETAENTRY a_pstEntry);
 CPE_DR_API LPDRMACROSGROUP dr_get_entry_macrosgroup(LPDRMETAENTRY entry);
 CPE_DR_API LPDRMETAENTRY dr_get_entryptr_by_name(LPDRMETA meta, const char* name);
 CPE_DR_API int dr_get_entry_by_name(int* a_piIdx, LPDRMETA meta, const char* name);

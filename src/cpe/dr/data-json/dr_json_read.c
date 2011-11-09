@@ -25,7 +25,6 @@ struct dr_json_parse_type_info {
 
 struct dr_json_parse_ctx {
     struct mem_buffer * m_output;
-    int m_version;
 
     struct dr_json_parse_type_info m_typeStacks[CPE_DR_MAX_LEVEL];
     int m_typePos;
@@ -34,7 +33,6 @@ struct dr_json_parse_ctx {
 };
 
 static int dr_json_null(void * ctx) {
-    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
     return 1;
 }
 
@@ -76,6 +74,7 @@ static int dr_json_string(void * ctx, const unsigned char * stringVal, size_t st
 static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t stringLen) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
     struct dr_json_parse_type_info * typeInfo = &c->m_typeStacks[c->m_typePos];
+    LPDRMETA refType = NULL;
     int r;
     int entryIdx;
 
@@ -89,6 +88,20 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
     typeInfo->m_entry = dr_get_entry_by_index(typeInfo->m_meta, entryIdx);
     if (typeInfo->m_entry == NULL) {
         return 0;
+    }
+
+    if (refType = dr_get_entry_ref_type(typeInfo->m_entry)) { /*composite*/
+        struct dr_json_parse_type_info * nestTypeInfo = NULL;
+
+        if ((c->m_typePos + 1) >= CPE_DR_MAX_LEVEL) { /*nest type overflow */
+            return 0;
+        }
+
+        ++c->m_typePos;
+        nestTypeInfo = &c->m_typeStacks[c->m_typePos];
+        nestTypeInfo->m_meta = refType;
+        nestTypeInfo->m_data = typeInfo->m_data + typeInfo->m_entry->m_data_start_pos;
+        nestTypeInfo->m_entry = NULL;
     }
 
     return 1;
@@ -130,11 +143,9 @@ static yajl_callbacks g_dr_json_callbacks = {
 static void dr_json_parse_ctx_init(
     struct dr_json_parse_ctx * ctx,
     struct mem_buffer * buffer, 
-    LPDRMETA meta,
-    int version)
+    LPDRMETA meta)
 {
     ctx->m_output = buffer;
-    ctx->m_version = version;
 
     ctx->m_typeStacks[0].m_meta = meta;
     ctx->m_typeStacks[0].m_data = mem_buffer_alloc(buffer, dr_get_meta_size(meta));
@@ -145,13 +156,13 @@ static void dr_json_parse_ctx_init(
 int dr_json_read(
     struct mem_buffer * result, 
     const char * input,
-    LPDRMETA meta, int version)
+    LPDRMETA meta)
 {
     struct dr_json_parse_ctx ctx;
     yajl_handle hand;
     yajl_status stat;
 
-    dr_json_parse_ctx_init(&ctx, result, meta, version);
+    dr_json_parse_ctx_init(&ctx, result, meta);
 
     hand = yajl_alloc(&g_dr_json_callbacks, NULL, (void *)&ctx);
     if (hand == NULL) {

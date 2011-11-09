@@ -26,10 +26,10 @@ void ParseTest::installMeta(const char * def) {
         << "install meta error";
 }
 
-int ParseTest::read(const char * data, const char * typeName, int version) {
+int ParseTest::read(const char * data, const char * typeName) {
     LPDRMETA meta = dr_get_meta_by_name(m_metaLib, typeName);
     EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
-    return dr_json_read(&m_buffer, data, meta, version);
+    return dr_json_read(&m_buffer, data, meta);
 }
 
 void * ParseTest::result(void) {
