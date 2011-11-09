@@ -13,110 +13,169 @@ static int dr_type_read_char_from_string(void * output, const char * input) {
     }
 }
 
-static int dr_type_read_int8_from_string(void * output, const char * input) {
-    long buf;
-    char * endptr;
-
-    buf = strtol(input, &endptr, 10);
-    if (*endptr != 0 || buf < SCHAR_MIN || buf > SCHAR_MAX) {
-        return -1;
-    }
-    else {
-        *((int8_t*)output) = buf;
-        return 0;
-    }
+#define DR_TYPE_BUILD_READ_INT_FUN(__bit, __min, __max)                 \
+static int dr_type_read_int ## __bit ## _from_string(void * output, const char * s) { \
+    int ## __bit ## _t acc;                                                        \
+    int base;                                                           \
+    char c;                                                             \
+    uint ## __bit ## _t cutoff;                                         \
+    int neg, any, cutlim;                                               \
+                                                                        \
+    do {                                                                \
+        c = *s++;                                                       \
+    } while (isspace((unsigned char)c));                                \
+                                                                        \
+    if (c == '-') {                                                     \
+        neg = 1;                                                        \
+        c = *s++;                                                       \
+    }                                                                   \
+    else {                                                              \
+    neg = 0;                                                            \
+    if (c == '+') {                                                     \
+        c = *s++;                                                       \
+    }                                                                   \
+    }                                                                   \
+                                                                        \
+    base = 10;                                                          \
+    if (c == '0' && (*s == 'x' || *s == 'X') &&                         \
+                 ((s[1] >= '0' && s[1] <= '9') ||                       \
+                  (s[1] >= 'A' && s[1] <= 'F') ||                       \
+                  (s[1] >= 'a' && s[1] <= 'f')))                        \
+    {                                                                   \
+    c = s[1];                                                           \
+    s += 2;                                                             \
+    base = 16;                                                          \
+    }                                                                   \
+                                                                        \
+    acc = any = 0;                                                      \
+                                                                        \
+    cutoff = neg                                                        \
+        ? (uint32_t)-(__min + __max) + __max                            \
+        : __max;                                                        \
+    cutlim = cutoff % base;                                             \
+    cutoff /= base;                                                     \
+                                                                        \
+    for ( ; ; c = *s++) {                                               \
+    if (c >= '0' && c <= '9')                                           \
+        c -= '0';                                                       \
+    else if (c >= 'A' && c <= 'Z')                                      \
+        c -= 'A' - 10;                                                  \
+    else if (c >= 'a' && c <= 'z')                                      \
+        c -= 'a' - 10;                                                  \
+    else                                                                \
+        break;                                                          \
+                                                                        \
+    if (c >= base) {                                                    \
+        break;                                                          \
+    }                                                                   \
+                                                                        \
+    if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {     \
+        any = -1;                                                       \
+    }                                                                   \
+    else {                                                              \
+    any = 1;                                                            \
+    acc *= base;                                                        \
+    acc += c;                                                           \
+    }                                                                   \
+    }                                                                   \
+                                                                        \
+    if (any < 0) { /*overflow*/                                         \
+        return -1;                                                      \
+    } else if (!any) { /*no data*/                                      \
+        return -1;                                                      \
+    }                                                                   \
+                                                                        \
+    if (neg) {                                                          \
+        acc = -acc;                                                     \
+    }                                                                   \
+                                                                        \
+    memcpy(output, &acc, sizeof(acc));                                  \
+                                                                        \
+    return *(s - 1) == 0 ? 0 : -1;                                      \
 }
 
-static int dr_type_read_uint8_from_string(void * output, const char * input) {
-    long buf;
-    char * endptr;
-
-    buf = strtol(input, &endptr, 10);
-    if (*endptr != 0 || buf < 0 || buf > UCHAR_MAX) {
-        return -1;
-    }
-    else {
-        *((uint8_t*)output) = buf;
-        return 0;
-    }
+#define DR_TYPE_BUILD_READ_UINT_FUN(__bit, __max)                       \
+    static int dr_type_read_uint ## __bit ## _from_string(void * output, const char * s) { \
+        uint ## __bit ## _t acc;                                        \
+        int base;                                                       \
+        char c;                                                         \
+        uint ## __bit ##_t cutoff;                                      \
+        int any, cutlim;                                                \
+                                                                        \
+        do {                                                            \
+            c = *s++;                                                   \
+        } while (isspace((unsigned char)c));                            \
+                                                                        \
+        if (c == '-') {                                                 \
+            return -1;                                                  \
+        }                                                               \
+                                                                        \
+        if (c == '+') {                                                 \
+            c = *s++;                                                   \
+        }                                                               \
+                                                                        \
+        base = 10;                                                      \
+        if (c == '0' && (*s == 'x' || *s == 'X') &&                     \
+            ((s[1] >= '0' && s[1] <= '9') ||                            \
+             (s[1] >= 'A' && s[1] <= 'F') ||                            \
+             (s[1] >= 'a' && s[1] <= 'f')))                             \
+        {                                                               \
+            c = s[1];                                                   \
+            s += 2;                                                     \
+            base = 16;                                                  \
+        }                                                               \
+                                                                        \
+        acc = any = 0;                                                  \
+                                                                        \
+        cutoff = __max;                                                 \
+        cutlim = cutoff % base;                                         \
+        cutoff /= base;                                                 \
+                                                                        \
+        for ( ; ; c = *s++) {                                           \
+            if (c >= '0' && c <= '9')                                   \
+                c -= '0';                                               \
+            else if (c >= 'A' && c <= 'Z')                              \
+                c -= 'A' - 10;                                          \
+            else if (c >= 'a' && c <= 'z')                              \
+                c -= 'a' - 10;                                          \
+            else                                                        \
+                break;                                                  \
+                                                                        \
+            if (c >= base) {                                            \
+                break;                                                  \
+            }                                                           \
+                                                                        \
+            if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) { \
+                any = -1;                                               \
+            }                                                           \
+            else {                                                      \
+                any = 1;                                                \
+                acc *= base;                                            \
+                acc += c;                                               \
+            }                                                           \
+        }                                                               \
+                                                                        \
+        if (any < 0) { /*overflow*/                                     \
+            return -1;                                                  \
+        } else if (!any) { /*no data*/                                  \
+            return -1;                                                  \
+        }                                                               \
+                                                                        \
+        memcpy(output, &acc, sizeof(acc));                              \
+                                                                        \
+        return *(s - 1) == 0 ? 0 : -1;                                  \
 }
 
-static int dr_type_read_int16_from_string(void * output, const char * input) {
-    long buf;
-    char * endptr;
 
-    buf = strtol(input, &endptr, 10);
-    if (*endptr != 0 || buf < SHRT_MIN || buf > SHRT_MAX) {
-        return -1;
-    }
-    else {
-        int16_t d = buf;
-        memcpy(output, &d, sizeof(d));
-        return 0;
-    }
-}
+DR_TYPE_BUILD_READ_INT_FUN(8, CHAR_MIN, CHAR_MAX)
+DR_TYPE_BUILD_READ_UINT_FUN(8, UCHAR_MAX)
+DR_TYPE_BUILD_READ_INT_FUN(16, SHRT_MIN, SHRT_MAX)
+DR_TYPE_BUILD_READ_UINT_FUN(16, USHRT_MAX)
+DR_TYPE_BUILD_READ_INT_FUN(32, INT_MIN, INT_MAX)
+DR_TYPE_BUILD_READ_UINT_FUN(32, UINT_MAX)
+DR_TYPE_BUILD_READ_INT_FUN(64, LONG_MIN, LONG_MAX)
+DR_TYPE_BUILD_READ_UINT_FUN(64, ULONG_MAX)
 
-static int dr_type_read_uint16_from_string(void * output, const char * input) {
-    long buf;
-    char * endptr;
-
-    buf = strtol(input, &endptr, 10);
-    if (*endptr != 0 || buf < 0 || buf > USHRT_MAX) {
-        return -1;
-    }
-    else {
-        uint16_t d = buf;
-        memcpy(output, &d, sizeof(d));
-        return 0;
-    }
-}
-
-static int dr_type_read_int32_from_string(void * output, const char * input) {
-    int32_t buf;
-    char * endptr;
-
-    buf = strtol(input, &endptr, 10);
-    if (*endptr != 0) {
-        return -1;
-    }
-    else {
-        int32_t d = buf;
-        memcpy(output, &d, sizeof(d));
-        return 0;
-    }
-}
-
-static int dr_type_read_uint32_from_string(void * output, const char * input) {
-    int64_t buf;
-    char * endptr;
-
-    buf = strtoll(input, &endptr, 10);
-    if (*endptr != 0 || buf < 0 || buf > UINT_MAX) {
-        return -1;
-    }
-    else {
-        uint32_t d = buf;
-        memcpy(output, &d, sizeof(d));
-        return 0;
-    }
-}
-
-static int dr_type_read_int64_from_string(void * output, const char * input) {
-    int64_t buf;
-    char * endptr;
-
-    buf = strtoll(input, &endptr, 10);
-    if (*endptr != 0) {
-        return -1;
-    }
-    else {
-        memcpy(output, &buf, sizeof(buf));
-        return 0;
-    }
-}
-
-static int dr_type_read_uint64_from_string(void * output, const char * input) {
-}
 
 struct tagDRCTypeInfo g_dr_ctypeinfos[] = {
     {CPE_DR_TYPE_UNION, "union", -1, NULL}

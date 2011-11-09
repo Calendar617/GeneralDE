@@ -149,7 +149,7 @@ TEST_F(CtypeOpsFromStringTest, uint16_end_with_char) {
 
 TEST_F(CtypeOpsFromStringTest, int32_min) {
     EXPECT_EQ(0, parse("int32", "-2147483648"));
-    EXPECT_EQ(-2147483648, as_int32());
+    EXPECT_EQ(INT_MIN, as_int32());
 }
 
 TEST_F(CtypeOpsFromStringTest, int32_max) {
@@ -158,13 +158,11 @@ TEST_F(CtypeOpsFromStringTest, int32_max) {
 }
 
 TEST_F(CtypeOpsFromStringTest, int32_up_overflow) {
-    EXPECT_EQ(0, parse("int32", "2147483648"));
-    EXPECT_EQ(-2147483648, as_int32());
+    EXPECT_EQ(-1, parse("int32", "2147483648"));
 }
 
 TEST_F(CtypeOpsFromStringTest, int32_down_overflow) {
-    EXPECT_EQ(0, parse("int32", "-2147483649"));
-    EXPECT_EQ(0, parse("int32", "-2147483649"));
+    EXPECT_EQ(-1, parse("int32", "-2147483649"));
 }
 
 TEST_F(CtypeOpsFromStringTest, int32_end_with_char) {
@@ -182,7 +180,7 @@ TEST_F(CtypeOpsFromStringTest, uint32_max) {
 }
 
 TEST_F(CtypeOpsFromStringTest, uint32_up_overflow) {
-    EXPECT_EQ(-1, parse("uint32", "65536"));
+    EXPECT_EQ(-1, parse("uint32", "4294967296"));
 }
 
 TEST_F(CtypeOpsFromStringTest, uint32_down_overflow) {
