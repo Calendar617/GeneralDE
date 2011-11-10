@@ -9,8 +9,7 @@ static int dr_inbuild_calc_lib_paras(struct DRInBuildMetaLib * inBuildLib);
 int dr_inbuild_build_lib(
     INOUT LPDRMETALIB *a_ppstLib,
     struct DRInBuildMetaLib * inBuildLib,
-    void * userLogCtx,
-    dr_inbuild_log_fun_t errorProcessor)
+    error_monitor_t em)
 {
     struct DRInBuildString * stringEle = 0;
     struct DRInBuildMacro * macroEle = 0;
@@ -37,11 +36,11 @@ int dr_inbuild_build_lib(
     /*build macros*/
     TAILQ_FOREACH(macroEle, &inBuildLib->m_macros, m_next) {
         macroEle->m_data.m_name_pos =
-            dr_add_metalib_string(metaLib, macroEle->m_name, &stringUsedCount, userLogCtx, errorProcessor);
+            dr_add_metalib_string(metaLib, macroEle->m_name, &stringUsedCount, em);
         macroEle->m_data.m_desc_pos =
-            dr_add_metalib_string(metaLib, macroEle->m_desc, &stringUsedCount, userLogCtx, errorProcessor);
+            dr_add_metalib_string(metaLib, macroEle->m_desc, &stringUsedCount, em);
 
-        dr_add_metalib_macro(metaLib, &macroEle->m_data, userLogCtx, errorProcessor);
+        dr_add_metalib_macro(metaLib, &macroEle->m_data, em);
     }
 
     /*build metas*/
@@ -50,27 +49,27 @@ int dr_inbuild_build_lib(
         struct DRInBuildMetaEntry * entryEle = 0;
 
         metaEle->m_data.m_name_pos =
-            dr_add_metalib_string(metaLib, metaEle->m_name, &stringUsedCount, userLogCtx, errorProcessor);
+            dr_add_metalib_string(metaLib, metaEle->m_name, &stringUsedCount, em);
         metaEle->m_data.m_desc_pos =
-            dr_add_metalib_string(metaLib, metaEle->m_desc, &stringUsedCount, userLogCtx, errorProcessor);
+            dr_add_metalib_string(metaLib, metaEle->m_desc, &stringUsedCount, em);
 
-        createdMeta = dr_add_metalib_meta(metaLib, &metaEle->m_data, userLogCtx, errorProcessor);
+        createdMeta = dr_add_metalib_meta(metaLib, &metaEle->m_data, em);
 
         /*build entries*/
         TAILQ_FOREACH(entryEle, &metaEle->m_entries, m_next) {
             entryEle->m_data.m_name_pos =
-                dr_add_metalib_string(metaLib, entryEle->m_name, &stringUsedCount, userLogCtx, errorProcessor);
+                dr_add_metalib_string(metaLib, entryEle->m_name, &stringUsedCount, em);
             entryEle->m_data.m_desc_pos =
-                dr_add_metalib_string(metaLib, entryEle->m_desc, &stringUsedCount, userLogCtx, errorProcessor);
+                dr_add_metalib_string(metaLib, entryEle->m_desc, &stringUsedCount, em);
             entryEle->m_data.m_cname_pos =
-                dr_add_metalib_string(metaLib, entryEle->m_cname, &stringUsedCount, userLogCtx, errorProcessor);
+                dr_add_metalib_string(metaLib, entryEle->m_cname, &stringUsedCount, em);
 
 
             if (entryEle->m_ref_type_name[0]) {
                 //LPDRMETA refMeta = dr_get_meta_by_name(metaLib, 
             }
 
-            dr_add_meta_entry(createdMeta, &entryEle->m_data, userLogCtx, errorProcessor);
+            dr_add_meta_entry(createdMeta, &entryEle->m_data, em);
         }
     }
 

@@ -2,7 +2,6 @@
 #define CPE_UTILS_ERROR_H
 
 #define CPE_SUCCESS				        0
-#define CPE_ERROR                       -1
 
 #define CPE_ERR_MAKE(mod, e)    (0x80000000 | ((mod)<<24) | (e))
 #define CPE_ERR_BASE(e)    ( (e) & 0xFFFFFF )

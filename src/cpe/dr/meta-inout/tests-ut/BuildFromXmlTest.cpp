@@ -11,13 +11,13 @@ void BuildFromXmlTest::TearDown() {
 }
 
 static void dr_create_lib_from_xml_error_test_record(
-    void * p, const char * file, int line, int errno, const char * msg)
+    struct error_info * info, void * context, const char * msg)
 {
-    BuildFromXmlTest * t = (BuildFromXmlTest *)p;
+    BuildFromXmlTest * t = (BuildFromXmlTest *)context;
 
     for(int i = 0; i < BuildFromXmlTest::MAX_ERROR_COUNT; ++i) {
         if (t->m_errors[i] == 0) {
-            t->m_errors[i] = errno;
+            t->m_errors[i] = info->m_errno;
             break;
         }
     }
@@ -47,10 +47,9 @@ int BuildFromXmlTest::parseMeta(const char * def) {
 
     bzero(m_errors, sizeof(m_errors));
 
-    return dr_create_lib_from_xml_ex(
-        &m_metaLib,
-        def, strlen(def),
-        this, dr_create_lib_from_xml_error_test_record);
+    CPE_DEF_ERROR_MONITOR(em, dr_create_lib_from_xml_error_test_record, this);
+
+    return dr_create_lib_from_xml_ex(&m_metaLib, def, strlen(def), &em);
 }
 
 LPDRMETA

@@ -18,7 +18,7 @@ CPE_DR_API int dr_create_lib_from_xml(
 CPE_DR_API int dr_create_lib_from_xml_ex(
     LPDRMETALIB * metaLib,
     const char* buf, int bufSize,
-    void * userData, dr_inbuild_log_fun_t errorProcessor);
+    error_monitor_t er);
 
 CPE_DR_API int dr_save_xml(
     LPDRMETALIB metaLib, const char * fileName);

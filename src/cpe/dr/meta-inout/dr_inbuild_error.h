@@ -7,8 +7,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define DR_NOTIFY_ERROR(userData, errorProcessor, e) \
-    if (errorProcessor) errorProcessor(userData, NULL, 0, e, dr_error_string(e));
+#define DR_NOTIFY_ERROR(em, e) CPE_ERROR_EX(em, e, "%s", dr_error_string(e));
 
 #ifdef __cplusplus
 }

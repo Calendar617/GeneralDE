@@ -21,20 +21,12 @@ struct DRXmlParseCtx {
     struct DRInBuildMetaLib * m_metaLib;
     struct DRInBuildMeta * m_curentMeta;
     enum DRXmlParseState m_state;
-    void * m_userData;
-    dr_inbuild_log_fun_t m_errorProcessor;
+    error_monitor_t m_em;
     char m_errorBuf[DR_XML_PARSE_ERROR_MSG_LEN];
 };
 
 static void dr_build_xml_notify_error(struct DRXmlParseCtx * ctx, int e, char const * msg) {
-    if (ctx->m_errorProcessor) {
-        ctx->m_errorProcessor(
-            ctx->m_userData,
-            NULL,
-            -1,
-            CPE_ERR_MAKE(CPE_MODID_DR, e),
-            msg == NULL ? dr_error_string(e) : msg);
-    }
+    CPE_ERROR_EX(ctx->m_em, e, "%s", msg == NULL ? dr_error_string(e) : msg);
 }
 
 static void dr_build_xml_process_metalib(
@@ -492,15 +484,15 @@ void dr_build_xml_parse_ctx_clear(struct DRXmlParseCtx * ctx) {
 }
 
 static void dr_create_lib_from_xml_error_processor(
-    void * p, const char * file, int line, int errno, const char * msg)
+    struct error_info * info, void * context, const char * msg)
 {
     FILE * errorFp;
 
-    if (p == NULL) {
+    if (context == NULL) {
         return;
     }
 
-    errorFp = (FILE *)p;
+    errorFp = (FILE *)context;
 }
 
 int  dr_create_lib_from_xml(
@@ -509,18 +501,16 @@ int  dr_create_lib_from_xml(
     int bufSize,
     FILE * errorFp)
 {
-    return dr_create_lib_from_xml_ex(
-        metaLib,
-        buf, bufSize,
-        errorFp, dr_create_lib_from_xml_error_processor);
+    CPE_DEF_ERROR_MONITOR(em, dr_create_lib_from_xml_error_processor, errorFp);
+
+    return dr_create_lib_from_xml_ex(metaLib, buf, bufSize, &em);
 }
 
 int dr_create_lib_from_xml_ex(
     LPDRMETALIB * metaLib,
     const char* buf,
     int bufSize,
-    void * userData, 
-    dr_inbuild_log_fun_t errorProcessor)
+    error_monitor_t em)
 {
     xmlParserCtxtPtr parseCtx = NULL;
     struct DRXmlParseCtx ctx;
@@ -532,14 +522,13 @@ int dr_create_lib_from_xml_ex(
         return -1;
     }
 
-    ctx.m_userData = userData;
-    ctx.m_errorProcessor = errorProcessor;
+    ctx.m_em = em;
 
     parseCtx = xmlCreatePushParserCtxt(&g_dr_xml_handler, &ctx, buf, bufSize, NULL);
     xmlParseChunk(parseCtx, NULL, 0, 1);
     xmlFreeParserCtxt(parseCtx);
 
-    ret = dr_inbuild_build_lib(metaLib, ctx.m_metaLib, userData, errorProcessor);
+    ret = dr_inbuild_build_lib(metaLib, ctx.m_metaLib, em);
 
     dr_build_xml_parse_ctx_clear(&ctx);
     

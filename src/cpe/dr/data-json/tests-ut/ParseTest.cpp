@@ -22,7 +22,7 @@ void ParseTest::installMeta(const char * def) {
 
     EXPECT_EQ(
         0,
-        dr_create_lib_from_xml_ex(&m_metaLib, def, strlen(def), NULL, NULL))
+        dr_create_lib_from_xml_ex(&m_metaLib, def, strlen(def), NULL))
         << "install meta error";
 }
 

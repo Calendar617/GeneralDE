@@ -17,9 +17,6 @@ void dr_inbuild_metalib_remove_meta(struct DRInBuildMetaLib * inBuildMetaLib, st
 struct DRInBuildMetaEntry * dr_inbuild_meta_add_entry(struct DRInBuildMeta * meta);
 void dr_inbuild_meta_remove_entry(struct DRInBuildMeta * meta, struct DRInBuildMetaEntry * entry);
 
-#define DR_NOTIFY_ERROR(userData, errorProcessor, e) \
-    errorProcessor(userData, NULL, 0, e, dr_error_string(e));
-
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

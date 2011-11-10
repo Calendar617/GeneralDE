@@ -43,7 +43,7 @@ int dr_init_lib(OUT LPDRMETALIB pstLib, const LPDRLIBPARAM pstParam) {
 
 int dr_add_metalib_string(
     LPDRMETALIB metaLib, const char * data, int * usedCount,
-    void * userData, dr_inbuild_log_fun_t errorProcessor)
+    error_monitor_t em)
 {
     char * base;
     int startPos;
@@ -55,7 +55,7 @@ int dr_add_metalib_string(
 
     dataSize = strlen(data) + 1;
     if ((*usedCount + dataSize) > metaLib->m_buf_size_str) { /*overflow*/
-        DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_NO_SPACE_FOR_STRBUF);
+        DR_NOTIFY_ERROR(em, CPE_DR_ERROR_NO_SPACE_FOR_STRBUF);
         return -1;
     }
 
@@ -69,7 +69,7 @@ int dr_add_metalib_string(
     return startPos;
 }
 
-LPDRMACRO dr_add_metalib_macro(LPDRMETALIB metaLib, LPDRMACRO macro, void * userData, dr_inbuild_log_fun_t errorProcessor) {
+LPDRMACRO dr_add_metalib_macro(LPDRMETALIB metaLib, LPDRMACRO macro, error_monitor_t em) {
     char * base = (char*)(metaLib + 1);
     LPDRMACRO newMacro = NULL;
 
@@ -103,7 +103,7 @@ static int dr_add_metalib_meta_find_next_pos(LPDRMETALIB metaLib) {
 }
 
 static void dr_add_metalib_meta_add_index_by_name(
-    LPDRMETALIB metaLib, LPDRMETA newMeta, void * userData, dr_inbuild_log_fun_t errorProcessor)
+    LPDRMETALIB metaLib, LPDRMETA newMeta, error_monitor_t em)
 {
     char * base = (char*)(metaLib + 1);
     int beginPos, endPos, curPos;
@@ -129,7 +129,7 @@ static void dr_add_metalib_meta_add_index_by_name(
     putAt = searchStart + curPos;
 
     if (strcmp(base + newMeta->m_name_pos, base + putAt->m_name_pos) == 0) {
-        DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_META_NAME_CONFLICT);
+        DR_NOTIFY_ERROR(em, CPE_DR_ERROR_META_NAME_CONFLICT);
     }
 
     memmove(
@@ -142,7 +142,7 @@ static void dr_add_metalib_meta_add_index_by_name(
 }
 
 static void dr_add_metalib_meta_add_index_by_id(
-    LPDRMETALIB metaLib, LPDRMETA newMeta, void * userData, dr_inbuild_log_fun_t errorProcessor)
+    LPDRMETALIB metaLib, LPDRMETA newMeta, error_monitor_t em)
 {
     char * base = (char*)(metaLib + 1);
     int beginPos, endPos, curPos;
@@ -167,7 +167,7 @@ static void dr_add_metalib_meta_add_index_by_id(
     putAt = searchStart + curPos;
 
     if (newMeta->m_id == putAt->m_id && newMeta->m_id != -1) {
-        DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_META_ID_CONFLICT);
+        DR_NOTIFY_ERROR(em, CPE_DR_ERROR_META_ID_CONFLICT);
     }
 
     memmove(
@@ -180,7 +180,7 @@ static void dr_add_metalib_meta_add_index_by_id(
 }
 
 LPDRMETA
-dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, void * userData, dr_inbuild_log_fun_t errorProcessor) {
+dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, error_monitor_t em) {
     char * base = (char*)(metaLib + 1);
     LPDRMETA newMeta = NULL;
     int newMetaPos = 0;
@@ -188,7 +188,7 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, void * userData, dr_inbu
     int newMetaUsedSize = dr_calc_meta_use_size(meta->m_entry_count);
 
     if (metaLib->m_meta_count >= metaLib->m_meta_max_count) {
-        DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_NO_SPACE_FOR_MATA);
+        DR_NOTIFY_ERROR(em, CPE_DR_ERROR_NO_SPACE_FOR_MATA);
         return NULL;
     }
 
@@ -197,7 +197,7 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, void * userData, dr_inbu
     if ( (newMetaPos + newMetaUsedSize)
          > (metaLib->m_startpos_meta + metaLib->m_buf_size_meta) )
     {
-        DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_NO_SPACE_FOR_MATA);
+        DR_NOTIFY_ERROR(em, CPE_DR_ERROR_NO_SPACE_FOR_MATA);
         return NULL;
     }
 
@@ -206,8 +206,8 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, void * userData, dr_inbu
     memcpy(newMeta, meta, sizeof(*newMeta));
     newMeta->m_self_pos = newMetaPos;
 
-    dr_add_metalib_meta_add_index_by_name(metaLib, newMeta, userData, errorProcessor);
-    dr_add_metalib_meta_add_index_by_id(metaLib, newMeta, userData, errorProcessor);
+    dr_add_metalib_meta_add_index_by_name(metaLib, newMeta, em);
+    dr_add_metalib_meta_add_index_by_id(metaLib, newMeta, em);
 
     /*must inc m_meta_count here
       becuse dr_add_metalib_meta_add_index_by_xxx will use this */
@@ -218,7 +218,7 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, void * userData, dr_inbu
 
 void dr_add_meta_entry_calc_align(
     LPDRMETA meta, LPDRMETAENTRY newEntry, int entryAlign,
-    void * userData, dr_inbuild_log_fun_t errorProcessor)
+    error_monitor_t em)
 {
     int align = entryAlign < meta->m_align ? entryAlign : meta->m_align;
     int panding = meta->m_data_size % align;
@@ -231,7 +231,7 @@ void dr_add_meta_entry_calc_align(
 }
 
 LPDRMETAENTRY
-dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuild_log_fun_t errorProcessor) {
+dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
     char * base = (char*)(meta) - meta->m_self_pos;
     LPDRMETAENTRY newEntry =  (LPDRMETAENTRY)(meta + 1);
     int i;
@@ -242,7 +242,7 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuil
     }
     
     if (i >= meta->m_entry_count) {
-        DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_META_NO_ENTRY);
+        DR_NOTIFY_ERROR(em, CPE_DR_ERROR_META_NO_ENTRY);
         return NULL;
     }
 
@@ -251,14 +251,14 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuil
         LPDRMETA usedType = NULL;
 
         if (entry->m_ref_type_pos < 0) {
-            DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
+            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
             return NULL;
         }
 
         usedType = dr_get_meta_by_name(((LPDRMETALIB)base) - 1, base + entry->m_ref_type_pos);
 
         if (usedType == NULL) {
-            DR_NOTIFY_ERROR(userData, errorProcessor, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
+            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
             return NULL;
         }
 
@@ -283,7 +283,7 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, void * userData, dr_inbuil
 
     newEntry->m_self_to_meta_pos = (char*)newEntry - (char*)meta;
 
-    dr_add_meta_entry_calc_align(meta, newEntry, entryAlign, userData, errorProcessor);
+    dr_add_meta_entry_calc_align(meta, newEntry, entryAlign, em);
 
     if (newEntry->m_version > meta->m_current_version) {
         meta->m_current_version = newEntry->m_version;
