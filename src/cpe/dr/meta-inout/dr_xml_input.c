@@ -483,25 +483,13 @@ void dr_build_xml_parse_ctx_clear(struct DRXmlParseCtx * ctx) {
     }
 }
 
-static void dr_create_lib_from_xml_error_processor(
-    struct error_info * info, void * context, const char * msg)
-{
-    FILE * errorFp;
-
-    if (context == NULL) {
-        return;
-    }
-
-    errorFp = (FILE *)context;
-}
-
 int  dr_create_lib_from_xml(
     LPDRMETALIB * metaLib,
     const char* buf,
     int bufSize,
     FILE * errorFp)
 {
-    CPE_DEF_ERROR_MONITOR(em, dr_create_lib_from_xml_error_processor, errorFp);
+    CPE_DEF_ERROR_MONITOR(em, cpe_error_log_to_file, errorFp);
 
     return dr_create_lib_from_xml_ex(metaLib, buf, bufSize, &em);
 }

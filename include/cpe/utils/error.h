@@ -1,12 +1,10 @@
 #ifndef CPE_UTILS_ERRORMONITOR_H
 #define CPE_UTILS_ERRORMONITOR_H
-#include <stdio.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define CPE_ERROR_MSG_MAX_LEN 128
 
 typedef enum {
     CPE_EL_INFO,
@@ -21,25 +19,42 @@ struct error_info {
     error_level_t m_level;
 };
 
-typedef struct error_monitor {
-    void (*on_error)(struct error_info * info, void * context, const char * msg);
+struct error_monitor_node {
+    void (*on_error)(struct error_info * info, void * context, const char * fmt, va_list args);
     void * m_context;
+    struct error_monitor_node * m_next;
+};
+
+typedef struct error_monitor {
+    struct error_monitor_node m_node;
     struct error_info m_curent_location;
 } * error_monitor_t;
 
+/*utils functions*/
+void cpe_error_log_to_file(struct error_info * info, void * context, const char * fmt, va_list args);
+void cpe_error_log_to_consol(struct error_info * info, void * context, const char * fmt, va_list args);
+
+/*operations*/
+void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...);
+void cpe_error_monitor_add_node(error_monitor_t monitor, struct error_monitor_node * node);
+void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor_node * node);
+
 #define _CPE_DO_ERROR_NOTIFY(monitor, level, en, format, args...)   \
     if (monitor) {                                                  \
-        char __buf[CPE_ERROR_MSG_MAX_LEN];                          \
-        snprintf(__buf, CPE_ERROR_MSG_MAX_LEN, format, ##args);     \
         monitor->m_curent_location.m_errno = en;                    \
         monitor->m_curent_location.m_level = level;                 \
-        monitor->on_error(                                          \
-            &monitor->m_curent_location,                            \
-            monitor->m_context, __buf);                             \
+        cpe_error_do_notify(monitor, format, ##args);               \
     }
 
 #define CPE_DEF_ERROR_MONITOR(name, fun, context) \
-    struct error_monitor name = { fun, context, { NULL, -1, 0, CPE_EL_ERROR } }
+    struct error_monitor name = { { fun, context, NULL }, { NULL, -1, 0, CPE_EL_ERROR } }
+
+#define CPE_DEF_ERROR_MONITOR_ADD(name, monitor, fun, context)          \
+    struct error_monitor_node name = { fun, context, NULL };            \
+    cpe_error_monitor_add_node(monitor, &name);
+
+#define CPE_DEF_ERROR_MONITOR_REMOVE(name, monitor)                     \
+    cpe_error_monitor_remove_node(monitor, &name);
 
 #define CPE_ERROR_LINE(monitor, line)           \
     monitor->m_curent_location.m_line = line;

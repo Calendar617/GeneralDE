@@ -11,7 +11,7 @@ void BuildFromXmlTest::TearDown() {
 }
 
 static void dr_create_lib_from_xml_error_test_record(
-    struct error_info * info, void * context, const char * msg)
+    struct error_info * info, void * context, const char * msg, va_list args)
 {
     BuildFromXmlTest * t = (BuildFromXmlTest *)context;
 
