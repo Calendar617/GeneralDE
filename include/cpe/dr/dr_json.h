@@ -1,6 +1,6 @@
 #ifndef CPE_DR_JSON_H
 #define CPE_DR_JSON_H
-#include "cpe/mem/buffer.h"
+#include "cpe/utils/buffer.h"
 #include "dr_types.h"
 
 #ifdef __cplusplus

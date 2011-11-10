@@ -1,6 +1,6 @@
 #ifndef CPE_MEM_BUFFER_PRIVATE_H
 #define CPE_MEM_BUFFER_PRIVATE_H
-#include "cpe/mem/buffer.h"
+#include "cpe/utils/buffer.h"
 
 #ifdef __cplusplus
 extern "C" {

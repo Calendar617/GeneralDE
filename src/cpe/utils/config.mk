@@ -1,4 +1,4 @@
-product:=cpe_mem
+product:=cpe_utils
 $(product).type:=clib
 $(product).libraries:=
 $(product).sources:=$(wildcard $(product-base)*.c)

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "cpe/mem/memory.h"
+#include "cpe/utils/memory.h"
 
 void * mem_alloc(struct mem_allocrator * alloc, size_t size) {
     if (alloc) {

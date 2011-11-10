@@ -1,7 +1,7 @@
 #ifndef CPE_DR_TEST_WITH_INPUTMETALIBTEST_H
 #define CPE_DR_TEST_WITH_INPUTMETALIBTEST_H
 #include "gtest/gtest.h"
-#include "cpe/mem/buffer.h"
+#include "cpe/utils/buffer.h"
 
 class BufferTest : public ::testing::Test {
 public:
