@@ -4,7 +4,7 @@
 #include "cpe/pal/types.h"
 #include "cpe/dr/dr_define.h"
 
-/** @defgroup CPE_DR_TYPE CPE_DR_Ö÷ÒªÀàĞÍ¶¨Òå
+/** @defgroup CPE_DR_TYPE CPE_DR_ä¸»è¦ç±»å‹å®šä¹‰
  *  @{
  */
 #ifdef __cplusplus
@@ -13,15 +13,15 @@ extern "C" {
 
 
 #if defined(_WIN64) || (__WORDSIZE == 64)
-    //64Î»ÏµÍ³
-    #define CPE_DR_PALTFROM_ALIGN_VALUE		8	/**<Æ½Ì¨È±Ê¡×Ö½Ú¶ÔÆëÖµ*/
-    #define CPE_DR_SIZEOF_POINTER 8         /**<Ö¸Õë±äÁ¿´æ´¢µÄ×Ö½ÚÊı*/
-    #define  CPE_DR_POINTER_TYPE_ALIGN 8	/*Ö¸ÕëÊı¾İÀàĞÍ¶ÔÆë·½Ê½*/
+    //64ä½ç³»ç»Ÿ
+    #define CPE_DR_PALTFROM_ALIGN_VALUE		8	/**<å¹³å°ç¼ºçœå­—èŠ‚å¯¹é½å€¼*/
+    #define CPE_DR_SIZEOF_POINTER 8         /**<æŒ‡é’ˆå˜é‡å­˜å‚¨çš„å­—èŠ‚æ•°*/
+    #define  CPE_DR_POINTER_TYPE_ALIGN 8	/*æŒ‡é’ˆæ•°æ®ç±»å‹å¯¹é½æ–¹å¼*/
 #else
-    //32Î»ÏµÍ³
-    #define CPE_DR_PALTFROM_ALIGN_VALUE		4	/**<Æ½Ì¨È±Ê¡×Ö½Ú¶ÔÆëÖµ*/
-    #define CPE_DR_SIZEOF_POINTER 4         /**<Ö¸Õë±äÁ¿´æ´¢µÄ×Ö½ÚÊı*/
-    #define  CPE_DR_POINTER_TYPE_ALIGN 4	/*Ö¸ÕëÊı¾İÀàĞÍ¶ÔÆë·½Ê½*/
+    //32ä½ç³»ç»Ÿ
+    #define CPE_DR_PALTFROM_ALIGN_VALUE		4	/**<å¹³å°ç¼ºçœå­—èŠ‚å¯¹é½å€¼*/
+    #define CPE_DR_SIZEOF_POINTER 4         /**<æŒ‡é’ˆå˜é‡å­˜å‚¨çš„å­—èŠ‚æ•°*/
+    #define  CPE_DR_POINTER_TYPE_ALIGN 4	/*æŒ‡é’ˆæ•°æ®ç±»å‹å¯¹é½æ–¹å¼*/
 #endif
 
 
@@ -62,11 +62,11 @@ extern "C" {
 
 typedef int64_t dr_longlong;
 typedef uint64_t dr_ulonglong;
-typedef uint16_t dr_wchar_t;  /**<Wchar»ù±¾Êı¾İÀàĞÍ*/
-typedef uint32_t dr_date_t;	/**<data»ù±¾Êı¾İÀàĞÍ*/
-typedef uint32_t dr_time_t;	/**<time»ù±¾Êı¾İÀàĞÍ*/
-typedef uint64_t dr_datetime_t; /**<datetime»ù±¾Êı¾İÀàĞÍ*/
-typedef uint32_t dr_ip_t;  /**<IPv4Êı¾İÀàĞÍ*/
+typedef uint16_t dr_wchar_t;  /**<WcharåŸºæœ¬æ•°æ®ç±»å‹*/
+typedef uint32_t dr_date_t;	/**<dataåŸºæœ¬æ•°æ®ç±»å‹*/
+typedef uint32_t dr_time_t;	/**<timeåŸºæœ¬æ•°æ®ç±»å‹*/
+typedef uint64_t dr_datetime_t; /**<datetimeåŸºæœ¬æ•°æ®ç±»å‹*/
+typedef uint32_t dr_ip_t;  /**<IPv4æ•°æ®ç±»å‹*/
 
 /** a offset-alike type   */
 typedef intptr_t DRPTR;  
@@ -134,45 +134,45 @@ typedef struct tagDRMacro		*LPDRMACRO;
 typedef struct tagDRMacrosGroup		*LPDRMACROSGROUP;
 
 
-/**Éú³Éc/c++ Í·ÎÄ¼ş¹æÔò½á¹¹ÉùÃ÷
+/**ç”Ÿæˆc/c++ å¤´æ–‡ä»¶è§„åˆ™ç»“æ„å£°æ˜
 */
 typedef struct tagDRHppRule DRHPPRULE;
 typedef struct tagDRHppRule *LPDRHPPRULE;
 
-/**³õÊ¼»¯ÔªÊı¾İ¿âµÄ½á¹¹Ìå
+/**åˆå§‹åŒ–å…ƒæ•°æ®åº“çš„ç»“æ„ä½“
 */
 struct tagDRLibParam
 {
-	int iID;        /**< ÔªÊı¿âµÄID*/ 
+	int iID;        /**< å…ƒæ•°åº“çš„ID*/ 
 
-	int iTagSetVersion; /**< ÔªÊı¾İÃèÊöXML±êÇ©¼¯µÄ°æ±¾*/
+	int iTagSetVersion; /**< å…ƒæ•°æ®æè¿°XMLæ ‡ç­¾é›†çš„ç‰ˆæœ¬*/
 
-	size_t iSize;		/**< ÔªÊı¾İµÄÄÚ´æ´óĞ¡£¬tdr_init_lib½«¸ù¾İ´ËÊı¾İ·ÖÅä¿Õ¼ä*/
-	size_t iMacrosGroupSize;      /**< ×Ô¶¨ÒåÊı¾İÀàĞÍËùÕ¼µÄ¿Õ¼ä´óĞ¡*/
-	size_t iMetaSize;      /**< ×Ô¶¨ÒåÊı¾İÀàĞÍËùÕ¼µÄ¿Õ¼ä´óĞ¡*/
-	size_t iStrBufSize;    /**< ×Ö·û´®»º³åÇøËùÕ¼µÄ´óĞ¡*/
+	size_t iSize;		/**< å…ƒæ•°æ®çš„å†…å­˜å¤§å°ï¼Œtdr_init_libå°†æ ¹æ®æ­¤æ•°æ®åˆ†é…ç©ºé—´*/
+	size_t iMacrosGroupSize;      /**< è‡ªå®šä¹‰æ•°æ®ç±»å‹æ‰€å çš„ç©ºé—´å¤§å°*/
+	size_t iMetaSize;      /**< è‡ªå®šä¹‰æ•°æ®ç±»å‹æ‰€å çš„ç©ºé—´å¤§å°*/
+	size_t iStrBufSize;    /**< å­—ç¬¦ä¸²ç¼“å†²åŒºæ‰€å çš„å¤§å°*/
 
-	int iMaxMacros;     /**< ´ËÔªÊı¾İ¿â°üº¬µÄ×î´óºê¶¨ÒåÊı*/
-	int iMaxMetas;	/**< ´ËÔªÊı¾İ¿â°üº¬µÄ×î´ó½á¹¹ÌåÊı*/
+	int iMaxMacros;     /**< æ­¤å…ƒæ•°æ®åº“åŒ…å«çš„æœ€å¤§å®å®šä¹‰æ•°*/
+	int iMaxMetas;	/**< æ­¤å…ƒæ•°æ®åº“åŒ…å«çš„æœ€å¤§ç»“æ„ä½“æ•°*/
 
-	int iMaxMacrosGroupNum; /*×î¶àÄÜÈİÄÉµÄºê¶¨Òå×éÊıÄ¿, Add at DR build Version: 0x00000008*/
+	int iMaxMacrosGroupNum; /*æœ€å¤šèƒ½å®¹çº³çš„å®å®šä¹‰ç»„æ•°ç›®, Add at DR build Version: 0x00000008*/
 
-	int iRes;           /**< Ô¤ÁôÎ»£¬ÔİÎ´Ê¹ÓÃ*/
-	int  iVersion;     /**< ÔªÊı¿âµÄ°æ±¾*/
+	int iRes;           /**< é¢„ç•™ä½ï¼Œæš‚æœªä½¿ç”¨*/
+	int  iVersion;     /**< å…ƒæ•°åº“çš„ç‰ˆæœ¬*/
 
-	char szName[CPE_DR_NAME_LEN];  /**< ÔªÊı¾İ¿âÃû×Ö*/
+	char szName[CPE_DR_NAME_LEN];  /**< å…ƒæ•°æ®åº“åå­—*/
 
 };
 
 /**
-sizeinfo/sizetypeÊôĞÔ
+sizeinfo/sizetypeå±æ€§
 */
 struct tagDRSizeInfo
 {
-    DROFF iNOff;   /**<ÍøÂç´«ÊäĞÅÏ¢Æ«ÒÆ*/
-    DROFF iHOff;    /**<±¾µØ´æ´¢ĞÅÏ¢Æ«ÒÆ*/
+    DROFF iNOff;   /**<ç½‘ç»œä¼ è¾“ä¿¡æ¯åç§»*/
+    DROFF iHOff;    /**<æœ¬åœ°å­˜å‚¨ä¿¡æ¯åç§»*/
     size_t iUnitSize;
-    int idxSizeType;	/*±£´æsizeinfo ÓÃ¼òµ¥ÀàĞÍ´ò°ü·½·¨Ê±Ê¹ÓÃÀàĞÍ£¬ÔÚCPE_DR_BUILD version 5Ê±¼ÓÈë*/
+    int idxSizeType;	/*ä¿å­˜sizeinfo ç”¨ç®€å•ç±»å‹æ‰“åŒ…æ–¹æ³•æ—¶ä½¿ç”¨ç±»å‹ï¼Œåœ¨CPE_DR_BUILD version 5æ—¶åŠ å…¥*/
 };
 typedef struct tagDRSizeInfo DRSIZEINFO;
 typedef struct tagDRSizeInfo *LPDRSIZEINFO;
@@ -181,5 +181,5 @@ typedef struct tagDRSizeInfo *LPDRSIZEINFO;
 }
 #endif /* __cplusplus */
 
-/** @}*/ // CPE_DR_TYPE DRÖ÷ÒªÀàĞÍ¶¨Òå
+/** @}*/ // CPE_DR_TYPE DRä¸»è¦ç±»å‹å®šä¹‰
 #endif /* CPE_DR_TYPES_H */

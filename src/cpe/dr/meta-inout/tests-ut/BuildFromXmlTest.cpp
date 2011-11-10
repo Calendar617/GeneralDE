@@ -3,51 +3,36 @@
 #include "cpe/dr/dr_metalib_xml.h"
 #include "BuildFromXmlTest.hpp"
 
-BuildFromXmlTest::BuildFromXmlTest() : m_metaLib(0) {
+BuildFromXmlTest::BuildFromXmlTest() : m_metaLib(0), m_errorList(NULL) {
+}
+
+void BuildFromXmlTest::SetUp() {
+    m_errorList = cpe_error_list_create(NULL);
+    ASSERT_TRUE(m_errorList);
 }
 
 void BuildFromXmlTest::TearDown() {
+    cpe_error_list_free(m_errorList);
+    m_errorList = NULL;
     dr_free_lib(&m_metaLib);
 }
 
-static void dr_create_lib_from_xml_error_test_record(
-    struct error_info * info, void * context, const char * msg, va_list args)
-{
-    BuildFromXmlTest * t = (BuildFromXmlTest *)context;
-
-    for(int i = 0; i < BuildFromXmlTest::MAX_ERROR_COUNT; ++i) {
-        if (t->m_errors[i] == 0) {
-            t->m_errors[i] = info->m_errno;
-            break;
-        }
-    }
-}
-
 int BuildFromXmlTest::errorCount(void) {
-    int i = 0;
-    while(i < MAX_ERROR_COUNT && m_errors[i] != 0) {
-        ++i;
-    }
-
-    return i;
+    return cpe_error_list_error_count(m_errorList);
 }
 
-bool BuildFromXmlTest::haveError(int error) {
-    for(int i = 0; i < MAX_ERROR_COUNT; ++i) {
-        if (CPE_ERR_BASE(m_errors[i]) == error) {
-            return true;
-        }
-    }
-
-    return false;
+bool BuildFromXmlTest::haveError(int e) {
+    return cpe_error_list_have_errno(m_errorList, e);
 }
 
 int BuildFromXmlTest::parseMeta(const char * def) {
     dr_free_lib(&m_metaLib);
 
-    bzero(m_errors, sizeof(m_errors));
+    cpe_error_list_free(m_errorList);
+    m_errorList = cpe_error_list_create(NULL);
 
-    CPE_DEF_ERROR_MONITOR(em, dr_create_lib_from_xml_error_test_record, this);
+    CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
+    //CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
 
     return dr_create_lib_from_xml_ex(&m_metaLib, def, strlen(def), &em);
 }

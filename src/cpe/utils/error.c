@@ -15,6 +15,15 @@ void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...) {
     va_end(args);
 }
 
+void cpe_error_do_notify_var(error_monitor_t monitor, const char * fmt, va_list args) {
+    struct error_monitor_node * node = &monitor->m_node;
+
+    while(node) {
+            node->on_error(&monitor->m_curent_location, node->m_context, fmt, args);
+            node = node->m_next;
+    }
+}
+
 void cpe_error_monitor_add_node(error_monitor_t monitor, struct error_monitor_node * node) {
     struct error_monitor_node * lastNode = &monitor->m_node;
     while(lastNode->m_next) {
@@ -46,4 +55,5 @@ void cpe_error_log_to_file(struct error_info * info, void * context, const char 
 
 void cpe_error_log_to_consol(struct error_info * info, void * context, const char * fmt, va_list args) {
     vprintf(fmt, args);
+    printf("\n");
 }

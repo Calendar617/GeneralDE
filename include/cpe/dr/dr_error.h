@@ -11,135 +11,135 @@ extern "C" {
 #define CPE_MODID_DR	0x01
 
 typedef enum {
-    CPE_DR_ERROR_NONE = 0,                    /**< Ã»ÓÐ´íÎó*/
-	CPE_DR_ERROR_INVALID_CUTOFF_VERSION,	    /**<¼ô²Ã°æ±¾´íÎó£¬ÆäÈ¡ÖµÓ¦´óÓÚÔªÊý¾Ý»ù×¼°æ±¾,²¢ÇÒÐ¡ÓÚÔªÊý¾ÝµÄµ±Ç°°æ±¾
-                                              Èç¹ûÔªÊý¾ÝÓÐ°æ±¾Ö¸Ê¾Æ÷£¬Ôò¼ô²Ã°æ±¾±ØÐë²»Ð¡ÓÚ°æ±¾Ö¸Ê¾Æ÷ÔÊÐíµÄ×îÐ¡°æ±¾*/
-	CPE_DR_ERR_NET_NO_NETBUFF_SPACE,			/**<ÍøÂç±àÂëÐÅÏ¢»º³åÇøÊ£Óà¿Õ¼ä²»¹»*/
-	CPE_DR_ERROR_INVALID_REFER_VALUE,		/**<´ËÔªËØµÄreferÊôÐÔÖµ²»ÕýÈ·£¬ÆäÖµ²»ÄÜÎª¸ºÊýÇÒ±ØÐë±ÈcountÊôÐÔÖµÐ¡*/
-	CPE_DR_ERROR_TOO_COMPLIEX_META,		/**<ÔªÊý¾ÝÃèÊö¸´ºÏÊý¾ÝÀàÐÍÇ¶Ì×²ã´Î³¬¹ý32²ã*/
-	CPE_DR_ERROR_NET_UNSUPPORTED_TYPE,			/**<²»Ö§³ÖµÄÔªÊý¾ÝÀàÐÍ*/
-	CPE_DR_ERROR_NET_INVALID_STRING_LEN,		/**<stringÀàÐÍµÄÔªËØÆä×Ö·û´®³¤¶È³¬¹ýÁËÔ¤¶¨×î´ó³¤¶È*/
-	CPE_DR_ERROR_NO_HOSTBUFF_SPACE,			/**<±¾µØ´æ´¢»º³åÇøÊ£Óà¿Õ¼ä²»¹»*/
-	CPE_DR_ERROR_NET_INVALID_VERSIONINDICATOR,	/**<ÔªËØÊý°æ±¾Ö¸Ê¾Æ÷µÄÖµ²»ÕýÈ·*/
-    CPE_DR_ERROR_NO_MEMORY,                   /**< ·ÖÅä´æ´¢¿Õ¼äÊ§°Ü*/
-    CPE_DR_ERROR_XML_PARSE,                /**< XMLÎÄ¼þ½âÎö´íÎó */
-    CPE_DR_ERROR_NO_XML_ROOT,              /**< XMLÔªËØÊ÷ÖÐÃ»ÓÐ¸ùÔªËØ*/
-    CPE_DR_ERROR_INVAILD_XML_ROOT,         /**< ÎÞÐ§µÄÔªÊý¾Ý¸ùÔªËØ*/
-    CPE_DR_ERROR_NAMESPACE_CONFLICT,       /**< ÔªÊý¾ÝÃèÊöÃû×Ö¿Õ¼ä³åÍ»£¬¼´²»ÄÜ½«¸ùÔªËØnameÊôÐÔÖµ²»Í¬µÄÐÅÏ¢¼Óµ½Í¬Ò»¸ö¿âÖÐ*/
-    CPE_DR_ERROR_MACRO_NO_NAME_ATTR,             /**< ºê¶¨ÒåÔªËØ±ØÐëÖ¸¶¨nameÊôÐÔ*/
-    CPE_DR_ERROR_INCLUDE_NO_FILE,          /**< includeÎ´¶¨ÒåfileÊôÐÔ*/
-    CPE_DR_ERROR_NO_VERSION,       /**< Ã»ÓÐÖ¸¶¨versionÊôÐÔ*/
-    CPE_DR_ERROR_ROOT_ID_CONFLICT,         /**< ¸ùÔªËØID³åÍ»£¬¼´²»ÄÜ½«¸ùÔªËØIDÊôÐÔÖµ²»Í¬µÄÐÅÏ¢¼Óµ½Í¬Ò»¸ö¿âÖÐ*/
-    CPE_DR_ERROR_INVALID_TAGSET_VERSION,    /**< ²»Ö§³ÖµÄÔªÊý¾ÝÃèÊöXML±êÇ©¼¯°æ±¾*/
-    CPE_DR_ERROR_INVALID_METALIB_PARAM,    /**< ÔªÊý¾Ý¿â²ÎÊý²»ÕýÈ·*/
-    CPE_DR_ERROR_INVALID_METALIB_CHECKSUM, /**< ÔªÊý¾Ý¿âÐ£ÑéºÍ²»ÕýÈ·*/
-    CPE_DR_ERROR_TOO_MUCH_MACROS,          /**< Ðè¼Óµ½ÔªÊý¾ÝÃèÊö¿âÖÐµÄºê¶¨ÒåÊý±ÈÔ¤¶¨ÒåµÄÒª¶à */
-    CPE_DR_ERROR_MACRO_NO_VALUE,           /**< ºê¶¨ÒåÔªËØÃ»ÓÐÖµÊôÐÔ*/
-    CPE_DR_ERROR_UNSUPPORTED_TYPE,           /**< ²»Ö§³ÖµÄÊý¾ÝÀàÐÍ */
-    CPE_DR_ERROR_METALIB_ROOT_NO_NAME,         /**< ÔªÊý¾ÝÃèÊö¿â¸ùÔªËØ±ØÐëÖ¸¶¨nameÊôÐÔ*/
-    CPE_DR_ERROR_NO_SPACE_FOR_MATA,            /**< Ã»ÓÐ×ã¹»µÄ¿Õ¼ä´æ´¢×Ô¶¨ÒåÊý¾ÝÀàÐÍ*/
-    CPE_DR_ERROR_NO_SPACE_FOR_STRBUF,          /**< ×Ö·û´®»º³åÇø¿Õ¼ä²»¹»*/
-    CPE_DR_ERROR_META_NO_NAME,                 /**< unionºÍstuctÔªËØ±ØÐë°üº¬nameÊôÐÔ*/
-    CPE_DR_ERROR_META_NAME_CONFLICT,           /**< Í¬ÀàÐÍµÄunionºÍstuctÔªËØ²»ÈÝÐíÍ¬Ãû*/
-    CPE_DR_ERROR_UNDEFINED_MACRO_NAME,         /**< ¸ÃºêÃûÃ»ÓÐ¶¨Òå*/
-    CPE_DR_ERROR_META_ID_CONFLICT,          /**< Í¬Ò»¸¸ÔªËØÏÂ²»ÄÜ³öÏÖIDÏàÍ¬µÄ×ÓÔªËØ*/
-    CPE_DR_ERROR_ENTRY_NO_TYPE,             /**< entryÔªËØ±ØÐë°üº¬typeÊôÐÔÇÒ²»ÄÜÎª¿Õ´®*/
-    CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE,     /**< entryµÄtypeÊôÐÔÖµÎÞÐ§*/
-    CPE_DR_ERROR_ENTRY_INVALID_IO_VALUE,       /**< entryµÄioÊôÐÔÖµÎÞÐ§*/
-    CPE_DR_ERROR_ENTRY_INVALID_UNIQUE_VALUE,   /**< entryµÄuniqueÊôÐÔ²»ÕýÈ·£¬ÕýÈ·È¡ÖµÎªfalse,true*/
-    CPE_DR_ERROR_ENTRY_INVALID_NOTNULL_VALUE,  /**< entryµÄnotnullÊôÐÔ²»ÕýÈ·£¬ÕýÈ·È¡ÖµÎªfalse,true*/
-    CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE,  /**< entryµÄsizeÊôÐÔÖµ²»ÕýÈ·*/
-    CPE_DR_ERROR_ENTRY_IVALID_SORTKEY_VALUE,    /**<entryµÄsortkeyÊôÐÔÖµ²»ÕýÈ·*/
-    CPE_DR_ERROR_ENTRY_INVALID_SELECT_VALUE,    /**< entryµÄselectÊôÐÔÖµ²»ÕýÈ·*/
-    CPE_DR_ERROR_ENTRY_INVALID_MAXID_VALUE,     /**< entryµÄmaxidÊôÐÔ²»ÕýÈ·*/
-    CPE_DR_ERROR_ENTRY_INVALID_MINID_VALUE,     /**< entryµÄminidÊôÐÔ²»ÕýÈ·*/
-    CPE_DR_ERROR_ENTRY_INVALID_MAXMINID_VALUE,     /**< entryµÄminidºÍmaxidÊôÐÔÖµ²»ÕýÈ·*/
-    CPE_DR_ERROR_ENTRY_INVALID_COUNT_VALUE,     /**<entryµÄcountÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE,		/**<entryµÄidÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_ENTRY_INVALID_DEFAULT_VALUE,  /**<entryµÄdefaultÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_ENTRY_INVALID_SORTMETHOD_VALUE, /**<entryµÄsortmethodÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_ENTRY_INVALID_DATETIME_VALUE,		/**<entryµÄdatetimeÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_ENTRY_INVAILD_DATE_VALUE,			/**<entryµÄdateÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_ENTRY_INVALID_TIME_VALUE,			/**<entryµÄtimeÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_ENTRY_INVALID_IP_VALUE,			/**<entryµÄipÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_ENTRY_INVALID_EXTENDTOTABLE_VALUE,	/**<entryµÄextendtotableÊôÐÔ²»ÕýÈ·*/
-    CPE_DR_ERROR_META_INVALID_SIZE_VALUE,      /**<structÔªËØµÄsizeÊôÐÔ²»ÕýÈ·*/
-    CPE_DR_ERROR_META_INVALID_ALIGN_VALUE,     /**<structÔªËØµÄalignÊôÐÔÖµ²»ÕýÈ·*/
-    CPE_DR_ERROR_META_INVALID_VERSIONINDICATOR_VALUE,      /**<structÔªËØµÄversionindicatorÊôÐÔ²»ÕýÈ·*/
-    CPE_DR_ERROR_META_INVALID_SIZETYPE_VALUE,      /**< ÔªËØµÄsizetype/sizeofÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_META_INVALID_SPLITTABLEFACTOR,	/**< structÔªËØµÄsplittablefactorÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_META_INVALID_PRIMARYKEY,			/**< structÔªËØµÄprimarykeyÊôÐÔÖµ²»ÕýÈ·*/
-    CPE_DR_ERROR_META_INVALID_INDEXCOLUMN,         /**< indexÔªËØµÄcolumnÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_META_INVALID_SPLITTABLEKEY,	/**< structÔªËØµÄsplittablekeyÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_META_INVALID_SPLITTABLERULE,	/**< structÔªËØµÄsplittableruleÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_META_INVALID_STRICTINPUT,		/**<structÔªËØµÄstrictinputÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_META_INVALID_DEPENDONSTRUCT,		/**<structÔªËØµÄdependonstructÊôÐÔÖµ²»ÕýÈ·*/
-    CPE_DR_ERROR_INVALID_PATH_VALUE,               /**<ÔªËØµÄpath²»ÕýÈ·£¬²»ÄÜÕýÈ·Æ¥ÅämetaÖÐµÄÔªËØ*/
-    CPE_DR_ERROR_INVALID_OFFSET,                   /**<ÔªËØµÄÆ«ÒÆÖµ²»¶Ô*/
-    CPE_DR_ERROR_NO_SPACE_TO_WRITE,                /**<½«ÐÅÏ¢Ð´µ½»º³åÇøÊ±¿Õ¼ä²»¹»*/
-    CPE_DR_ERROR_META_NO_ENTRY,                    /**< ×Ô¶¨ÒåÊý¾ÝÀàÐÍÃ»ÓÐ°üº¬ÈÎºÎ×Ó³ÉÔ±*/
-    CPE_DR_ERROR_ENTRY_INVALID_REFER_VALUE,        /**<entryÔªËØµÄreferÊôÐÔÖµ²»ÕýÈ·*/
-    CPE_DR_ERROR_ENTRY_INVALID_SIZEINFO_VALUE,     /**<entryÔªËØµÄsizeinfoÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_UNSPORTED_IOSTREAM,				/**<²»Ö§³ÖµÄIOÁ÷*/
-	CPE_DR_ERROR_FAILED_TO_WRITE_FILE,				/**<Ð´ÎÄ¼þÊ§°Ü*/
-	CPE_DR_ERROR_FAILED_OPEN_FILE_TO_WRITE,					/**<´ò¿ªÎÄ¼þÐ´Ê§°Ü*/
-	CPE_DR_ERROR_INVALID_METALIB_FILE,				/**<±£´æÔªÊý¾Ý¿âµÄ¶þ½øÖÆÎÄ¼þÎÞÐ§*/
-	CPE_DR_ERROR_FAILED_OPEN_FILE_TO_READ,			/**<´ò¿ªÎÄ¼þ¶ÁÊ§°Ü*/
-    CPE_DR_ERROR_VARIABLE_ARRAY_NO_REFER,          /**<¿É±äÊý×é±ØÐëÖ¸¶¨referÊôÐÔ*/
-    CPE_DR_ERROR_VARIABLE_BEFOR_SIZEINFO,          /**<ÔªÊý¾ÝÖÐsizeinfo³ÉÔ±Ç°µÄ³ÉÔ±µÄ´æ´¢¿Õ¼ä±ØÐëÊÇ¹Ì¶¨µÄ*/
-	CPE_DR_ERROR_FAILED_CONVERT_CHINESE_TO_UNICODE,	/**<ÖÐÎÄ×Ö·û´®×ª»»³Éunicode×Ö·û´®Ê§°Ü*/
-	CPE_DR_ERROR_BREACH_KEY_RESTRICTION,			/**<entryÔªËØµÄÖµ²»Âú×ã¼üÔ¼Êø*/
-	CPE_DR_ERROR_DB_UNSUPPORTED_DBMS,				/**<²»Ö§³ÖµÄÊý¾Ý¿â¹ÜÀíÏµÍ³DBMS*/
-	CPE_DR_ERROR_DB_UNSUPPORTED_COMPOSITE_ARRAY,	/**<²»Ö§³ÖÎª¸´ºÏÊý¾ÝÀàÐÍÊý×é³ÉÔ±Éú³É½¨±íÓï¾ä*/
-	CPE_DR_ERROR_DB_FAILD_TO_CONNECT_SERVER,       /**<Á¬½ÓÊý¾Ý¿â·þÎñÆ÷Ê§°Ü*/
-	CPE_DR_ERROR_DB_UNSUPPORTED_OPER,				/**<²»Ö§³ÖµÄÊý¾Ý²Ù×÷*/
-	CPE_DR_ERROR_DB_NO_PRIMARYKEY,					/**<¸Ã¼ô²Ã°æ±¾ÎÞ·¨Éú³ÉÓÐÐ§µÄÖ÷¼üÐÅÏ¢*/
-	CPE_DR_ERROR_DB_FAILED_TO_QUERY,					/**<Ö´ÐÐÊý¾Ý¿âSQLÓï¾äÊ§°Ü*/
-	CPE_DR_ERROR_DB_FAILED_TO_CONNECT,					/**<Êý¾Ý¿âÁ¬½Ó´íÎó*/
-	CPE_DR_ERROR_DB_FAILED_TO_GET_QUERY_RESULT,		/**<È¡SQL²éÑ¯½á¹ûÊ§°Ü*/
-	CPE_DR_ERROR_DB_NO_RESULT_SET,			/**<SQL²éÑ¯½á¹û¼¯Îª¿Õ*/
-	CPE_DR_ERROR_DB_NO_RECORD_IN_RESULTSET, /**<½á¹û¼¯ÖÐÃ»ÓÐ¸ü¶àµÄÊý¾Ý¼ÇÂ¼»ò³öÏÖÁË´íÎó*/
-	CPE_DR_ERROR_DB_NO_EXPECTED_FIELD,			/**<µ±Ç°Êý¾ÝÐÐÖÐ²»´æÔÚÖ¸¶¨µÄÊý¾ÝÓò*/
-	CPE_DR_ERROR_DB_UNSUPPORTED_VARIABLE_META,	/**<²»Ö§³ÖÎª´æ´¢¿Õ¼ä²»¹Ì¶¨µÄ½á¹¹Éú³É½¨±íÓï¾ä*/
-	CPE_DR_ERROR_BUILD_VERSION_CONFLICT,		/**<Éú³ÉÔªÊý¾Ý¿âÎÄ¼þµÄtdr¹¤¾ßµÄºËÐÄÊý¾Ý¹¹½¨°æ±¾ºÍtdr¿âµÄºËÐÄÊý¾Ý¹¹¹¹½¨°æ±¾²»Ò»ÖÂ*/
-	CPE_DR_ERROR_DIFF_METALIB_HASH,			/**<ÔªÊý¾Ý¿âµÄÉ¢ÁÐÖµºÍÆÚÍûµÄÉ¢ÁÐÖµ²»Ò»ÖÂ*/
-	CPE_DR_ERROR_CONFICT_INDEX_NUM,			/**<½á¹¹Ìå³ÉÔ±µÄÊµ¼ÊË÷ÒýÊýÓëÔ¤¼ÆµÄ²»Ò»ÖÂ*/
-	CPE_DR_ERROR_INVALID_VERSION,					/**<³ÉÔ±µÄvesionÊôÐÔÖµ²»ÕýÈ·*/
-	CPE_DR_ERROR_DB_NOSPLITTABLE_KEY,				/**<Êý¾ÝËùÔÚµÄÊý¾Ý¿â±íÊÇ·Ö±í´æ´¢µÄ,µ«´ËÊý¾ÝµÄÔªÊý¾ÝÃèÊöÃ»ÓÐÖ¸¶¨·Ö±í¹Ø¼ü×Ö*/
-	CPE_DR_ERROR_MACROGSROUP_ATTRIBUTE,			/**<´¦ÀímacrosgroupÊôÐÔÊ§°Ü*/
-	CPE_DR_ERROR_ENTRY_INVALID_BINDMACROSGROUP,	/**<entryµÄbindmacrosgroupÊôÐÔÖµÎÞÐ§*/
-	CPE_DR_ERROR_VALUE_BEYOND_TYPE_FIELD,				/**<³ÉÔ±È¡ÖµÒÑ¾­³¬³ö´ËÀàÐÍµÄÖÃÓÚ·¶Î§*/
-	CPE_DR_ERROR_META_EXTENABLE_ARRAY,					/**<ÔÚ¿ÉÀ©Õ¹µÄ½á¹¹ÌåÊý×é³ÉÔ±ÖÐ¶¨ÒåÁË²»ÈÝÐí³öÏÖµÄÊôÐÔ*/
-	CPE_DR_ERROR_FAILED_TO_CALL_ENTER_META,		/**<µ±·¢ÏÖ¸´ºÏÊý¾ÝÀàÐÍÊý¾Ý³ÉÔ±Ê±£¬µ÷ÓÃ»Øµ÷Ê§°Ü*/
-	CPE_DR_ERROR_FAILED_TO_CALL_VIST_ENTRY,		/**<µ±·¢ÏÖ¼òµ¥Êý¾ÝÀàÐÍ³ÉÔ±Ê±,µ÷ÓÃ»Øµ÷º¯ÊýÊ§°Ü*/
-	CPE_DR_ERROR_INVALID_AUTOINCREMENT,			/**<³ÉÔ±µÄautoincrementÊôÐÔÎÞÐ§£¬Ä¿Ç°Ö»ÓÐ·ÇÊý×éÕûÊýÊý¾ÝÀàÐÍµÄ³ÉÔ±²ÅÄÜ¶¨Òå´ËÊôÐÔ*/
-	CPE_DR_ERROR_INVALID_CUSTOMATTR,				/**<³ÉÔ±µÄcustomÊôÐÔÖµÎÞÐ§,ÇëÈ·¶¨ÊôÐÔÖµµÄ³¤¶È²»³¬¹ý×î´ó³¤¶ÈÏÞÖÆ*/
-	CPE_DR_ERROR_INVALID_UNIQUEENTRYNAMEVALUE,				/**<½á¹¹ÌåµÄuniqueentrynameÊôÐÔÖµÎÞÐ§,´ËÊôÐÔµÄÊôÐÔÖµÖ»ÄÜÎªtrue/false*/
-	CPE_DR_ERROR_NAME_CONFLICT_WHEN_EXTEND,				/**<½«½á¹¹Ìå³ÉÔ±Õ¹¿ª´æ´¢Ê±»á³öÏÖÖØÃû*/
-	CPE_DR_ERROR_INVALID_PARAM,					/**<²ÎÊýÎÞÐ§£¬Çë¼ì²éÃ¿¸ö²ÎÊýÊÇ·ñÂú×ã½Ó¿ÚµÄÇ°ÖÃÌõ¼þÔ¼Êø*/
-	CPE_DR_ERROR_NEED_ADD_PREFIX_META_UNSPPORT_ENTRY_INDEX,	/**<ÔÚÕ¹¿ª´æ´¢Ê±ÐèÒªÌí¼ÓÇ°×ºµÄ½á¹¹Ìå²»Ö§³Ö½¨Á¢ËùÓÐ³ÉÔ±Ãû×ÖÆ«ÒÆË÷Òý±í*/
-	CPE_DR_ERROR_SET_DB_OPTIONS,     /**<ÉèÖÃdbÊôÐÔÊ§°Ü*/
-	CPE_DR_ERROR_INVALID_VARIABLE_ARRAY_ENTRY,		/**<½á¹¹Ìå³ÉÔ±ÖÐ£¬Ö»ÈÝÐí×îºóÒ»¸ö³ÉÔ±ÊÇ¿É±äÊý×éÀàÐÍµÄ³ÉÔ±*/
-	CPE_DR_ERROR_INVALID_VARIABLE_STRING_ENTRY,	/**<½á¹¹Ìâ³ÉÔ±ÖÐ£¬Ã»ÓÐ¶¨ÒåsizeÊôÐÔµÄstringÀàÐÍ³ÉÔ±(Æä´æ´¢¿Õ¼äÊÇ¿É±äµÄ)Ö»ÄÜ×÷Îª×îºóÒ»¸ö³ÉÔ±£¬ÇÒ²»ÄÜÎªÊý×é£¬*/
-    CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT,          /**<Ãû×Ö´®Ì«³¤£¬³¬¹ýÁË×î´ó³¤¶ÈÏÞÖÆ*/
-    CPE_DR_ERROR_PLATFORM_CONFLICT,               /**<Éú³ÉÔªÊý¾Ý¿âÎÄ¼þµÄÏµÍ³Æ½Ì¨ÓëÉú³Étdr¿âµÄÏµÍ³Æ½Ì¨²»Ò»ÖÂ£¬Çë×¢Òâ32Î»Æ½Ì¨Óë64Î»Æ½Ì¨µÄÇø±ð*/
-    CPE_DR_ERROR_UNSOLVED_INCLUDE,                 /**<xmlÎÄ¼þÖÐ´æÔÚÎÞ·¨½âÎöµÄinclude¹ØÏµ*/
-    CPE_DR_ERROR_INVALID_INDICATOR_VALUE,      /**<ÍøÂçÊý¾Ý°üÖÐµÄ°æ±¾Ö¸Ê¾Æ÷Öµ²»ÕýÈ·£¬ÆäÈ¡ÖµÓ¦´óÓÚÔªÊý¾Ý»ù×¼°æ±¾,²¢ÇÒÐ¡ÓÚÔªÊý¾ÝµÄµ±Ç°°æ±¾
-                                              Èç¹ûÔªÊý¾ÝÓÐ°æ±¾Ö¸Ê¾Æ÷£¬Ôò°æ±¾Ö¸Ê¾Æ÷µÄÖµ±ØÐë²»Ð¡ÓÚ°æ±¾Ö¸Ê¾Æ÷ÔÊÐíµÄ×îÐ¡°æ±¾*/
-    CPE_DR_ERROR_COUNT                     /**< ´íÎó´úÂë½áÊø±êÖ¾*/
+    CPE_DR_ERROR_NONE = 0,                    /**< æ²¡æœ‰é”™è¯¯*/
+	CPE_DR_ERROR_INVALID_CUTOFF_VERSION,	    /**<å‰ªè£ç‰ˆæœ¬é”™è¯¯ï¼Œå…¶å–å€¼åº”å¤§äºŽå…ƒæ•°æ®åŸºå‡†ç‰ˆæœ¬,å¹¶ä¸”å°äºŽå…ƒæ•°æ®çš„å½“å‰ç‰ˆæœ¬
+                                              å¦‚æžœå…ƒæ•°æ®æœ‰ç‰ˆæœ¬æŒ‡ç¤ºå™¨ï¼Œåˆ™å‰ªè£ç‰ˆæœ¬å¿…é¡»ä¸å°äºŽç‰ˆæœ¬æŒ‡ç¤ºå™¨å…è®¸çš„æœ€å°ç‰ˆæœ¬*/
+	CPE_DR_ERR_NET_NO_NETBUFF_SPACE,			/**<ç½‘ç»œç¼–ç ä¿¡æ¯ç¼“å†²åŒºå‰©ä½™ç©ºé—´ä¸å¤Ÿ*/
+	CPE_DR_ERROR_INVALID_REFER_VALUE,		/**<æ­¤å…ƒç´ çš„referå±žæ€§å€¼ä¸æ­£ç¡®ï¼Œå…¶å€¼ä¸èƒ½ä¸ºè´Ÿæ•°ä¸”å¿…é¡»æ¯”countå±žæ€§å€¼å°*/
+	CPE_DR_ERROR_TOO_COMPLIEX_META,		/**<å…ƒæ•°æ®æè¿°å¤åˆæ•°æ®ç±»åž‹åµŒå¥—å±‚æ¬¡è¶…è¿‡32å±‚*/
+	CPE_DR_ERROR_NET_UNSUPPORTED_TYPE,			/**<ä¸æ”¯æŒçš„å…ƒæ•°æ®ç±»åž‹*/
+	CPE_DR_ERROR_NET_INVALID_STRING_LEN,		/**<stringç±»åž‹çš„å…ƒç´ å…¶å­—ç¬¦ä¸²é•¿åº¦è¶…è¿‡äº†é¢„å®šæœ€å¤§é•¿åº¦*/
+	CPE_DR_ERROR_NO_HOSTBUFF_SPACE,			/**<æœ¬åœ°å­˜å‚¨ç¼“å†²åŒºå‰©ä½™ç©ºé—´ä¸å¤Ÿ*/
+	CPE_DR_ERROR_NET_INVALID_VERSIONINDICATOR,	/**<å…ƒç´ æ•°ç‰ˆæœ¬æŒ‡ç¤ºå™¨çš„å€¼ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_NO_MEMORY,                   /**< åˆ†é…å­˜å‚¨ç©ºé—´å¤±è´¥*/
+    CPE_DR_ERROR_XML_PARSE,                /**< XMLæ–‡ä»¶è§£æžé”™è¯¯ */
+    CPE_DR_ERROR_NO_XML_ROOT,              /**< XMLå…ƒç´ æ ‘ä¸­æ²¡æœ‰æ ¹å…ƒç´ */
+    CPE_DR_ERROR_INVAILD_XML_ROOT,         /**< æ— æ•ˆçš„å…ƒæ•°æ®æ ¹å…ƒç´ */
+    CPE_DR_ERROR_NAMESPACE_CONFLICT,       /**< å…ƒæ•°æ®æè¿°åå­—ç©ºé—´å†²çªï¼Œå³ä¸èƒ½å°†æ ¹å…ƒç´ nameå±žæ€§å€¼ä¸åŒçš„ä¿¡æ¯åŠ åˆ°åŒä¸€ä¸ªåº“ä¸­*/
+    CPE_DR_ERROR_MACRO_NO_NAME_ATTR,             /**< å®å®šä¹‰å…ƒç´ å¿…é¡»æŒ‡å®šnameå±žæ€§*/
+    CPE_DR_ERROR_INCLUDE_NO_FILE,          /**< includeæœªå®šä¹‰fileå±žæ€§*/
+    CPE_DR_ERROR_NO_VERSION,       /**< æ²¡æœ‰æŒ‡å®šversionå±žæ€§*/
+    CPE_DR_ERROR_ROOT_ID_CONFLICT,         /**< æ ¹å…ƒç´ IDå†²çªï¼Œå³ä¸èƒ½å°†æ ¹å…ƒç´ IDå±žæ€§å€¼ä¸åŒçš„ä¿¡æ¯åŠ åˆ°åŒä¸€ä¸ªåº“ä¸­*/
+    CPE_DR_ERROR_INVALID_TAGSET_VERSION,    /**< ä¸æ”¯æŒçš„å…ƒæ•°æ®æè¿°XMLæ ‡ç­¾é›†ç‰ˆæœ¬*/
+    CPE_DR_ERROR_INVALID_METALIB_PARAM,    /**< å…ƒæ•°æ®åº“å‚æ•°ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_INVALID_METALIB_CHECKSUM, /**< å…ƒæ•°æ®åº“æ ¡éªŒå’Œä¸æ­£ç¡®*/
+    CPE_DR_ERROR_TOO_MUCH_MACROS,          /**< éœ€åŠ åˆ°å…ƒæ•°æ®æè¿°åº“ä¸­çš„å®å®šä¹‰æ•°æ¯”é¢„å®šä¹‰çš„è¦å¤š */
+    CPE_DR_ERROR_MACRO_NO_VALUE,           /**< å®å®šä¹‰å…ƒç´ æ²¡æœ‰å€¼å±žæ€§*/
+    CPE_DR_ERROR_UNSUPPORTED_TYPE,           /**< ä¸æ”¯æŒçš„æ•°æ®ç±»åž‹ */
+    CPE_DR_ERROR_METALIB_ROOT_NO_NAME,         /**< å…ƒæ•°æ®æè¿°åº“æ ¹å…ƒç´ å¿…é¡»æŒ‡å®šnameå±žæ€§*/
+    CPE_DR_ERROR_NO_SPACE_FOR_MATA,            /**< æ²¡æœ‰è¶³å¤Ÿçš„ç©ºé—´å­˜å‚¨è‡ªå®šä¹‰æ•°æ®ç±»åž‹*/
+    CPE_DR_ERROR_NO_SPACE_FOR_STRBUF,          /**< å­—ç¬¦ä¸²ç¼“å†²åŒºç©ºé—´ä¸å¤Ÿ*/
+    CPE_DR_ERROR_META_NO_NAME,                 /**< unionå’Œstuctå…ƒç´ å¿…é¡»åŒ…å«nameå±žæ€§*/
+    CPE_DR_ERROR_META_NAME_CONFLICT,           /**< åŒç±»åž‹çš„unionå’Œstuctå…ƒç´ ä¸å®¹è®¸åŒå*/
+    CPE_DR_ERROR_UNDEFINED_MACRO_NAME,         /**< è¯¥å®åæ²¡æœ‰å®šä¹‰*/
+    CPE_DR_ERROR_META_ID_CONFLICT,          /**< åŒä¸€çˆ¶å…ƒç´ ä¸‹ä¸èƒ½å‡ºçŽ°IDç›¸åŒçš„å­å…ƒç´ */
+    CPE_DR_ERROR_ENTRY_NO_TYPE,             /**< entryå…ƒç´ å¿…é¡»åŒ…å«typeå±žæ€§ä¸”ä¸èƒ½ä¸ºç©ºä¸²*/
+    CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE,     /**< entryçš„typeå±žæ€§å€¼æ— æ•ˆ*/
+    CPE_DR_ERROR_ENTRY_INVALID_IO_VALUE,       /**< entryçš„ioå±žæ€§å€¼æ— æ•ˆ*/
+    CPE_DR_ERROR_ENTRY_INVALID_UNIQUE_VALUE,   /**< entryçš„uniqueå±žæ€§ä¸æ­£ç¡®ï¼Œæ­£ç¡®å–å€¼ä¸ºfalse,true*/
+    CPE_DR_ERROR_ENTRY_INVALID_NOTNULL_VALUE,  /**< entryçš„notnullå±žæ€§ä¸æ­£ç¡®ï¼Œæ­£ç¡®å–å€¼ä¸ºfalse,true*/
+    CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE,  /**< entryçš„sizeå±žæ€§å€¼ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_ENTRY_IVALID_SORTKEY_VALUE,    /**<entryçš„sortkeyå±žæ€§å€¼ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_ENTRY_INVALID_SELECT_VALUE,    /**< entryçš„selectå±žæ€§å€¼ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_ENTRY_INVALID_MAXID_VALUE,     /**< entryçš„maxidå±žæ€§ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_ENTRY_INVALID_MINID_VALUE,     /**< entryçš„minidå±žæ€§ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_ENTRY_INVALID_MAXMINID_VALUE,     /**< entryçš„minidå’Œmaxidå±žæ€§å€¼ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_ENTRY_INVALID_COUNT_VALUE,     /**<entryçš„countå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE,		/**<entryçš„idå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_ENTRY_INVALID_DEFAULT_VALUE,  /**<entryçš„defaultå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_ENTRY_INVALID_SORTMETHOD_VALUE, /**<entryçš„sortmethodå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_ENTRY_INVALID_DATETIME_VALUE,		/**<entryçš„datetimeå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_ENTRY_INVAILD_DATE_VALUE,			/**<entryçš„dateå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_ENTRY_INVALID_TIME_VALUE,			/**<entryçš„timeå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_ENTRY_INVALID_IP_VALUE,			/**<entryçš„ipå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_ENTRY_INVALID_EXTENDTOTABLE_VALUE,	/**<entryçš„extendtotableå±žæ€§ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_META_INVALID_SIZE_VALUE,      /**<structå…ƒç´ çš„sizeå±žæ€§ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_META_INVALID_ALIGN_VALUE,     /**<structå…ƒç´ çš„alignå±žæ€§å€¼ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_META_INVALID_VERSIONINDICATOR_VALUE,      /**<structå…ƒç´ çš„versionindicatorå±žæ€§ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_META_INVALID_SIZETYPE_VALUE,      /**< å…ƒç´ çš„sizetype/sizeofå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_META_INVALID_SPLITTABLEFACTOR,	/**< structå…ƒç´ çš„splittablefactorå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_META_INVALID_PRIMARYKEY,			/**< structå…ƒç´ çš„primarykeyå±žæ€§å€¼ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_META_INVALID_INDEXCOLUMN,         /**< indexå…ƒç´ çš„columnå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_META_INVALID_SPLITTABLEKEY,	/**< structå…ƒç´ çš„splittablekeyå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_META_INVALID_SPLITTABLERULE,	/**< structå…ƒç´ çš„splittableruleå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_META_INVALID_STRICTINPUT,		/**<structå…ƒç´ çš„strictinputå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_META_INVALID_DEPENDONSTRUCT,		/**<structå…ƒç´ çš„dependonstructå±žæ€§å€¼ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_INVALID_PATH_VALUE,               /**<å…ƒç´ çš„pathä¸æ­£ç¡®ï¼Œä¸èƒ½æ­£ç¡®åŒ¹é…metaä¸­çš„å…ƒç´ */
+    CPE_DR_ERROR_INVALID_OFFSET,                   /**<å…ƒç´ çš„åç§»å€¼ä¸å¯¹*/
+    CPE_DR_ERROR_NO_SPACE_TO_WRITE,                /**<å°†ä¿¡æ¯å†™åˆ°ç¼“å†²åŒºæ—¶ç©ºé—´ä¸å¤Ÿ*/
+    CPE_DR_ERROR_META_NO_ENTRY,                    /**< è‡ªå®šä¹‰æ•°æ®ç±»åž‹æ²¡æœ‰åŒ…å«ä»»ä½•å­æˆå‘˜*/
+    CPE_DR_ERROR_ENTRY_INVALID_REFER_VALUE,        /**<entryå…ƒç´ çš„referå±žæ€§å€¼ä¸æ­£ç¡®*/
+    CPE_DR_ERROR_ENTRY_INVALID_SIZEINFO_VALUE,     /**<entryå…ƒç´ çš„sizeinfoå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_UNSPORTED_IOSTREAM,				/**<ä¸æ”¯æŒçš„IOæµ*/
+	CPE_DR_ERROR_FAILED_TO_WRITE_FILE,				/**<å†™æ–‡ä»¶å¤±è´¥*/
+	CPE_DR_ERROR_FAILED_OPEN_FILE_TO_WRITE,					/**<æ‰“å¼€æ–‡ä»¶å†™å¤±è´¥*/
+	CPE_DR_ERROR_INVALID_METALIB_FILE,				/**<ä¿å­˜å…ƒæ•°æ®åº“çš„äºŒè¿›åˆ¶æ–‡ä»¶æ— æ•ˆ*/
+	CPE_DR_ERROR_FAILED_OPEN_FILE_TO_READ,			/**<æ‰“å¼€æ–‡ä»¶è¯»å¤±è´¥*/
+    CPE_DR_ERROR_VARIABLE_ARRAY_NO_REFER,          /**<å¯å˜æ•°ç»„å¿…é¡»æŒ‡å®šreferå±žæ€§*/
+    CPE_DR_ERROR_VARIABLE_BEFOR_SIZEINFO,          /**<å…ƒæ•°æ®ä¸­sizeinfoæˆå‘˜å‰çš„æˆå‘˜çš„å­˜å‚¨ç©ºé—´å¿…é¡»æ˜¯å›ºå®šçš„*/
+	CPE_DR_ERROR_FAILED_CONVERT_CHINESE_TO_UNICODE,	/**<ä¸­æ–‡å­—ç¬¦ä¸²è½¬æ¢æˆunicodeå­—ç¬¦ä¸²å¤±è´¥*/
+	CPE_DR_ERROR_BREACH_KEY_RESTRICTION,			/**<entryå…ƒç´ çš„å€¼ä¸æ»¡è¶³é”®çº¦æŸ*/
+	CPE_DR_ERROR_DB_UNSUPPORTED_DBMS,				/**<ä¸æ”¯æŒçš„æ•°æ®åº“ç®¡ç†ç³»ç»ŸDBMS*/
+	CPE_DR_ERROR_DB_UNSUPPORTED_COMPOSITE_ARRAY,	/**<ä¸æ”¯æŒä¸ºå¤åˆæ•°æ®ç±»åž‹æ•°ç»„æˆå‘˜ç”Ÿæˆå»ºè¡¨è¯­å¥*/
+	CPE_DR_ERROR_DB_FAILD_TO_CONNECT_SERVER,       /**<è¿žæŽ¥æ•°æ®åº“æœåŠ¡å™¨å¤±è´¥*/
+	CPE_DR_ERROR_DB_UNSUPPORTED_OPER,				/**<ä¸æ”¯æŒçš„æ•°æ®æ“ä½œ*/
+	CPE_DR_ERROR_DB_NO_PRIMARYKEY,					/**<è¯¥å‰ªè£ç‰ˆæœ¬æ— æ³•ç”Ÿæˆæœ‰æ•ˆçš„ä¸»é”®ä¿¡æ¯*/
+	CPE_DR_ERROR_DB_FAILED_TO_QUERY,					/**<æ‰§è¡Œæ•°æ®åº“SQLè¯­å¥å¤±è´¥*/
+	CPE_DR_ERROR_DB_FAILED_TO_CONNECT,					/**<æ•°æ®åº“è¿žæŽ¥é”™è¯¯*/
+	CPE_DR_ERROR_DB_FAILED_TO_GET_QUERY_RESULT,		/**<å–SQLæŸ¥è¯¢ç»“æžœå¤±è´¥*/
+	CPE_DR_ERROR_DB_NO_RESULT_SET,			/**<SQLæŸ¥è¯¢ç»“æžœé›†ä¸ºç©º*/
+	CPE_DR_ERROR_DB_NO_RECORD_IN_RESULTSET, /**<ç»“æžœé›†ä¸­æ²¡æœ‰æ›´å¤šçš„æ•°æ®è®°å½•æˆ–å‡ºçŽ°äº†é”™è¯¯*/
+	CPE_DR_ERROR_DB_NO_EXPECTED_FIELD,			/**<å½“å‰æ•°æ®è¡Œä¸­ä¸å­˜åœ¨æŒ‡å®šçš„æ•°æ®åŸŸ*/
+	CPE_DR_ERROR_DB_UNSUPPORTED_VARIABLE_META,	/**<ä¸æ”¯æŒä¸ºå­˜å‚¨ç©ºé—´ä¸å›ºå®šçš„ç»“æž„ç”Ÿæˆå»ºè¡¨è¯­å¥*/
+	CPE_DR_ERROR_BUILD_VERSION_CONFLICT,		/**<ç”Ÿæˆå…ƒæ•°æ®åº“æ–‡ä»¶çš„tdrå·¥å…·çš„æ ¸å¿ƒæ•°æ®æž„å»ºç‰ˆæœ¬å’Œtdråº“çš„æ ¸å¿ƒæ•°æ®æž„æž„å»ºç‰ˆæœ¬ä¸ä¸€è‡´*/
+	CPE_DR_ERROR_DIFF_METALIB_HASH,			/**<å…ƒæ•°æ®åº“çš„æ•£åˆ—å€¼å’ŒæœŸæœ›çš„æ•£åˆ—å€¼ä¸ä¸€è‡´*/
+	CPE_DR_ERROR_CONFICT_INDEX_NUM,			/**<ç»“æž„ä½“æˆå‘˜çš„å®žé™…ç´¢å¼•æ•°ä¸Žé¢„è®¡çš„ä¸ä¸€è‡´*/
+	CPE_DR_ERROR_INVALID_VERSION,					/**<æˆå‘˜çš„vesionå±žæ€§å€¼ä¸æ­£ç¡®*/
+	CPE_DR_ERROR_DB_NOSPLITTABLE_KEY,				/**<æ•°æ®æ‰€åœ¨çš„æ•°æ®åº“è¡¨æ˜¯åˆ†è¡¨å­˜å‚¨çš„,ä½†æ­¤æ•°æ®çš„å…ƒæ•°æ®æè¿°æ²¡æœ‰æŒ‡å®šåˆ†è¡¨å…³é”®å­—*/
+	CPE_DR_ERROR_MACROGSROUP_ATTRIBUTE,			/**<å¤„ç†macrosgroupå±žæ€§å¤±è´¥*/
+	CPE_DR_ERROR_ENTRY_INVALID_BINDMACROSGROUP,	/**<entryçš„bindmacrosgroupå±žæ€§å€¼æ— æ•ˆ*/
+	CPE_DR_ERROR_VALUE_BEYOND_TYPE_FIELD,				/**<æˆå‘˜å–å€¼å·²ç»è¶…å‡ºæ­¤ç±»åž‹çš„ç½®äºŽèŒƒå›´*/
+	CPE_DR_ERROR_META_EXTENABLE_ARRAY,					/**<åœ¨å¯æ‰©å±•çš„ç»“æž„ä½“æ•°ç»„æˆå‘˜ä¸­å®šä¹‰äº†ä¸å®¹è®¸å‡ºçŽ°çš„å±žæ€§*/
+	CPE_DR_ERROR_FAILED_TO_CALL_ENTER_META,		/**<å½“å‘çŽ°å¤åˆæ•°æ®ç±»åž‹æ•°æ®æˆå‘˜æ—¶ï¼Œè°ƒç”¨å›žè°ƒå¤±è´¥*/
+	CPE_DR_ERROR_FAILED_TO_CALL_VIST_ENTRY,		/**<å½“å‘çŽ°ç®€å•æ•°æ®ç±»åž‹æˆå‘˜æ—¶,è°ƒç”¨å›žè°ƒå‡½æ•°å¤±è´¥*/
+	CPE_DR_ERROR_INVALID_AUTOINCREMENT,			/**<æˆå‘˜çš„autoincrementå±žæ€§æ— æ•ˆï¼Œç›®å‰åªæœ‰éžæ•°ç»„æ•´æ•°æ•°æ®ç±»åž‹çš„æˆå‘˜æ‰èƒ½å®šä¹‰æ­¤å±žæ€§*/
+	CPE_DR_ERROR_INVALID_CUSTOMATTR,				/**<æˆå‘˜çš„customå±žæ€§å€¼æ— æ•ˆ,è¯·ç¡®å®šå±žæ€§å€¼çš„é•¿åº¦ä¸è¶…è¿‡æœ€å¤§é•¿åº¦é™åˆ¶*/
+	CPE_DR_ERROR_INVALID_UNIQUEENTRYNAMEVALUE,				/**<ç»“æž„ä½“çš„uniqueentrynameå±žæ€§å€¼æ— æ•ˆ,æ­¤å±žæ€§çš„å±žæ€§å€¼åªèƒ½ä¸ºtrue/false*/
+	CPE_DR_ERROR_NAME_CONFLICT_WHEN_EXTEND,				/**<å°†ç»“æž„ä½“æˆå‘˜å±•å¼€å­˜å‚¨æ—¶ä¼šå‡ºçŽ°é‡å*/
+	CPE_DR_ERROR_INVALID_PARAM,					/**<å‚æ•°æ— æ•ˆï¼Œè¯·æ£€æŸ¥æ¯ä¸ªå‚æ•°æ˜¯å¦æ»¡è¶³æŽ¥å£çš„å‰ç½®æ¡ä»¶çº¦æŸ*/
+	CPE_DR_ERROR_NEED_ADD_PREFIX_META_UNSPPORT_ENTRY_INDEX,	/**<åœ¨å±•å¼€å­˜å‚¨æ—¶éœ€è¦æ·»åŠ å‰ç¼€çš„ç»“æž„ä½“ä¸æ”¯æŒå»ºç«‹æ‰€æœ‰æˆå‘˜åå­—åç§»ç´¢å¼•è¡¨*/
+	CPE_DR_ERROR_SET_DB_OPTIONS,     /**<è®¾ç½®dbå±žæ€§å¤±è´¥*/
+	CPE_DR_ERROR_INVALID_VARIABLE_ARRAY_ENTRY,		/**<ç»“æž„ä½“æˆå‘˜ä¸­ï¼Œåªå®¹è®¸æœ€åŽä¸€ä¸ªæˆå‘˜æ˜¯å¯å˜æ•°ç»„ç±»åž‹çš„æˆå‘˜*/
+	CPE_DR_ERROR_INVALID_VARIABLE_STRING_ENTRY,	/**<ç»“æž„é¢˜æˆå‘˜ä¸­ï¼Œæ²¡æœ‰å®šä¹‰sizeå±žæ€§çš„stringç±»åž‹æˆå‘˜(å…¶å­˜å‚¨ç©ºé—´æ˜¯å¯å˜çš„)åªèƒ½ä½œä¸ºæœ€åŽä¸€ä¸ªæˆå‘˜ï¼Œä¸”ä¸èƒ½ä¸ºæ•°ç»„ï¼Œ*/
+    CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT,          /**<åå­—ä¸²å¤ªé•¿ï¼Œè¶…è¿‡äº†æœ€å¤§é•¿åº¦é™åˆ¶*/
+    CPE_DR_ERROR_PLATFORM_CONFLICT,               /**<ç”Ÿæˆå…ƒæ•°æ®åº“æ–‡ä»¶çš„ç³»ç»Ÿå¹³å°ä¸Žç”Ÿæˆtdråº“çš„ç³»ç»Ÿå¹³å°ä¸ä¸€è‡´ï¼Œè¯·æ³¨æ„32ä½å¹³å°ä¸Ž64ä½å¹³å°çš„åŒºåˆ«*/
+    CPE_DR_ERROR_UNSOLVED_INCLUDE,                 /**<xmlæ–‡ä»¶ä¸­å­˜åœ¨æ— æ³•è§£æžçš„includeå…³ç³»*/
+    CPE_DR_ERROR_INVALID_INDICATOR_VALUE,      /**<ç½‘ç»œæ•°æ®åŒ…ä¸­çš„ç‰ˆæœ¬æŒ‡ç¤ºå™¨å€¼ä¸æ­£ç¡®ï¼Œå…¶å–å€¼åº”å¤§äºŽå…ƒæ•°æ®åŸºå‡†ç‰ˆæœ¬,å¹¶ä¸”å°äºŽå…ƒæ•°æ®çš„å½“å‰ç‰ˆæœ¬
+                                              å¦‚æžœå…ƒæ•°æ®æœ‰ç‰ˆæœ¬æŒ‡ç¤ºå™¨ï¼Œåˆ™ç‰ˆæœ¬æŒ‡ç¤ºå™¨çš„å€¼å¿…é¡»ä¸å°äºŽç‰ˆæœ¬æŒ‡ç¤ºå™¨å…è®¸çš„æœ€å°ç‰ˆæœ¬*/
+    CPE_DR_ERROR_COUNT                     /**< é”™è¯¯ä»£ç ç»“æŸæ ‡å¿—*/
 } CPEDRERRORNO;
 
 
 typedef enum
 {
-    CPE_DR_SUCWARN_NONE = 0,                    /**< Ã»ÓÐ´íÎó*/
-    CPE_DR_SUCWARN_MACRO_NAME_CONFLICT,        /**<³öÏÖÍ¬ÃûµÄºê¶¨Òå*/
-    CPE_DR_SUCWARN_CNAME_BE_TRANCATED,         /**<cnameÊôÐÔÖµ³¬¹ýÔ¤¶¨×î´ó³¤¶È£¬±»½Ø¶Ï*/
-    CPE_DR_SUCWARN_DESC_VALUE_BE_TRANCATED,    /**<descÊôÐÔÖµ³¬¹ýÔ¤¶¨×î´ó³¤¶È£¬±»½Ø¶Ï*/
-    CPE_DR_SUCWARN_NO_ID,                      /**<ÔªËØÃ»ÓÐÖ¸¶¨idÊôÐÔ*/
-    CPE_DR_SUCWARN_NO_NAME,                    /**<ÔªËØÃ»ÓÐÖ¸¶¨nameÊôÐÔ*/
-    CPE_DR_SUCWARN_NO_VERSION,                 /**<ÔªËØÃ»ÓÐÖ¸¶¨versionÊôÐÔ*/
-	CPE_DR_SUCWARN_TRUNCATE_DATE,				/**<±£´æÊý¾ÝÊ±½øÐÐÁËÊý¾Ý½Ø¶Ï*/
+    CPE_DR_SUCWARN_NONE = 0,                    /**< æ²¡æœ‰é”™è¯¯*/
+    CPE_DR_SUCWARN_MACRO_NAME_CONFLICT,        /**<å‡ºçŽ°åŒåçš„å®å®šä¹‰*/
+    CPE_DR_SUCWARN_CNAME_BE_TRANCATED,         /**<cnameå±žæ€§å€¼è¶…è¿‡é¢„å®šæœ€å¤§é•¿åº¦ï¼Œè¢«æˆªæ–­*/
+    CPE_DR_SUCWARN_DESC_VALUE_BE_TRANCATED,    /**<descå±žæ€§å€¼è¶…è¿‡é¢„å®šæœ€å¤§é•¿åº¦ï¼Œè¢«æˆªæ–­*/
+    CPE_DR_SUCWARN_NO_ID,                      /**<å…ƒç´ æ²¡æœ‰æŒ‡å®šidå±žæ€§*/
+    CPE_DR_SUCWARN_NO_NAME,                    /**<å…ƒç´ æ²¡æœ‰æŒ‡å®šnameå±žæ€§*/
+    CPE_DR_SUCWARN_NO_VERSION,                 /**<å…ƒç´ æ²¡æœ‰æŒ‡å®šversionå±žæ€§*/
+	CPE_DR_SUCWARN_TRUNCATE_DATE,				/**<ä¿å­˜æ•°æ®æ—¶è¿›è¡Œäº†æ•°æ®æˆªæ–­*/
 } CPEDRSUCWARNINGNO;
 
 

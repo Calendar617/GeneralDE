@@ -34,7 +34,7 @@ void cpe_error_list_free(error_list_t el) {
         return;
     }
 
-    while(TAILQ_EMPTY(&el->m_nodes)) {
+    while(!TAILQ_EMPTY(&el->m_nodes)) {
         struct error_list_node * node = TAILQ_FIRST(&el->m_nodes);
         TAILQ_REMOVE(&el->m_nodes, node, m_next);
         mem_free(el->m_alloc, node);

@@ -36,6 +36,7 @@ void cpe_error_log_to_consol(struct error_info * info, void * context, const cha
 
 /*operations*/
 void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...);
+void cpe_error_do_notify_var(error_monitor_t monitor, const char * fmt, va_list args);
 void cpe_error_monitor_add_node(error_monitor_t monitor, struct error_monitor_node * node);
 void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor_node * node);
 
@@ -56,11 +57,10 @@ void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor
 #define CPE_DEF_ERROR_MONITOR_REMOVE(name, monitor)                     \
     cpe_error_monitor_remove_node(monitor, &name);
 
-#define CPE_ERROR_LINE(monitor, line)           \
-    monitor->m_curent_location.m_line = line;
-
-#define CPE_ERROR_FILE(monitor, file)           \
-    monitor->m_curent_location.m_file = file;
+#define CPE_ERROR_SET_LINE(monitor, line) monitor->m_curent_location.m_line = line
+#define CPE_ERROR_SET_FILE(monitor, file) monitor->m_curent_location.m_file = file
+#define CPE_ERROR_SET_ERRNO(monitor, e) monitor->m_curent_location.m_errno = e
+#define CPE_ERROR_SET_LEVEL(monitor, l) monitor->m_curent_location.m_level = l
 
 #define CPE_INFO_NOTIFY(monitor, format, args...)               \
     _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_INFO, 0, format, ##args)

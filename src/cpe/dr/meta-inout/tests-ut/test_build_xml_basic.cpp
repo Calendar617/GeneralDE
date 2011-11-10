@@ -38,3 +38,24 @@ TEST_F(BuildFromXmlTest, xml_format_error) {
 
     ASSERT_TRUE(haveError(CPE_DR_ERROR_XML_PARSE));
 }
+
+TEST_F(BuildFromXmlTest, metalib_name_overflow) {
+    char name[CPE_DR_NAME_LEN + 1];
+    for(int i = 0; i < CPE_DR_NAME_LEN; ++i) {
+        name[i] = 'a';
+    }
+    name[CPE_DR_NAME_LEN] = 0;
+
+    char buf[1024];
+    snprintf(
+        buf, 1024,
+        "<?xml version='1.0' standalone='yes' ?>"
+        "<metalib tagsetversion='1' name='%s' version='20'/>",
+        name);
+
+    EXPECT_EQ(
+        CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT,
+        parseMeta(buf));
+
+    ASSERT_TRUE(haveError(CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT));
+}
