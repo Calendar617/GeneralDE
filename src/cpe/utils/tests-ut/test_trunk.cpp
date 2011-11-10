@@ -14,7 +14,7 @@ TEST_F(BufferTest, trunk_append_basic) {
     struct mem_buffer_trunk * trunk = 
         mem_buffer_append_trunk(&m_buffer, 3);
 
-    char * data = "abcde";
+    const char * data = "abcde";
 
     EXPECT_EQ(3, mem_trunk_append(&m_buffer, trunk, data, 3));
     EXPECT_EQ(3, trunk->m_size);
@@ -25,7 +25,7 @@ TEST_F(BufferTest, trunk_append_twice) {
     struct mem_buffer_trunk * trunk = 
         mem_buffer_append_trunk(&m_buffer, 10);
 
-    char * data = "abcde";
+    const char * data = "abcde";
 
     EXPECT_EQ(3, mem_trunk_append(&m_buffer, trunk, data, 3));
     EXPECT_EQ(3, mem_trunk_append(&m_buffer, trunk, data, 3));
@@ -44,7 +44,7 @@ TEST_F(BufferTest, trunk_append_overflow) {
     struct mem_buffer_trunk * trunk = 
         mem_buffer_append_trunk(&m_buffer, 2);
 
-    char * data = "abcde";
+    const char * data = "abcde";
 
     EXPECT_EQ(2, mem_trunk_append(&m_buffer, trunk, data, 3));
     EXPECT_EQ(2, trunk->m_size);
@@ -55,7 +55,7 @@ TEST_F(BufferTest, trunk_append_twice_overflow) {
     struct mem_buffer_trunk * trunk = 
         mem_buffer_append_trunk(&m_buffer, 5);
 
-    char * data = "abcde";
+    const char * data = "abcde";
 
     EXPECT_EQ(3, mem_trunk_append(&m_buffer, trunk, data, 3));
     EXPECT_EQ(3, trunk->m_size);
@@ -71,7 +71,7 @@ TEST_F(BufferTest, trunk_free) {
     struct mem_buffer_trunk * trunk = 
         mem_buffer_append_trunk(&m_buffer, 5);
 
-    char * data = "abcde";
+    const char * data = "abcde";
 
     EXPECT_EQ(3, mem_trunk_append(&m_buffer, trunk, data, 3));
     EXPECT_EQ(3, trunk->m_size);
@@ -82,7 +82,7 @@ TEST_F(BufferTest, trunk_free) {
 }
 
 TEST_F(BufferTest, trunk_free_middle) {
-    char * data = "abcde";
+    const char * data = "abcde";
 
     struct mem_buffer_trunk * trunk1 = 
         mem_buffer_append_trunk(&m_buffer, 5);

@@ -19,7 +19,7 @@ static int dr_type_read_int ## __bit ## _from_string(void * output, const char *
     int base;                                                           \
     char c;                                                             \
     uint ## __bit ## _t cutoff;                                         \
-    int neg, any, cutlim;                                               \
+    int ## __bit ## _t neg, any, cutlim;                                \
                                                                         \
     do {                                                                \
         c = *s++;                                                       \
@@ -50,7 +50,7 @@ static int dr_type_read_int ## __bit ## _from_string(void * output, const char *
     acc = any = 0;                                                      \
                                                                         \
     cutoff = neg                                                        \
-        ? (uint32_t)-(__min + __max) + __max                            \
+        ? (uint ## __bit ## _t)-(__min + __max) + __max                 \
         : __max;                                                        \
     cutlim = cutoff % base;                                             \
     cutoff /= base;                                                     \
@@ -100,7 +100,7 @@ static int dr_type_read_int ## __bit ## _from_string(void * output, const char *
         int base;                                                       \
         char c;                                                         \
         uint ## __bit ##_t cutoff;                                      \
-        int any, cutlim;                                                \
+        int ## __bit ## _t any, cutlim;                                 \
                                                                         \
         do {                                                            \
             c = *s++;                                                   \
