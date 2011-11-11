@@ -1,5 +1,6 @@
 #include "cpe/dr/dr_metalib_init.h"
 #include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/dr/dr_metalib_xml.h"
 #include "BuildFromXmlTest.hpp"
 
 TEST_F(BuildFromXmlTest, metalib_basic) {
@@ -17,19 +18,19 @@ TEST_F(BuildFromXmlTest, metalib_tagsetversion_overflow) {
     EXPECT_EQ(
         CPE_DR_ERROR_INVALID_TAGSET_VERSION,
         parseMeta(
-        "<metalib tagsetversion='1000000000' name='net' version='1'/>"));
+            "<metalib tagsetversion='1000000000' name='net' version='1'/>"));
 }
 
 TEST_F(BuildFromXmlTest, metalib_tagsetversion_unknown) {
     EXPECT_EQ(
         CPE_DR_ERROR_INVALID_TAGSET_VERSION,
         parseMeta(
-        "<metalib tagsetversion='0' name='net' version='1'/>"));
+            "<metalib tagsetversion='0' name='net' version='1'/>"));
 
     EXPECT_EQ(
         CPE_DR_ERROR_INVALID_TAGSET_VERSION,
         parseMeta(
-        "<metalib tagsetversion='2' name='net' version='1'/>"));
+            "<metalib tagsetversion='2' name='net' version='1'/>"));
 }
 
 TEST_F(BuildFromXmlTest, metalib_version_not_exist) {
@@ -43,7 +44,7 @@ TEST_F(BuildFromXmlTest, metalib_version_overflow) {
     EXPECT_EQ(
         CPE_DR_ERROR_INVALID_VERSION,
         parseMeta(
-        "<metalib tagsetversion='1' name='net' version='2000000000'/>"));
+            "<metalib tagsetversion='1' name='net' version='2000000000'/>"));
 }
 
 TEST_F(BuildFromXmlTest, metalib_name_not_exist) {
@@ -79,4 +80,15 @@ TEST_F(BuildFromXmlTest, metalib_name_overflow) {
         parseMeta(buf));
 
     ASSERT_TRUE(haveError(CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT));
+}
+
+TEST_F(BuildFromXmlTest, parse_no_em) {
+    dr_free_lib(&m_metaLib);
+
+    const char * def =
+        "<metalib tagsetversion='1000000000' name='net' version='1'/>";
+
+    EXPECT_EQ(
+        CPE_DR_ERROR_INVALID_TAGSET_VERSION,
+        dr_create_lib_from_xml_ex(&m_metaLib, def, strlen(def), NULL));
 }

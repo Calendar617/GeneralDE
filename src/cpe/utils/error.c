@@ -25,6 +25,10 @@ void cpe_error_do_notify_var(error_monitor_t monitor, const char * fmt, va_list 
 }
 
 void cpe_error_monitor_add_node(error_monitor_t monitor, struct error_monitor_node * node) {
+    if (monitor == NULL) {
+        return;
+    }
+
     struct error_monitor_node * lastNode = &monitor->m_node;
     while(lastNode->m_next) {
         lastNode = lastNode->m_next;
@@ -35,6 +39,10 @@ void cpe_error_monitor_add_node(error_monitor_t monitor, struct error_monitor_no
 }
 
 void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor_node * removeNode) {
+    if (monitor == NULL) {
+        return;
+    }
+
     struct error_monitor_node * node = &monitor->m_node;
     while(node->m_next) {
         if (node->m_next == removeNode) {

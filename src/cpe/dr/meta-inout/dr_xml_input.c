@@ -552,35 +552,52 @@ void dr_record_last_errno(struct error_info * info, void * context, const char *
     *((int*)context) = info->m_errno;
 }
 
-int dr_create_lib_from_xml_ex(
+void dr_create_lib_from_xml_ex_i(
     LPDRMETALIB * metaLib,
     const char* buf,
     int bufSize,
+    int * ret,
     error_monitor_t em)
 {
     xmlParserCtxtPtr parseCtx = NULL;
     struct DRXmlParseCtx ctx;
-    int ret = 0;
 
     dr_build_xml_parse_ctx_init(&ctx);
     ctx.m_metaLib = dr_inbuild_create_lib();
     if (ctx.m_metaLib == NULL) {
-        return -1;
+        *ret = -1;
+        return;
     }
-
-    CPE_DEF_ERROR_MONITOR_ADD(logError, em, dr_record_last_errno, &ret);
 
     ctx.m_em = em;
 
     parseCtx = xmlCreatePushParserCtxt(&g_dr_xml_handler, &ctx, buf, bufSize, NULL);
+
     xmlParseChunk(parseCtx, NULL, 0, 1);
     xmlFreeParserCtxt(parseCtx);
 
     dr_inbuild_build_lib(metaLib, ctx.m_metaLib, em);
 
     dr_build_xml_parse_ctx_clear(&ctx);
-    
-    CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
+}
+
+int dr_create_lib_from_xml_ex(
+    LPDRMETALIB * metaLib,
+    const char* buf,
+    int bufSize,
+    error_monitor_t em)
+{
+    int ret = 0;
+
+    if (em) {
+        CPE_DEF_ERROR_MONITOR_ADD(logError, em, dr_record_last_errno, &ret);
+        dr_create_lib_from_xml_ex_i(metaLib, buf, bufSize, &ret, em);
+        CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
+    }
+    else {
+        CPE_DEF_ERROR_MONITOR(logError, dr_record_last_errno, &ret);
+        dr_create_lib_from_xml_ex_i(metaLib, buf, bufSize, &ret, &logError);
+    }
 
     return ret;
 }
