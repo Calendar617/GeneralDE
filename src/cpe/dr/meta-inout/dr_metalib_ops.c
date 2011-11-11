@@ -128,14 +128,16 @@ static void dr_add_metalib_meta_add_index_by_name(
 
     putAt = searchStart + curPos;
 
-    if (strcmp(base + newMeta->m_name_pos, base + putAt->m_name_pos) == 0) {
-        DR_NOTIFY_ERROR(em, CPE_DR_ERROR_META_NAME_CONFLICT);
-    }
+    if (curPos < metaLib->m_meta_count) {
+        if (strcmp(base + newMeta->m_name_pos, base + putAt->m_name_pos) == 0) {
+            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_META_NAME_CONFLICT);
+        }
 
-    memmove(
-        searchStart + curPos + 1,
-        searchStart + curPos,
-        sizeof(struct tagDRMetaIdxByName) * (metaLib->m_meta_count - curPos));
+        memmove(
+            searchStart + curPos + 1,
+            searchStart + curPos,
+            sizeof(struct tagDRMetaIdxByName) * (metaLib->m_meta_count - curPos));
+    }
 
     putAt->m_name_pos = newMeta->m_name_pos;
     putAt->m_diff_to_base = newMeta->m_self_pos;
@@ -166,14 +168,16 @@ static void dr_add_metalib_meta_add_index_by_id(
 
     putAt = searchStart + curPos;
 
-    if (newMeta->m_id == putAt->m_id && newMeta->m_id != -1) {
-        DR_NOTIFY_ERROR(em, CPE_DR_ERROR_META_ID_CONFLICT);
-    }
+    if (curPos < metaLib->m_meta_count) {
+        if (newMeta->m_id == putAt->m_id && newMeta->m_id >= 0) {
+            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_META_ID_CONFLICT);
+        }
 
-    memmove(
-        searchStart + curPos + 1,
-        searchStart + curPos,
-        sizeof(struct tagDRMetaIdxById) * (metaLib->m_meta_count - curPos));
+        memmove(
+            searchStart + curPos + 1,
+            searchStart + curPos,
+            sizeof(struct tagDRMetaIdxById) * (metaLib->m_meta_count - curPos));
+    }
 
     putAt->m_id = newMeta->m_id;
     putAt->m_diff_to_base = newMeta->m_self_pos;

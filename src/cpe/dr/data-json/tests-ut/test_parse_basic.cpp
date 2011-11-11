@@ -2,7 +2,6 @@
 
 TEST_F(ParseTest, metalib_basic) {
     installMeta(
-        "<?xml version='1.0' standalone='yes' ?>"
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='S' version='1'>"
         "	     <entry name='a1' type='int16'/>"
@@ -21,7 +20,6 @@ TEST_F(ParseTest, metalib_basic) {
 
 TEST_F(ParseTest, metalib_nest) {
     installMeta(
-        "<?xml version='1.0' standalone='yes' ?>"
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='S' version='1'>"
         "	     <entry name='a1' type='int16'/>"
@@ -40,7 +38,7 @@ TEST_F(ParseTest, metalib_nest) {
         int16_t a2;
     } expect = { { 12 }, 14  };
 
-    ASSERT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S"));
+    ASSERT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
 
     ASSERT_JSON_READ_RESULT(expect);
 }

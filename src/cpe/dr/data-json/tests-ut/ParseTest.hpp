@@ -2,6 +2,7 @@
 #define CPE_DR_DATAJSON_TEST_PARSETEST_H
 #include <string.h>
 #include "gtest/gtest.h"
+#include "cpe/utils/error_list.h"
 #include "cpe/dr/dr_json.h"
 
 class ParseTest : public ::testing::Test {
@@ -12,6 +13,7 @@ public:
 
     LPDRMETALIB m_metaLib;
     struct mem_buffer m_buffer;
+    error_list_t m_errorList;
 
     void installMeta(const char * data);
     int read(const char * data, const char * typeName);

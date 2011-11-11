@@ -5,11 +5,13 @@ class BuildFromXmlMetaTest : public BuildFromXmlTest {
 };
 
 TEST_F(BuildFromXmlMetaTest, struct_data) {
-    parseMeta(
-        "<metalib tagsetversion='1' name='net'  version='10'>"
-        "    <struct name='PkgHead' desc='PkgHead.desc' version='1' id='33'/>"
-        "</metalib>"
-        );
+    EXPECT_EQ(
+        0,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <struct name='PkgHead' desc='PkgHead.desc' version='1' id='33'/>"
+            "</metalib>"
+            ));
 
     LPDRMETA meta = get_meta("PkgHead");
 
@@ -24,12 +26,14 @@ TEST_F(BuildFromXmlMetaTest, struct_data) {
 }
 
 TEST_F(BuildFromXmlMetaTest, union_data) {
-    parseMeta(
-        "<metalib tagsetversion='1' name='net'  version='10'>"
-        "    <union name='PkgHead' desc='PkgHead.desc' version='1'>"
-        "    </union>"
-        "</metalib>"
-        );
+    EXPECT_EQ(
+        0,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <union name='PkgHead' desc='PkgHead.desc' version='1' id='33'>"
+            "    </union>"
+            "</metalib>"
+            ));
 
     LPDRMETA meta = get_meta("PkgHead");
 
@@ -111,30 +115,58 @@ TEST_F(BuildFromXmlMetaTest, version_bigger) {
     EXPECT_TRUE(haveError(CPE_DR_ERROR_INVALID_VERSION));
 }
 
-TEST_F(BuildFromXmlMetaTest, duplicate_name) {
-    parseMeta(
-        "<?xml version='1.0' standalone='yes' ?>"
-        "<metalib tagsetversion='1' name='net'  version='10'>"
-        "    <struct name='A1' version='1'/>"
-        "    <struct name='A1' version='1'/>"
-        "</metalib>"
-        );
+TEST_F(BuildFromXmlMetaTest, no_id) {
+    EXPECT_EQ(
+        0,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <struct name='A1' version='1'/>"
+            "</metalib>"
+            ));
 
-    ASSERT_TRUE(dr_get_meta_by_name(m_metaLib, "A1"));
-    ASSERT_TRUE(haveError(CPE_DR_ERROR_META_NAME_CONFLICT));
+    EXPECT_TRUE(dr_get_meta_by_name(m_metaLib, "A1"));
+}
+
+TEST_F(BuildFromXmlMetaTest, no_id_duplicate) {
+    EXPECT_EQ(
+        0,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <struct name='A1' version='1'/>"
+            "    <struct name='A2' version='1'/>"
+            "</metalib>"
+            ));
+
+    EXPECT_TRUE(dr_get_meta_by_name(m_metaLib, "A1"));
+    EXPECT_TRUE(dr_get_meta_by_name(m_metaLib, "A2"));
+}
+
+TEST_F(BuildFromXmlMetaTest, duplicate_name) {
+    EXPECT_EQ(
+        CPE_DR_ERROR_META_NAME_CONFLICT,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <struct name='A1' version='1' id='3'/>"
+            "    <struct name='A1' version='1' id='4'/>"
+            "</metalib>"
+            ));
+
+    EXPECT_TRUE(dr_get_meta_by_name(m_metaLib, "A1"));
+    EXPECT_TRUE(haveError(CPE_DR_ERROR_META_NAME_CONFLICT));
 }
 
 TEST_F(BuildFromXmlMetaTest, duplicate_id) {
-    parseMeta(
-        "<?xml version='1.0' standalone='yes' ?>"
-        "<metalib tagsetversion='1' name='net'  version='10'>"
-        "    <struct name='A1' version='1' id='3'/>"
-        "    <struct name='A2' version='1' id='3'/>"
-        "</metalib>"
-        );
+    EXPECT_EQ(
+        CPE_DR_ERROR_META_ID_CONFLICT,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <struct name='A1' version='1' id='3'/>"
+            "    <struct name='A2' version='1' id='3'/>"
+            "</metalib>"
+            ));
 
-    ASSERT_TRUE(dr_get_meta_by_id(m_metaLib, 3));
-    ASSERT_TRUE(haveError(CPE_DR_ERROR_META_ID_CONFLICT));
+    EXPECT_TRUE(dr_get_meta_by_id(m_metaLib, 3));
+    EXPECT_TRUE(haveError(CPE_DR_ERROR_META_ID_CONFLICT));
 }
 
 TEST_F(BuildFromXmlMetaTest, set_align) {
