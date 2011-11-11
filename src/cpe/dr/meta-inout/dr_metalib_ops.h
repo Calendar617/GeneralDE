@@ -10,9 +10,13 @@ extern "C" {
 
 int dr_init_lib(IN LPDRMETALIB pstLib, IN const LPDRLIBPARAM pstParam);
 int dr_add_metalib_string(LPDRMETALIB metaLib, const char * data, int * usedCount, error_monitor_t em);
+
 LPDRMACRO dr_add_metalib_macro(LPDRMETALIB metaLib, LPDRMACRO macro, error_monitor_t em);
+
 LPDRMETA dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, error_monitor_t em);
+
 LPDRMETAENTRY dr_add_meta_entry( LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em);
+void dr_meta_complete(LPDRMETA meta, error_monitor_t em);
 
 int dr_calc_meta_use_size(int entryCount);
 

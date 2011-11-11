@@ -9,7 +9,9 @@ TEST_F(BuildFromXmlMetaTest, struct_data) {
         0,
         parseMeta(
             "<metalib tagsetversion='1' name='net'  version='10'>"
-            "    <struct name='PkgHead' desc='PkgHead.desc' version='1' id='33'/>"
+            "    <struct name='PkgHead' desc='PkgHead.desc' version='1' id='33'>"
+            "	     <entry name='a1' type='int8'/>"
+            "    </struct>"
             "</metalib>"
             ));
 
@@ -21,8 +23,18 @@ TEST_F(BuildFromXmlMetaTest, struct_data) {
     EXPECT_EQ(33, dr_get_meta_id(meta));
     EXPECT_EQ(1, dr_get_meta_based_version(meta));
     EXPECT_EQ(1, dr_get_meta_current_version(meta));
-    EXPECT_EQ(0, dr_get_entry_num(meta));
+    EXPECT_EQ(1, dr_get_entry_num(meta));
     EXPECT_EQ(1, dr_get_meta_align(meta));
+}
+
+TEST_F(BuildFromXmlMetaTest, struct_no_entry) {
+    EXPECT_EQ(
+        CPE_DR_ERROR_META_NO_ENTRY,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <struct name='PkgHead' desc='PkgHead.desc' version='1' id='33'/>"
+            "</metalib>"
+            ));
 }
 
 TEST_F(BuildFromXmlMetaTest, union_data) {
@@ -31,6 +43,7 @@ TEST_F(BuildFromXmlMetaTest, union_data) {
         parseMeta(
             "<metalib tagsetversion='1' name='net'  version='10'>"
             "    <union name='PkgHead' desc='PkgHead.desc' version='1' id='33'>"
+            "	     <entry name='a1' type='int8'/>"
             "    </union>"
             "</metalib>"
             ));
@@ -42,7 +55,17 @@ TEST_F(BuildFromXmlMetaTest, union_data) {
     EXPECT_EQ(CPE_DR_TYPE_UNION, dr_get_meta_type(meta));
     EXPECT_EQ(1, dr_get_meta_based_version(meta));
     EXPECT_EQ(1, dr_get_meta_current_version(meta));
-    EXPECT_EQ(0, dr_get_entry_num(meta));
+    EXPECT_EQ(1, dr_get_entry_num(meta));
+}
+
+TEST_F(BuildFromXmlMetaTest, enum_no_entry) {
+    EXPECT_EQ(
+        CPE_DR_ERROR_META_NO_ENTRY,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <union name='PkgHead' desc='PkgHead.desc' version='1' id='33'/>"
+            "</metalib>"
+            ));
 }
 
 TEST_F(BuildFromXmlMetaTest, by_name) {
@@ -120,7 +143,9 @@ TEST_F(BuildFromXmlMetaTest, no_id) {
         0,
         parseMeta(
             "<metalib tagsetversion='1' name='net'  version='10'>"
-            "    <struct name='A1' version='1'/>"
+            "    <struct name='A1' version='1'>"
+            "	     <entry name='a1' type='int8'/>"
+            "    </struct>"
             "</metalib>"
             ));
 
@@ -132,8 +157,12 @@ TEST_F(BuildFromXmlMetaTest, no_id_duplicate) {
         0,
         parseMeta(
             "<metalib tagsetversion='1' name='net'  version='10'>"
-            "    <struct name='A1' version='1'/>"
-            "    <struct name='A2' version='1'/>"
+            "    <struct name='A1' version='1'>"
+            "	     <entry name='a1' type='int8'/>"
+            "    </struct>"
+            "    <struct name='A2' version='1'>"
+            "	     <entry name='a1' type='int8'/>"
+            "    </struct>"
             "</metalib>"
             ));
 
@@ -146,8 +175,12 @@ TEST_F(BuildFromXmlMetaTest, duplicate_name) {
         CPE_DR_ERROR_META_NAME_CONFLICT,
         parseMeta(
             "<metalib tagsetversion='1' name='net'  version='10'>"
-            "    <struct name='A1' version='1' id='3'/>"
-            "    <struct name='A1' version='1' id='4'/>"
+            "    <struct name='A1' version='1' id='3'>"
+            "	     <entry name='a1' type='int8'/>"
+            "    </struct>"
+            "    <struct name='A1' version='1' id='4'>"
+            "	     <entry name='a1' type='int8'/>"
+            "    </struct>"
             "</metalib>"
             ));
 
@@ -160,8 +193,12 @@ TEST_F(BuildFromXmlMetaTest, duplicate_id) {
         CPE_DR_ERROR_META_ID_CONFLICT,
         parseMeta(
             "<metalib tagsetversion='1' name='net'  version='10'>"
-            "    <struct name='A1' version='1' id='3'/>"
-            "    <struct name='A2' version='1' id='3'/>"
+            "    <struct name='A1' version='1' id='3'>"
+            "	     <entry name='a1' type='int8'/>"
+            "    </struct>"
+            "    <struct name='A2' version='1' id='3'>"
+            "	     <entry name='a1' type='int8'/>"
+            "    </struct>"
             "</metalib>"
             ));
 

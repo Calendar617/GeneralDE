@@ -40,8 +40,6 @@ TEST_F(ParseTest, metalib_nest) {
     } expect = { { 12 }, 14  };
 #pragma pack(pop)
 
-    printf("size=%d\n", sizeof(expect));
-
     ASSERT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
 
     ASSERT_JSON_READ_RESULT(expect);

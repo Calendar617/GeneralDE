@@ -225,13 +225,14 @@ void dr_add_meta_entry_calc_align(
     error_monitor_t em)
 {
     int align = entryAlign < meta->m_align ? entryAlign : meta->m_align;
+
     int panding = meta->m_data_size % align;
     if (panding) {
         panding = align - panding;
     }
 
     newEntry->m_data_start_pos = meta->m_data_size + panding;
-    meta->m_data_size += meta->m_data_size + newEntry->m_unitsize;
+    meta->m_data_size += panding + newEntry->m_unitsize;
 }
 
 LPDRMETAENTRY
@@ -298,4 +299,16 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
 
 int dr_calc_meta_use_size(int entryCount) {
     return sizeof(struct tagDRMeta) + sizeof(struct tagDRMetaEntry) * entryCount;
+}
+
+void dr_meta_complete(LPDRMETA meta, error_monitor_t em) {
+    int panding = meta->m_data_size % meta->m_align;
+    if (panding) {
+        panding = meta->m_align - panding;
+    }
+    meta->m_data_size += panding;
+
+    if (meta->m_entry_count == 0) {
+        CPE_ERROR_EX(em, CPE_DR_ERROR_META_NO_ENTRY, "meta %s have no entry", dr_get_meta_name(meta));
+    }
 }

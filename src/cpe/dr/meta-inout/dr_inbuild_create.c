@@ -88,6 +88,8 @@ int dr_inbuild_build_lib(
 
             dr_add_meta_entry(createdMeta, &entryEle->m_data, em);
         }
+
+        dr_meta_complete(createdMeta, em);
     }
 
     *a_ppstLib = metaLib;
