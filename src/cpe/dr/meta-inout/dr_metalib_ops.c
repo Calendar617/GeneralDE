@@ -260,7 +260,7 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
             return NULL;
         }
 
-        usedType = dr_get_meta_by_name(((LPDRMETALIB)base) - 1, base + entry->m_ref_type_pos);
+        usedType = (LPDRMETA)(base + entry->m_ref_type_pos);
 
         if (usedType == NULL) {
             DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);

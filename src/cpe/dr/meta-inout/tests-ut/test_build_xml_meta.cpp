@@ -25,6 +25,10 @@ TEST_F(BuildFromXmlMetaTest, struct_data) {
     EXPECT_EQ(1, dr_get_meta_current_version(meta));
     EXPECT_EQ(1, dr_get_entry_num(meta));
     EXPECT_EQ(1, dr_get_meta_align(meta));
+
+    int entryPos = -1;
+    EXPECT_EQ(0, dr_get_entry_by_name(&entryPos, meta, "a1"));
+    EXPECT_EQ(0, entryPos);
 }
 
 TEST_F(BuildFromXmlMetaTest, struct_no_entry) {
@@ -215,4 +219,28 @@ TEST_F(BuildFromXmlMetaTest, set_align) {
         );
 
     EXPECT_EQ(3, dr_get_meta_align(get_meta("A1")));
+}
+
+TEST_F(BuildFromXmlMetaTest, composite_basic) {
+    EXPECT_EQ(
+        0,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='1'>"
+            "    <struct name='S' version='1'>"
+            "	     <entry name='a1' type='int16'/>"
+            "    </struct>"
+            "    <struct name='S2' version='1'>"
+            "	     <entry name='m_s' type='S'/>"
+            "	     <entry name='a2' type='int16'/>"
+            "    </struct>"
+            "</metalib>"
+            ));
+
+    LPDRMETA metaS = dr_get_meta_by_name(m_metaLib, "S");
+    ASSERT_TRUE(metaS);
+
+    LPDRMETA metaS2 = dr_get_meta_by_name(m_metaLib, "S2");
+    ASSERT_TRUE(metaS2);
+    ASSERT_TRUE(dr_get_entryptr_by_name(metaS2, "m_s"));
+    EXPECT_TRUE(metaS == dr_get_entry_ref_type(dr_get_entryptr_by_name(metaS2, "m_s")));
 }

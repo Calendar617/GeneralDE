@@ -78,7 +78,7 @@ int dr_inbuild_build_lib(
                 if (refMeta) {
                     entryEle->m_data.m_type = refMeta->m_type;
                     entryEle->m_data.m_unitsize = refMeta->m_data_size;
-                    entryEle->m_data.m_ref_type_pos = refMeta->m_name_pos;
+                    entryEle->m_data.m_ref_type_pos = (char*)refMeta - (char*)(metaLib + 1);
                 }
                 else {
                     CPE_ERROR_EX(em, CPE_DR_ERROR_ENTRY_NO_TYPE, "ref type \"%s\" is unknown!", entryEle->m_ref_type_name);
