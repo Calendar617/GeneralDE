@@ -1,3 +1,4 @@
+#include "cpe/dr/dr_metalib_manage.h"
 #include "ParseTest.hpp"
 
 TEST_F(ParseTest, metalib_basic) {

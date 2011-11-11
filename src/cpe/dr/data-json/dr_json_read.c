@@ -86,20 +86,12 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
     struct dr_json_parse_type_info * typeInfo = &c->m_typeStacks[c->m_typePos];
     LPDRMETA refType = NULL;
-    int r;
-    int entryIdx;
 
     JSON_PARSE_CTX_COPY_STR_TMP(c, stringVal, stringLen);
 
-    r = dr_get_entry_by_name(&entryIdx, typeInfo->m_meta, c->m_buf);
-    if (r < 0) {
-        CPE_INFO(c->m_em, "%s have no entry %s", dr_get_meta_name(typeInfo->m_meta), c->m_buf);
-        return 0;
-    }
-
-    typeInfo->m_entry = dr_get_entry_by_index(typeInfo->m_meta, entryIdx);
+    typeInfo->m_entry = dr_get_entryptr_by_name(typeInfo->m_meta, c->m_buf);
     if (typeInfo->m_entry == NULL) {
-        CPE_ERROR(c->m_em, "internal error, entry %s at %d is null", c->m_buf, entryIdx);
+        CPE_INFO(c->m_em, "%s have no entry %s", dr_get_meta_name(typeInfo->m_meta), c->m_buf);
         return 0;
     }
 
@@ -127,6 +119,11 @@ static int dr_json_start_map(void * ctx) {
 
 static int dr_json_end_map(void * ctx) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+    if (c->m_typePos < 0) {
+        CPE_ERROR(c->m_em, "internal error! type stack is empty");
+        return 0;
+    }
+    --c->m_typePos;
     return 1;
 }
 
