@@ -13,6 +13,7 @@ enum DRXmlParseState {
     PS_Init
     , PS_InMetaLib
     , PS_InMeta
+    , PS_Error
 };
 
 #define DR_XML_PARSE_ERROR_MSG_LEN 256
@@ -44,6 +45,8 @@ static void dr_build_xml_process_metalib(
     int haveVersion = 0;
 
     if (ctx->m_state != PS_Init) {
+        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_XML_PARSE, "error metalib tag!");
+        ctx->m_state = PS_Error;
         return;
     }
 
@@ -68,8 +71,9 @@ static void dr_build_xml_process_metalib(
             DR_COPY_STR(ctx->m_metaLib->m_data.szName, (char const *)valueBegin, len);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_TAGSET_VERSION) == 0) {
-            if (len > INTEGER_BUF_LEN - 1) {
+            if (len >= INTEGER_BUF_LEN) {
                 dr_build_xml_notify_error(ctx, CPE_DR_ERROR_INVALID_TAGSET_VERSION, NULL);
+                ctx->m_state = PS_Error;
                 return;
             }
 
@@ -88,6 +92,15 @@ static void dr_build_xml_process_metalib(
         }
         else {
         }
+    }
+
+    if (ctx->m_metaLib->m_data.iTagSetVersion != 1) {
+        dr_build_xml_notify_error(
+            ctx,
+            CPE_DR_ERROR_INVALID_TAGSET_VERSION,
+            "unknown tagsetversion version, only support 1!");
+
+        ctx->m_state = PS_Error;
     }
 
     if (!haveVersion || ctx->m_metaLib->m_data.iVersion < 0) {
