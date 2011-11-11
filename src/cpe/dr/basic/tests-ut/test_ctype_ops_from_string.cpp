@@ -5,7 +5,7 @@ class CtypeOpsFromStringTest : public ::testing::Test {
 public:
     int parse(const char * name, const char * data) {
         const struct tagDRCTypeInfo * typeInfo =
-            dr_find_ctype_info_by_name(name, -1);
+            dr_find_ctype_info_by_name(name);
 
         EXPECT_TRUE(typeInfo);
         if (typeInfo == NULL) {
