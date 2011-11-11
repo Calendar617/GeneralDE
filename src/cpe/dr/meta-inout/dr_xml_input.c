@@ -7,6 +7,7 @@
 #include "../dr_internal_types.h"
 #include "../dr_ctype_ops.h"
 #include "dr_inbuild.h"
+#include "dr_inbuild_error.h"
 #include "dr_XMLtags.h"
 
 enum DRXmlParseState {
@@ -29,10 +30,6 @@ struct DRXmlParseCtx {
     error_monitor_t m_em;
 };
 
-static void dr_build_xml_notify_error(struct DRXmlParseCtx * ctx, int e, char const * msg) {
-    CPE_ERROR_EX(ctx->m_em, e, "%s", msg == NULL ? dr_error_string(e) : msg);
-}
-
 static void dr_build_xml_process_metalib(
     struct DRXmlParseCtx * ctx,
     int nb_attributes,
@@ -45,7 +42,7 @@ static void dr_build_xml_process_metalib(
     int haveVersion = 0;
 
     if (ctx->m_state != PS_Init) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_XML_PARSE, "error metalib tag!");
+        CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_XML_PARSE, "error metalib tag!");
         ctx->m_state = PS_Error;
         return;
     }
@@ -64,7 +61,7 @@ static void dr_build_xml_process_metalib(
 
         if (strcmp((char const *)localname, CPE_DR_TAG_NAME) == 0) {
             if (len >= CPE_DR_NAME_LEN) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
                 return;
             }
 
@@ -72,7 +69,7 @@ static void dr_build_xml_process_metalib(
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_TAGSET_VERSION) == 0) {
             if (len >= INTEGER_BUF_LEN) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_INVALID_TAGSET_VERSION, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
                 ctx->m_state = PS_Error;
                 return;
             }
@@ -82,7 +79,7 @@ static void dr_build_xml_process_metalib(
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
             if (len > INTEGER_BUF_LEN - 1) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_INVALID_VERSION, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_VERSION);
                 return;
             }
 
@@ -95,8 +92,8 @@ static void dr_build_xml_process_metalib(
     }
 
     if (ctx->m_metaLib->m_data.iTagSetVersion != 1) {
-        dr_build_xml_notify_error(
-            ctx,
+        CPE_ERROR_EX(
+            ctx->m_em,
             CPE_DR_ERROR_INVALID_TAGSET_VERSION,
             "unknown tagsetversion version, only support 1!");
 
@@ -104,11 +101,11 @@ static void dr_build_xml_process_metalib(
     }
 
     if (!haveVersion || ctx->m_metaLib->m_data.iVersion < 0) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NO_VERSION, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NO_VERSION);
     }
 
     if (strlen(ctx->m_metaLib->m_data.szName) == 0) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_METALIB_ROOT_NO_NAME, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_METALIB_ROOT_NO_NAME);
     }
 
     ctx->m_state = PS_InMetaLib;
@@ -131,7 +128,7 @@ static void dr_build_xml_process_macro(
 
     struct DRInBuildMacro * newMacro = dr_inbuild_metalib_add_macro(ctx->m_metaLib);
     if (newMacro == NULL) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NO_MEMORY, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NO_MEMORY);
         return;
     }
 
@@ -151,7 +148,7 @@ static void dr_build_xml_process_macro(
 
         if (strcmp((char const *)localname, CPE_DR_TAG_NAME) == 0) {
             if (len > CPE_DR_MACRO_LEN) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
                 return;
             }
 
@@ -166,7 +163,7 @@ static void dr_build_xml_process_macro(
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_MACRO_VALUE) == 0) {
             if (len >= INTEGER_BUF_LEN) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
                 return;
             }
             haveValue = 1;
@@ -182,12 +179,12 @@ static void dr_build_xml_process_macro(
     }
 
     if (strlen(newMacro->m_name) == 0) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_MACRO_NO_NAME_ATTR, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_MACRO_NO_NAME_ATTR);
         haveError = 1;
     }
 
     if (!haveValue) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_MACRO_NO_VALUE, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_MACRO_NO_VALUE);
         haveError = 1;
     }
 
@@ -216,7 +213,7 @@ static void dr_build_xml_process_meta(
 
     newMeta = dr_inbuild_metalib_add_meta(ctx->m_metaLib);
     if (newMeta == NULL) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NO_MEMORY, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NO_MEMORY);
         return;
     }
 
@@ -237,7 +234,7 @@ static void dr_build_xml_process_meta(
 
         if (strcmp((char const *)localname, CPE_DR_TAG_NAME) == 0) {
             if (len > CPE_DR_MACRO_LEN) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
                 return;
             }
 
@@ -252,7 +249,7 @@ static void dr_build_xml_process_meta(
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_ID) == 0) {
             if (len >= INTEGER_BUF_LEN) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
                 return;
             }
 
@@ -261,7 +258,7 @@ static void dr_build_xml_process_meta(
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
             if (len >= INTEGER_BUF_LEN) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_INVALID_TAGSET_VERSION, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
                 return;
             }
 
@@ -270,7 +267,7 @@ static void dr_build_xml_process_meta(
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_ALIGN) == 0) {
             if (len >= INTEGER_BUF_LEN) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_META_INVALID_ALIGN_VALUE, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_META_INVALID_ALIGN_VALUE);
                 return;
             }
 
@@ -283,11 +280,11 @@ static void dr_build_xml_process_meta(
 
 
     if (version < 0) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NO_VERSION, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NO_VERSION);
         haveError = 1;
     }
     else if (version > ctx->m_metaLib->m_data.iVersion) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_INVALID_VERSION, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_VERSION);
         haveError = 1;
     }
     else {
@@ -311,7 +308,6 @@ static void dr_build_xml_process_entry(
 {
     const int INTEGER_BUF_LEN = 10;
     char buf[INTEGER_BUF_LEN];
-    const struct tagDRCTypeInfo * ctypeInfo = NULL;
     int indexAttribute = 0;
     int index = 0;
     int version = -1;
@@ -323,7 +319,7 @@ static void dr_build_xml_process_entry(
 
     struct DRInBuildMetaEntry * newEntry = dr_inbuild_meta_add_entry(ctx->m_curentMeta);
     if (newEntry == NULL) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NO_MEMORY, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NO_MEMORY);
         return;
     }
 
@@ -341,7 +337,7 @@ static void dr_build_xml_process_entry(
 
         if (strcmp((char const *)localname, CPE_DR_TAG_NAME) == 0) {
             if (len >= CPE_DR_NAME_LEN) {
-                dr_build_xml_notify_error(ctx, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT, NULL);
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
                 return;
             }
 
@@ -349,24 +345,32 @@ static void dr_build_xml_process_entry(
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_CNNAME) == 0) {
             if (len >= CPE_DR_CHNAME_LEN) {
-                //TODO
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
+                len = CPE_DR_CHNAME_LEN - 1;
             }
 
             DR_COPY_STR(newEntry->m_cname, (char const *)valueBegin, len);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_DESCIPTION) == 0) {
             if (len >= CPE_DR_DESC_LEN) {
-                //TODO
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
+                len = CPE_DR_CHNAME_LEN - 1;
             }
 
             DR_COPY_STR(newEntry->m_desc, (char const *)valueBegin, len);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_TYPE) == 0) {
-            ctypeInfo = dr_find_ctype_info_by_name(valueBegin, len);
+            if (len >= CPE_DR_NAME_LEN) {
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
+                return;
+            }
+
+            DR_COPY_STR(newEntry->m_ref_type_name, (char const *)valueBegin, len);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
             if (len >= INTEGER_BUF_LEN) {
-                //TODO
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
+                return;
             }
 
             DR_COPY_STR(buf, (char const *)valueBegin, len);
@@ -380,23 +384,19 @@ static void dr_build_xml_process_entry(
         version = ctx->m_curentMeta->m_data.m_based_version;
     }
     else if (version > ctx->m_metaLib->m_data.iVersion) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_INVALID_VERSION, NULL);
+        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_VERSION);
         haveError = 1;
     }
 
     newEntry->m_data.m_version = version;
 
-    if (ctypeInfo == NULL) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_ENTRY_NO_TYPE, NULL);
+    if (strlen(newEntry->m_name) == 0) {
+        CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_META_NO_NAME, "entry no name");
         haveError = 1;
     }
-    else {
-        newEntry->m_data.m_type = ctypeInfo->m_id;
-        newEntry->m_data.m_unitsize = ctypeInfo->m_size;
-    }
 
-    if (strlen(newEntry->m_name) == 0) {
-        dr_build_xml_notify_error(ctx, CPE_DR_ERROR_META_NO_NAME, "entry no name");
+    if (strlen(newEntry->m_ref_type_name) == 0) {
+        CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_ENTRY_NO_TYPE, "%s's type is null!", newEntry->m_name);
         haveError = 1;
     }
 

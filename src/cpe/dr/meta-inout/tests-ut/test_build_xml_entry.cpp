@@ -57,6 +57,26 @@ TEST_F(BuildFromXmlEntryTest, no_type) {
     EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_NO_TYPE));
 }
 
+TEST_F(BuildFromXmlEntryTest, type_composite) {
+    EXPECT_EQ(
+        0,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <struct name='A1' version='1'>"
+            "	     <entry name='a1' type='int32'\n/>"
+            "    </struct>"
+            "    <struct name='A2' version='1'>"
+            "	     <entry name='a1' type='A1'\n/>"
+            "    </struct>"
+            "</metalib>"
+            ));
+
+    LPDRMETA meta = get_meta("A2");
+    ASSERT_TRUE(meta);
+
+    EXPECT_EQ(1, dr_get_entry_num(meta));
+}
+
 TEST_F(BuildFromXmlEntryTest, version_new) {
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'>"

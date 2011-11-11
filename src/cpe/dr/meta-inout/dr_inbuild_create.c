@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <strings.h>
 #include "cpe/dr/dr_error.h"
+#include "cpe/dr/dr_metalib_manage.h"
+#include "../dr_ctype_ops.h"
 #include "dr_inbuild.h"
 #include "dr_metalib_ops.h"
 
@@ -57,6 +59,8 @@ int dr_inbuild_build_lib(
 
         /*build entries*/
         TAILQ_FOREACH(entryEle, &metaEle->m_entries, m_next) {
+            const struct tagDRCTypeInfo * ctypeInfo = NULL;
+
             entryEle->m_data.m_name_pos =
                 dr_add_metalib_string(metaLib, entryEle->m_name, &stringUsedCount, em);
             entryEle->m_data.m_desc_pos =
@@ -64,9 +68,22 @@ int dr_inbuild_build_lib(
             entryEle->m_data.m_cname_pos =
                 dr_add_metalib_string(metaLib, entryEle->m_cname, &stringUsedCount, em);
 
-
-            if (entryEle->m_ref_type_name[0]) {
-                //LPDRMETA refMeta = dr_get_meta_by_name(metaLib, 
+            ctypeInfo = dr_find_ctype_info_by_name(entryEle->m_ref_type_name);
+            if (ctypeInfo) {
+                entryEle->m_data.m_type = ctypeInfo->m_id;
+                entryEle->m_data.m_unitsize = ctypeInfo->m_size;
+            }
+            else {
+                LPDRMETA refMeta = dr_get_meta_by_name(metaLib, entryEle->m_ref_type_name);
+                if (refMeta) {
+                    entryEle->m_data.m_type = refMeta->m_type;
+                    entryEle->m_data.m_unitsize = refMeta->m_data_size;
+                    entryEle->m_data.m_ref_type_pos = refMeta->m_name_pos;
+                }
+                else {
+                    CPE_ERROR_EX(em, CPE_DR_ERROR_ENTRY_NO_TYPE, "ref type \"%s\" is unknown!", entryEle->m_ref_type_name);
+                    continue;
+                }
             }
 
             dr_add_meta_entry(createdMeta, &entryEle->m_data, em);

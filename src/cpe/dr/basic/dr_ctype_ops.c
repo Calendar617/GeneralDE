@@ -224,23 +224,12 @@ static const int g_dr_ctypeinfos_count
 = sizeof(g_dr_ctypeinfos) / sizeof(struct tagDRCTypeInfo);
 
 const struct tagDRCTypeInfo *
-dr_find_ctype_info_by_name(const char * name, size_t n) {
+dr_find_ctype_info_by_name(const char * name) {
     int i = 0;
 
-    if (n < 0) {
-        for(i = 0; i < g_dr_ctypeinfos_count; ++i) {
-            if (strcmp(g_dr_ctypeinfos[i].m_name, name) == 0) {
-                return &g_dr_ctypeinfos[i];
-            }
-        }
-    }
-    else {
-        for(i = 0; i < g_dr_ctypeinfos_count; ++i) {
-            if (strncmp(g_dr_ctypeinfos[i].m_name, name, n) == 0
-                && g_dr_ctypeinfos[i].m_name[n] == 0)
-            {
-                return &g_dr_ctypeinfos[i];
-            }
+    for(i = 0; i < g_dr_ctypeinfos_count; ++i) {
+        if (strcmp(g_dr_ctypeinfos[i].m_name, name) == 0) {
+            return &g_dr_ctypeinfos[i];
         }
     }
 

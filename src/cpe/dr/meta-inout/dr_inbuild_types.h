@@ -19,26 +19,26 @@ struct DRInBuildMeta {
     int m_entries_count;
 
     struct tagDRMeta m_data;
-    char m_desc[CPE_DR_DESC_LEN + 1];
-    char m_name[CPE_DR_NAME_LEN + 1];
+    char m_desc[CPE_DR_DESC_LEN];
+    char m_name[CPE_DR_NAME_LEN];
 };
 
 struct DRInBuildMetaEntry {
     TAILQ_ENTRY(DRInBuildMetaEntry) m_next;
 
     struct tagDRMetaEntry m_data;
-    char m_name[CPE_DR_NAME_LEN + 1];
-    char m_desc[CPE_DR_DESC_LEN + 1];
-    char m_cname[CPE_DR_CHNAME_LEN + 1];
-    char m_ref_type_name[CPE_DR_NAME_LEN + 1];
+    char m_name[CPE_DR_NAME_LEN];
+    char m_desc[CPE_DR_DESC_LEN];
+    char m_cname[CPE_DR_CHNAME_LEN];
+    char m_ref_type_name[CPE_DR_NAME_LEN];
 };
 
 struct DRInBuildMacro {
     TAILQ_ENTRY(DRInBuildMacro) m_next;
 
     struct tagDRMacro m_data;
-    char m_name[CPE_DR_MACRO_LEN + 1];
-    char m_desc[CPE_DR_DESC_LEN + 1];
+    char m_name[CPE_DR_MACRO_LEN];
+    char m_desc[CPE_DR_DESC_LEN];
 };
 
 #endif

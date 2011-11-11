@@ -12,10 +12,8 @@ class CtypeOpsFindByNameTest : public ::testing::TestWithParam<CtypeNameIdInfo> 
 TEST_P(CtypeOpsFindByNameTest, FindByName) {
     CtypeNameIdInfo caseInfo = GetParam();
 
-    EXPECT_TRUE(dr_find_ctype_info_by_name(caseInfo.name, strlen(caseInfo.name))) << "get ctype by name " << caseInfo.name << " fail!";
-
     const struct tagDRCTypeInfo * ctypeInfo = dr_find_ctype_info_by_name(caseInfo.name, -1);
-    ASSERT_TRUE(dr_find_ctype_info_by_name(caseInfo.name, -1)) << "get ctype by name " << caseInfo.name << " fail!";
+    ASSERT_TRUE(dr_find_ctype_info_by_name(caseInfo.name)) << "get ctype by name " << caseInfo.name << " fail!";
 
     EXPECT_EQ(caseInfo.m_id, ctypeInfo->m_id);
 }

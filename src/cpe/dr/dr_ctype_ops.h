@@ -19,7 +19,7 @@ struct tagDRCTypeInfo {
      < 0     use strlen(name)
 */
 const struct tagDRCTypeInfo *
-dr_find_ctype_info_by_name(const char * name, size_t n);
+dr_find_ctype_info_by_name(const char * name);
 
 const struct tagDRCTypeInfo *
 dr_find_ctype_info_by_type(int typeId);
