@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <string.h>
 #include "yajl/yajl_parse.h"
 #include "cpe/dr/dr_json.h"
@@ -26,6 +25,7 @@ struct dr_json_parse_type_info {
 
 struct dr_json_parse_ctx {
     struct mem_buffer * m_output;
+    error_monitor_t m_em;
 
     struct dr_json_parse_type_info m_typeStacks[CPE_DR_MAX_LEVEL];
     int m_typePos;
@@ -47,22 +47,32 @@ static int dr_json_number(void * ctx, const char * s, size_t l) {
     struct dr_json_parse_type_info * parseType = &c->m_typeStacks[c->m_typePos];
 
     if (parseType->m_entry == NULL || parseType->m_data == NULL) {
+        CPE_ERROR(c->m_em, "internal error, no current entry info!");
         return 0;
     }
 
     const struct tagDRCTypeInfo * cTypeInfo =
         dr_find_ctype_info_by_type(parseType->m_entry->m_type);
     if (cTypeInfo == NULL) {
+        CPE_ERROR(c->m_em, "internal error, no type info of type %d!", parseType->m_entry->m_type);
         return 0;
     }
 
     if (cTypeInfo->read_from_string) {
         JSON_PARSE_CTX_COPY_STR_TMP(c, s, l);
-        return 0 == cTypeInfo->read_from_string(
-            parseType->m_data + parseType->m_entry->m_data_start_pos,
-            c->m_buf);
+        if (cTypeInfo->read_from_string(
+                parseType->m_data + parseType->m_entry->m_data_start_pos,
+                c->m_buf) == 0)
+        {
+            return 1;
+        }
+        else {
+            CPE_ERROR(c->m_em, "read %s from \"%s\" error!", cTypeInfo->m_name, c->m_buf);
+            return 0;
+        }
     }
     else {
+        CPE_ERROR(c->m_em, "%s not support read from string!", cTypeInfo->m_name);
         return 0;
     }
 }
@@ -83,11 +93,13 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
 
     r = dr_get_entry_by_name(&entryIdx, typeInfo->m_meta, c->m_buf);
     if (r < 0) {
+        CPE_INFO(c->m_em, "%s have no entry %s", dr_get_meta_name(typeInfo->m_meta), c->m_buf);
         return 0;
     }
 
     typeInfo->m_entry = dr_get_entry_by_index(typeInfo->m_meta, entryIdx);
     if (typeInfo->m_entry == NULL) {
+        CPE_ERROR(c->m_em, "internal error, entry %s at %d is null", c->m_buf, entryIdx);
         return 0;
     }
 
@@ -95,6 +107,7 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
         struct dr_json_parse_type_info * nestTypeInfo = NULL;
 
         if ((c->m_typePos + 1) >= CPE_DR_MAX_LEVEL) { /*nest type overflow */
+            CPE_ERROR(c->m_em, "too complex, max nest level %d reached", CPE_DR_MAX_LEVEL);
             return 0;
         }
 
@@ -144,7 +157,8 @@ static yajl_callbacks g_dr_json_callbacks = {
 static void dr_json_parse_ctx_init(
     struct dr_json_parse_ctx * ctx,
     struct mem_buffer * buffer, 
-    LPDRMETA meta)
+    LPDRMETA meta,
+    error_monitor_t em)
 {
     ctx->m_output = buffer;
 
@@ -152,6 +166,7 @@ static void dr_json_parse_ctx_init(
     ctx->m_typeStacks[0].m_data = mem_buffer_alloc(buffer, dr_get_meta_size(meta));
     ctx->m_typeStacks[0].m_entry = NULL;
     ctx->m_typePos = 0;
+    ctx->m_em = em;
 }
 
 void dr_json_read_i(
@@ -164,7 +179,7 @@ void dr_json_read_i(
     yajl_handle hand;
     yajl_status stat;
 
-    dr_json_parse_ctx_init(&ctx, result, meta);
+    dr_json_parse_ctx_init(&ctx, result, meta, em);
 
     hand = yajl_alloc(&g_dr_json_callbacks, NULL, (void *)&ctx);
     if (hand == NULL) {

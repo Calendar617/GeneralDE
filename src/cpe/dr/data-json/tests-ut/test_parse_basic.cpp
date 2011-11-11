@@ -42,5 +42,8 @@ TEST_F(ParseTest, metalib_nest) {
 
     ASSERT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
 
+    //memcpy(&expect, result(), sizeof(expect));
+    //printf("m_s.a1=%d, a2=%d\n", expect.m_s.a1, expect.a2);
+
     ASSERT_JSON_READ_RESULT(expect);
 }

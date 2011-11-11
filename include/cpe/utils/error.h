@@ -43,9 +43,9 @@ void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor
 
 #define _CPE_DO_ERROR_NOTIFY(monitor, level, en, format, args...)   \
     if (monitor) {                                                  \
-        monitor->m_curent_location.m_errno = en;                    \
-        monitor->m_curent_location.m_level = level;                 \
-        cpe_error_do_notify(monitor, format, ##args);               \
+        (monitor)->m_curent_location.m_errno = en;                  \
+        (monitor)->m_curent_location.m_level = level;               \
+        cpe_error_do_notify((monitor), format, ##args);             \
     }
 
 #define CPE_DEF_ERROR_MONITOR(name, fun, context) \
@@ -63,7 +63,7 @@ void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor
 #define CPE_ERROR_SET_ERRNO(monitor, e) monitor->m_curent_location.m_errno = e
 #define CPE_ERROR_SET_LEVEL(monitor, l) monitor->m_curent_location.m_level = l
 
-#define CPE_INFO_NOTIFY(monitor, format, args...)               \
+#define CPE_INFO(monitor, format, args...)                          \
     _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_INFO, 0, format, ##args)
 
 #define CPE_WARNING(monitor, format, args...)                       \
