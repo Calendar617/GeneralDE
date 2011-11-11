@@ -2,6 +2,7 @@
 #include <string.h>
 #include "yajl/yajl_parse.h"
 #include "cpe/dr/dr_json.h"
+#include "cpe/dr/dr_error.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_internal_types.h"
 #include "../dr_ctype_ops.h"
@@ -153,10 +154,11 @@ static void dr_json_parse_ctx_init(
     ctx->m_typePos = 0;
 }
 
-int dr_json_read(
+void dr_json_read_i(
     struct mem_buffer * result, 
     const char * input,
-    LPDRMETA meta)
+    LPDRMETA meta,
+    error_monitor_t em)
 {
     struct dr_json_parse_ctx ctx;
     yajl_handle hand;
@@ -166,15 +168,36 @@ int dr_json_read(
 
     hand = yajl_alloc(&g_dr_json_callbacks, NULL, (void *)&ctx);
     if (hand == NULL) {
-        return -1;
+        CPE_ERROR_EX(em, CPE_DR_ERROR_NO_MEMORY, "can`t alloc memory for json parser");
+        return;
     }
 
     stat = yajl_parse(hand, input, strlen(input));
     if (stat != yajl_status_ok) {  
         yajl_free(hand);
-        return -1;
+        return;
     }
 
     yajl_free(hand);
-    return 0;
+}
+
+int dr_json_read(
+    struct mem_buffer * result, 
+    const char * input,
+    LPDRMETA meta,
+    error_monitor_t em)
+{
+    int ret = 0;
+
+    if (em) {
+        CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
+        dr_json_read_i(result, input, meta, em);
+        CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
+    }
+    else {
+        CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
+        dr_json_read_i(result, input, meta, &logError);
+    }
+
+    return ret;
 }

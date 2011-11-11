@@ -31,12 +31,16 @@ TEST_F(ParseTest, metalib_nest) {
         "</metalib>"
         );
 
+#pragma pack(push,1)
     struct {
         struct {
             int16_t a1;
         } m_s;
         int16_t a2;
     } expect = { { 12 }, 14  };
+#pragma pack(pop)
+
+    printf("size=%d\n", sizeof(expect));
 
     ASSERT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
 

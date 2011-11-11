@@ -33,6 +33,7 @@ typedef struct error_monitor {
 /*utils functions*/
 void cpe_error_log_to_file(struct error_info * info, void * context, const char * fmt, va_list args);
 void cpe_error_log_to_consol(struct error_info * info, void * context, const char * fmt, va_list args);
+void cpe_error_save_last_errno(struct error_info * info, void * context, const char * fmt, va_list args);
 
 /*operations*/
 void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...);

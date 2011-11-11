@@ -548,10 +548,6 @@ int  dr_create_lib_from_xml(
     return dr_create_lib_from_xml_ex(metaLib, buf, bufSize, &em);
 }
 
-void dr_record_last_errno(struct error_info * info, void * context, const char * fmt, va_list args) {
-    *((int*)context) = info->m_errno;
-}
-
 void dr_create_lib_from_xml_ex_i(
     LPDRMETALIB * metaLib,
     const char* buf,
@@ -590,12 +586,12 @@ int dr_create_lib_from_xml_ex(
     int ret = 0;
 
     if (em) {
-        CPE_DEF_ERROR_MONITOR_ADD(logError, em, dr_record_last_errno, &ret);
+        CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
         dr_create_lib_from_xml_ex_i(metaLib, buf, bufSize, &ret, em);
         CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
     }
     else {
-        CPE_DEF_ERROR_MONITOR(logError, dr_record_last_errno, &ret);
+        CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
         dr_create_lib_from_xml_ex_i(metaLib, buf, bufSize, &ret, &logError);
     }
 

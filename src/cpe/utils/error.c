@@ -65,3 +65,9 @@ void cpe_error_log_to_consol(struct error_info * info, void * context, const cha
     vprintf(fmt, args);
     printf("\n");
 }
+
+void cpe_error_save_last_errno(struct error_info * info, void * context, const char * fmt, va_list args) {
+    if (info->m_level == CPE_EL_ERROR) {
+        *((int*)context) = info->m_errno;
+    }
+}
