@@ -1,21 +1,10 @@
-/*
-**  @file $RCSfile: tos.h,v $
-**  general description of this module
-**  $Id: tos.h,v 1.7 2009-01-23 09:34:20 kent Exp $
-**  @author $Author: kent $
-**  @date $Date: 2009-01-23 09:34:20 $
-**  @version $Revision: 1.7 $
-**  @note Editor: Vim 6.1, Gcc 4.0.1, tab=4
-**  @note Platform: Linux
-*/
-
-#ifndef CPE_OS_H
-#define CPE_OS_H
+#ifndef CPE_PAL_OS_H
+#define CPE_PAL_OS_H
 
 #if defined(__GNUC__)
-#define CPE_OS_UNUSED_ARG(a) ((void)a)//do{}while(NULL == &a)
+#define CPE_UNUSED_ARG(a) ((void)a)
 #else
-#define CPE_OS_UNUSED_ARG(a) a
+#define CPE_UNUSED_ARG(a) a
 #endif
 
 #ifdef WIN32
@@ -28,7 +17,7 @@
 	#endif /* _WIN32_WINNT */
 	#include <io.h>
 	#include <process.h>
-	#include "cpe/pal/getopt.h"
+	#include "getopt.h"
 #else	/* WIN32 */
 	#include <unistd.h>
 	#include <endian.h>
@@ -36,10 +25,6 @@
 #endif	/* WIN32 */
 
 #include <stdlib.h>
-
-#include "cpe/pal/types.h"
-
-#include "cpe/pal/rules.h"
 
 #ifdef WIN32
 	#if defined (LITTLEENDIAN) && LITTLEENDIAN >0 

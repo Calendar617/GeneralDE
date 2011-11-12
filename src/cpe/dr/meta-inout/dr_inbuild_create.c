@@ -9,7 +9,7 @@
 static int dr_inbuild_calc_lib_paras(struct DRInBuildMetaLib * inBuildLib);
 
 int dr_inbuild_build_lib(
-    INOUT LPDRMETALIB *a_ppstLib,
+    LPDRMETALIB *a_ppstLib,
     struct DRInBuildMetaLib * inBuildLib,
     error_monitor_t em)
 {

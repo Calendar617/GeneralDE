@@ -5,7 +5,7 @@
 #include "dr_metalib_ops.h"
 #include "dr_inbuild_error.h"
 
-int dr_init_lib(OUT LPDRMETALIB pstLib, const LPDRLIBPARAM pstParam) {
+int dr_init_lib(LPDRMETALIB pstLib, const LPDRLIBPARAM pstParam) {
     bzero(pstLib, pstParam->iSize);
 
     pstLib->m_magic = CPE_DR_MAGIC;

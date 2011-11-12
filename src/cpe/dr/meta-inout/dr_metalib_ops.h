@@ -8,7 +8,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int dr_init_lib(IN LPDRMETALIB pstLib, IN const LPDRLIBPARAM pstParam);
+int dr_init_lib(LPDRMETALIB pstLib, const LPDRLIBPARAM pstParam);
 int dr_add_metalib_string(LPDRMETALIB metaLib, const char * data, int * usedCount, error_monitor_t em);
 
 LPDRMACRO dr_add_metalib_macro(LPDRMETALIB metaLib, LPDRMACRO macro, error_monitor_t em);

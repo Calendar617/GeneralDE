@@ -143,7 +143,7 @@ typedef enum
 } CPEDRSUCWARNINGNO;
 
 
-CPE_DR_API  char const* dr_error_string(IN int iErrorCode);
+CPE_DR_API  char const* dr_error_string(int iErrorCode);
 
 #undef _CPE_CUR_MODID
 

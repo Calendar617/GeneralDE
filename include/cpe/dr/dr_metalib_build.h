@@ -25,4 +25,4 @@ int dr_inbuild_build_lib(
 #endif
 
 
-#endif /* CPE_DR_METALIB_MANAGE_H */
+#endif

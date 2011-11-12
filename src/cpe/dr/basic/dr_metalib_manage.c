@@ -348,7 +348,7 @@ const char *dr_entry_customattr(LPDRMETALIB a_pstLib, LPDRMETAENTRY a_pstEntry) 
     return NULL;
 }
 
-int dr_lib_find_macro_value(OUT int *a_piID, LPDRMETALIB a_pstLib, const  char *a_pszName) {
+int dr_lib_find_macro_value(int *a_piID, LPDRMETALIB a_pstLib, const  char *a_pszName) {
     char * base;
     int i;
     struct tagDRMacro* macros = 0;
