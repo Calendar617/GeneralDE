@@ -12,14 +12,14 @@ void ParseTest::SetUp() {
 
 void ParseTest::TearDown() {
     mem_buffer_free(&m_buffer);
-    dr_free_lib(&m_metaLib);
+    dr_lib_free(&m_metaLib);
     cpe_error_list_free(m_errorList);
 }
 
 void ParseTest::installMeta(const char * def) {
     static const int MAX_ERROR_COUNT = 10;
 
-    dr_free_lib(&m_metaLib);
+    dr_lib_free(&m_metaLib);
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);
 
@@ -33,7 +33,7 @@ void ParseTest::installMeta(const char * def) {
 }
 
 int ParseTest::read(const char * data, const char * typeName) {
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, typeName);
+    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, typeName);
     EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
 
     cpe_error_list_free(m_errorList);

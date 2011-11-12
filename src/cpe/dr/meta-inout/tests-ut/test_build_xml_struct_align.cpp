@@ -14,8 +14,8 @@ TEST_F(BuildFromXmlStructAlign, align1_basic) {
         "</metalib>"
         );
 
-    EXPECT_EQ(1, dr_get_meta_align(get_meta("S1")));
-    EXPECT_EQ(3, dr_get_meta_size(get_meta("S1")));
+    EXPECT_EQ(1, dr_meta_align(get_meta("S1")));
+    EXPECT_EQ(3, dr_meta_size(get_meta("S1")));
 }
 
 TEST_F(BuildFromXmlStructAlign, align2_basic) {
@@ -28,7 +28,7 @@ TEST_F(BuildFromXmlStructAlign, align2_basic) {
         "</metalib>"
         );
 
-    EXPECT_EQ(4, dr_get_meta_size(get_meta("S1")));
+    EXPECT_EQ(4, dr_meta_size(get_meta("S1")));
 }
 
 
@@ -46,8 +46,8 @@ TEST_F(BuildFromXmlStructAlign, align_composite_2_1) {
         "</metalib>"
         );
 
-    EXPECT_EQ(4, dr_get_meta_size(get_meta("S1")));
-    EXPECT_EQ(5, dr_get_meta_size(get_meta("S2")));
+    EXPECT_EQ(4, dr_meta_size(get_meta("S1")));
+    EXPECT_EQ(5, dr_meta_size(get_meta("S2")));
 }
 
 TEST_F(BuildFromXmlStructAlign, align_composite_1_2) {
@@ -64,6 +64,6 @@ TEST_F(BuildFromXmlStructAlign, align_composite_1_2) {
         "</metalib>"
         );
 
-    EXPECT_EQ(3, dr_get_meta_size(get_meta("S1")));
-    EXPECT_EQ(4, dr_get_meta_size(get_meta("S2")));
+    EXPECT_EQ(3, dr_meta_size(get_meta("S1")));
+    EXPECT_EQ(4, dr_meta_size(get_meta("S2")));
 }

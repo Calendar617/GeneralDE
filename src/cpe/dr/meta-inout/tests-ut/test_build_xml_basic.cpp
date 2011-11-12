@@ -9,9 +9,9 @@ TEST_F(BuildFromXmlTest, metalib_basic) {
 
     ASSERT_EQ(0, errorCount());
 
-    ASSERT_STREQ("net", dr_get_metalib_name(m_metaLib));
-    ASSERT_EQ(10, dr_get_metalib_version(m_metaLib));
-    ASSERT_EQ(0, dr_get_metalib_macro_num(m_metaLib));
+    ASSERT_STREQ("net", dr_lib_name(m_metaLib));
+    ASSERT_EQ(10, dr_lib_version(m_metaLib));
+    ASSERT_EQ(0, dr_lib_macro_num(m_metaLib));
 }
 
 TEST_F(BuildFromXmlTest, metalib_tagsetversion_overflow) {
@@ -83,7 +83,7 @@ TEST_F(BuildFromXmlTest, metalib_name_overflow) {
 }
 
 TEST_F(BuildFromXmlTest, parse_no_em) {
-    dr_free_lib(&m_metaLib);
+    dr_lib_free(&m_metaLib);
 
     const char * def =
         "<metalib tagsetversion='1000000000' name='net' version='1'/>";

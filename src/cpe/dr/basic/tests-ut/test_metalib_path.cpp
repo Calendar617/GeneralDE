@@ -17,7 +17,7 @@ public:
     virtual void SetUp() {
         loadLib();
 
-        m_pMeta = dr_get_meta_by_name(m_lib, "Pkg");
+        m_pMeta = dr_lib_find_meta_by_name(m_lib, "Pkg");
         ASSERT_TRUE(m_pMeta) << "get meta Pkg fail!";
     }
 
@@ -35,7 +35,7 @@ TEST_P(MetaLibManagerPathTest, CheckPath) {
     char buf[1024];
     memset(buf, 0xcc, 1024);
 
-    char * checkPath = dr_entry_off_to_path(m_pMeta, caseData.pos, buf, caseData.size < 0 ? 1024 : caseData.size);
+    char * checkPath = dr_meta_off_to_path(m_pMeta, caseData.pos, buf, caseData.size < 0 ? 1024 : caseData.size);
 
     ASSERT_STREQ(caseData.path, checkPath) << "get path at " << caseData.pos << " error!";
 }

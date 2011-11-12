@@ -22,17 +22,15 @@ class MetaLibManagerMicroTest : public ::testing::TestWithParam<MicroData>, publ
 TEST_P(MetaLibManagerMicroTest, CheckData) {
     MicroData macro = GetParam();
 
-    LPDRMACRO pMacro = dr_get_metalib_macro_by_index(m_lib, macro.index);
+    LPDRMACRO pMacro = dr_lib_macro_at(m_lib, macro.index);
     ASSERT_TRUE(pMacro) << "get macro at " << macro.index << " fail!";
 
-    ASSERT_STREQ(macro.name, dr_get_macro_name_by_ptr(m_lib, pMacro));
+    ASSERT_STREQ(macro.name, dr_macro_name(m_lib, pMacro));
 
-    int checkValue = -1;
-    ASSERT_EQ(0, dr_get_macro_value_by_ptr(&checkValue, pMacro)) << "call dr_get_macro_value_by_ptr fail!";
+    ASSERT_EQ(macro.value, dr_macro_value(pMacro))
+        << "call dr_get_macro_value_by_ptr fail!";
 
-    ASSERT_EQ(macro.value, checkValue);
-
-    ASSERT_STREQ(macro.desc, dr_get_macro_desc_by_ptr(m_lib, pMacro));
+    ASSERT_STREQ(macro.desc, dr_macro_desc(m_lib, pMacro));
 }
 
 MicroData macroDataCases[] = {

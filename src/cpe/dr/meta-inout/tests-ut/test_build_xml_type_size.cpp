@@ -29,7 +29,7 @@ TEST_P(BuildFromXmlTypeSizeTest, CheckSize) {
 
     parseMeta(buf);
 
-    EXPECT_EQ(caseData.m_size, dr_get_meta_size(get_meta("S1")))
+    EXPECT_EQ(caseData.m_size, dr_meta_size(get_meta("S1")))
         << "size of type " << caseData.m_name << " error!";
 }
 

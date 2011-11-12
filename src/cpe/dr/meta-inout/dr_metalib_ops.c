@@ -309,6 +309,6 @@ void dr_meta_complete(LPDRMETA meta, error_monitor_t em) {
     meta->m_data_size += panding;
 
     if (meta->m_entry_count == 0) {
-        CPE_ERROR_EX(em, CPE_DR_ERROR_META_NO_ENTRY, "meta %s have no entry", dr_get_meta_name(meta));
+        CPE_ERROR_EX(em, CPE_DR_ERROR_META_NO_ENTRY, "meta %s have no entry", dr_meta_name(meta));
     }
 }

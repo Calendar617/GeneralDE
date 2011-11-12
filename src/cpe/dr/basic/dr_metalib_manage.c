@@ -6,7 +6,7 @@
 #include "cpe/dr/dr_error.h"
 #include "../dr_internal_types.h"
 
-LPDRMETA dr_get_meta_by_name(LPDRMETALIB a_pstLib, const char* a_pszName) {
+LPDRMETA dr_lib_find_meta_by_name(LPDRMETALIB a_pstLib, const char* a_pszName) {
     char * base;
     struct tagDRMetaIdxByName * searchStart;
     int beginPos, endPos, curPos;
@@ -44,7 +44,7 @@ static int dr_comp_metaidx_by_id(const void * l, const void * r) {
     return lItem->m_id - rItem->m_id;
 }
 
-LPDRMETA dr_get_meta_by_id(LPDRMETALIB a_pstLib, int id) {
+LPDRMETA dr_lib_find_meta_by_id(LPDRMETALIB a_pstLib, int id) {
     char * base;
     struct tagDRMetaIdxById * searchStart;
     int beginPos, endPos, curPos;
@@ -74,23 +74,23 @@ LPDRMETA dr_get_meta_by_id(LPDRMETALIB a_pstLib, int id) {
     return NULL;
 }
 
-int dr_get_meta_based_version(LPDRMETA meta) {
+int dr_meta_based_version(LPDRMETA meta) {
     return meta->m_based_version;
 }
 
-int dr_get_meta_current_version(LPDRMETA meta) {
+int dr_meta_current_version(LPDRMETA meta) {
     return meta->m_current_version;
 }
 
-int dr_get_meta_type(LPDRMETA meta) {
+int dr_meta_type(LPDRMETA meta) {
     return meta->m_type;
 }
 
-const char *dr_get_meta_name(LPDRMETA meta) {
+const char *dr_meta_name(LPDRMETA meta) {
     return (char *)(meta) - meta->m_self_pos + meta->m_name_pos;
 }
 
-const char *dr_get_meta_desc(LPDRMETA meta) {
+const char *dr_meta_desc(LPDRMETA meta) {
     if (meta->m_desc_pos < 0) {
         return "";
     }
@@ -99,37 +99,23 @@ const char *dr_get_meta_desc(LPDRMETA meta) {
     }
 }
 
-int dr_get_meta_id(LPDRMETA meta) {
+int dr_meta_id(LPDRMETA meta) {
     return meta->m_id;
 }
 
-size_t dr_get_meta_size(LPDRMETA meta) {
+size_t dr_meta_size(LPDRMETA meta) {
     return meta->m_data_size;
 }
 
-int dr_get_meta_align(LPDRMETA meta) {
+int dr_meta_align(LPDRMETA meta) {
     return meta->m_align;
 }
 
-int dr_get_entry_version(LPDRMETAENTRY entry) {
-    return entry->m_version;
-}
-
-int dr_get_entry_num(LPDRMETA meta) {
+int dr_meta_entry_num(LPDRMETA meta) {
     return meta->m_entry_count;
 }
 
-int dr_sizeinfo_to_off(LPDRSIZEINFO a_pstRedirector, LPDRMETA meta, int a_iEntry, const char* a_pszName) {
-    //TODO
-    return -1;
-}
-
-int dr_entry_path_to_off(LPDRMETA meta, INOUT LPDRMETAENTRY *a_ppstEntry, OUT DROFF *a_piHOff, const char *a_pszPath) {
-    //TODO
-    return -1;
-}
-
-char *dr_entry_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iBufSize) {
+char * dr_meta_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iBufSize) {
     int writePos = 0;
     int i;
     LPDRMETA pstCurMeta = meta;
@@ -147,7 +133,7 @@ char *dr_entry_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iB
             beginPos < endPos && curEntry == NULL;
             curPos = beginPos + (endPos - beginPos - 1) / 2)
         {
-            LPDRMETAENTRY pstEntry = dr_get_entry_by_index(pstCurMeta, curPos);
+            LPDRMETAENTRY pstEntry = dr_meta_entry_at(pstCurMeta, curPos);
 
             if (a_iOff < pstEntry->m_data_start_pos) {
                 endPos = curPos;
@@ -169,7 +155,7 @@ char *dr_entry_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iB
         writePos += snprintf(a_pBuf + writePos,
                              a_iBufSize - writePos,
                              pstCurMeta == meta ? "%s" : ".%s",
-                             dr_get_entry_name(curEntry));
+                             dr_entry_name(curEntry));
 
         if (curEntry->m_type <= CPE_DR_TYPE_COMPOSITE) {
             pstCurMeta = (LPDRMETA)(base + curEntry->m_ref_type_pos);
@@ -183,49 +169,7 @@ char *dr_entry_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iB
     return writePos == 0 ? NULL : a_pBuf;
 }
 
-int dr_do_have_autoincrement_entry(LPDRMETA meta) {
-    //TODO
-}
-
-const char *dr_get_entry_name(LPDRMETAENTRY a_pstEntry) {
-    LPDRMETA pstMeta = (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
-
-    char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
-
-    return base + a_pstEntry->m_name_pos;
-}
-
-const char *dr_get_entry_cname(LPDRMETAENTRY a_pstEntry) {
-    LPDRMETA pstMeta = (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
-
-    char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
-
-    if (a_pstEntry->m_cname_pos < 0) {
-        return "";
-    }
-    else {
-        return base + a_pstEntry->m_cname_pos;
-    }
-}
-
-const char *dr_get_entry_desc(LPDRMETAENTRY a_pstEntry) {
-    LPDRMETA pstMeta = (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
-
-    char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
-
-    if (a_pstEntry->m_desc_pos < 0) {
-        return "";
-    }
-    else {
-        return base + a_pstEntry->m_desc_pos;
-    }
-}
-
-LPDRMACROSGROUP dr_get_entry_macrosgroup(LPDRMETAENTRY a_pstEntry) {
-    //TODO
-}
-
-LPDRMETAENTRY dr_get_entryptr_by_name(LPDRMETA meta, const char* a_pszName) {
+LPDRMETAENTRY dr_meta_find_entry_by_name(LPDRMETA meta, const char* a_pszName) {
     int i;
     char * base = (char *)(meta) - meta->m_self_pos;
     LPDRMETAENTRY pstEntryBegin = (LPDRMETAENTRY)(meta + 1);
@@ -241,7 +185,7 @@ LPDRMETAENTRY dr_get_entryptr_by_name(LPDRMETA meta, const char* a_pszName) {
     return NULL;
 }
 
-int dr_get_entry_by_name(OUT int* a_piIdx, LPDRMETA meta, const char* a_pszName) {
+int dr_meta_find_entry_idx_by_name(LPDRMETA meta, const char* a_pszName) {
     int i;
     char * base = (char *)(meta) - meta->m_self_pos;
     LPDRMETAENTRY pstEntryBegin = (LPDRMETAENTRY)(meta + 1);
@@ -250,15 +194,14 @@ int dr_get_entry_by_name(OUT int* a_piIdx, LPDRMETA meta, const char* a_pszName)
         LPDRMETAENTRY pstCurEntry = pstEntryBegin + i;
 
         if (strcmp(base + pstCurEntry->m_name_pos, a_pszName) == 0) {
-            *a_piIdx = i;
-            return 0;
+            return i;
         }
     }
 
     return -1;
 }
 
-int dr_get_entry_by_id(OUT int* a_piIdx, LPDRMETA meta, int a_iId) {
+int dr_meta_find_entry_idx_by_id(LPDRMETA meta, int a_iId) {
     if (a_iId < 0) {
         return -1;
     }
@@ -270,15 +213,14 @@ int dr_get_entry_by_id(OUT int* a_piIdx, LPDRMETA meta, int a_iId) {
         LPDRMETAENTRY pstCurEntry = pstEntryBegin + i;
 
         if (pstCurEntry->m_id == a_iId) {
-            *a_piIdx = i;
-            return 0;
+            return i;
         }
     }
 
     return -1;
 }
 
-LPDRMETAENTRY dr_get_entry_by_index(LPDRMETA meta, int a_idxEntry) {
+LPDRMETAENTRY dr_meta_entry_at(LPDRMETA meta, int a_idxEntry) {
     if (a_idxEntry < 0 || a_idxEntry >= meta->m_entry_count) {
         return NULL;
     }
@@ -286,42 +228,7 @@ LPDRMETAENTRY dr_get_entry_by_index(LPDRMETA meta, int a_idxEntry) {
     return (struct tagDRMetaEntry *)(meta + 1) + a_idxEntry;
 }
 
-int dr_get_entry_id(LPDRMETAENTRY a_pstEntry) {
-    return a_pstEntry->m_id;
-}
-
-const char *dr_get_entry_id_name(LPDRMETALIB a_pstLib, LPDRMETAENTRY a_pstEntry) {
-    //TODO
-}
-
-size_t dr_get_entry_unitsize(LPDRMETAENTRY a_pstEntry) {
-    return a_pstEntry->m_unitsize;
-}
-
-int dr_get_entry_type(LPDRMETAENTRY a_pstEntry) {
-    return a_pstEntry->m_type;
-}
-
-int dr_get_entry_count(LPDRMETAENTRY a_pstEntry) {
-    return a_pstEntry->m_count;
-}
-
-LPDRMETA dr_get_entry_type_meta(LPDRMETALIB a_pstLib, LPDRMETAENTRY a_pstEntry) {
-    return (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
-}
-
-LPDRMETA dr_get_entry_ref_type(LPDRMETAENTRY a_pstEntry) {
-    if (a_pstEntry->m_type > CPE_DR_TYPE_COMPOSITE) {
-        return NULL;
-    }
-    else {
-        LPDRMETA pstMeta = (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
-        char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
-        return (LPDRMETA)(base + a_pstEntry->m_ref_type_pos);
-    }
-}
-
-LPDRMETAENTRY dr_get_entry_by_path(LPDRMETA meta, const char* a_pszEntryPath) {
+LPDRMETAENTRY dr_meta_find_entry_by_path(LPDRMETA meta, const char* a_pszEntryPath) {
     char * base;
     LPDRMETALIB pstLib;
     LPDRMETA pstCurMeta;
@@ -359,15 +266,89 @@ LPDRMETAENTRY dr_get_entry_by_path(LPDRMETA meta, const char* a_pszEntryPath) {
         pstCurMeta = (LPDRMETA)(base + pstEntry->m_ref_type_pos);
     }
 
-    return dr_get_entryptr_by_name(pstCurMeta, nameBegin);
+    return dr_meta_find_entry_by_name(pstCurMeta, nameBegin);
 }
 
-const char *dr_get_entry_customattr(LPDRMETALIB a_pstLib, LPDRMETAENTRY a_pstEntry) {
+int dr_entry_version(LPDRMETAENTRY entry) {
+    return entry->m_version;
+}
+
+const char *dr_entry_name(LPDRMETAENTRY a_pstEntry) {
+    LPDRMETA pstMeta = (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
+
+    char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
+
+    return base + a_pstEntry->m_name_pos;
+}
+
+const char *dr_entry_cname(LPDRMETAENTRY a_pstEntry) {
+    LPDRMETA pstMeta = (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
+
+    char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
+
+    if (a_pstEntry->m_cname_pos < 0) {
+        return "";
+    }
+    else {
+        return base + a_pstEntry->m_cname_pos;
+    }
+}
+
+const char *dr_entry_desc(LPDRMETAENTRY a_pstEntry) {
+    LPDRMETA pstMeta = (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
+
+    char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
+
+    if (a_pstEntry->m_desc_pos < 0) {
+        return "";
+    }
+    else {
+        return base + a_pstEntry->m_desc_pos;
+    }
+}
+
+LPDRMACROSGROUP dr_entry_macrosgroup(LPDRMETAENTRY a_pstEntry) {
     //TODO
     return NULL;
 }
 
-int dr_get_macro_value(OUT int *a_piID, LPDRMETALIB a_pstLib, const  char *a_pszName) {
+int dr_entry_id(LPDRMETAENTRY a_pstEntry) {
+    return a_pstEntry->m_id;
+}
+
+size_t dr_entry_size(LPDRMETAENTRY a_pstEntry) {
+    return a_pstEntry->m_unitsize;
+}
+
+int dr_entry_type(LPDRMETAENTRY a_pstEntry) {
+    return a_pstEntry->m_type;
+}
+
+int dr_entry_array_count(LPDRMETAENTRY a_pstEntry) {
+    return a_pstEntry->m_array_count;
+}
+
+LPDRMETA dr_entry_self_meta(LPDRMETAENTRY a_pstEntry) {
+    return (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
+}
+
+LPDRMETA dr_entry_ref_meta(LPDRMETAENTRY a_pstEntry) {
+    if (a_pstEntry->m_type > CPE_DR_TYPE_COMPOSITE) {
+        return NULL;
+    }
+    else {
+        LPDRMETA pstMeta = (LPDRMETA)((char * )a_pstEntry - a_pstEntry->m_self_to_meta_pos);
+        char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
+        return (LPDRMETA)(base + a_pstEntry->m_ref_type_pos);
+    }
+}
+
+const char *dr_entry_customattr(LPDRMETALIB a_pstLib, LPDRMETAENTRY a_pstEntry) {
+    //TODO
+    return NULL;
+}
+
+int dr_lib_find_macro_value(OUT int *a_piID, LPDRMETALIB a_pstLib, const  char *a_pszName) {
     char * base;
     int i;
     struct tagDRMacro* macros = 0;
@@ -388,13 +369,13 @@ int dr_get_macro_value(OUT int *a_piID, LPDRMETALIB a_pstLib, const  char *a_psz
     return -1;
 }
 
-int dr_get_metalib_macro_num(LPDRMETALIB a_pstLib) {
+int dr_lib_macro_num(LPDRMETALIB a_pstLib) {
     assert(a_pstLib);
 
     return a_pstLib->m_macro_count;
 }
 
-LPDRMACRO dr_get_metalib_macro_by_index(LPDRMETALIB a_pstLib, int a_iIdx) {
+LPDRMACRO dr_lib_macro_at(LPDRMETALIB a_pstLib, int a_iIdx) {
     assert(a_pstLib);
 
     if (a_iIdx < 0 || a_iIdx >= a_pstLib->m_macro_count) {
@@ -406,7 +387,7 @@ LPDRMACRO dr_get_metalib_macro_by_index(LPDRMETALIB a_pstLib, int a_iIdx) {
     }
 }
 
-const char* dr_get_macro_name_by_ptr(LPDRMETALIB a_pstLib, LPDRMACRO a_pstMacro) {
+const char* dr_macro_name(LPDRMETALIB a_pstLib, LPDRMACRO a_pstMacro) {
     char * base;
 
     assert(a_pstLib);
@@ -415,15 +396,11 @@ const char* dr_get_macro_name_by_ptr(LPDRMETALIB a_pstLib, LPDRMACRO a_pstMacro)
     return (char *)base + a_pstMacro->m_name_pos;
 }
 
-int dr_get_macro_value_by_ptr(OUT int *a_piID, LPDRMACRO a_pstMacro) {
-    assert(a_piID);
-    assert(a_pstMacro);
-
-    *a_piID = a_pstMacro->m_value;
-    return 0;
+int dr_macro_value(LPDRMACRO a_pstMacro) {
+    return a_pstMacro->m_value;
 }
 
-const char* dr_get_macro_desc_by_ptr(LPDRMETALIB a_pstLib, LPDRMACRO a_pstMacro) {
+const char* dr_macro_desc(LPDRMETALIB a_pstLib, LPDRMACRO a_pstMacro) {
     assert(a_pstLib);
     if (a_pstMacro->m_desc_pos < 0) {
         return "";
@@ -434,26 +411,26 @@ const char* dr_get_macro_desc_by_ptr(LPDRMETALIB a_pstLib, LPDRMACRO a_pstMacro)
     }
 }
 
-LPDRMACROSGROUP dr_get_macro_macrosgroup(LPDRMETALIB a_pstLib, LPDRMACRO a_pstMacro) {
+LPDRMACROSGROUP dr_macro_macrosgroup(LPDRMETALIB a_pstLib, LPDRMACRO a_pstMacro) {
     //TODO
 }
 
-int dr_get_macrosgroup_num(LPDRMETALIB a_pstLib) {
+int dr_lib_macrosgroup_num(LPDRMETALIB a_pstLib) {
     //TODO
 }
 
-LPDRMACROSGROUP dr_get_macrosgroup_by_index(LPDRMETALIB a_pstLib, int a_iIdx) {
+LPDRMACROSGROUP dr_lib_macrosgroup_at(LPDRMETALIB a_pstLib, int a_iIdx) {
     //TODO
 }
 
-const char* dr_get_macrosgroup_name(LPDRMACROSGROUP a_pstGroup) {
+const char* dr_macrosgroup_name(LPDRMACROSGROUP a_pstGroup) {
     //TODO
 }
 
-int dr_get_macrosgroup_macro_num(LPDRMACROSGROUP a_pstGroup) {
+int dr_macrosgroup_macro_num(LPDRMACROSGROUP a_pstGroup) {
     //TODO
 }
 
-LPDRMACRO dr_get_macrosgroup_macro_by_index(LPDRMETALIB a_pstLib, LPDRMACROSGROUP a_pstGroup, int a_iIdx) {
+LPDRMACRO dr_macrosgroup_macro_at(LPDRMETALIB a_pstLib, LPDRMACROSGROUP a_pstGroup, int a_iIdx) {
     //TODO
 }

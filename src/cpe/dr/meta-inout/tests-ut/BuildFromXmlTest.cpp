@@ -14,7 +14,7 @@ void BuildFromXmlTest::SetUp() {
 void BuildFromXmlTest::TearDown() {
     cpe_error_list_free(m_errorList);
     m_errorList = NULL;
-    dr_free_lib(&m_metaLib);
+    dr_lib_free(&m_metaLib);
 }
 
 int BuildFromXmlTest::errorCount(void) {
@@ -26,7 +26,7 @@ bool BuildFromXmlTest::haveError(int e) {
 }
 
 int BuildFromXmlTest::parseMeta(const char * def) {
-    dr_free_lib(&m_metaLib);
+    dr_lib_free(&m_metaLib);
 
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);
@@ -39,7 +39,7 @@ int BuildFromXmlTest::parseMeta(const char * def) {
 
 LPDRMETA
 BuildFromXmlTest::get_meta(const char * name) {
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, name);
+    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, name);
 
     EXPECT_TRUE(meta != NULL) << "get meta " << name << " fail!";
 
@@ -48,11 +48,11 @@ BuildFromXmlTest::get_meta(const char * name) {
 
 LPDRMETAENTRY
 BuildFromXmlTest::get_entry(const char * metaName, const char * entryName) {
-    LPDRMETA meta = dr_get_meta_by_name(m_metaLib, metaName);
+    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, metaName);
     EXPECT_TRUE(meta != NULL)
         << "get meta " << metaName << " fail!";
 
-    LPDRMETAENTRY entry = dr_get_entry_by_path(meta, entryName);
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_path(meta, entryName);
     EXPECT_TRUE(entry != NULL)
         << "get entry " << entryName << " of " << metaName << " fail!";
 

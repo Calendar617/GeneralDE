@@ -26,22 +26,22 @@ class MetaLibManagerMetaTest : public ::testing::TestWithParam<MetaData>, public
 TEST_P(MetaLibManagerMetaTest, CheckData) {
     MetaData meta = GetParam();
 
-    LPDRMETA pMeta = dr_get_meta_by_name(m_lib, meta.name);
+    LPDRMETA pMeta = dr_lib_find_meta_by_name(m_lib, meta.name);
     ASSERT_TRUE(pMeta) << "get meta by name " << meta.name << " fail!";
 
-    ASSERT_STREQ(meta.name, dr_get_meta_name(pMeta));
+    ASSERT_STREQ(meta.name, dr_meta_name(pMeta));
 
-    ASSERT_STREQ(meta.desc, dr_get_meta_desc(pMeta)) << meta.name << " desc error!";
+    ASSERT_STREQ(meta.desc, dr_meta_desc(pMeta)) << meta.name << " desc error!";
 
-    ASSERT_EQ(meta.type, dr_get_meta_type(pMeta)) << meta.name << " type error!";
+    ASSERT_EQ(meta.type, dr_meta_type(pMeta)) << meta.name << " type error!";
 
-    ASSERT_EQ(meta.size, dr_get_meta_size(pMeta)) << meta.name << " size error!";
+    ASSERT_EQ(meta.size, dr_meta_size(pMeta)) << meta.name << " size error!";
 
-    ASSERT_EQ(meta.entry_num, dr_get_entry_num(pMeta)) << meta.name << " entry_num error!";
+    ASSERT_EQ(meta.entry_num, dr_meta_entry_num(pMeta)) << meta.name << " entry_num error!";
 
-    ASSERT_EQ(meta.base_version, dr_get_meta_based_version(pMeta)) << meta.name << " based_version error!";
+    ASSERT_EQ(meta.base_version, dr_meta_based_version(pMeta)) << meta.name << " based_version error!";
 
-    ASSERT_EQ(meta.current_version, dr_get_meta_current_version(pMeta)) << meta.name << " current_version error!";
+    ASSERT_EQ(meta.current_version, dr_meta_current_version(pMeta)) << meta.name << " current_version error!";
 }
 
 MetaData metaDataCases[] = {

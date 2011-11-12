@@ -74,7 +74,7 @@ int dr_inbuild_build_lib(
                 entryEle->m_data.m_unitsize = ctypeInfo->m_size;
             }
             else {
-                LPDRMETA refMeta = dr_get_meta_by_name(metaLib, entryEle->m_ref_type_name);
+                LPDRMETA refMeta = dr_lib_find_meta_by_name(metaLib, entryEle->m_ref_type_name);
                 if (refMeta) {
                     entryEle->m_data.m_type = refMeta->m_type;
                     entryEle->m_data.m_unitsize = refMeta->m_data_size;

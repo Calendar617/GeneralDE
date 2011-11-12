@@ -89,13 +89,13 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
 
     JSON_PARSE_CTX_COPY_STR_TMP(c, stringVal, stringLen);
 
-    typeInfo->m_entry = dr_get_entryptr_by_name(typeInfo->m_meta, c->m_buf);
+    typeInfo->m_entry = dr_meta_find_entry_by_name(typeInfo->m_meta, c->m_buf);
     if (typeInfo->m_entry == NULL) {
-        CPE_INFO(c->m_em, "%s have no entry %s", dr_get_meta_name(typeInfo->m_meta), c->m_buf);
+        CPE_INFO(c->m_em, "%s have no entry %s", dr_meta_name(typeInfo->m_meta), c->m_buf);
         return 0;
     }
 
-    if (refType = dr_get_entry_ref_type(typeInfo->m_entry)) { /*composite*/
+    if (refType = dr_entry_ref_meta(typeInfo->m_entry)) { /*composite*/
         struct dr_json_parse_type_info * nestTypeInfo = NULL;
 
         if ((c->m_typePos + 1) >= CPE_DR_MAX_LEVEL) { /*nest type overflow */
@@ -160,7 +160,7 @@ static void dr_json_parse_ctx_init(
     ctx->m_output = buffer;
 
     ctx->m_typeStacks[0].m_meta = meta;
-    ctx->m_typeStacks[0].m_data = mem_buffer_alloc(buffer, dr_get_meta_size(meta));
+    ctx->m_typeStacks[0].m_data = mem_buffer_alloc(buffer, dr_meta_size(meta));
     ctx->m_typeStacks[0].m_entry = NULL;
     ctx->m_typePos = 0;
     ctx->m_em = em;
