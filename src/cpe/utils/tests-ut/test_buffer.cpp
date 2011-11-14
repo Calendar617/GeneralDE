@@ -3,8 +3,8 @@
 TEST_F(BufferTest, append_empty) {
     const char * data = "test_string";
     
-    EXPECT_EQ(0, append_string(data));
-    EXPECT_EQ(0, append_zero());
+    EXPECT_EQ(strlen(data), append_string(data));
+    EXPECT_EQ(1, append_zero());
 
     EXPECT_EQ(strlen(data) + 1, mem_buffer_size(&m_buffer));
 

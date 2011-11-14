@@ -91,7 +91,7 @@ int mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size)
 
     writedSize += mem_trunk_append(buffer, trunk, buf + writedSize, size - writedSize);
 
-    return 0;
+    return size;
 }
 
 void * mem_buffer_make_continuous(struct mem_buffer * buffer) {
