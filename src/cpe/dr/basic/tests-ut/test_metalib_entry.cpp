@@ -144,12 +144,12 @@ TEST_P(MetaLibManagerEntryTest, CheckData) {
 
 EntryData entryDataCases[] = {
     /* idx id  name       desc           cname            type                  size count*/
-    {  0,  11, "magic",   "",            "",              CPE_DR_TYPE_SMALLINT, 2,   1}
-    , {1,  12, "version", "",            "",              CPE_DR_TYPE_SMALLINT, 2,   1}
+    {  0,  11, "magic",   "",            "",              CPE_DR_TYPE_INT16, 2,   1}
+    , {1,  12, "version", "",            "",              CPE_DR_TYPE_INT16, 2,   1}
     , {2,  -1, "time",    "",            "",              CPE_DR_TYPE_DATETIME, 8,   1}
-    , {3,  -1, "cmd",     "",            "",              CPE_DR_TYPE_SMALLINT, 2,   1}
-    , {4,  -1, "bodylen", "",            "bodylen.cname", CPE_DR_TYPE_SMALLINT, 2,   1}
-    , {5,  -1, "msgid",   "message id",  "",              CPE_DR_TYPE_UINT,     4,   1}
+    , {3,  -1, "cmd",     "",            "",              CPE_DR_TYPE_INT16, 2,   1}
+    , {4,  -1, "bodylen", "",            "bodylen.cname", CPE_DR_TYPE_INT16, 2,   1}
+    , {5,  -1, "msgid",   "message id",  "",              CPE_DR_TYPE_UINT32,     4,   1}
 };
 
 INSTANTIATE_TEST_CASE_P(

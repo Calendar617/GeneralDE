@@ -175,48 +175,70 @@ DR_TYPE_BUILD_READ_UINT_FUN(32, UINT_MAX)
 DR_TYPE_BUILD_READ_INT_FUN(64, LONG_MIN, LONG_MAX)
 DR_TYPE_BUILD_READ_UINT_FUN(64, ULONG_MAX)
 
+int dr_type_printf_int8_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%d", *((int8_t*)data));
+}
+int dr_type_printf_int16_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%d", *((int16_t*)data));
+}
+int dr_type_printf_int32_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%d", *((int32_t*)data));
+}
+int dr_type_printf_int64_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%ld", *((int64_t*)data));
+}
+int dr_type_printf_uint8_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%ud", *((uint8_t*)data));
+}
+int dr_type_printf_uint16_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%ud", *((uint16_t*)data));
+}
+int dr_type_printf_uint32_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%ud", *((uint32_t*)data));
+}
+int dr_type_printf_uint64_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%uld", *((uint64_t*)data));
+}
+
+int dr_type_printf_char_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%c", *((char*)data));
+}
+
+int dr_type_printf_uchar_to_stream(write_stream_t stream, const void * data) {
+    return stream_printf(stream, "%uc", *((unsigned char*)data));
+}
+
+struct DRTypeNameMap {
+    const int m_typeId;
+    const char * m_typeName;
+};
 
 struct tagDRCTypeInfo g_dr_ctypeinfos[] = {
-    {CPE_DR_TYPE_UNION, "union", -1, NULL}
-    , {CPE_DR_TYPE_STRUCT, "struct", -1, NULL}
-    , {CPE_DR_TYPE_CHAR, "char", 1, dr_type_read_char_from_string}
-    , {CPE_DR_TYPE_UCHAR, "uchar", 1, dr_type_read_char_from_string}
-    , {CPE_DR_TYPE_BYTE, "byte", 1, dr_type_read_int8_from_string}
-    , {CPE_DR_TYPE_SHORT, "short", 2, dr_type_read_int16_from_string}
-    , {CPE_DR_TYPE_USHORT, "ushort", 2, dr_type_read_uint16_from_string}
-    , {CPE_DR_TYPE_INT, "int", 4, dr_type_read_int32_from_string}
-    , {CPE_DR_TYPE_UINT, "uint", 4, dr_type_read_uint32_from_string}
-    , {CPE_DR_TYPE_LONG, "long", 4, dr_type_read_int32_from_string}
-    , {CPE_DR_TYPE_ULONG, "ulong", 4, dr_type_read_uint32_from_string}
-    , {CPE_DR_TYPE_LONGLONG, "longlong", 8, dr_type_read_int64_from_string}
-    , {CPE_DR_TYPE_ULONGLONG, "ulonglong", 8, dr_type_read_int64_from_string}
-    , {CPE_DR_TYPE_DATE, "date", 4, NULL}
-    , {CPE_DR_TYPE_TIME, "time", 4, NULL}
-    , {CPE_DR_TYPE_DATETIME, "datetime", 8, NULL}
-    , {CPE_DR_TYPE_MONEY, "money", 4, NULL}
-    , {CPE_DR_TYPE_FLOAT, "float", 4, NULL}
-    , {CPE_DR_TYPE_DOUBLE, "double", 8, NULL}
-    , {CPE_DR_TYPE_IP, "ip", 4, NULL}
-    , {CPE_DR_TYPE_WCHAR, "wchar", 2, NULL}
-    , {CPE_DR_TYPE_STRING, "string", -1, NULL}
-    , {CPE_DR_TYPE_WSTRING, "wstring", -1, NULL}
-    , {CPE_DR_TYPE_VOID, "void", -1, NULL}
-
-    /*same name types*/
-    , {CPE_DR_TYPE_SMALLINT, "smallint", 2, dr_type_read_int16_from_string}
-    , {CPE_DR_TYPE_SMALLUINT, "smalluint", 2, dr_type_read_uint16_from_string}
-    , {CPE_DR_TYPE_CHAR, "int8", 1, dr_type_read_int8_from_string}
-    , {CPE_DR_TYPE_UCHAR, "uint8", 1, dr_type_read_uint8_from_string}
-    , {CPE_DR_TYPE_CHAR, "tinyint", 1, dr_type_read_int8_from_string}
-    , {CPE_DR_TYPE_UCHAR, "tinyuint", 1, dr_type_read_uint8_from_string}
-    , {CPE_DR_TYPE_LONGLONG, "bigint", 8, dr_type_read_int64_from_string}
-    , {CPE_DR_TYPE_ULONGLONG, "biguint", 8, dr_type_read_uint64_from_string}
-    , {CPE_DR_TYPE_SHORT, "int16", 2, dr_type_read_int16_from_string}
-    , {CPE_DR_TYPE_USHORT, "uint16", 2, dr_type_read_uint16_from_string}
-    , {CPE_DR_TYPE_INT, "int32", 4, dr_type_read_int32_from_string}
-    , {CPE_DR_TYPE_UINT, "uint32", 4, dr_type_read_uint32_from_string}
-    , {CPE_DR_TYPE_LONGLONG, "int64", 8, dr_type_read_int64_from_string}
-    , {CPE_DR_TYPE_ULONGLONG, "uint64", 8, dr_type_read_uint64_from_string}
+    {CPE_DR_TYPE_UNION, "union", -1, NULL, NULL}
+    , {CPE_DR_TYPE_STRUCT, "struct", -1, NULL, NULL}
+    , {CPE_DR_TYPE_CHAR, "char", 1, dr_type_read_char_from_string, dr_type_printf_char_to_stream}
+    , {CPE_DR_TYPE_UCHAR, "uchar", 1, dr_type_read_char_from_string, dr_type_printf_uchar_to_stream}
+    , {CPE_DR_TYPE_INT8, "int8", 1, dr_type_read_int8_from_string, dr_type_printf_int8_to_stream}
+    , {CPE_DR_TYPE_INT16, "int16", 2, dr_type_read_int16_from_string, dr_type_printf_int16_to_stream}
+    , {CPE_DR_TYPE_UINT16, "uint16", 2, dr_type_read_uint16_from_string, dr_type_printf_uint16_to_stream}
+    , {CPE_DR_TYPE_INT32, "int32", 4, dr_type_read_int32_from_string, dr_type_printf_int32_to_stream}
+    , {CPE_DR_TYPE_UINT32, "uint32", 4, dr_type_read_uint32_from_string, dr_type_printf_uint32_to_stream}
+    , {CPE_DR_TYPE_INT32, "int32", 4, dr_type_read_int32_from_string, dr_type_printf_int32_to_stream}
+    , {CPE_DR_TYPE_UINT32, "uint32", 4, dr_type_read_uint32_from_string, dr_type_printf_uint32_to_stream}
+    , {CPE_DR_TYPE_INT64, "int64", 8, dr_type_read_int64_from_string, dr_type_printf_int64_to_stream}
+    , {CPE_DR_TYPE_UINT64, "uint64", 8, dr_type_read_uint64_from_string, dr_type_printf_uint64_to_stream}
+    , {CPE_DR_TYPE_DATE, "date", 4, NULL, NULL}
+    , {CPE_DR_TYPE_TIME, "time", 4, NULL, NULL}
+    , {CPE_DR_TYPE_DATETIME, "datetime", 8, NULL, NULL}
+    , {CPE_DR_TYPE_MONEY, "money", 4, NULL, NULL}
+    , {CPE_DR_TYPE_FLOAT, "float", 4, NULL, NULL}
+    , {CPE_DR_TYPE_DOUBLE, "double", 8, NULL, NULL}
+    , {CPE_DR_TYPE_IP, "ip", 4, NULL, NULL}
+    , {CPE_DR_TYPE_CHAR, "char", 1, NULL, NULL}
+    , {CPE_DR_TYPE_STRING, "string", -1, NULL, NULL}
+    , {CPE_DR_TYPE_STRING, "string", -1, NULL, NULL}
+    , {CPE_DR_TYPE_VOID, "void", -1, NULL, NULL}
+    , {CPE_DR_TYPE_UINT8, "uint8", 1, dr_type_read_uint8_from_string, dr_type_printf_uint8_to_stream}
 };
 
 static const int g_dr_ctypeinfos_count

@@ -49,7 +49,6 @@ static TypeSizeCase g_align_basic_case[] = {
     , { "date", 4 }
     , { "time", 4 }
     , { "datetime", 8 }
-    , { "wchar", 2 }
     , { "ip", 4 }
     , { "int8", 1 }
     , { "uint8", 1 }

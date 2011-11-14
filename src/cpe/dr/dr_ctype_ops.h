@@ -1,5 +1,6 @@
 #ifndef CPE_DR_CTYPE_OPS_H
 #define CPE_DR_CTYPE_OPS_H
+#include "cpe/utils/stream.h"
 #include "dr_internal_types.h"
 
 #ifdef __cplusplus
@@ -13,6 +14,7 @@ struct tagDRCTypeInfo {
 
     /*type operations*/
     int (* read_from_string)(void * output, const char * input);
+    int (* printf_to_stream)(write_stream_t output, const void * input);
 };
 
 /*n: >= 0    name-length

@@ -15,17 +15,15 @@ extern "C" {
 #define	CPE_DR_TYPE_COMPOSITE	CPE_DR_TYPE_STRUCT
 #define CPE_DR_TYPE_CHAR		0x02
 #define CPE_DR_TYPE_UCHAR		0x03
-#define CPE_DR_TYPE_BYTE		0x04
-#define CPE_DR_TYPE_SMALLINT		0x05
-#define CPE_DR_TYPE_SHORT		0x05
-#define CPE_DR_TYPE_SMALLUINT		0x06
-#define CPE_DR_TYPE_USHORT		0x06
-#define CPE_DR_TYPE_INT		0x07
-#define CPE_DR_TYPE_UINT		0x08
-#define CPE_DR_TYPE_LONG		0x09
-#define CPE_DR_TYPE_ULONG		0x0a
-#define CPE_DR_TYPE_LONGLONG	0x0b
-#define CPE_DR_TYPE_ULONGLONG	0x0c
+#define CPE_DR_TYPE_INT8		0x04
+#define CPE_DR_TYPE_INT16		0x05
+#define CPE_DR_TYPE_UINT16		0x06
+#define CPE_DR_TYPE_INT32		0x07
+#define CPE_DR_TYPE_UINT32		0x08
+/*#define CPE_DR_TYPE_LONG		0x09*/
+/*#define CPE_DR_TYPE_ULONG		0x0a*/
+#define CPE_DR_TYPE_INT64	    0x0b
+#define CPE_DR_TYPE_UINT64	    0x0c
 #define CPE_DR_TYPE_DATE		0x0d
 #define CPE_DR_TYPE_TIME		0x0e
 #define CPE_DR_TYPE_DATETIME	0x0f
@@ -33,11 +31,12 @@ extern "C" {
 #define CPE_DR_TYPE_FLOAT		0x11
 #define CPE_DR_TYPE_DOUBLE		0x12
 #define CPE_DR_TYPE_IP			0x13
-#define CPE_DR_TYPE_WCHAR		0x14
+/*#define CPE_DR_TYPE_WCHAR		0x14*/
 #define CPE_DR_TYPE_STRING		0x15
-#define CPE_DR_TYPE_WSTRING	0x16
+/*#define CPE_DR_TYPE_WSTRING	0x16*/
 #define CPE_DR_TYPE_VOID		0x17
-#define CPE_DR_TYPE_MAX		CPE_DR_TYPE_VOID
+#define CPE_DR_TYPE_UINT8		0x18
+#define CPE_DR_TYPE_MAX		    CPE_DR_TYPE_UINT8
 
 
 CPE_DR_API char *dr_drip_to_ineta(dr_ip_t a_iTDRIp);

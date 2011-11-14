@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <strings.h>
+#include <string.h>
 #include "cpe/dr/dr_error.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_ctype_ops.h"
