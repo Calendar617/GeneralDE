@@ -1,6 +1,5 @@
 #include <limits.h>
-#include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include "../dr_ctype_ops.h"
 
 static int dr_type_read_char_from_string(void * output, const char * input) {
