@@ -575,6 +575,10 @@ int stream_vprintf(struct write_stream * stream, const char *format, va_list arg
     return cnt;
 }
 
+int stream_write(struct write_stream * stream, const void * buf, size_t size) {
+    return stream->write(stream, buf, size);
+}
+
 int stream_do_flush_dummy(struct write_stream * stream) {
     return 0;
 }
