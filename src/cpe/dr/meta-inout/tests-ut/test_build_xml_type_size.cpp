@@ -34,16 +34,7 @@ TEST_P(BuildFromXmlTypeSizeTest, CheckSize) {
 }
 
 static TypeSizeCase g_align_basic_case[] = {
-    { "byte", 1 }
-    , { "char", 1 }
-    , { "tinyint", 1 }
-    , { "tinyuint", 1 }
-    , { "smallint", 2 }
-    , { "smalluint", 2 }
-    , { "int", 4 }
-    , { "uint", 4 }
-    , { "bigint", 8 }
-    , { "biguint", 8 }
+    { "char", 1 }
     , { "float", 4 }
     , { "double", 8 }
     , { "date", 4 }

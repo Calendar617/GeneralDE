@@ -11,7 +11,7 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
         "	     <entry name='a1' "
         "               desc='a1.desc'\n"
         "               cname='a1.cname'\n"
-        "               type='smallint'\n"
+        "               type='int16'\n"
         "               defaultvalue='1'\n"
         "               id='12'/>"
         "    </struct>"
@@ -24,14 +24,14 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
     EXPECT_STREQ("a1.desc", dr_entry_desc(entry));
     EXPECT_STREQ("a1.cname", dr_entry_cname(entry));
     EXPECT_EQ(1, dr_entry_version(entry));
-    EXPECT_EQ(CPE_DR_TYPE_SMALLINT, dr_entry_type(entry));
+    EXPECT_EQ(CPE_DR_TYPE_INT16, dr_entry_type(entry));
 }
 
 TEST_F(BuildFromXmlEntryTest, no_name) {
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'>"
         "    <struct name='PkgHead' version='1'>"
-        "	     <entry type='smallint'\n/>"
+        "	     <entry type='int16'\n/>"
         "    </struct>"
         "</metalib>"
         );
@@ -81,7 +81,7 @@ TEST_F(BuildFromXmlEntryTest, version_new) {
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'>"
         "    <struct name='PkgHead' version='1'>"
-        "	     <entry name='a1' version='2'\n type='smallint'/>"
+        "	     <entry name='a1' version='2'\n type='int16'/>"
         "    </struct>"
         "</metalib>"
         );
@@ -96,7 +96,7 @@ TEST_F(BuildFromXmlEntryTest, version_bigger) {
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'>"
         "    <struct name='PkgHead' version='1'>"
-        "	     <entry name='a1' version='11'\n type='smallint'/>"
+        "	     <entry name='a1' version='11'\n type='int16'/>"
         "    </struct>"
         "</metalib>"
         );

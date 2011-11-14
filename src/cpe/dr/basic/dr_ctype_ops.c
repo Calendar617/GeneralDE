@@ -259,7 +259,7 @@ dr_find_ctype_info_by_name(const char * name) {
 
 const struct tagDRCTypeInfo *
 dr_find_ctype_info_by_type(int typeId) {
-    if (typeId < 0 || typeId > CPE_DR_TYPE_VOID) {
+    if (typeId < 0 || typeId > CPE_DR_TYPE_MAX) {
         return NULL;
     }
     else {

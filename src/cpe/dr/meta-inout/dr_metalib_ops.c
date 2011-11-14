@@ -273,7 +273,10 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
     }
     else { /* is basic type */
         const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(entry->m_type);
-        assert(typeInfo);
+        if (typeInfo == NULL) {
+            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
+            return;
+        }
 
         if (typeInfo->m_size > 0) {
             entry->m_unitsize = typeInfo->m_size;
