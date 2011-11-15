@@ -227,13 +227,24 @@ void dr_add_meta_entry_calc_align(
 {
     int align = entryAlign < meta->m_align ? entryAlign : meta->m_align;
 
-    int panding = meta->m_data_size % align;
-    if (panding) {
-        panding = align - panding;
-    }
+    if (meta->m_type == CPE_DR_TYPE_STRUCT) {
+        int panding = meta->m_data_size % align;
+        if (panding) {
+            panding = align - panding;
+        }
 
-    newEntry->m_data_start_pos = meta->m_data_size + panding;
-    meta->m_data_size += panding + newEntry->m_unitsize;
+        newEntry->m_data_start_pos = meta->m_data_size + panding;
+        meta->m_data_size += panding + newEntry->m_unitsize;
+    }
+    else if (meta->m_type == CPE_DR_TYPE_UNION) {
+        newEntry->m_data_start_pos = 0;
+        if (meta->m_data_size < newEntry->m_unitsize) {
+            meta->m_data_size = newEntry->m_unitsize;
+        }
+    }
+    else {
+        CPE_ERROR_EX(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE, "unknown meta type %d!", meta->m_type);
+    }
 }
 
 LPDRMETAENTRY
