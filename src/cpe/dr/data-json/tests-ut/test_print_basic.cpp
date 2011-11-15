@@ -1,7 +1,7 @@
 #include "PrintTest.hpp"
 
 #define DEF_PRINT_TYPED_TEST(__typeName, __type, __input, __expect)     \
-    TEST_F(PrintTest, metalib_ ## __typeName ) {                        \
+    TEST_F(PrintTest, print_ ## __typeName ) {                        \
     installMeta(                                                        \
     "<metalib tagsetversion='1' name='net'  version='1'>"               \
     "    <struct name='S' version='1'>"                                 \
@@ -24,8 +24,10 @@ DEF_PRINT_TYPED_TEST(int16, int16_t, 12, "12")
 DEF_PRINT_TYPED_TEST(uint16, uint16_t, 12, "12")
 DEF_PRINT_TYPED_TEST(int32, int32_t, 12, "12")
 DEF_PRINT_TYPED_TEST(uint32, uint32_t, 12, "12")
+DEF_PRINT_TYPED_TEST(char, char, 'a', "\"a\"")
+DEF_PRINT_TYPED_TEST(uchar, unsigned char, 'a', "\"a\"")
 
-TEST_F(PrintTest, metalib_nest) {
+TEST_F(PrintTest, print_struct) {
     installMeta(
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='S' version='1'>"

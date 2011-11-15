@@ -42,15 +42,11 @@ static int dr_json_boolean(void * ctx, int boolean) {
     return 1;
 }
 
-static int dr_json_number(void * ctx, const char * s, size_t l) {
-    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    struct dr_json_parse_type_info * parseType = &c->m_typeStacks[c->m_typePos];
-
-    if (parseType->m_entry == NULL || parseType->m_data == NULL) {
-        CPE_ERROR(c->m_em, "internal error, no current entry info!");
-        return 0;
-    }
-
+int dr_json_do_parse_from_string(
+    struct dr_json_parse_ctx * c, 
+    struct dr_json_parse_type_info * parseType,
+    const char * s, size_t l)
+{
     const struct tagDRCTypeInfo * cTypeInfo =
         dr_find_ctype_info_by_type(parseType->m_entry->m_type);
     if (cTypeInfo == NULL) {
@@ -77,9 +73,28 @@ static int dr_json_number(void * ctx, const char * s, size_t l) {
     }
 }
 
-static int dr_json_string(void * ctx, const unsigned char * stringVal, size_t stringLen) {
+static int dr_json_number(void * ctx, const char * s, size_t l) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    return 1;
+    struct dr_json_parse_type_info * parseType = &c->m_typeStacks[c->m_typePos];
+
+    if (parseType->m_entry == NULL || parseType->m_data == NULL) {
+        CPE_ERROR(c->m_em, "internal error, no current entry info!");
+        return 0;
+    }
+
+    return dr_json_do_parse_from_string(c, parseType, s, l);
+}
+
+static int dr_json_string(void * ctx, const unsigned char * s, size_t l) {
+    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+    struct dr_json_parse_type_info * parseType = &c->m_typeStacks[c->m_typePos];
+
+    if (parseType->m_entry == NULL || parseType->m_data == NULL) {
+        CPE_ERROR(c->m_em, "internal error, no current entry info!");
+        return 0;
+    }
+
+    return dr_json_do_parse_from_string(c, parseType, s, l);
 }
 
 static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t stringLen) {

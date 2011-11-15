@@ -72,7 +72,7 @@ static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, const v
         struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, 20);
         int len = typeInfo->printf_to_stream((write_stream_t)&bufS, data);
         buf[len] = 0;
-        yajl_gen_string(g, buf, len);
+        JSON_PRINT_CHECK_GEN_RESULT(yajl_gen_string(g, buf, len));
     }
 }
 
@@ -122,7 +122,7 @@ static void dr_json_print_i(
     }
 
     yajl_gen_config(g, yajl_gen_beautify, flag & DR_JSON_PRINT_MINIMIZE ? 1 : 0);
-    yajl_gen_config(g, yajl_gen_validate_utf8, flag & DR_JSON_PRINT_VALIDATE_UTF8 ? 1 : 0);
+    //yajl_gen_config(g, yajl_gen_validate_utf8, flag & DR_JSON_PRINT_VALIDATE_UTF8 ? 1 : 0);
     yajl_gen_config(g, yajl_gen_print_callback, stream_write, output);
 
     metaStacks[metaPos].m_meta = rootMeta;
@@ -142,6 +142,10 @@ static void dr_json_print_i(
         for(; curMetaPos == metaPos && curEntryPos < curMeta->m_entry_count; ++curEntryPos) {
             LPDRMETAENTRY curEntry = dr_meta_entry_at(curMeta, curEntryPos);
             const void * curData = metaStacks[metaPos].m_data + curEntry->m_data_start_pos;
+
+            if (curEntryPos == 1 && curMeta->m_type == CPE_DR_TYPE_UNION) { /*report first union item error*/
+                CPE_ERROR(em, "too many entry for union!");
+            }
 
             JSON_PRINT_GEN_STRING(dr_entry_name(curEntry));
 
