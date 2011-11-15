@@ -46,7 +46,7 @@ static const char * yajl_errno_to_string(yajl_gen_status s) {
             yajl_gen_string(g, __p, strlen(__p)));  \
     } while(0)
 
-static void dr_print_print_numeric(yajl_gen g, int typeId, void * data, error_monitor_t em) {
+static void dr_print_print_numeric(yajl_gen g, int typeId, const void * data, error_monitor_t em) {
     const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(typeId);
     if (typeInfo == NULL || typeInfo->printf_to_stream == NULL) {
         CPE_ERROR(em, "unknown type %d!", typeInfo);
@@ -61,7 +61,7 @@ static void dr_print_print_numeric(yajl_gen g, int typeId, void * data, error_mo
     }
 }
 
-static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, void * data, error_monitor_t em) {
+static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, const void * data, error_monitor_t em) {
     const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(typeId);
     if (typeInfo == NULL || typeInfo->printf_to_stream == NULL) {
         CPE_ERROR(em, "unknown type %d!", typeInfo);
@@ -76,9 +76,10 @@ static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, void * 
     }
 }
 
-static void dr_print_print_basic_data(yajl_gen g, int typeId, void * data, error_monitor_t em) {
+static void dr_print_print_basic_data(yajl_gen g, int typeId, const void * data, error_monitor_t em) {
     switch(typeId) {
     case CPE_DR_TYPE_INT8:
+    case CPE_DR_TYPE_UINT8:
     case CPE_DR_TYPE_INT16:
     case CPE_DR_TYPE_UINT16:
     case CPE_DR_TYPE_INT32:
@@ -90,6 +91,10 @@ static void dr_print_print_basic_data(yajl_gen g, int typeId, void * data, error
     case CPE_DR_TYPE_CHAR:
     case CPE_DR_TYPE_UCHAR:
         dr_print_print_string(g, typeId, 1, data, em);
+        break;
+    default:
+        CPE_ERROR_EX(em, CPE_DR_ERROR_UNSUPPORTED_TYPE, "not supported type %d!", typeId);
+        yajl_gen_null(g);
         break;
     }
 }
@@ -156,20 +161,8 @@ static void dr_json_print_i(
                 metaStacks[curMetaPos].m_data = curData;
                 metaStacks[curMetaPos].m_entryPos = 0;
             }
-            else if (curEntry->m_type >= CPE_DR_TYPE_INT8 && curEntry->m_type <= CPE_DR_TYPE_DOUBLE) { /*numeric*/
-                char buf[20 + 1];
-                struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, 20);
-                const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(curEntry->m_type);
-                if (typeInfo == NULL || typeInfo->printf_to_stream == NULL) {
-                    CPE_ERROR(em, "unknown type %d!", curEntry->m_type);
-                    yajl_gen_null(g);
-                }
-                else {
-                    int len = typeInfo->printf_to_stream((write_stream_t)&bufS, curData);
-                    yajl_gen_number(g, buf, len);
-                }
-            }
-            else { /*string*/
+            else {
+                dr_print_print_basic_data(g, curEntry->m_type, curData, em);
             }
         }
 
