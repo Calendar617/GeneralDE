@@ -3,7 +3,7 @@
 
 struct CtypeNameIdInfo {
     int m_id;
-    const char * name;
+    const char * m_name;
 };
 
 class CtypeOpsFindByNameTest : public ::testing::TestWithParam<CtypeNameIdInfo> {
@@ -12,10 +12,22 @@ class CtypeOpsFindByNameTest : public ::testing::TestWithParam<CtypeNameIdInfo> 
 TEST_P(CtypeOpsFindByNameTest, FindByName) {
     CtypeNameIdInfo caseInfo = GetParam();
 
-    const struct tagDRCTypeInfo * ctypeInfo = dr_find_ctype_info_by_name(caseInfo.name);
-    ASSERT_TRUE(dr_find_ctype_info_by_name(caseInfo.name)) << "get ctype by name " << caseInfo.name << " fail!";
+    const struct tagDRCTypeInfo * ctypeInfo = dr_find_ctype_info_by_name(caseInfo.m_name);
+    ASSERT_TRUE(ctypeInfo) << "get ctype by name " << caseInfo.m_name << " fail!";
 
     EXPECT_EQ(caseInfo.m_id, ctypeInfo->m_id);
+}
+
+class CtypeOpsFindByIdTest : public ::testing::TestWithParam<CtypeNameIdInfo> {
+};
+
+TEST_P(CtypeOpsFindByIdTest, FindById) {
+    CtypeNameIdInfo caseInfo = GetParam();
+
+    const struct tagDRCTypeInfo * ctypeInfo = dr_find_ctype_info_by_type(caseInfo.m_id);
+    ASSERT_TRUE(ctypeInfo) << "get ctype by id " << caseInfo.m_id << " fail!";
+
+    EXPECT_STREQ(caseInfo.m_name, ctypeInfo->m_name);
 }
 
 CtypeNameIdInfo ctypeCasees[] = {
@@ -44,4 +56,9 @@ CtypeNameIdInfo ctypeCasees[] = {
 INSTANTIATE_TEST_CASE_P(
     CheckName,
     CtypeOpsFindByNameTest,
+    testing::ValuesIn(ctypeCasees));
+
+INSTANTIATE_TEST_CASE_P(
+    CheckId,
+    CtypeOpsFindByIdTest,
     testing::ValuesIn(ctypeCasees));

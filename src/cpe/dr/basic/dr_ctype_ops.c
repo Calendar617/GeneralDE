@@ -185,27 +185,29 @@ int dr_type_printf_int32_to_stream(write_stream_t stream, const void * data) {
     return stream_printf(stream, "%d", *((int32_t*)data));
 }
 int dr_type_printf_int64_to_stream(write_stream_t stream, const void * data) {
-    return stream_printf(stream, "%ld", *((int64_t*)data));
+    return stream_printf(stream, "%I64d", *((int64_t*)data));
 }
 int dr_type_printf_uint8_to_stream(write_stream_t stream, const void * data) {
-    return stream_printf(stream, "%ud", *((uint8_t*)data));
+    return stream_printf(stream, "%u", *((uint8_t*)data));
 }
 int dr_type_printf_uint16_to_stream(write_stream_t stream, const void * data) {
-    return stream_printf(stream, "%ud", *((uint16_t*)data));
+    return stream_printf(stream, "%u", *((uint16_t*)data));
 }
 int dr_type_printf_uint32_to_stream(write_stream_t stream, const void * data) {
-    return stream_printf(stream, "%ud", *((uint32_t*)data));
+    return stream_printf(stream, "%u", *((uint32_t*)data));
 }
 int dr_type_printf_uint64_to_stream(write_stream_t stream, const void * data) {
-    return stream_printf(stream, "%uld", *((uint64_t*)data));
+    return stream_printf(stream, "%I64u", *((uint64_t*)data));
 }
 
 int dr_type_printf_char_to_stream(write_stream_t stream, const void * data) {
-    return stream_printf(stream, "%c", *((char*)data));
+    char tmp = *((char*)data);
+    return stream_printf(stream, "%c", tmp);
 }
 
 int dr_type_printf_uchar_to_stream(write_stream_t stream, const void * data) {
-    return stream_printf(stream, "%uc", *((unsigned char*)data));
+    unsigned char tmp = *((unsigned char*)data);
+    return stream_printf(stream, "%c", tmp);
 }
 
 struct DRTypeNameMap {
@@ -234,7 +236,7 @@ struct tagDRCTypeInfo g_dr_ctypeinfos[] = {
     , {CPE_DR_TYPE_FLOAT, "float", 4, NULL, NULL}
     , {CPE_DR_TYPE_DOUBLE, "double", 8, NULL, NULL}
     , {CPE_DR_TYPE_IP, "ip", 4, NULL, NULL}
-    , {CPE_DR_TYPE_CHAR, "char", 1, NULL, NULL}
+    , {CPE_DR_TYPE_CHAR, "char", 1, dr_type_read_char_from_string, dr_type_printf_char_to_stream}
     , {CPE_DR_TYPE_STRING, "string", -1, NULL, NULL}
     , {CPE_DR_TYPE_STRING, "string", -1, NULL, NULL}
     , {CPE_DR_TYPE_VOID, "void", -1, NULL, NULL}
