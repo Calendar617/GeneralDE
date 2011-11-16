@@ -3,6 +3,8 @@
 #include <fcntl.h>
 #include <errno.h>
 #include "gtest/gtest.h"
+#include "cpe/dr/dr_metalib_manage.h"
+#include "../../dr_internal_types.h"
 #include "with_InputMetaLibTest.hpp"
 
 WithInputMetaLibTest::WithInputMetaLibTest()
@@ -39,3 +41,30 @@ void WithInputMetaLibTest::freeLib() {
     }
 }
 
+LPDRMETA
+WithInputMetaLibTest::meta(const char * name) {
+    LPDRMETA r = dr_lib_find_meta_by_name(m_lib, name);
+    EXPECT_TRUE(r) << "get meta " << name << " fail!";
+    return r;
+}
+
+LPDRMETAENTRY
+WithInputMetaLibTest::entry(const char * metaName, const char * entryName) {
+    LPDRMETA meta = dr_lib_find_meta_by_name(m_lib, metaName);
+    EXPECT_TRUE(meta) << "get meta " << metaName << " fail!";
+    if (meta == NULL) {
+        return NULL;
+    }
+
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_path(meta, entryName);
+    EXPECT_TRUE(entry) << "get meta " << metaName << "." << entryName << " fail!";
+    return entry;
+}
+
+int32_t WithInputMetaLibTest::address_to_pos(void * p) {
+    return (int)p - (int)(m_lib + 1);
+}
+
+int32_t WithInputMetaLibTest::address_to_start(void * p) {
+    return (int)p - (int)(m_lib);
+}

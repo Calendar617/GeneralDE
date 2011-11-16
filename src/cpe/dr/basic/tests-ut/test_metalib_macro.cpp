@@ -36,8 +36,8 @@ TEST_P(MetaLibManagerMicroTest, CheckData) {
 MicroData macroDataCases[] = {
     {0, "VERSION", 100, "VERSION.desc"}
     , {1, "MAX_BODY_LEN", 32000, ""}
-    , {2, "CMD_LOGIN", 0, ""}
-    , {3, "CMD_LOGOUT", 1, ""}
+    , {2, "CMD_LOGIN", 34, ""}
+    , {3, "CMD_LOGOUT", 89, ""}
     , {4, "MAX_NAME_LEN", 12, ""}
     , {5, "MAX_PASS_LEN", 32, ""}
     , {6, "MAX_ATTR_SIZE", 128, ""}

@@ -156,3 +156,23 @@ INSTANTIATE_TEST_CASE_P(
     CheckAllEntryData,
     MetaLibManagerEntryTest,
     testing::ValuesIn(entryDataCases));
+
+TEST_F(MetaLibManagerEntryTest, range_basic) {
+    EXPECT_EQ(34, entry("PkgBody", "login")->m_select_range_min);
+    EXPECT_EQ(34, entry("PkgBody", "login")->m_select_range_max);
+
+    EXPECT_EQ(89, entry("PkgBody", "logout")->m_select_range_min);
+    EXPECT_EQ(89, entry("PkgBody", "logout")->m_select_range_max);
+}
+
+TEST_F(MetaLibManagerEntryTest, selector_basic) {
+    EXPECT_EQ(
+        address_to_pos(entry("PkgHead", "cmd")),
+        entry("Pkg", "body")->m_select_entry_pos);
+
+    EXPECT_EQ(
+        entry("Pkg", "head")->m_data_start_pos
+        + entry("PkgHead", "cmd")->m_data_start_pos
+        ,
+        entry("Pkg", "body")->m_select_data_start_pos);
+}

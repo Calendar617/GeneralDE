@@ -69,14 +69,19 @@ struct tagDRMetaEntry {
     /*036*/ int32_t m_array_count;
     /*040*/ int32_t m_data_start_pos_3; /*same as start pos?*/
     /*044*/ int32_t m_data_start_pos;
-    int8_t reserve_3[72];
+    int8_t reserve_3[56];
+    /*104*/ int32_t m_select_data_start_pos;
+    /*108*/ int32_t m_select_entry_pos;
+    int8_t reserve_4[8];
     /*120*/ int32_t m_ref_type_pos;
-    int8_t reserve_4[20];
+    /*124*/ int32_t m_select_range_max;
+    /*128*/ int32_t m_select_range_min;
+    int8_t reserve_5[12];
     /*144*/ int32_t m_desc_pos;
     /*148*/ int32_t m_cname_pos;
-    int8_t reserve_5[12];
-    /*164*/ int32_t m_self_to_meta_pos;
     int8_t reserve_6[12];
+    /*164*/ int32_t m_self_to_meta_pos;
+    int8_t reserve_7[12];
 };/*180*/
 
 struct tagDRMacro {
