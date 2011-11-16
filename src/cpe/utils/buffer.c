@@ -49,8 +49,11 @@ mem_buffer_append_trunk_after(
 
 size_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer) {
     size_t readedSize = 0;
+    struct mem_buffer_trunk * trunk;
 
-    struct mem_buffer_trunk * trunk = TAILQ_FIRST(&buffer->m_trunks);
+    if (!buf || size <= 0 || !buffer) return -1;
+
+    trunk = TAILQ_FIRST(&buffer->m_trunks);
 
     while(readedSize < size && trunk != TAILQ_END(&trunk->m_trunks)) {
         size_t readSize = size - readedSize;
@@ -70,8 +73,9 @@ size_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer) {
 int mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size) {
     size_t writedSize = 0;
     size_t newTrunkSize = 0;
-
     struct mem_buffer_trunk * trunk = NULL;
+
+    if (!buffer || !buf || size < 0) return -1;
 
     trunk = TAILQ_LAST(&buffer->m_trunks, mem_buffer_trunk_list);
 
@@ -95,7 +99,11 @@ int mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size)
 }
 
 void * mem_buffer_make_continuous(struct mem_buffer * buffer) {
-    struct mem_buffer_trunk * trunk = TAILQ_FIRST(&buffer->m_trunks);
+    struct mem_buffer_trunk * trunk;
+
+    if (!buffer) return NULL;
+
+    trunk = TAILQ_FIRST(&buffer->m_trunks);
 
     if (trunk == TAILQ_END(&buffer->m_trunks)) {
         return NULL;
@@ -125,6 +133,8 @@ void * mem_buffer_alloc(struct mem_buffer * buffer, size_t size) {
     void * result = NULL;
     struct mem_buffer_trunk * trunk = NULL;
 
+    if (!buffer || size <= 0) return NULL;
+
     trunk = TAILQ_LAST(&buffer->m_trunks, mem_buffer_trunk_list);
     if (trunk == NULL || trunk->m_size + size > trunk->m_capacity) {
         trunk = mem_buffer_append_trunk(buffer, size);
@@ -140,4 +150,36 @@ void * mem_buffer_alloc(struct mem_buffer * buffer, size_t size) {
     buffer->m_size += size;
 
     return result;
+}
+
+char * mem_buffer_strdup(struct mem_buffer * buffer, const char * s) {
+    size_t n;
+    char * p;
+
+    if (!s) return NULL;
+
+    n = strlen(s);
+    p = (char*)mem_buffer_alloc(buffer, n + 1);
+    if (p == NULL) {
+        return NULL;
+    }
+
+    memcpy(p, s, n + 1);
+    return p;
+}
+
+char * mem_buffer_strndup(struct mem_buffer * buffer, const char * s, size_t n) {
+    char * p;
+
+    if (!s || n <= 0) return NULL;
+
+    p = (char*)mem_buffer_alloc(buffer, n + 1);
+    if (p == NULL) {
+        return NULL;
+    }
+
+    memcpy(p, s, n);
+    p[n] = 0;
+
+    return p;
 }

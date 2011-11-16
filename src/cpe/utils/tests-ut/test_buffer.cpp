@@ -81,3 +81,13 @@ TEST_F(BufferTest, alloc_empty_null) {
     EXPECT_FALSE(mem_buffer_alloc(&m_buffer, 12));
     EXPECT_EQ(0, mem_buffer_size(&m_buffer));
 }
+
+TEST_F(BufferTest, strdup_basic) {
+    EXPECT_STREQ("abc", mem_buffer_strdup(&m_buffer, "abc"));
+    EXPECT_EQ(4, mem_buffer_size(&m_buffer));
+}
+
+TEST_F(BufferTest, strndup_basic) {
+    EXPECT_STREQ("abc", mem_buffer_strndup(&m_buffer, "abcd", 3));
+    EXPECT_EQ(4, mem_buffer_size(&m_buffer));
+}
