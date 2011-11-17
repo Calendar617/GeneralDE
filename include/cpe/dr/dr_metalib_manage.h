@@ -37,6 +37,7 @@ CPE_DR_API int dr_entry_id(LPDRMETAENTRY entry);
 CPE_DR_API size_t dr_entry_size(LPDRMETAENTRY entry);
 CPE_DR_API int dr_entry_type(LPDRMETAENTRY entry);
 CPE_DR_API int dr_entry_array_count(LPDRMETAENTRY entry);
+CPE_DR_API LPDRMETAENTRY dr_entry_select_entry(LPDRMETAENTRY entry);
 CPE_DR_API const char *dr_entry_customattr(LPDRMETALIB metaLib, LPDRMETAENTRY entry);
 
 CPE_DR_API int dr_lib_find_macro_value(int *a_piID, LPDRMETALIB metaLib, const  char *name);

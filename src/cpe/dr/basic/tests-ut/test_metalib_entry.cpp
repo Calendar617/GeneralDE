@@ -198,3 +198,10 @@ TEST_F(MetaLibManagerEntryTest, select_basic) {
     EXPECT_EQ(89, entry("PkgBody", "logout")->m_select_range_min);
     EXPECT_EQ(89, entry("PkgBody", "logout")->m_select_range_max);
 }
+
+TEST_F(MetaLibManagerEntryTest, select_entry_basic) {
+    LPDRMETAENTRY selectEntry = dr_entry_select_entry(entry("Pkg", "body"));
+    ASSERT_TRUE(selectEntry);
+
+    EXPECT_STREQ("cmd", dr_entry_name(selectEntry));
+}
