@@ -7,11 +7,10 @@
 #include "../dr_internal_types.h"
 #include "../dr_ctype_ops.h"
 
-struct dr_json_print_stack_node {
-    LPDRMETA m_meta;
-    const void * m_data;
-    int m_entryPos;
-};
+static void dr_json_print_composite_type(
+    yajl_gen g,
+    LPDRMETA meta, LPDRMETAENTRY parentEntry, const void * data,
+    error_monitor_t em, int level);
 
 static const char * yajl_errno_to_string(yajl_gen_status s) {
     static const char * s_errorMsgs[] = {
@@ -39,7 +38,7 @@ static const char * yajl_errno_to_string(yajl_gen_status s) {
     }                                                           \
     }
 
-#define JSON_PRINT_GEN_STRING(str)                  \
+#define JSON_PRINT_GEN_STRING(g, str)               \
     do {                                            \
         const char * __p = (str);                   \
         JSON_PRINT_CHECK_GEN_RESULT(                \
@@ -99,6 +98,82 @@ static void dr_print_print_basic_data(yajl_gen g, int typeId, const void * data,
     }
 }
 
+static void dr_json_print_entry(
+    yajl_gen g,
+    LPDRMETA meta,
+    LPDRMETAENTRY entry,
+    const void * data,
+    error_monitor_t em,
+    int level)
+{
+    JSON_PRINT_GEN_STRING(g, dr_entry_name(entry));
+
+    if(entry->m_type <= CPE_DR_TYPE_COMPOSITE) {
+        dr_json_print_composite_type(g, dr_entry_ref_meta(entry), entry, data, em, level + 1);
+    }
+    else {
+        dr_print_print_basic_data(g, entry->m_type, data, em);
+    }
+}
+
+static void dr_json_print_struct(yajl_gen g, LPDRMETA meta, const void * data, error_monitor_t em, int level) {
+    int entryPos = 0;
+    for(entryPos = 0; entryPos < meta->m_entry_count; ++entryPos) {
+        LPDRMETAENTRY curEntry = dr_meta_entry_at(meta, entryPos);
+        const void * curData = data + curEntry->m_data_start_pos;
+        dr_json_print_entry(g, meta, curEntry, curData, em, level);
+    }
+}
+
+static void dr_json_print_union(yajl_gen g, LPDRMETA meta, LPDRMETAENTRY parentEntry, const void * data, error_monitor_t em, int level) {
+    LPDRMETAENTRY printEntry = NULL;
+
+    int entryPos = 0;
+    LPDRMETAENTRY selectEntry = dr_entry_select_entry(parentEntry);
+    if (selectEntry) {
+    }
+    else { /*have select entry*/
+        for(; entryPos < meta->m_entry_count; ++entryPos) {
+            LPDRMETAENTRY curEntry = dr_meta_entry_at(meta, entryPos);
+
+            if (curEntry->m_select_range_min > curEntry->m_select_range_max) {
+                printEntry = curEntry;
+                break;
+            }
+        }
+    }
+
+    if (printEntry) {
+        const void * curData = data + printEntry->m_data_start_pos;
+        dr_json_print_entry(g, meta, printEntry, curData, em, level);
+    }
+}
+
+static void dr_json_print_composite_type(
+    yajl_gen g,
+    LPDRMETA meta, LPDRMETAENTRY parentEntry, const void * data,
+    error_monitor_t em, int level)
+{
+    if (level >= CPE_DR_MAX_LEVEL) {
+        CPE_ERROR_EX(em, CPE_DR_ERROR_TOO_COMPLIEX_META, "max level realched!");
+        return;
+    }
+
+    yajl_gen_map_open(g);
+
+    if (meta->m_type == CPE_DR_TYPE_STRUCT) {
+        dr_json_print_struct(g, meta, data, em, level);
+    }
+    else if (meta->m_type == CPE_DR_TYPE_UNION) {
+        dr_json_print_union(g, meta, parentEntry, data, em, level);
+    }
+    else {
+        CPE_ERROR(em, "unknown complex type %d!", meta->m_type);
+    }
+
+    yajl_gen_map_close(g);
+}
+
 static void dr_json_print_i(
     write_stream_t output,
     const void * input,
@@ -107,8 +182,6 @@ static void dr_json_print_i(
     error_monitor_t em)
 {
     yajl_gen g;
-    struct dr_json_print_stack_node metaStacks[CPE_DR_MAX_LEVEL];
-    int metaPos = 0;
 
     if (output == NULL || input == NULL || rootMeta == NULL) {
         CPE_ERROR(em, "bad para");
@@ -125,62 +198,7 @@ static void dr_json_print_i(
     //yajl_gen_config(g, yajl_gen_validate_utf8, flag & DR_JSON_PRINT_VALIDATE_UTF8 ? 1 : 0);
     yajl_gen_config(g, yajl_gen_print_callback, stream_write, output);
 
-    metaStacks[metaPos].m_meta = rootMeta;
-    metaStacks[metaPos].m_data = input;
-    metaStacks[metaPos].m_entryPos = 0;
-
-    while(metaPos >= 0) {
-        int curMetaPos = metaPos;
-        LPDRMETA curMeta = metaStacks[metaPos].m_meta;
-        const void * curData = metaStacks[metaPos].m_data;
-        int curEntryPos = metaStacks[metaPos].m_entryPos;
-
-        if (curEntryPos == 0) {
-            JSON_PRINT_CHECK_GEN_RESULT(yajl_gen_map_open(g));
-        }
-
-        for(; curMetaPos == metaPos && curEntryPos < curMeta->m_entry_count; ++curEntryPos) {
-            LPDRMETAENTRY curEntry = dr_meta_entry_at(curMeta, curEntryPos);
-            const void * curData = metaStacks[metaPos].m_data + curEntry->m_data_start_pos;
-
-            if (curEntryPos == 1 && curMeta->m_type == CPE_DR_TYPE_UNION) { /*report first union item error*/
-                CPE_ERROR(em, "too many entry for union!");
-            }
-
-            JSON_PRINT_GEN_STRING(dr_entry_name(curEntry));
-
-            if(curEntry->m_type <= CPE_DR_TYPE_COMPOSITE) {
-                metaStacks[curMetaPos].m_entryPos = metaPos + 1;
-                ++curMetaPos;
-                if (curMetaPos >= CPE_DR_MAX_LEVEL) {
-                    CPE_ERROR_EX(em, CPE_DR_ERROR_TOO_COMPLIEX_META, "max level realched!");
-                    return;
-                }
-
-                metaStacks[curMetaPos].m_meta = dr_entry_ref_meta(curEntry);
-                if (metaStacks[curMetaPos].m_meta == NULL) {
-                    CPE_ERROR(em, "ref meta not exist!");
-                    return;
-                }
-                metaStacks[curMetaPos].m_data = curData;
-                metaStacks[curMetaPos].m_entryPos = 0;
-            }
-            else {
-                dr_print_print_basic_data(g, curEntry->m_type, curData, em);
-            }
-        }
-
-        if (curMetaPos != metaPos) {
-            metaPos = curMetaPos;
-        }
-        else {
-            if (curEntryPos == curMeta->m_entry_count) {
-                JSON_PRINT_CHECK_GEN_RESULT(yajl_gen_map_close(g));
-            }
-
-            --metaPos;
-        }
-    }
+    dr_json_print_composite_type(g, rootMeta, NULL, input, em, 0);
 
     yajl_gen_free(g);    
 }
