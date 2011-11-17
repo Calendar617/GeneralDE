@@ -119,6 +119,7 @@ char * dr_meta_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iB
     int writePos = 0;
     int i;
     LPDRMETA pstCurMeta = meta;
+    LPDRMETAENTRY pstEntry;
     char * base = (char *)(meta) - meta->m_self_pos;
 
     if (a_iBufSize <= 0) {
@@ -133,7 +134,7 @@ char * dr_meta_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iB
             beginPos < endPos && curEntry == NULL;
             curPos = beginPos + (endPos - beginPos - 1) / 2)
         {
-            LPDRMETAENTRY pstEntry = dr_meta_entry_at(pstCurMeta, curPos);
+            pstEntry = dr_meta_entry_at(pstCurMeta, curPos);
 
             if (a_iOff < pstEntry->m_data_start_pos) {
                 endPos = curPos;
@@ -167,6 +168,57 @@ char * dr_meta_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iB
     }
 
     return writePos == 0 ? NULL : a_pBuf;
+}
+
+int dr_meta_path_to_off(LPDRMETA meta, const char * path) {
+    char * base;
+    LPDRMETALIB pstLib;
+    LPDRMETA pstCurMeta;
+    const char * nameBegin;
+    const char * nameEnd;
+    LPDRMETAENTRY pstEntry;
+    int off;
+
+    base = (char *)(meta) - meta->m_self_pos;
+    pstLib = ((LPDRMETALIB)base) - 1;
+
+    off = 0;
+    pstCurMeta = meta;
+    for(nameBegin = path, nameEnd = strchr(nameBegin, '.');
+        nameEnd;
+        nameBegin = nameEnd + 1, nameEnd = strchr(nameBegin, '.'))
+    {
+        int i;
+        LPDRMETAENTRY pstEntryBegin = (LPDRMETAENTRY)(pstCurMeta + 1);
+        pstEntry = NULL;
+
+        for(i = 0; i < pstCurMeta->m_entry_count && pstEntry == NULL; ++i) {
+            LPDRMETAENTRY pstCheckEntry = pstEntryBegin + i;
+
+            if (strncmp(base + pstCheckEntry->m_name_pos, nameBegin, nameEnd - nameBegin) == 0) {
+                pstEntry = pstCheckEntry;
+            }
+        }
+
+        if (pstEntry == NULL) {
+            return -1;
+        }
+
+        if (pstEntry->m_type > CPE_DR_TYPE_COMPOSITE) {
+            return -1;
+        }
+
+        off += pstEntry->m_data_start_pos;
+        pstCurMeta = (LPDRMETA)(base + pstEntry->m_ref_type_pos);
+    }
+
+    if (pstEntry = dr_meta_find_entry_by_name(pstCurMeta, nameBegin)) {
+        off += pstEntry->m_data_start_pos;
+        return off;
+    }
+    else {
+        return -1;
+    }
 }
 
 LPDRMETAENTRY dr_meta_find_entry_by_name(LPDRMETA meta, const char* a_pszName) {

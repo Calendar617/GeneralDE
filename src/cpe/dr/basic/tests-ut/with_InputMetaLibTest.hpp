@@ -15,6 +15,7 @@ public:
 
     LPDRMETA meta(const char * name);
     LPDRMETAENTRY entry(const char * metaName, const char * entryname);
+    LPDRMETAENTRY entry(const char * metaName, int pos);
 
     int32_t address_to_start(void * p);
     int32_t address_to_pos(void * p);

@@ -56,9 +56,22 @@ WithInputMetaLibTest::entry(const char * metaName, const char * entryName) {
         return NULL;
     }
 
-    LPDRMETAENTRY entry = dr_meta_find_entry_by_path(meta, entryName);
-    EXPECT_TRUE(entry) << "get meta " << metaName << "." << entryName << " fail!";
-    return entry;
+    LPDRMETAENTRY e = dr_meta_find_entry_by_path(meta, entryName);
+    EXPECT_TRUE(e) << "get entry " << metaName << "." << entryName << " fail!";
+    return e;
+}
+
+LPDRMETAENTRY
+WithInputMetaLibTest::entry(const char * metaName, int pos) {
+    LPDRMETA meta = dr_lib_find_meta_by_name(m_lib, metaName);
+    EXPECT_TRUE(meta) << "get meta " << metaName << " fail!";
+    if (meta == NULL) {
+        return NULL;
+    }
+
+    LPDRMETAENTRY e = dr_meta_entry_at(meta, pos);
+    EXPECT_TRUE(e) << "get entry at " << pos << " in " << metaName << " fail!";
+    return e;
 }
 
 int32_t WithInputMetaLibTest::address_to_pos(void * p) {

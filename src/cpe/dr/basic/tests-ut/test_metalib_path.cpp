@@ -9,51 +9,78 @@ struct Pos2PathCase {
     const char * path;
 };
 
-class MetaLibManagerPathTest : public ::testing::TestWithParam<Pos2PathCase>, public WithInputMetaLibTest {
+class MetaLibManagerPath : public ::testing::Test, public WithInputMetaLibTest {
 public:
-    MetaLibManagerPathTest() : m_pMeta(0) {
+    virtual void SetUp() { loadLib(); }
+    virtual void TearDown() { freeLib(); }
+
+    char m_buf[128];
+    const char * pos2path(const char * metaName, int pos, int bufSize = -1) {
+        return dr_meta_off_to_path(meta(metaName), pos, m_buf, bufSize < 0 ? 128 : bufSize);
     }
 
-    virtual void SetUp() {
-        loadLib();
-
-        m_pMeta = dr_lib_find_meta_by_name(m_lib, "Pkg");
-        ASSERT_TRUE(m_pMeta) << "get meta Pkg fail!";
+    int path2pos(const char * metaName, const char * path) {
+        return dr_meta_path_to_off(meta(metaName), path);
     }
-
-    virtual void TearDown() {
-        m_pMeta = 0;
-        freeLib();
-    }
-
-    LPDRMETA m_pMeta;
 };
 
-TEST_P(MetaLibManagerPathTest, CheckPath) {
-    Pos2PathCase caseData = GetParam();
-
-    char buf[1024];
-    memset(buf, 0xcc, 1024);
-
-    char * checkPath = dr_meta_off_to_path(m_pMeta, caseData.pos, buf, caseData.size < 0 ? 1024 : caseData.size);
-
-    ASSERT_STREQ(caseData.path, checkPath) << "get path at " << caseData.pos << " error!";
+TEST_F(MetaLibManagerPath, pos2path_basic) {
+    EXPECT_STREQ("head.magic", pos2path("Pkg", 0));
 }
 
-Pos2PathCase checkPathCases[] = {
-    /*  size pos path*/
-    {   -1,  0,  "head.magic"}
-    , { 0,   0,  0}
-    , { 1,   0,  ""}
-    , { 3,   0,  "he"}
-    , { 11,   0,  "head.magic"}
-    , { -1,   1,  "head.magic"}
-    , { -1,   4,  "head.time"}
-    , { -1,   11111111,  0}
-    , { -1,   123,  "body.login.zone"}
-};
+TEST_F(MetaLibManagerPath, pos2path_buf_empty) {
+    EXPECT_STREQ(NULL, pos2path("Pkg", 0, 0));
+}
 
-INSTANTIATE_TEST_CASE_P(
-    CheckGetPathByPos,
-    MetaLibManagerPathTest,
-    testing::ValuesIn(checkPathCases));
+TEST_F(MetaLibManagerPath, pos2path_buf_size_1) {
+    EXPECT_STREQ("", pos2path("Pkg", 0, 1));
+}
+
+TEST_F(MetaLibManagerPath, pos2path_buf_size_small) {
+    EXPECT_STREQ("he", pos2path("Pkg", 0, 3));
+}
+
+TEST_F(MetaLibManagerPath, pos2path_buf_size_enough) {
+    EXPECT_STREQ("head.magic", pos2path("Pkg", 0, 11));
+}
+
+TEST_F(MetaLibManagerPath, pos2path_pos_at_middle) {
+    EXPECT_STREQ("head.magic", pos2path("Pkg", 1));
+}
+
+TEST_F(MetaLibManagerPath, pos2path_entry_ad_middle) {
+    EXPECT_STREQ("head.time", pos2path("Pkg", 4));
+}
+
+TEST_F(MetaLibManagerPath, pos2path_pos_overflow) {
+    EXPECT_STREQ(NULL, pos2path("Pkg", 111111));
+}
+
+TEST_F(MetaLibManagerPath, pos2path_many_level) {
+    EXPECT_STREQ("body.login.zone", pos2path("Pkg", 123));
+}
+
+TEST_F(MetaLibManagerPath, path2pos_basic) {
+    EXPECT_EQ(0, path2pos("Pkg", "head"));
+}
+
+TEST_F(MetaLibManagerPath, path2pos_nested) {
+    EXPECT_EQ(0, path2pos("Pkg", "head.magic"));
+}
+
+TEST_F(MetaLibManagerPath, path2pos_middle) {
+    EXPECT_EQ(2, path2pos("Pkg", "head.version"));
+}
+
+TEST_F(MetaLibManagerPath, path2pos_first_not_exist) {
+    EXPECT_EQ(-1, path2pos("Pkg", "not-exist.version"));
+}
+
+TEST_F(MetaLibManagerPath, path2pos_last_not_exist) {
+    EXPECT_EQ(-1, path2pos("Pkg", "head.not-exist"));
+}
+
+TEST_F(MetaLibManagerPath, path2pos_many_level) {
+    EXPECT_EQ(64, path2pos("Pkg", "body.login.zone"));
+}
+
