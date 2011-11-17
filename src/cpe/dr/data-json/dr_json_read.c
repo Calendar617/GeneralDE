@@ -19,6 +19,7 @@
 
 struct dr_json_parse_type_info {
     LPDRMETA m_meta;
+    LPDRMETAENTRY m_parentEntry;
     void * m_data;
     LPDRMETAENTRY m_entry;
 };
@@ -101,8 +102,13 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
     struct dr_json_parse_type_info * typeInfo = &c->m_typeStacks[c->m_typePos];
     LPDRMETA refType = NULL;
+    LPDRMETAENTRY selectEntry;
 
     JSON_PARSE_CTX_COPY_STR_TMP(c, stringVal, stringLen);
+
+    selectEntry = dr_entry_select_entry(typeInfo->m_parentEntry);
+    if (selectEntry) {
+    }
 
     typeInfo->m_entry = dr_meta_find_entry_by_name(typeInfo->m_meta, c->m_buf);
     if (typeInfo->m_entry == NULL) {
@@ -121,6 +127,7 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
         ++c->m_typePos;
         nestTypeInfo = &c->m_typeStacks[c->m_typePos];
         nestTypeInfo->m_meta = refType;
+        nestTypeInfo->m_parentEntry = typeInfo->m_entry;
         nestTypeInfo->m_data = typeInfo->m_data + typeInfo->m_entry->m_data_start_pos;
         nestTypeInfo->m_entry = NULL;
     }
@@ -175,6 +182,7 @@ static void dr_json_parse_ctx_init(
     ctx->m_output = buffer;
 
     ctx->m_typeStacks[0].m_meta = meta;
+    ctx->m_typeStacks[0].m_parentEntry = NULL;
     ctx->m_typeStacks[0].m_data = mem_buffer_alloc(buffer, dr_meta_size(meta));
     ctx->m_typeStacks[0].m_entry = NULL;
     ctx->m_typePos = 0;
