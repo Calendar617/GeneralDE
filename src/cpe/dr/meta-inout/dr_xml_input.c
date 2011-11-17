@@ -23,6 +23,18 @@ enum DRXmlParseState {
     memcpy(buf, str, len);         \
     buf[len] = 0;
 
+#define DR_DO_READ_INT(__d, __e)                                        \
+    if (len >= INTEGER_BUF_LEN) {                                       \
+        DR_NOTIFY_ERROR(ctx->m_em, (__e));                              \
+        return;                                                         \
+    }                                                                   \
+    DR_COPY_STR(buf, (char const *)valueBegin, len);                    \
+    sscanf(buf, "%d", &(__d))
+
+#define DR_DO_DUP_STR(buf)                                              \
+    buf =  mem_buffer_strndup(                                          \
+        &ctx->m_metaLib->m_tmp_buf, (char const *)valueBegin, len);
+
 struct DRXmlParseCtx {
     struct DRInBuildMetaLib * m_metaLib;
     struct DRInBuildMeta * m_curentMeta;
@@ -312,6 +324,8 @@ static void dr_build_xml_process_entry(
     int index = 0;
     int version = -1;
     int haveError = 0;
+    int haveMin = 0;
+    int haveMax = 0;
 
     if (ctx->m_state != PS_InMeta || ctx->m_curentMeta == NULL) {
         return;
@@ -365,19 +379,41 @@ static void dr_build_xml_process_entry(
                 return;
             }
 
-            DR_COPY_STR(newEntry->m_ref_type_name, (char const *)valueBegin, len);
+            DR_DO_DUP_STR(newEntry->m_ref_type_name);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
-            if (len >= INTEGER_BUF_LEN) {
-                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
-                return;
-            }
-
-            DR_COPY_STR(buf, (char const *)valueBegin, len);
-            sscanf(buf, "%d", &version);
+            DR_DO_READ_INT(version, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
+        }
+        else if (strcmp((char const *)localname, CPE_DR_TAG_ID) == 0) {
+            DR_DO_READ_INT(newEntry->m_data.m_select_range_min, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
+            newEntry->m_data.m_select_range_max = newEntry->m_data.m_select_range_min;
+        }
+        else if (strcmp((char const *)localname, CPE_DR_TAG_MAXID) == 0) {
+            haveMax = 1;
+            DR_DO_READ_INT(newEntry->m_data.m_select_range_max, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
+        }
+        else if (strcmp((char const *)localname, CPE_DR_TAG_MINID) == 0) {
+            haveMin = 1;
+            DR_DO_READ_INT(newEntry->m_data.m_select_range_min, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
+        }
+        else if (strcmp((char const *)localname, CPE_DR_TAG_SELECT) == 0) {
+            DR_DO_DUP_STR(newEntry->m_selector_path);
         }
         else {
         }
+    }
+
+    if (haveMin && haveMax && newEntry->m_data.m_select_range_min > newEntry->m_data.m_select_range_max) {
+        CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE, "id min(%d) bigger than max(%d)!",
+                     newEntry->m_data.m_select_range_min, newEntry->m_data.m_select_range_max);
+    }
+
+    if (haveMin && !haveMax) {
+        CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE, "id maxid not setted!");
+    }
+
+    if (haveMax && !haveMin) {
+        CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE, "id minid not setted!");
     }
 
     if (version < 0) {
@@ -395,7 +431,7 @@ static void dr_build_xml_process_entry(
         haveError = 1;
     }
 
-    if (strlen(newEntry->m_ref_type_name) == 0) {
+    if (newEntry->m_ref_type_name == NULL) {
         CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_ENTRY_NO_TYPE, "%s's type is null!", newEntry->m_name);
         haveError = 1;
     }

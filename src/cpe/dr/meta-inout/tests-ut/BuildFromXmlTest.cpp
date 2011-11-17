@@ -38,16 +38,16 @@ int BuildFromXmlTest::parseMeta(const char * def) {
 }
 
 LPDRMETA
-BuildFromXmlTest::get_meta(const char * name) {
-    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, name);
+BuildFromXmlTest::meta(const char * name) {
+    LPDRMETA m = dr_lib_find_meta_by_name(m_metaLib, name);
 
-    EXPECT_TRUE(meta != NULL) << "get meta " << name << " fail!";
+    EXPECT_TRUE(m != NULL) << "get meta " << name << " fail!";
 
-    return meta;
+    return m;
 }
 
 LPDRMETAENTRY
-BuildFromXmlTest::get_entry(const char * metaName, const char * entryName) {
+BuildFromXmlTest::entry(const char * metaName, const char * entryName) {
     LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, metaName);
     EXPECT_TRUE(meta != NULL)
         << "get meta " << metaName << " fail!";
@@ -58,3 +58,8 @@ BuildFromXmlTest::get_entry(const char * metaName, const char * entryName) {
 
     return entry;
 }
+
+int32_t BuildFromXmlTest::address_to_pos(void * p) {
+    return (int)p - (int)(m_metaLib + 1);
+}
+

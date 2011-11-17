@@ -247,6 +247,49 @@ void dr_add_meta_entry_calc_align(
     }
 }
 
+int dr_add_meta_entry_set_type_calc_align(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
+    char * base = (char*)(meta) - meta->m_self_pos;
+    int entryAlign = 0;
+
+    //process type
+    if (entry->m_type <= CPE_DR_TYPE_COMPOSITE) {/*is composite type*/
+        LPDRMETA usedType = NULL;
+
+        if (entry->m_ref_type_pos < 0) {
+            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
+            return -1;
+        }
+
+        usedType = (LPDRMETA)(base + entry->m_ref_type_pos);
+
+        if (usedType == NULL) {
+            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
+            return -1;
+        }
+
+        entry->m_unitsize = usedType->m_data_size;
+        entryAlign = usedType->m_align;
+    }
+    else { /* is basic type */
+        const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(entry->m_type);
+        if (typeInfo == NULL) {
+            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
+            return -1;
+        }
+
+        if (typeInfo->m_size > 0) {
+            entry->m_unitsize = typeInfo->m_size;
+            entryAlign = typeInfo->m_size;
+        }
+        else {
+            //TODO: unknown how to process
+            assert(0);
+        }
+    }
+
+    return entryAlign;
+}
+
 LPDRMETAENTRY
 dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
     char * base = (char*)(meta) - meta->m_self_pos;
@@ -264,39 +307,9 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
     }
 
     //process type
-    if (entry->m_type <= CPE_DR_TYPE_COMPOSITE) {/*is composite type*/
-        LPDRMETA usedType = NULL;
-
-        if (entry->m_ref_type_pos < 0) {
-            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
-            return NULL;
-        }
-
-        usedType = (LPDRMETA)(base + entry->m_ref_type_pos);
-
-        if (usedType == NULL) {
-            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
-            return NULL;
-        }
-
-        entry->m_unitsize = usedType->m_data_size;
-        entryAlign = usedType->m_align;
-    }
-    else { /* is basic type */
-        const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(entry->m_type);
-        if (typeInfo == NULL) {
-            DR_NOTIFY_ERROR(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE);
-            return;
-        }
-
-        if (typeInfo->m_size > 0) {
-            entry->m_unitsize = typeInfo->m_size;
-            entryAlign = typeInfo->m_size;
-        }
-        else {
-            //TODO: unknown how to process
-            assert(0);
-        }
+    entryAlign = dr_add_meta_entry_set_type_calc_align(meta, entry, em);
+    if (entryAlign < 0) {
+        return NULL;
     }
 
     memcpy(newEntry, entry, sizeof(*newEntry));

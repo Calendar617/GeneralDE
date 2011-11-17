@@ -11,6 +11,8 @@ struct DRInBuildMetaLib * dr_inbuild_create_lib(void) {
 
     bzero(inBuildMetaLib, sizeof(*inBuildMetaLib));
 
+    mem_buffer_init(&inBuildMetaLib->m_tmp_buf, NULL);
+
     inBuildMetaLib->m_data.iID = -1;
     
     TAILQ_INIT(&inBuildMetaLib->m_macros);
@@ -24,6 +26,8 @@ void dr_inbuild_free_lib(struct DRInBuildMetaLib * inBuildMetaLib) {
     if (inBuildMetaLib == NULL) {
         return;
     }
+
+    mem_buffer_free(&inBuildMetaLib->m_tmp_buf);
 
     /*free macro list*/
     while(! TAILQ_EMPTY(&inBuildMetaLib->m_macros)) {
@@ -106,6 +110,9 @@ dr_inbuild_meta_add_entry(struct DRInBuildMeta * meta) {
 
     bzero(newEntry, sizeof(struct DRInBuildMetaEntry));
     newEntry->m_data.m_id = -1;
+    newEntry->m_data.m_select_range_min = 1;
+    newEntry->m_data.m_select_data_start_pos = -1;
+    newEntry->m_data.m_select_entry_pos = -1;
 
     TAILQ_INSERT_TAIL(&meta->m_entries, newEntry, m_next);
     ++meta->m_entries_count;

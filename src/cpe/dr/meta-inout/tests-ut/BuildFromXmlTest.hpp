@@ -4,6 +4,7 @@
 #include "cpe/utils/error_list.h"
 #include "cpe/dr/dr_error.h"
 #include "cpe/dr/dr_metalib_manage.h"
+#include "../../dr_internal_types.h"
 
 class BuildFromXmlTest : public ::testing::Test {
 public:
@@ -19,8 +20,10 @@ public:
     int errorCount(void);
     bool haveError(int error);
 
-    LPDRMETA get_meta(const char * name);
-    LPDRMETAENTRY get_entry(const char * metaName, const char * entryName);
+    LPDRMETA meta(const char * name);
+    LPDRMETAENTRY entry(const char * metaName, const char * entryName);
+
+    int32_t address_to_pos(void * p);
 };
 
 #endif
