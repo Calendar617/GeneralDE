@@ -268,3 +268,21 @@ dr_find_ctype_info_by_type(int typeId) {
         return &g_dr_ctypeinfos[typeId];
     }
 }
+
+const char * dr_type_name(int typeId) {
+    if (typeId < 0 || typeId > CPE_DR_TYPE_MAX) {
+        return "unknown";
+    }
+    else {
+        return g_dr_ctypeinfos[typeId].m_name;
+    }
+}
+
+int dr_type_size(int typeId) {
+    if (typeId < 0 || typeId > CPE_DR_TYPE_MAX) {
+        return -1;
+    }
+    else {
+        return g_dr_ctypeinfos[typeId].m_size;
+    }
+}
