@@ -130,7 +130,6 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
 
     entry = dr_meta_find_entry_by_name(curStack->m_meta, c->m_buf);
     if (entry == NULL) {
-        CPE_INFO(c->m_em, "%s have no entry %s", dr_meta_name(curStack->m_meta), c->m_buf);
         return 1;
     }
 
