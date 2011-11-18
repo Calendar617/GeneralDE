@@ -143,5 +143,6 @@ TEST_F(ParseTest, type_union_selector_basic) {
     ASSERT_TRUE(r);
     EXPECT_EQ(3, r->s);
     EXPECT_EQ(12, r->u.a1);
+
 }
 

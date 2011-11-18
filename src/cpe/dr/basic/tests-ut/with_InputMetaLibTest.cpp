@@ -75,9 +75,9 @@ WithInputMetaLibTest::entry(const char * metaName, int pos) {
 }
 
 int32_t WithInputMetaLibTest::address_to_pos(void * p) {
-    return (int)p - (int)(m_lib + 1);
+    return (int32_t)((char *)p - (char *)(m_lib + 1));
 }
 
 int32_t WithInputMetaLibTest::address_to_start(void * p) {
-    return (int)p - (int)(m_lib);
+    return (int32_t)((char *)p - (char *)m_lib);
 }

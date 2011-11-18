@@ -69,7 +69,7 @@ static int dr_inbuild_build_calc_entry_select(
     }
     else {
         char * base = (char*)(createdMeta) - createdMeta->m_self_pos;
-        entryEle->m_data.m_select_entry_pos = (int)selectEntry - (int)base;
+        entryEle->m_data.m_select_entry_pos = (int32_t)((char *)selectEntry - base);
         entryEle->m_data.m_select_data_start_pos = dr_meta_path_to_off(createdMeta, entryEle->m_selector_path);
     }
 }

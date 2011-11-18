@@ -60,6 +60,6 @@ BuildFromXmlTest::entry(const char * metaName, const char * entryName) {
 }
 
 int32_t BuildFromXmlTest::address_to_pos(void * p) {
-    return (int)p - (int)(m_metaLib + 1);
+    return (int32_t)((char *)p - (char *)(m_metaLib + 1));
 }
 
