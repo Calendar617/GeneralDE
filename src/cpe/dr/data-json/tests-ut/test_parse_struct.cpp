@@ -1,4 +1,5 @@
 #include <sstream>
+#include "cpe/dr/dr_ctypes_read.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "ParseTest.hpp"
 
@@ -85,17 +86,10 @@ TEST_F(ParseTest, struct_ignore_nest_not_struct) {
         "</metalib>"
         );
 
-#pragma pack(push,1)
-    struct {
-        int16_t a1;
-        int16_t a2;
-    } expect = { 23, 14  };
-#pragma pack(pop)
-
-    ASSERT_EQ(0, read("{ \"a1\" : { a2: 15 },"
+    ASSERT_EQ(0, read("{ \"a1\" : { \"a2\": 15 },"
                       " \"a2\" : 14 }", "S2"));
 
-    EXPECT_EQ(14, expect.a2);
+    EXPECT_EQ(14, dr_read_int16(result(2), CPE_DR_TYPE_INT16));
 }
 
 TEST_F(ParseTest, struct_ignore_nest_level_2) {
@@ -108,15 +102,49 @@ TEST_F(ParseTest, struct_ignore_nest_level_2) {
         "</metalib>"
         );
 
-#pragma pack(push,1)
-    struct {
-        int16_t a1;
-        int16_t a2;
-    } expect = { 23, 14  };
-#pragma pack(pop)
-
-    ASSERT_EQ(0, read("{ \"a1\" : { a2: { a2 : 15 } },"
+    ASSERT_EQ(0, read("{ \"a1\" : { \"a2\": { \"a2\" : 15 } },"
                       " \"a2\" : 14 }", "S2"));
 
-    EXPECT_EQ(14, expect.a2);
+    EXPECT_EQ(14, dr_read_int16(result(2), CPE_DR_TYPE_INT16));
+}
+
+TEST_F(ParseTest, struct_ignore_overflow_level) {
+    ::std::ostringstream metaS;
+    metaS << 
+        "<metalib tagsetversion='1' name='net'  version='1'>\n"
+        "    <struct name='L1' version='1'>\n"
+        "	     <entry name='a1' type='int16'/>\n"
+        "    </struct>\n";
+    for(int i = 0; i < (CPE_DR_MAX_LEVEL - 1); ++i) {
+        metaS <<
+            "    <struct name='L" << (i + 2) << "' version='1'>\n"
+            "	     <entry name='a1' type='L" << (i + 1) << "'/>\n"
+            "    </struct>\n";
+    }
+    metaS <<
+        "    <struct name='L33' version='1'>\n"
+        "	     <entry name='a1' type='L32'/>\n"
+        "	     <entry name='a2' type='int16'/>\n"
+        "    </struct>"
+        "</metalib>";
+
+    installMeta(metaS.str().c_str());
+
+    ::std::ostringstream dataS;
+    dataS << "{ \"a1\": ";
+    for(int i = 0; i < CPE_DR_MAX_LEVEL; ++i) {
+        dataS << "{ \"a1\": ";
+    }
+
+    dataS << "23";
+
+    for(int i = 0; i < CPE_DR_MAX_LEVEL; ++i) {
+        dataS << "} ";
+    }
+
+    dataS << ", \"a2\": 14}";
+
+    ASSERT_EQ(-1, read(dataS.str().c_str(), "L33"));
+
+    EXPECT_EQ(14, dr_read_int16(result(2), CPE_DR_TYPE_INT16));
 }

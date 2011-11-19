@@ -43,6 +43,6 @@ int ParseTest::read(const char * data, const char * typeName) {
     return dr_json_read(&m_buffer, data, meta, &em);
 }
 
-void * ParseTest::result(void) {
-    return mem_buffer_make_continuous(&m_buffer);
+void * ParseTest::result(int startPos) {
+    return ((char *)mem_buffer_make_continuous(&m_buffer)) + startPos;
 }

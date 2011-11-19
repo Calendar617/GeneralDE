@@ -17,7 +17,7 @@ public:
 
     void installMeta(const char * data);
     int read(const char * data, const char * typeName);
-    void * result(void);
+    void * result(int startPos = 0);
 };
 
 #define ASSERT_JSON_READ_RESULT(__expect)  do {                 \

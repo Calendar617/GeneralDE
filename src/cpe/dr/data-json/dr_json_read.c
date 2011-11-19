@@ -144,6 +144,7 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
     }
 
     JSON_PARSE_CTX_COPY_STR_TMP(c, stringVal, stringLen);
+
     entry = dr_meta_find_entry_by_name(curStack->m_meta, c->m_buf);
     if (entry == NULL) {
         return 1;
