@@ -8,7 +8,7 @@ $(product).sources := $(addprefix $(product-base), \
                        )
 
 $(product).product.include:=3rdTools/libev/include
-$(product).flags.cpp:=-DHAVE_CONFIG_H -I$(product-base)$(dev-env)
+$(product).flags.cpp:=-DHAVE_CONFIG_H -I$(product-base)$(dev-env) -Wno-unused -Wno-parentheses
 $(product).flags.ld:=
 
 $(eval $(call product-def,$(product)))
