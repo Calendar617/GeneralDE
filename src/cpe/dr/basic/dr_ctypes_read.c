@@ -4,24 +4,26 @@
 
 
 struct tagDRCtypeTypeReadOps {
-    int (*to_int8)(int8_t * result, const void * input, error_monitor_t em);
-    int (*to_uint8)(uint8_t * result, const void * input, error_monitor_t em);
-    int (*to_int16)(int16_t * result, const void * input, error_monitor_t em);
-    int (*to_uint16)(uint16_t * result, const void * input, error_monitor_t em);
-    int (*to_int32)(int32_t * result, const void * input, error_monitor_t em);
-    int (*to_uint32)(uint32_t * result, const void * input, error_monitor_t em);
-    int (*to_int64)(int64_t * result, const void * input, error_monitor_t em);
-    int (*to_uint64)(uint64_t * result, const void * input, error_monitor_t em);
+    int (*to_int8)(int8_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
+    int (*to_uint8)(uint8_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
+    int (*to_int16)(int16_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
+    int (*to_uint16)(uint16_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
+    int (*to_int32)(int32_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
+    int (*to_uint32)(uint32_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
+    int (*to_int64)(int64_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
+    int (*to_uint64)(uint64_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
 };
 
-#define DEF_CVT_FUN_ASSIGN_CHECK_NONE(__from, __to)                       \
-int __from ## _to_ ## __to(__to ## _t * result, const void * input, error_monitor_t em) { \
+#define DEF_CVT_FUN_ASSIGN_CHECK_NONE(__from, __to)                     \
+int __from ## _to_ ## __to(__to ## _t * result, const void * input,     \
+                               LPDRMETAENTRY entry, error_monitor_t em) { \
     *result = *(const __from ## _t *)input;                             \
     return 0;                                                           \
 }
 
 #define DEF_CVT_FUN_ASSIGN_CHECK_MIN(__from, __to, __min, __valuefmt)   \
-int __from ## _to_ ## __to(__to ## _t * result, const void * input, error_monitor_t em) { \
+int __from ## _to_ ## __to(__to ## _t * result, const void * input,     \
+                           LPDRMETAENTRY entry, error_monitor_t em) {   \
     int r = 0;                                                          \
     __from ## _t tmp = *(const __from ## _t *)input;                    \
     if (tmp < __min) {                                                  \
@@ -35,7 +37,8 @@ int __from ## _to_ ## __to(__to ## _t * result, const void * input, error_monito
 }
 
 #define DEF_CVT_FUN_ASSIGN_CHECK_RANGE(__from, __to, __min, __max, __valuefmt) \
-int __from ## _to_ ## __to(__to ## _t * result, const void * input, error_monitor_t em) { \
+int __from ## _to_ ## __to(__to ## _t * result, const void * input,     \
+                           LPDRMETAENTRY entry, error_monitor_t em) {   \
     int r = 0;                                                          \
     __from ## _t tmp = *(const __from ## _t *)input;                    \
     if (tmp < __min) {                                                  \
@@ -55,7 +58,8 @@ int __from ## _to_ ## __to(__to ## _t * result, const void * input, error_monito
 }
 
 #define DEF_CVT_FUN_ASSIGN_CHECK_MAX(__from, __to, __max, __valuefmt)   \
-int __from ## _to_ ## __to(__to ## _t * result, const void * input, error_monitor_t em) { \
+int __from ## _to_ ## __to(__to ## _t * result, const void * input,     \
+                           LPDRMETAENTRY entry, error_monitor_t em) {   \
     int r = 0;                                                          \
     __from ## _t tmp = *(const __from ## _t *)input;                    \
     if (tmp > __max) {                                                  \
@@ -257,26 +261,88 @@ struct tagDRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
     }
 };
 
+#define CPE_READOPS_COUNT (sizeof(g_dr_ctype_read_ops) / sizeof(struct tagDRCtypeTypeReadOps))
+
 #define CPE_DEF_READ_FUN(__to)                                          \
-int dr_try_read_ ## __to(__to ## _t * result, const void * input, int type, error_monitor_t em) { \
-    if (type < 0 || type > sizeof(g_dr_ctype_read_ops) / sizeof(struct tagDRCtypeTypeReadOps)) { \
-        CPE_ERROR(em, "read from %d, type is unknown", type);           \
-        return -1;                                                      \
+    int dr_ctype_try_read_ ## __to(                                     \
+        __to ## _t * result,                                            \
+        const void * input, int type, error_monitor_t em)               \
+    {                                                                   \
+        if (type < 0 || type > CPE_READOPS_COUNT) {                     \
+            CPE_ERROR(em, "read from %d, type is unknown", type);       \
+            return -1;                                                  \
+        }                                                               \
+        else {                                                          \
+            if (g_dr_ctype_read_ops[type].to_ ## __to) {                \
+                return g_dr_ctype_read_ops[type].to_ ## __to (          \
+                    result, input, NULL, em);                           \
+            }                                                           \
+            else {                                                      \
+                CPE_ERROR(em, "read from %d, type not support to "      \
+                          #__to, type);                                 \
+                return -1;                                              \
+            }                                                           \
+        }                                                               \
     }                                                                   \
-    else {                                                              \
-        return g_dr_ctype_read_ops[type].to_ ## __to (result, input, em); \
+    __to ## _t dr_ctype_read_ ## __to(const void * input, int type) {   \
+        if (type < 0 || type > CPE_READOPS_COUNT) {                     \
+            return (__to ## _t)0;                                       \
+        }                                                               \
+        else {                                                          \
+            if (g_dr_ctype_read_ops[type].to_ ## __to) {                \
+                __to ## _t tmp = 0;                                     \
+                g_dr_ctype_read_ops[type].to_ ## __to (                 \
+                    &tmp, input, NULL, NULL);                           \
+                return tmp;                                             \
+            }                                                           \
+            else {                                                      \
+                return (__to ## _t)0;                                   \
+            }                                                           \
+        }                                                               \
     }                                                                   \
-}                                                                       \
-__to ## _t dr_read_ ## __to(const void * input, int type) {             \
-    if (type < 0 || type > sizeof(g_dr_ctype_read_ops) / sizeof(struct tagDRCtypeTypeReadOps)) { \
-        return (__to ## _t)-1;                                          \
+    int dr_try_read_ ## __to(                                           \
+        __to ## _t * result,                                            \
+        const void * input, LPDRMETAENTRY entry, error_monitor_t em)    \
+    {                                                                   \
+        if (entry == NULL) {                                            \
+            return -1;                                                  \
+        }                                                               \
+        if (entry->m_type < 0 || entry->m_type > CPE_READOPS_COUNT) {   \
+            CPE_ERROR(em, "read from %d, type is unknown",              \
+                      entry->m_type);                                   \
+            return -1;                                                  \
+        }                                                               \
+        else {                                                          \
+            if (g_dr_ctype_read_ops[entry->m_type].to_ ## __to) {       \
+                return g_dr_ctype_read_ops[entry->m_type].to_ ## __to ( \
+                    result, input, entry, em);                          \
+            }                                                           \
+            else {                                                      \
+                CPE_ERROR(em, "read from %d, type not support to "      \
+                          #__to, entry->m_type);                        \
+                return -1;                                              \
+            }                                                           \
+        }                                                               \
     }                                                                   \
-    else {                                                              \
-        __to ## _t tmp;                                                 \
-        g_dr_ctype_read_ops[type].to_ ## __to (&tmp, input, NULL);      \
-        return tmp;                                                     \
+    __to ## _t dr_read_ ## __to(                                        \
+        const void * input, LPDRMETAENTRY entry)                        \
+    {                                                                   \
+        if (entry == NULL ||                                            \
+            entry->m_type < 0 || entry->m_type > CPE_READOPS_COUNT) {   \
+            return (__to ## _t)0;                                       \
+        }                                                               \
+        else {                                                          \
+            if (g_dr_ctype_read_ops[entry->m_type].to_ ## __to) {       \
+                __to ## _t tmp = 0;                                     \
+                g_dr_ctype_read_ops[entry->m_type].to_ ## __to (        \
+                    &tmp, input, entry, NULL);                          \
+                return tmp;                                             \
+            }                                                           \
+            else {                                                      \
+                return (__to ## _t)0;                                   \
+            }                                                           \
+        }                                                               \
     }                                                                   \
- }
 
 
 CPE_DEF_READ_FUN(int8);

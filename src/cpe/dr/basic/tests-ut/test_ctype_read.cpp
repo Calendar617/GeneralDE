@@ -23,11 +23,11 @@ public:
 TEST_F(CtypeReadTest, __to ## _from_ ## __from ## _ ## __cn) {          \
     __from ## _t input = __input;                                       \
     EXPECT_EQ((__to ## _t)(__input),                                    \
-              dr_read_ ## __to(&input, __from_type));                   \
+              dr_ctype_read_ ## __to(&input, __from_type));                   \
                                                                         \
     CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);     \
     __to ## _t result;                                                  \
-    EXPECT_EQ(0, dr_try_read_ ## __to(&result, &input, __from_type, &em)); \
+    EXPECT_EQ(0, dr_ctype_try_read_ ## __to(&result, &input, __from_type, &em)); \
     EXPECT_EQ((__to ## _t)(__input), result);                           \
     EXPECT_EQ(0, cpe_error_list_error_count(m_errorList));              \
 }
@@ -36,11 +36,11 @@ TEST_F(CtypeReadTest, __to ## _from_ ## __from ## _ ## __cn) {          \
 TEST_F(CtypeReadTest, __to ## _from_ ## __from ## _ ## __cn) {          \
     __from ## _t input = __input;                                       \
     EXPECT_EQ((__to ## _t)(__input),                                    \
-              dr_read_ ## __to(&input, __from_type));                   \
+              dr_ctype_read_ ## __to(&input, __from_type));                   \
                                                                         \
     CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);     \
     __to ## _t result;                                                  \
-    EXPECT_EQ(-1, dr_try_read_ ## __to(&result, &input, __from_type, &em)); \
+    EXPECT_EQ(-1, dr_ctype_try_read_ ## __to(&result, &input, __from_type, &em)); \
     EXPECT_EQ((__to ## _t)(__input), result);                           \
     EXPECT_EQ(1, cpe_error_list_error_count(m_errorList));              \
 }
