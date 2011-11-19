@@ -38,7 +38,13 @@ static int dr_inbuild_build_calc_entry_type(
     ctypeInfo = dr_find_ctype_info_by_name(entryEle->m_ref_type_name);
     if (ctypeInfo) {
         entryEle->m_data.m_type = ctypeInfo->m_id;
-        entryEle->m_data.m_unitsize = ctypeInfo->m_size;
+        if ((int)ctypeInfo->m_size > 0) {
+            entryEle->m_data.m_unitsize = ctypeInfo->m_size;
+        }
+        else if (entryEle->m_data.m_unitsize <= 0) {
+            CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE, "no size of  type \"%s\" configured!", entryEle->m_ref_type_name);
+            return -1;
+        }
     }
     else {
         LPDRMETA refMeta = dr_lib_find_meta_by_name(ctx->m_metaLib, entryEle->m_ref_type_name);

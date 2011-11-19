@@ -106,3 +106,60 @@ TEST_F(BuildFromXmlEntryTest, version_bigger) {
     EXPECT_EQ(0, dr_meta_entry_num(head));
     EXPECT_TRUE(haveError(CPE_DR_ERROR_INVALID_VERSION));
 }
+
+TEST_F(BuildFromXmlEntryTest, size_for_string) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='PkgHead' version='1'>"
+        "	     <entry name='a1' type='string' size='12'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ((size_t)12, dr_entry_size(entry("PkgHead", "a1")));
+    EXPECT_EQ((size_t)12, dr_meta_size(meta("PkgHead")));
+}
+
+TEST_F(BuildFromXmlEntryTest, size_for_int) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='PkgHead' version='1'>"
+        "	     <entry name='a1' type='int16' size='12'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ((size_t)2, dr_entry_size(entry("PkgHead", "a1")));
+}
+
+TEST_F(BuildFromXmlEntryTest, size_for_complex_type) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='U1' version='1'>"
+        "	     <entry name='a1' type='int16'/>"
+        "	     <entry name='a1' type='int16'/>"
+        "    </struct>"
+        "    <struct name='PkgHead' version='1'>"
+        "	     <entry name='a1' type='U1' size='12'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ((size_t)4, dr_entry_size(entry("PkgHead", "a1")));
+}
+
+TEST_F(BuildFromXmlEntryTest, string_no_size) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='PkgHead' version='1'>"
+        "	     <entry name='a1' type='string'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    LPDRMETA head = meta("PkgHead");
+
+    EXPECT_EQ(0, dr_meta_entry_num(head));
+    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE));
+}
+

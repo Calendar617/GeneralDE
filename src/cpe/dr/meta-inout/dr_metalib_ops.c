@@ -209,6 +209,7 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, error_monitor_t em) {
 
     memcpy(newMeta, meta, sizeof(*newMeta));
     newMeta->m_self_pos = newMetaPos;
+    newMeta->m_entry_count = 0;
 
     dr_add_metalib_meta_add_index_by_name(metaLib, newMeta, em);
     dr_add_metalib_meta_add_index_by_id(metaLib, newMeta, em);
@@ -276,13 +277,11 @@ int dr_add_meta_entry_set_type_calc_align(LPDRMETA meta, LPDRMETAENTRY entry, er
             return -1;
         }
 
-        if (typeInfo->m_size > 0) {
-            entry->m_unitsize = typeInfo->m_size;
+        if ((int)typeInfo->m_size > 0) {
             entryAlign = typeInfo->m_size;
         }
         else {
-            //TODO: unknown how to process
-            assert(0);
+            entryAlign = 1;
         }
     }
 
@@ -291,16 +290,12 @@ int dr_add_meta_entry_set_type_calc_align(LPDRMETA meta, LPDRMETAENTRY entry, er
 
 LPDRMETAENTRY
 dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
-    LPDRMETAENTRY newEntry =  (LPDRMETAENTRY)(meta + 1);
+    LPDRMETAENTRY newEntry =  (LPDRMETAENTRY)(meta + 1) + meta->m_entry_count;
     int i;
     int entryAlign = 0;
 
-    //search the slot for newEntry
-    for(i = 0; i < meta->m_entry_count && newEntry->m_name_pos != 0; ++i, ++newEntry) {
-    }
-    
-    if (i >= meta->m_entry_count) {
-        DR_NOTIFY_ERROR(em, CPE_DR_ERROR_META_NO_ENTRY);
+    if (entry->m_name_pos < 0) {
+        CPE_ERROR_EX(em, CPE_DR_ERROR_META_NO_NAME, "entry have no name!");
         return NULL;
     }
 
@@ -320,6 +315,7 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
         meta->m_current_version = newEntry->m_version;
     }
 
+    ++meta->m_entry_count;
     return newEntry;
 }
 
