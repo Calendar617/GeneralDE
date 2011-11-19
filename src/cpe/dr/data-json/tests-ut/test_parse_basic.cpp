@@ -40,3 +40,16 @@ TEST_F(ParseTest, type_string) {
 
     EXPECT_STREQ("abc", (const char *)result());
 }
+
+TEST_F(ParseTest, type_string_overflow) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='a1' type='string' size='5'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+    ASSERT_EQ(0, read("{ \"a1\" : \"abcde\"}", "S"));
+
+    EXPECT_STREQ("abcd", (const char *)result());
+}

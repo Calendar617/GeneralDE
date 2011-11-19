@@ -72,8 +72,8 @@ static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, const v
     }
 }
 
-static void dr_print_print_basic_data(yajl_gen g, int typeId, const void * data, error_monitor_t em) {
-    switch(typeId) {
+static void dr_print_print_basic_data(yajl_gen g, LPDRMETAENTRY entry, const void * data, error_monitor_t em) {
+    switch(entry->m_type) {
     case CPE_DR_TYPE_INT8:
     case CPE_DR_TYPE_UINT8:
     case CPE_DR_TYPE_INT16:
@@ -82,14 +82,18 @@ static void dr_print_print_basic_data(yajl_gen g, int typeId, const void * data,
     case CPE_DR_TYPE_UINT32:
     case CPE_DR_TYPE_INT64:
     case CPE_DR_TYPE_UINT64:
-        dr_print_print_numeric(g, typeId, data, em);
+        dr_print_print_numeric(g, entry->m_type, data, em);
         break;
     case CPE_DR_TYPE_CHAR:
     case CPE_DR_TYPE_UCHAR:
-        dr_print_print_string(g, typeId, 1, data, em);
+        dr_print_print_string(g, entry->m_type, 1, data, em);
+        break;
+    case CPE_DR_TYPE_STRING:
+    case (CPE_DR_TYPE_STRING + 1):
+        dr_print_print_string(g, entry->m_type, entry->m_unitsize, data, em);
         break;
     default:
-        CPE_ERROR_EX(em, CPE_DR_ERROR_UNSUPPORTED_TYPE, "not supported type %d!", typeId);
+        CPE_ERROR_EX(em, CPE_DR_ERROR_UNSUPPORTED_TYPE, "print basic data not supported type %d!", entry->m_type);
         yajl_gen_null(g);
         break;
     }
@@ -109,7 +113,7 @@ static void dr_json_print_entry(
         dr_json_print_composite_type(g, dr_entry_ref_meta(entry), entry, data, em, level + 1);
     }
     else {
-        dr_print_print_basic_data(g, entry->m_type, data, em);
+        dr_print_print_basic_data(g, entry, data, em);
     }
 }
 

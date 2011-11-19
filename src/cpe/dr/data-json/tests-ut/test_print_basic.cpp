@@ -27,6 +27,25 @@ DEF_PRINT_TYPED_TEST(uint32, uint32_t, 12, "12")
 DEF_PRINT_TYPED_TEST(char, char, 'a', "\"a\"")
 DEF_PRINT_TYPED_TEST(uchar, unsigned char, 'a', "\"a\"")
 
+TEST_F(PrintTest, print_string) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='a1' type='string' size='5'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+#pragma pack(push,1)
+    struct {
+        char a1[5];
+    } input = { "abcd"  };
+#pragma pack(pop)
+
+    EXPECT_EQ(0, print(&input, "S"));
+    EXPECT_STREQ("{\"a1\":\"abcd\"}", result());
+}
+
 TEST_F(PrintTest, print_struct) {
     installMeta(
         "<metalib tagsetversion='1' name='net'  version='1'>"
