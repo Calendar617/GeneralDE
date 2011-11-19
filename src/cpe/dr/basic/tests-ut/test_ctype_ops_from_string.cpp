@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "cpe/dr/dr_ctypes_op.h"
 #include "../../dr_ctype_ops.h"
 
 class CtypeOpsFromStringTest : public ::testing::Test {
@@ -12,13 +13,7 @@ public:
             return -1;
         }
 
-        EXPECT_TRUE(typeInfo->read_from_string);
-        if (typeInfo->read_from_string) {
-            return typeInfo->read_from_string(m_buf, data);
-        }
-        else {
-            return -1;
-        }
+        return dr_ctype_set_from_string(m_buf, typeInfo->m_id, data, NULL);
     }
 
     int8_t as_int8(void) { return *((int8_t*)m_buf); }
@@ -189,4 +184,8 @@ TEST_F(CtypeOpsFromStringTest, uint32_down_overflow) {
 
 TEST_F(CtypeOpsFromStringTest, uint32_end_with_char) {
     EXPECT_EQ(-1, parse("uint32", "15a"));
+}
+
+TEST_F(CtypeOpsFromStringTest, string_basic) {
+    EXPECT_EQ(-1, parse("string", "a"));
 }

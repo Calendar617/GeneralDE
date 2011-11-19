@@ -5,7 +5,7 @@ void BufferTest::SetUp() {
 }
 
 void BufferTest::TearDown() {
-    mem_buffer_free(&m_buffer);
+    mem_buffer_clear(&m_buffer);
 }
 
 size_t BufferTest::append_string(const char * data) {

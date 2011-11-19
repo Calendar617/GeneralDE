@@ -1,9 +1,9 @@
 #include <limits.h>
-#include "cpe/dr/dr_ctypes_read.h"
+#include "cpe/dr/dr_ctypes_op.h"
 #include "../dr_ctype_ops.h"
 
 
-struct tagDRCtypeTypeReadOps {
+struct DRCtypeTypeReadOps {
     int (*to_int8)(int8_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
     int (*to_uint8)(uint8_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
     int (*to_int16)(int16_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
@@ -144,7 +144,7 @@ DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, uint32, UINT_MAX, "%I64u");
 DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, int64, 9223372036854775807LL, "%I64u");
 DEF_CVT_FUN_ASSIGN_CHECK_NONE(uint64, uint64);
 
-struct tagDRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
+struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
      /*CPE_DR_TYPE_UNION*/
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
     }
@@ -261,7 +261,7 @@ struct tagDRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
     }
 };
 
-#define CPE_READOPS_COUNT (sizeof(g_dr_ctype_read_ops) / sizeof(struct tagDRCtypeTypeReadOps))
+#define CPE_READOPS_COUNT (sizeof(g_dr_ctype_read_ops) / sizeof(struct DRCtypeTypeReadOps))
 
 #define CPE_DEF_READ_FUN(__to)                                          \
     int dr_ctype_try_read_ ## __to(                                     \

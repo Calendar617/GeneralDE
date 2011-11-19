@@ -1,5 +1,5 @@
 #include <sstream>
-#include "cpe/dr/dr_ctypes_read.h"
+#include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "ParseTest.hpp"
 
@@ -89,7 +89,7 @@ TEST_F(ParseTest, struct_ignore_nest_not_struct) {
     ASSERT_EQ(0, read("{ \"a1\" : { \"a2\": 15 },"
                       " \"a2\" : 14 }", "S2"));
 
-    EXPECT_EQ(14, dr_read_int16(result(2), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(14, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
 }
 
 TEST_F(ParseTest, struct_ignore_nest_level_2) {
@@ -105,7 +105,7 @@ TEST_F(ParseTest, struct_ignore_nest_level_2) {
     ASSERT_EQ(0, read("{ \"a1\" : { \"a2\": { \"a2\" : 15 } },"
                       " \"a2\" : 14 }", "S2"));
 
-    EXPECT_EQ(14, dr_read_int16(result(2), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(14, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
 }
 
 TEST_F(ParseTest, struct_ignore_overflow_level) {
@@ -146,5 +146,5 @@ TEST_F(ParseTest, struct_ignore_overflow_level) {
 
     ASSERT_EQ(-1, read(dataS.str().c_str(), "L33"));
 
-    EXPECT_EQ(14, dr_read_int16(result(2), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(14, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
 }

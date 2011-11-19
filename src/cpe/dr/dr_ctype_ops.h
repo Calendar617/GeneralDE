@@ -11,10 +11,6 @@ struct tagDRCTypeInfo {
     int m_id;
     char m_name[32];
     size_t m_size;
-
-    /*type operations*/
-    int (* read_from_string)(void * output, const char * input);
-    int (* printf_to_stream)(write_stream_t output, const void * input);
 };
 
 /*n: >= 0    name-length

@@ -9,7 +9,7 @@ void mem_buffer_init(struct mem_buffer * buffer, struct mem_allocrator * allocra
     TAILQ_INIT(&buffer->m_trunks);
 }
 
-void mem_buffer_free(struct mem_buffer * buffer) {
+void mem_buffer_clear(struct mem_buffer * buffer) {
     while(!TAILQ_EMPTY(&buffer->m_trunks)) {
         mem_trunk_free(buffer, TAILQ_FIRST(&buffer->m_trunks));
     }
@@ -120,7 +120,7 @@ void * mem_buffer_make_continuous(struct mem_buffer * buffer) {
 
     mem_buffer_read(mem_trunk_data(trunk), buffer->m_size, buffer);
 
-    mem_buffer_free(buffer);
+    mem_buffer_clear(buffer);
 
     TAILQ_INSERT_HEAD(&buffer->m_trunks, trunk, m_next);
 

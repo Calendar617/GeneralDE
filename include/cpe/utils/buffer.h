@@ -10,12 +10,12 @@ extern "C" {
 struct mem_buffer;
 struct mem_buffer_trunk;
 
-struct mem_buffer {
+typedef struct mem_buffer {
     struct mem_allocrator * m_default_allocrator;
     size_t m_size;
     size_t m_auto_inc_size;
     TAILQ_HEAD(mem_buffer_trunk_list, mem_buffer_trunk) m_trunks;
-};
+} * mem_buffer_t;
 
 struct mem_buffer_pos {
     struct mem_buffer * m_buffer;
@@ -40,7 +40,7 @@ void mem_trunk_set_size(struct mem_buffer * buffer, struct mem_buffer_trunk * tr
 size_t mem_buffer_size(struct mem_buffer * buffer);
 
 void mem_buffer_init(struct mem_buffer * buffer, struct mem_allocrator * allocrator);
-void mem_buffer_free(struct mem_buffer * buffer);
+void mem_buffer_clear(struct mem_buffer * buffer);
 
 /* buffer position operations */
 void mem_buffer_head(struct mem_buffer_pos * pos, struct mem_buffer * buffer);

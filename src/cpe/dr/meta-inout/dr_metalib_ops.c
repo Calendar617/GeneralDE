@@ -291,7 +291,6 @@ int dr_add_meta_entry_set_type_calc_align(LPDRMETA meta, LPDRMETAENTRY entry, er
 LPDRMETAENTRY
 dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
     LPDRMETAENTRY newEntry =  (LPDRMETAENTRY)(meta + 1) + meta->m_entry_count;
-    int i;
     int entryAlign = 0;
 
     if (entry->m_name_pos < 0) {

@@ -2,7 +2,7 @@
 #include "yajl/yajl_parse.h"
 #include "cpe/dr/dr_json.h"
 #include "cpe/dr/dr_error.h"
-#include "cpe/dr/dr_ctypes_read.h"
+#include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_internal_types.h"
 #include "../dr_ctype_ops.h"
@@ -186,7 +186,7 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
 
         selectEntry = dr_entry_select_entry(entry);
         if (selectEntry) {
-            if (dr_try_read_int32(
+            if (dr_ctype_try_read_int32(
                     &nestStackNode->m_select_data,
                     (const char *)curStack->m_data + entry->m_select_data_start_pos,
                     selectEntry->m_type, c->m_em) == 0)

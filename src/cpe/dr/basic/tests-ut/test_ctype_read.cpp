@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "cpe/utils/error_list.h"
-#include "cpe/dr/dr_ctypes_read.h"
+#include "cpe/dr/dr_ctypes_op.h"
 
 class CtypeReadTest : public ::testing::Test {
 public:

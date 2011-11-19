@@ -1,6 +1,7 @@
 #include <strings.h>
 #include "gtest/gtest.h"
 #include "cpe/utils/stream_mem.h"
+#include "cpe/dr/dr_ctypes_op.h"
 #include "../../dr_ctype_ops.h"
 
 class CtypeOpsPrintfTest : public ::testing::Test {
@@ -9,20 +10,9 @@ public:
         const struct tagDRCTypeInfo * typeInfo =
             dr_find_ctype_info_by_name(name);
 
-        EXPECT_TRUE(typeInfo);
-        if (typeInfo == NULL) {
-            return -1;
-        }
-
-        EXPECT_TRUE(typeInfo->printf_to_stream);
-        if (typeInfo->printf_to_stream) {
-            struct write_stream_mem S = CPE_STREAM_MEM_INITIALIZER(m_buf, 128);
-            bzero(m_buf, 128);
-            return typeInfo->printf_to_stream((write_stream_t)&S, data);
-        }
-        else {
-            return -1;
-        }
+        struct write_stream_mem S = CPE_STREAM_MEM_INITIALIZER(m_buf, 128);
+        bzero(m_buf, 128);
+        return dr_ctype_print_to_stream((write_stream_t)&S, data, typeInfo->m_id, NULL);
     }
 
     char m_buf[128];

@@ -1,6 +1,7 @@
 #include <string.h>
 #include "yajl/yajl_gen.h"
 #include "cpe/utils/stream_mem.h"
+#include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/dr/dr_json.h"
 #include "cpe/dr/dr_error.h"
 #include "cpe/dr/dr_metalib_manage.h"
@@ -46,32 +47,28 @@ static const char * yajl_errno_to_string(yajl_gen_status s) {
     } while(0)
 
 static void dr_print_print_numeric(yajl_gen g, int typeId, const void * data, error_monitor_t em) {
-    const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(typeId);
-    if (typeInfo == NULL || typeInfo->printf_to_stream == NULL) {
-        CPE_ERROR(em, "unknown type %d!", typeInfo);
-        yajl_gen_null(g);
-    }
-    else {
-        char buf[20 + 1];
-        struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, 20);
-        int len = typeInfo->printf_to_stream((write_stream_t)&bufS, data);
+    char buf[20 + 1];
+    struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, 20);
+    int len = dr_ctype_print_to_stream((write_stream_t)&bufS, data, typeId, em);
+    if (len > 0) {
         buf[len] = 0;
         yajl_gen_number(g, buf, len);
+    }
+    else {
+        yajl_gen_null(g);
     }
 }
 
 static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, const void * data, error_monitor_t em) {
-    const struct tagDRCTypeInfo * typeInfo = dr_find_ctype_info_by_type(typeId);
-    if (typeInfo == NULL || typeInfo->printf_to_stream == NULL) {
-        CPE_ERROR(em, "unknown type %d!", typeInfo);
-        yajl_gen_null(g);
-    }
-    else {
-        char buf[bufLen + 1];
-        struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, 20);
-        int len = typeInfo->printf_to_stream((write_stream_t)&bufS, data);
+    char buf[bufLen + 1];
+    struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, bufLen + 1);
+    int len = dr_ctype_print_to_stream((write_stream_t)&bufS, data, typeId, em);
+    if (len > 0) {
         buf[len] = 0;
         JSON_PRINT_CHECK_GEN_RESULT(yajl_gen_string(g, (const unsigned char *)buf, len));
+    }
+    else {
+        yajl_gen_null(g);
     }
 }
 

@@ -27,7 +27,7 @@ void dr_inbuild_free_lib(struct DRInBuildMetaLib * inBuildMetaLib) {
         return;
     }
 
-    mem_buffer_free(&inBuildMetaLib->m_tmp_buf);
+    mem_buffer_clear(&inBuildMetaLib->m_tmp_buf);
 
     /*free macro list*/
     while(! TAILQ_EMPTY(&inBuildMetaLib->m_macros)) {
