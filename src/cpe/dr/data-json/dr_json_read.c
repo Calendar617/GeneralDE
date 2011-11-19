@@ -2,7 +2,7 @@
 #include "yajl/yajl_parse.h"
 #include "cpe/dr/dr_json.h"
 #include "cpe/dr/dr_error.h"
-#include "cpe/dr/dr_ctypes_op.h"
+#include "cpe/dr/dr_data.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_internal_types.h"
 #include "../dr_ctype_ops.h"
@@ -67,30 +67,16 @@ void dr_json_do_parse_from_string(
     struct dr_json_parse_stack_info * parseType,
     const char * s, size_t l)
 {
-    const struct tagDRCTypeInfo * cTypeInfo;
-
     if (parseType->m_entry == NULL) {
         return;
     }
 
-    cTypeInfo = dr_find_ctype_info_by_type(parseType->m_entry->m_type);
-    if (cTypeInfo == NULL) {
-        CPE_ERROR(c->m_em, "internal error, no type info of type %d!", parseType->m_entry->m_type);
-        return;
-    }
-
-    if (cTypeInfo->read_from_string) {
-        JSON_PARSE_CTX_COPY_STR_TMP(c, s, l);
-        if (cTypeInfo->read_from_string(
-                parseType->m_data + parseType->m_entry->m_data_start_pos,
-                c->m_buf) != 0)
-        {
-            CPE_ERROR(c->m_em, "read %s from \"%s\" error!", cTypeInfo->m_name, c->m_buf);
-        }
-    }
-    else {
-        CPE_ERROR(c->m_em, "%s not support read from string!", cTypeInfo->m_name);
-    }
+    JSON_PARSE_CTX_COPY_STR_TMP(c, s, l);
+    dr_set_from_string(
+        parseType->m_data + parseType->m_entry->m_data_start_pos,
+        parseType->m_entry,
+        c->m_buf,
+        c->m_em);
 }
 
 static int dr_json_number(void * ctx, const char * s, size_t l) {
@@ -118,9 +104,7 @@ static int dr_json_string(void * ctx, const unsigned char * s, size_t l) {
 
     parseType = &c->m_typeStacks[c->m_stackPos];
 
-    if (parseType->m_entry) {
-        dr_json_do_parse_from_string(c, parseType, (const char *)s, l);
-    }
+    dr_json_do_parse_from_string(c, parseType, (const char *)s, l);
 
     return 1;
 }
@@ -186,10 +170,10 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
 
         selectEntry = dr_entry_select_entry(entry);
         if (selectEntry) {
-            if (dr_ctype_try_read_int32(
+            if (dr_try_read_int32(
                     &nestStackNode->m_select_data,
                     (const char *)curStack->m_data + entry->m_select_data_start_pos,
-                    selectEntry->m_type, c->m_em) == 0)
+                    selectEntry, c->m_em) == 0)
             {
                 nestStackNode->m_select_state = dr_json_read_select_use;
             }
