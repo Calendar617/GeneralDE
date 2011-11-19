@@ -28,3 +28,15 @@ DEF_PARSE_TYPED_TEST(uint32, uint32_t, "12", 12)
 DEF_PARSE_TYPED_TEST(char, char, "\"a\"", 'a')
 DEF_PARSE_TYPED_TEST(uchar, unsigned char, "\"a\"", 'a')
 
+TEST_F(ParseTest, type_string) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='a1' type='string' size='5'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+    ASSERT_EQ(0, read("{ \"a1\" : \"abc\"}", "S"));
+
+    EXPECT_STREQ("abc", (const char *)result());
+}
