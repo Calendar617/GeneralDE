@@ -18,8 +18,6 @@ void PrintTest::TearDown() {
 }
 
 void PrintTest::installMeta(const char * def) {
-    static const int MAX_ERROR_COUNT = 10;
-
     dr_lib_free(&m_metaLib);
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);

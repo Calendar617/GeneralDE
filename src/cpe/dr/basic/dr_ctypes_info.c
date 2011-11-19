@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <limits.h>
 #include <string.h>
 #include "../dr_ctype_ops.h"

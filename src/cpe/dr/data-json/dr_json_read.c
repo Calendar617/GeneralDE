@@ -33,16 +33,6 @@ struct dr_json_parse_stack_info {
     int32_t m_select_data;
 };
 
-static void dr_json_parse_stack_init(
-    struct dr_json_parse_stack_info * stackInfo, LPDRMETA meta, void * data)
-{
-    stackInfo->m_meta = meta;
-    stackInfo->m_data = data;
-    stackInfo->m_entry = NULL;
-    stackInfo->m_select_state = dr_json_read_select_not_use;
-    stackInfo->m_select_data = 0;
-}
-
 struct dr_json_parse_ctx {
     struct mem_buffer * m_output;
     error_monitor_t m_em;
@@ -57,8 +47,18 @@ static int dr_json_null(void * ctx) {
     return 1;
 }
 
+static void dr_json_parse_stack_init(
+    struct dr_json_parse_stack_info * stackInfo, LPDRMETA meta, void * data)
+{
+    stackInfo->m_meta = meta;
+    stackInfo->m_data = data;
+    stackInfo->m_entry = NULL;
+    stackInfo->m_select_state = dr_json_read_select_not_use;
+    stackInfo->m_select_data = 0;
+}
+
 static int dr_json_boolean(void * ctx, int boolean) {
-    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+    //struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
     return 1;
 }
 
@@ -107,7 +107,7 @@ static int dr_json_string(void * ctx, const unsigned char * s, size_t l) {
     struct dr_json_parse_stack_info * parseType = &c->m_typeStacks[c->m_stackPos];
 
     if (parseType->m_entry) {
-        dr_json_do_parse_from_string(c, parseType, s, l);
+        dr_json_do_parse_from_string(c, parseType, (const char *)s, l);
         return 1;
     }
 
@@ -150,7 +150,8 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
         return 1;
     }
 
-    if (refType = dr_entry_ref_meta(entry)) { /*composite*/
+    refType = dr_entry_ref_meta(entry);
+    if (refType) { /*composite*/
         struct dr_json_parse_stack_info * nestStackNode;
         LPDRMETAENTRY selectEntry;
 
@@ -203,12 +204,12 @@ static int dr_json_end_map(void * ctx) {
 }
 
 static int dr_json_start_array(void * ctx) {
-    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+    //struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
     return 1;
 }
 
 static int dr_json_end_array(void * ctx) {
-    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+    //struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
     return 1;
 }
 
@@ -263,7 +264,7 @@ void dr_json_read_i(
         return;
     }
 
-    stat = yajl_parse(hand, input, strlen(input));
+    stat = yajl_parse(hand, (const unsigned char *)input, strlen(input));
     if (stat != yajl_status_ok) {  
         yajl_free(hand);
         return;

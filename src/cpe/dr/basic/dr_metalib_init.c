@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <assert.h>
 #include "cpe/dr/dr_metalib_init.h"
 #include "../dr_internal_types.h"

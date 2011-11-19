@@ -189,7 +189,6 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, error_monitor_t em) {
     char * base = (char*)(metaLib + 1);
     LPDRMETA newMeta = NULL;
     int newMetaPos = 0;
-    int i = 0;
     int newMetaUsedSize = dr_calc_meta_use_size(meta->m_entry_count);
 
     if (metaLib->m_meta_count >= metaLib->m_meta_max_count) {
@@ -292,7 +291,6 @@ int dr_add_meta_entry_set_type_calc_align(LPDRMETA meta, LPDRMETAENTRY entry, er
 
 LPDRMETAENTRY
 dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
-    char * base = (char*)(meta) - meta->m_self_pos;
     LPDRMETAENTRY newEntry =  (LPDRMETAENTRY)(meta + 1);
     int i;
     int entryAlign = 0;

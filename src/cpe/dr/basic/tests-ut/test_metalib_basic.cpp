@@ -14,7 +14,7 @@ class MetalibManagerTest : public ::testing::Test, public WithInputMetaLibTest {
 };
 
 TEST_F(MetalibManagerTest, Size) {
-    ASSERT_EQ(m_libSize, dr_lib_size(m_lib));
+    ASSERT_EQ((size_t)m_libSize, dr_lib_size(m_lib));
 }
 
 TEST_F(MetalibManagerTest, Name) {

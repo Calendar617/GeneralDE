@@ -8,11 +8,11 @@ void BufferTest::TearDown() {
     mem_buffer_free(&m_buffer);
 }
 
-int BufferTest::append_string(const char * data) {
+size_t BufferTest::append_string(const char * data) {
     return mem_buffer_append(&m_buffer, data, strlen(data));
 }
 
-int BufferTest::append_zero() {
+size_t BufferTest::append_zero() {
     char buf = 0;
     return mem_buffer_append(&m_buffer, &buf, 1);
 }
@@ -35,3 +35,4 @@ char *
 BufferTest::as_string(void) {
     return (char *)mem_buffer_make_continuous(&m_buffer);
 }
+

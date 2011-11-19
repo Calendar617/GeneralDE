@@ -48,7 +48,7 @@ void mem_buffer_seek(struct mem_buffer_pos * pos, size_t n);
 void mem_buffer_at(struct mem_buffer_pos * pos, struct mem_buffer * buffer, size_t n);
 
 /* buffer read write operations */
-int mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size);
+size_t mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size);
 size_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer);
 void * mem_buffer_make_continuous(struct mem_buffer * buffer);
 void * mem_buffer_alloc(struct mem_buffer * buffer, size_t size);

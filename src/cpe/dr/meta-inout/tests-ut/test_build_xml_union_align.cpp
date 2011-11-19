@@ -19,24 +19,14 @@ TEST_F(BuildFromXmlUnionAlign, align1_basic) {
         "</metalib>"
         );
 
-#pragma pack(push,1)
-    struct {
-        char a1;
-        union {
-            int8_t b1;
-            int16_t b2;
-        } m_u;
-    } data;
-#pragma pack(pop)
-
     EXPECT_EQ(1, dr_meta_align(meta("S1")));
-    EXPECT_EQ(2, dr_meta_size(meta("S1")));
+    EXPECT_EQ((size_t)2, dr_meta_size(meta("S1")));
 
     EXPECT_EQ(0, entry("S1", "b1")->m_data_start_pos);
     EXPECT_EQ(0, entry("S1", "b2")->m_data_start_pos);
 
     EXPECT_EQ(1, dr_meta_align(meta("S2")));
-    EXPECT_EQ(3, dr_meta_size(meta("S2")));
+    EXPECT_EQ((size_t)3, dr_meta_size(meta("S2")));
 
     EXPECT_EQ(0, entry("S2", "a1")->m_data_start_pos);
     EXPECT_EQ(1, entry("S2", "m_u")->m_data_start_pos);

@@ -70,7 +70,7 @@ size_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer) {
     return readedSize;
 }
 
-int mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size) {
+size_t mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size) {
     size_t writedSize = 0;
     size_t newTrunkSize = 0;
     struct mem_buffer_trunk * trunk = NULL;
@@ -90,7 +90,7 @@ int mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size)
 
     trunk = mem_buffer_append_trunk(buffer, newTrunkSize);
     if (trunk == NULL) {
-            return -1;
+        return -1;
     }
 
     writedSize += mem_trunk_append(buffer, trunk, buf + writedSize, size - writedSize);

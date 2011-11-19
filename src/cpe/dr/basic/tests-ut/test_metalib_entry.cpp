@@ -11,7 +11,7 @@ struct EntryData {
     const char * desc;
     const char * cname;
     int type;
-    int size;
+    size_t size;
     int count;
 };
 

@@ -4,7 +4,7 @@ TEST_F(BufferTest, append_empty) {
     const char * data = "test_string";
     
     EXPECT_EQ(strlen(data), append_string(data));
-    EXPECT_EQ(1, append_zero());
+    EXPECT_EQ((size_t)1, append_zero());
 
     EXPECT_EQ(strlen(data) + 1, mem_buffer_size(&m_buffer));
 
@@ -18,14 +18,14 @@ TEST_F(BufferTest, append_multi_trunk) {
 
     append_zero();
 
-    EXPECT_EQ(4, mem_buffer_size(&m_buffer));
+    EXPECT_EQ((size_t)4, mem_buffer_size(&m_buffer));
     EXPECT_STREQ("abc", as_string());
 }
 
 TEST_F(BufferTest, read_from_empty) {
     char buf[5];
 
-    EXPECT_EQ(0, mem_buffer_read(buf, 5, &m_buffer));
+    EXPECT_EQ((size_t)0, mem_buffer_read(buf, 5, &m_buffer));
 }
 
 TEST_F(BufferTest, read_basic) {
@@ -35,7 +35,7 @@ TEST_F(BufferTest, read_basic) {
     EXPECT_TRUE(append_trunk("b"));
     EXPECT_TRUE(append_trunk("c"));
 
-    EXPECT_EQ(3, mem_buffer_read(buf, 5, &m_buffer));
+    EXPECT_EQ((size_t)3, mem_buffer_read(buf, 5, &m_buffer));
     buf[3] = 0;
 
     EXPECT_STREQ("abc", buf);
@@ -70,7 +70,7 @@ TEST_F(BufferTest, make_continuous_multi_trunk) {
 TEST_F(BufferTest, alloc_empty) {
     void * p = mem_buffer_alloc(&m_buffer, 12);
     EXPECT_TRUE(p);
-    EXPECT_EQ(12, mem_buffer_size(&m_buffer));
+    EXPECT_EQ((size_t)12, mem_buffer_size(&m_buffer));
 
     strncpy((char*)p, "abc", 12);
     EXPECT_STREQ("abc", as_string());
@@ -79,15 +79,15 @@ TEST_F(BufferTest, alloc_empty) {
 TEST_F(BufferTest, alloc_empty_null) {
     m_buffer.m_default_allocrator = mem_allocrator_null();
     EXPECT_FALSE(mem_buffer_alloc(&m_buffer, 12));
-    EXPECT_EQ(0, mem_buffer_size(&m_buffer));
+    EXPECT_EQ((size_t)0, mem_buffer_size(&m_buffer));
 }
 
 TEST_F(BufferTest, strdup_basic) {
     EXPECT_STREQ("abc", mem_buffer_strdup(&m_buffer, "abc"));
-    EXPECT_EQ(4, mem_buffer_size(&m_buffer));
+    EXPECT_EQ((size_t)4, mem_buffer_size(&m_buffer));
 }
 
 TEST_F(BufferTest, strndup_basic) {
     EXPECT_STREQ("abc", mem_buffer_strndup(&m_buffer, "abcd", 3));
-    EXPECT_EQ(4, mem_buffer_size(&m_buffer));
+    EXPECT_EQ((size_t)4, mem_buffer_size(&m_buffer));
 }

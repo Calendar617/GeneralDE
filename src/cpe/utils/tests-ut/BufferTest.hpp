@@ -10,8 +10,8 @@ public:
 
     struct mem_buffer m_buffer;
 
-    int append_string(const char * data);
-    int append_zero();
+    size_t append_string(const char * data);
+    size_t append_zero();
 
     struct mem_buffer_trunk *
     append_trunk(const char * data);

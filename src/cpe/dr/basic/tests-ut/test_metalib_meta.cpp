@@ -7,7 +7,7 @@ struct MetaData {
     const char * name;
     const char * desc;
     int type;
-    int size;
+    size_t size;
     int entry_num;
     int current_version;
     int base_version;

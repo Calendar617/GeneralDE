@@ -1,3 +1,4 @@
+#include <sstream>
 #include "cpe/dr/dr_metalib_manage.h"
 #include "ParseTest.hpp"
 
@@ -119,4 +120,3 @@ TEST_F(ParseTest, struct_ignore_nest_level_2) {
 
     EXPECT_EQ(14, expect.a2);
 }
-

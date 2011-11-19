@@ -42,7 +42,7 @@ static const char * yajl_errno_to_string(yajl_gen_status s) {
     do {                                            \
         const char * __p = (str);                   \
         JSON_PRINT_CHECK_GEN_RESULT(                \
-            yajl_gen_string(g, __p, strlen(__p)));  \
+            yajl_gen_string(g, (const unsigned char *)__p, strlen(__p))); \
     } while(0)
 
 static void dr_print_print_numeric(yajl_gen g, int typeId, const void * data, error_monitor_t em) {
@@ -71,7 +71,7 @@ static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, const v
         struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, 20);
         int len = typeInfo->printf_to_stream((write_stream_t)&bufS, data);
         buf[len] = 0;
-        JSON_PRINT_CHECK_GEN_RESULT(yajl_gen_string(g, buf, len));
+        JSON_PRINT_CHECK_GEN_RESULT(yajl_gen_string(g, (const unsigned char *)buf, len));
     }
 }
 

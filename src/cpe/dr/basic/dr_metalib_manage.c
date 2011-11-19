@@ -37,13 +37,6 @@ LPDRMETA dr_lib_find_meta_by_name(LPDRMETALIB metaLib, const char* a_pszName) {
     return NULL;
 }
 
-static int dr_comp_metaidx_by_id(const void * l, const void * r) {
-    struct tagDRMetaIdxById * lItem = (struct tagDRMetaIdxById *)l;
-    struct tagDRMetaIdxById * rItem = (struct tagDRMetaIdxById *)r;
-
-    return lItem->m_id - rItem->m_id;
-}
-
 LPDRMETA dr_lib_find_meta_by_id(LPDRMETALIB metaLib, int id) {
     char * base;
     struct tagDRMetaIdxById * searchStart;
@@ -117,7 +110,6 @@ int dr_meta_entry_num(LPDRMETA meta) {
 
 char * dr_meta_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iBufSize) {
     int writePos = 0;
-    int i;
     LPDRMETA pstCurMeta = meta;
     LPDRMETAENTRY pstEntry;
     char * base = (char *)(meta) - meta->m_self_pos;
@@ -212,7 +204,8 @@ int dr_meta_path_to_off(LPDRMETA meta, const char * path) {
         pstCurMeta = (LPDRMETA)(base + pstEntry->m_ref_type_pos);
     }
 
-    if (pstEntry = dr_meta_find_entry_by_name(pstCurMeta, nameBegin)) {
+    pstEntry = dr_meta_find_entry_by_name(pstCurMeta, nameBegin);
+    if (pstEntry) {
         off += pstEntry->m_data_start_pos;
         return off;
     }
@@ -478,24 +471,30 @@ const char* dr_macro_desc(LPDRMETALIB metaLib, LPDRMACRO a_pstMacro) {
 
 LPDRMACROSGROUP dr_macro_macrosgroup(LPDRMETALIB metaLib, LPDRMACRO a_pstMacro) {
     //TODO
+    return NULL;
 }
 
 int dr_lib_macrosgroup_num(LPDRMETALIB metaLib) {
     //TODO
+    return -1;
 }
 
 LPDRMACROSGROUP dr_lib_macrosgroup_at(LPDRMETALIB metaLib, int a_iIdx) {
     //TODO
+    return NULL;
 }
 
 const char* dr_macrosgroup_name(LPDRMACROSGROUP a_pstGroup) {
     //TODO
+    return NULL;
 }
 
 int dr_macrosgroup_macro_num(LPDRMACROSGROUP a_pstGroup) {
     //TODO
+    return -1;
 }
 
 LPDRMACRO dr_macrosgroup_macro_at(LPDRMETALIB metaLib, LPDRMACROSGROUP a_pstGroup, int a_iIdx) {
     //TODO
+    return NULL;
 }

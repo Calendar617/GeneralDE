@@ -64,8 +64,8 @@ static void dr_build_xml_process_metalib(
         ++indexAttribute, index += 5)
     {
         const xmlChar *localname = attributes[index];
-        const xmlChar *prefix = attributes[index+1];
-        const xmlChar *nsURI = attributes[index+2];
+        /*const xmlChar *prefix = attributes[index+1];*/
+        /*const xmlChar *nsURI = attributes[index+2];*/
         const xmlChar *valueBegin = attributes[index+3];
         const xmlChar *valueEnd = attributes[index+4];
 
@@ -151,8 +151,8 @@ static void dr_build_xml_process_macro(
         ++indexAttribute, index += 5)
     {
         const xmlChar *localname = attributes[index];
-        const xmlChar *prefix = attributes[index+1];
-        const xmlChar *nsURI = attributes[index+2];
+        /*const xmlChar *prefix = attributes[index+1];*/
+        /*const xmlChar *nsURI = attributes[index+2]*/;
         const xmlChar *valueBegin = attributes[index+3];
         const xmlChar *valueEnd = attributes[index+4];
 
@@ -237,8 +237,8 @@ static void dr_build_xml_process_meta(
         ++indexAttribute, index += 5)
     {
         const xmlChar *localname = attributes[index];
-        const xmlChar *prefix = attributes[index+1];
-        const xmlChar *nsURI = attributes[index+2];
+        /*const xmlChar *prefix = attributes[index+1];*/
+        /*const xmlChar *nsURI = attributes[index+2];*/
         const xmlChar *valueBegin = attributes[index+3];
         const xmlChar *valueEnd = attributes[index+4];
 
@@ -342,8 +342,8 @@ static void dr_build_xml_process_entry(
         ++indexAttribute, index += 5)
     {
         const xmlChar *localname = attributes[index];
-        const xmlChar *prefix = attributes[index+1];
-        const xmlChar *nsURI = attributes[index+2];
+        /*const xmlChar *prefix = attributes[index+1];*/
+        /*const xmlChar *nsURI = attributes[index+2];*/
         const xmlChar *valueBegin = attributes[index+3];
         const xmlChar *valueEnd = attributes[index+4];
 
@@ -549,7 +549,7 @@ static xmlSAXHandler g_dr_xml_handler = {
     , NULL /* commentSAXFunc comment */
     , dr_build_xml_warningSAX /* warningSAXFunc warning */
     , dr_build_xml_errorSAX /* errorSAXFunc error */
-    , NULL /* fatalErrorSAXFunc fatalError; /* unused error() get all the errors * */
+    , NULL /* fatalErrorSAXFunc fatalError; unused error() get all the errors * */
     , NULL /* getParameterEntitySAXFunc getParameterEntity */
     , NULL /* cdataBlockSAXFunc cdataBlock */
     , NULL /* externalSubsetSAXFunc externalSubset */

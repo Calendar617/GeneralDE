@@ -56,7 +56,7 @@ static int dr_inbuild_build_calc_entry_type(
     return 0;
 }
 
-static int dr_inbuild_build_calc_entry_select(
+static void dr_inbuild_build_calc_entry_select(
     struct DRInBuildCreateCtx * ctx, LPDRMETA createdMeta, struct DRInBuildMetaEntry * entryEle)
 {
     if (entryEle->m_selector_path == NULL) {
@@ -79,7 +79,6 @@ static void dr_inbuild_build_add_entry(
     LPDRMETA createdMeta,
     struct DRInBuildMetaEntry * entryEle)
 {
-    char * base = (char*)(createdMeta) - createdMeta->m_self_pos;
     int ignoreEntry = 0;
 
     entryEle->m_data.m_name_pos = dr_inbuild_build_add_string(ctx, entryEle->m_name);

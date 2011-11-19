@@ -51,7 +51,7 @@ TEST_F(ParseTest, type_union_no_select_use_small) {
             int32_t a2;
         } m_s;
         int16_t a2;
-    } expect = { { 12 }, 14  };
+    };
 #pragma pack(pop)
 
     EXPECT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
@@ -134,7 +134,7 @@ TEST_F(ParseTest, type_union_selector_basic) {
             int16_t a1;
             int32_t a2;
         } u;
-    } expect = { 3, { 12 }  };
+    };
 #pragma pack(pop)
 
     ASSERT_EQ(0, read("{ \"s\" : 3, \"u\" : { \"a1\" : 12, \"a2\" : 13 } }", "S2"));

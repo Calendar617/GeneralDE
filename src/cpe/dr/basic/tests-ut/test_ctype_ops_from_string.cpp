@@ -171,7 +171,7 @@ TEST_F(CtypeOpsFromStringTest, int32_end_with_char) {
 
 TEST_F(CtypeOpsFromStringTest, uint32_min) {
     EXPECT_EQ(0, parse("uint32", "0"));
-    EXPECT_EQ(0, as_uint32());
+    EXPECT_EQ(0U, as_uint32());
 }
 
 TEST_F(CtypeOpsFromStringTest, uint32_max) {
