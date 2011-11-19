@@ -37,6 +37,6 @@ $(product).sources:= $(addprefix $(product-base), \
 
 $(product).product.include:=3rdTools/$(product)/include
 $(product).flags.ld:=
-$(product).flags.cpp:=-DHAVE_CONFIG_H -I$(product-base)$(OS_NAME) -I$(product-base) -DLOG4C_RCPATH=\"\"
+$(product).flags.cpp:=-DHAVE_CONFIG_H -I$(product-base)$(OS_NAME) -I$(product-base) -DLOG4C_RCPATH=\"\" -Wno-unused
 
 $(eval $(call product-def,$(product)))

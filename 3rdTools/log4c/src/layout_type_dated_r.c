@@ -24,9 +24,11 @@ static const char* dated_r_format(
     struct tm	tm;
 
 #ifndef _WIN32
+/* delete by lokiwang
 #ifndef __HP_cc
 #warning gmtime() routine should be defined in sd_xplatform
 #endif
+*/
     gmtime_r(&a_event->evt_timestamp.tv_sec, &tm);
 #else
     /* xxx Need a CreateMutex/ReleaseMutex or something here

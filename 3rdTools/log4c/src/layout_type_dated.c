@@ -24,9 +24,11 @@ static const char* dated_format(
     static char buffer[1024];
 
 #ifndef _WIN32
+/* delete by lokiwang
 #ifndef __HP_cc
 #warning gmtime() routine should be defined in sd_xplatform
 #endif
+*/
     struct tm   tm;
     gmtime_r(&a_event->evt_timestamp.tv_sec, &tm);
     snprintf(buffer, sizeof(buffer), "%04d%02d%02d %02d:%02d:%02d.%03ld %-8s %s- %s\n",
