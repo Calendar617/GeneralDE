@@ -69,7 +69,7 @@ TEST_F(ParseTest, struct_ignore_unknown_key_with_nest) {
 #pragma pack(pop)
 
     ASSERT_EQ(0, read("{ \"a1\" : 12,"
-                      " \"not-exist\": { a2: 15 },"
+                      " \"not-exist\": { \"a2\": 15 },"
                       " \"a2\" : 14 }", "S2"));
 
     ASSERT_JSON_READ_RESULT(expect);

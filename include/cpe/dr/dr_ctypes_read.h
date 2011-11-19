@@ -1,5 +1,5 @@
-#ifndef CPE_DR_READ_H
-#define CPE_DR_READ_H
+#ifndef CPE_DR_CTYPES_READ_H
+#define CPE_DR_CTYPES_READ_H
 #include "cpe/utils/error.h"
 #include "dr_ctypes_info.h"
 

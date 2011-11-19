@@ -95,7 +95,13 @@ void dr_json_do_parse_from_string(
 
 static int dr_json_number(void * ctx, const char * s, size_t l) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    struct dr_json_parse_stack_info * parseType = &c->m_typeStacks[c->m_stackPos];
+    struct dr_json_parse_stack_info * parseType;
+
+    if (c->m_stackPos < 0 || c->m_stackPos >= CPE_DR_MAX_LEVEL) {
+        return 1;
+    }
+
+    parseType = &c->m_typeStacks[c->m_stackPos];
 
     dr_json_do_parse_from_string(c, parseType, s, l);
 
@@ -104,11 +110,16 @@ static int dr_json_number(void * ctx, const char * s, size_t l) {
 
 static int dr_json_string(void * ctx, const unsigned char * s, size_t l) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    struct dr_json_parse_stack_info * parseType = &c->m_typeStacks[c->m_stackPos];
+    struct dr_json_parse_stack_info * parseType;
+
+    if (c->m_stackPos < 0 || c->m_stackPos >= CPE_DR_MAX_LEVEL) {
+        return 1;
+    }
+
+    parseType = &c->m_typeStacks[c->m_stackPos];
 
     if (parseType->m_entry) {
         dr_json_do_parse_from_string(c, parseType, (const char *)s, l);
-        return 1;
     }
 
     return 1;
@@ -116,9 +127,15 @@ static int dr_json_string(void * ctx, const unsigned char * s, size_t l) {
 
 static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t stringLen) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    struct dr_json_parse_stack_info * curStack = &c->m_typeStacks[c->m_stackPos];
+    struct dr_json_parse_stack_info * curStack;
     LPDRMETA refType = NULL;
     LPDRMETAENTRY entry = NULL;
+
+    if (c->m_stackPos < 0 || c->m_stackPos >= CPE_DR_MAX_LEVEL) {
+        return 1;
+    }
+    
+    curStack = &c->m_typeStacks[c->m_stackPos];
 
     curStack->m_entry = NULL;
 
@@ -127,7 +144,6 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
     }
 
     JSON_PARSE_CTX_COPY_STR_TMP(c, stringVal, stringLen);
-
     entry = dr_meta_find_entry_by_name(curStack->m_meta, c->m_buf);
     if (entry == NULL) {
         return 1;
@@ -146,7 +162,7 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
         }
         break;
     default:
-        CPE_INFO(c->m_em, "process %s.%s, unknown select state %d", dr_meta_name(curStack->m_meta), c->m_buf, curStack->m_select_state);
+        CPE_ERROR(c->m_em, "process %s.%s, unknown select state %d", dr_meta_name(curStack->m_meta), c->m_buf, curStack->m_select_state);
         return 1;
     }
 
@@ -160,11 +176,8 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
             return 1;
         }
 
-        ++c->m_stackPos;
-        nestStackNode = &c->m_typeStacks[c->m_stackPos];
-        nestStackNode->m_meta = refType;
-        nestStackNode->m_data = curStack->m_data + entry->m_data_start_pos;
-        nestStackNode->m_entry = NULL;
+        nestStackNode = &c->m_typeStacks[c->m_stackPos + 1];
+
         dr_json_parse_stack_init(
             nestStackNode,
             refType,
@@ -190,14 +203,16 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
 }
 
 static int dr_json_start_map(void * ctx) {
+    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+    ++c->m_stackPos;
     return 1;
 }
 
 static int dr_json_end_map(void * ctx) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
-    if (c->m_stackPos < 0) {
-        CPE_ERROR(c->m_em, "internal error! type stack is empty");
-        return 0;
+    if (c->m_stackPos >= 0 && c->m_stackPos < CPE_DR_MAX_LEVEL) {
+        /*clear current stack*/
+        dr_json_parse_stack_init(&c->m_typeStacks[c->m_stackPos], NULL, NULL);
     }
     --c->m_stackPos;
     return 1;
@@ -242,7 +257,7 @@ static void dr_json_parse_ctx_init(
         meta,
         mem_buffer_alloc(buffer, dr_meta_size(meta)));
 
-    ctx->m_stackPos = 0;
+    ctx->m_stackPos = -1;
     ctx->m_em = em;
 }
 
