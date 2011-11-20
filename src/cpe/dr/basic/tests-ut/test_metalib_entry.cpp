@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/dr/dr_data.h"
 #include "cpe/dr/dr_ctypes_info.h"
 #include "cpe/dr/dr_error.h"
 #include "with_InputMetaLibTest.hpp"
@@ -204,4 +205,21 @@ TEST_F(MetaLibManagerEntryTest, select_entry_basic) {
     ASSERT_TRUE(selectEntry);
 
     EXPECT_STREQ("cmd", dr_entry_name(selectEntry));
+}
+
+TEST_F(MetaLibManagerEntryTest, default_basic) {
+    LPDRMETAENTRY e = entry("PkgHead", "magic");
+    ASSERT_TRUE(e);
+
+    const void * dftValue = dr_entry_dft_value(e);
+    ASSERT_TRUE(dftValue) << "dftValue not exist";
+
+    EXPECT_EQ(13, dr_read_int32(dftValue, e));
+}
+
+TEST_F(MetaLibManagerEntryTest, default_no_default) {
+    LPDRMETAENTRY e = entry("PkgHead", "time");
+    ASSERT_TRUE(e);
+
+    EXPECT_FALSE(dr_entry_dft_value(e));
 }

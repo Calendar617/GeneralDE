@@ -27,9 +27,10 @@ CPE_DR_API LPDRMETAENTRY dr_meta_find_entry_by_name(LPDRMETA meta, const char* n
 CPE_DR_API LPDRMETAENTRY dr_meta_find_entry_by_path(LPDRMETA meta, const char* entryPath);
 
 CPE_DR_API int dr_entry_version(LPDRMETAENTRY entry);
-CPE_DR_API const char *dr_entry_name(LPDRMETAENTRY entry);
-CPE_DR_API const char *dr_entry_cname(LPDRMETAENTRY entry);
-CPE_DR_API const char *dr_entry_desc(LPDRMETAENTRY entry);
+CPE_DR_API const char * dr_entry_name(LPDRMETAENTRY entry);
+CPE_DR_API const char * dr_entry_cname(LPDRMETAENTRY entry);
+CPE_DR_API const char * dr_entry_desc(LPDRMETAENTRY entry);
+CPE_DR_API const void * dr_entry_dft_value(LPDRMETAENTRY entry);
 CPE_DR_API LPDRMETA dr_entry_ref_meta(LPDRMETAENTRY entry);
 CPE_DR_API LPDRMETA dr_entry_self_meta(LPDRMETAENTRY entry);
 CPE_DR_API LPDRMACROSGROUP dr_entry_macrosgroup(LPDRMETAENTRY entry);

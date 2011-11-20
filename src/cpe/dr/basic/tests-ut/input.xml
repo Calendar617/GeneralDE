@@ -14,7 +14,7 @@
 </macrosgroup>
 
 <struct name="PkgHead" version="1" versionindicator="version" id='1' desc="PkgHead.desc">
-	<entry name="magic" type="short" defaultvalue="0x3344" id='11'/>
+	<entry name="magic" type="short" defaultvalue="13" id='11'/>
 	<entry name="version" type="short" defaultvalue="1" id='12'/>
 	<entry name="time" type="datetime" />
 	<entry name="cmd" type="smallint" />

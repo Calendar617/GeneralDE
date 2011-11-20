@@ -79,7 +79,8 @@ struct tagDRMetaEntry {
     int8_t reserve_5[12];
     /*144*/ int32_t m_desc_pos;
     /*148*/ int32_t m_cname_pos;
-    int8_t reserve_6[12];
+    /*152*/ int32_t m_dft_value_pos;
+    int8_t reserve_6[8];
     /*164*/ int32_t m_self_to_meta_pos;
     int8_t reserve_7[12];
 };/*180*/
