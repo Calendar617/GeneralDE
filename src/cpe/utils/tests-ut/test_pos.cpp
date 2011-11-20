@@ -287,3 +287,100 @@ TEST_F(BufferTest, pos_seek_back_empty) {
     mem_buffer_end(&e, &m_buffer);
     EXPECT_TRUE(mem_pos_eq(&p, &e));
 }
+
+TEST_F(BufferTest, pos_diff_basic) {
+    append_trunk("abc");
+
+    struct mem_buffer_pos b;
+    mem_buffer_begin(&b, &m_buffer);
+
+    struct mem_buffer_pos e;
+    mem_buffer_end(&e, &m_buffer);
+
+    EXPECT_EQ(3, mem_pos_diff(&b, &e));
+    EXPECT_EQ(-3, mem_pos_diff(&e, &b));
+}
+
+TEST_F(BufferTest, pos_diff_empty) {
+    struct mem_buffer_pos b;
+    mem_buffer_begin(&b, &m_buffer);
+
+    struct mem_buffer_pos e;
+    mem_buffer_begin(&e, &m_buffer);
+
+    EXPECT_EQ(0, mem_pos_diff(&b, &e));
+    EXPECT_EQ(0, mem_pos_diff(&e, &b));
+}
+
+TEST_F(BufferTest, pos_diff_same_trunk) {
+    append_trunk("abc");
+
+    struct mem_buffer_pos b;
+    mem_pos_at(&b, &m_buffer, 2);
+
+    struct mem_buffer_pos e;
+    mem_pos_at(&e, &m_buffer, 1);
+
+    EXPECT_EQ(-1, mem_pos_diff(&b, &e));
+    EXPECT_EQ(1, mem_pos_diff(&e, &b));
+}
+
+TEST_F(BufferTest, pos_diff_same_multi_trunk) {
+    append_trunk("a");
+    append_trunk("b");
+    append_trunk("c");
+
+    struct mem_buffer_pos b;
+    mem_buffer_begin(&b, &m_buffer);
+
+    struct mem_buffer_pos e;
+    mem_buffer_end(&e, &m_buffer);
+
+    EXPECT_EQ(3, mem_pos_diff(&b, &e));
+    EXPECT_EQ(-3, mem_pos_diff(&e, &b));
+}
+
+TEST_F(BufferTest, pos_diff_multi_trunk_from_middle) {
+    append_trunk("a");
+    append_trunk("b");
+    append_trunk("c");
+
+    struct mem_buffer_pos b;
+    mem_pos_at(&b, &m_buffer, 1);
+
+    struct mem_buffer_pos e;
+    mem_buffer_end(&e, &m_buffer);
+
+    EXPECT_EQ(2, mem_pos_diff(&b, &e));
+    EXPECT_EQ(-2, mem_pos_diff(&e, &b));
+}
+
+TEST_F(BufferTest, pos_diff_multi_trunk_to_middle) {
+    append_trunk("a");
+    append_trunk("b");
+    append_trunk("c");
+
+    struct mem_buffer_pos b;
+    mem_buffer_begin(&b, &m_buffer);
+
+    struct mem_buffer_pos e;
+    mem_pos_at(&e, &m_buffer, 1);
+
+    EXPECT_EQ(1, mem_pos_diff(&b, &e));
+    EXPECT_EQ(-1, mem_pos_diff(&e, &b));
+}
+
+TEST_F(BufferTest, pos_diff_multi_trunk_middle_to_middle) {
+    append_trunk("a");
+    append_trunk("b");
+    append_trunk("c");
+
+    struct mem_buffer_pos b;
+    mem_pos_at(&b, &m_buffer, 1);
+
+    struct mem_buffer_pos e;
+    mem_pos_at(&e, &m_buffer, 2);
+
+    EXPECT_EQ(1, mem_pos_diff(&b, &e));
+    EXPECT_EQ(-1, mem_pos_diff(&e, &b));
+}

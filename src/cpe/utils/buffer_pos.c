@@ -111,45 +111,41 @@ int mem_pos_eq(mem_buffer_pos_t l, mem_buffer_pos_t r) {
         : 0;
 }
 
-ssize_t mem_pos_diff(mem_buffer_pos_t l, mem_buffer_pos_t r) {
+static ssize_t mem_pos_diff_i(mem_buffer_pos_t l, mem_buffer_pos_t r) {
     ssize_t from_l = 0;
+    struct mem_buffer_trunk * trunk = l->m_trunk;
+
+    while(trunk && trunk != r->m_trunk) {
+        from_l += (trunk->m_size - l->m_pos_in_trunk);
+        trunk = TAILQ_NEXT(trunk, m_next);
+        l->m_pos_in_trunk = 0;
+    }
+
+    if (trunk == r->m_trunk) {
+        if (trunk) {
+            assert(trunk == r->m_trunk);
+            return from_l + r->m_pos_in_trunk - l->m_pos_in_trunk;
+        }
+        else {
+            return from_l;
+        }
+    }
+    else {
+        return -1;
+    }
+}
+
+ssize_t mem_pos_diff(mem_buffer_pos_t l, mem_buffer_pos_t r) {
+    ssize_t result;
 
     assert(l);
     assert(r);
     assert(l->m_buffer == r->m_buffer);
 
-    while(l->m_trunk && l->m_trunk != r->m_trunk) {
-        from_l += (l->m_trunk->m_size - l->m_pos_in_trunk);
+    result = mem_pos_diff_i(l, r);
+    if (result >= 0) return result;
 
-        l->m_trunk = TAILQ_NEXT(l->m_trunk, m_next);
-        l->m_pos_in_trunk = 0;
-    }
-
-    if (l->m_trunk) {
-        assert(l->m_trunk == r->m_trunk);
-        return from_l + r->m_pos_in_trunk;
-    }
-    else {
-        if (!r->m_trunk) {
-            return 0;
-        }
-        else {
-            ssize_t head_to_r = 0;
-            struct mem_buffer_trunk * trunk = TAILQ_FIRST(&r->m_buffer->m_trunks);
-
-            while(trunk && trunk != r->m_trunk) {
-                head_to_r += trunk->m_size;
-                trunk = TAILQ_NEXT(trunk, m_next);
-            }
-
-            assert(trunk == r->m_trunk);
-            if (trunk == r->m_trunk) {
-                head_to_r += r->m_pos_in_trunk;
-            }
-
-            return - (r->m_buffer->m_size - from_l - head_to_r);
-        }
-    }
+    return -  mem_pos_diff_i(r, l);
 }
 
 int mem_pos_valide(mem_buffer_pos_t l) {
