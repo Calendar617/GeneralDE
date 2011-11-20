@@ -6,8 +6,12 @@ void mem_buffer_begin(struct mem_buffer_pos * pos, struct mem_buffer * buffer) {
     assert(buffer);
 
     pos->m_buffer = buffer;
-    pos->m_trunk = TAILQ_FIRST(&buffer->m_trunks);
     pos->m_pos_in_trunk = 0;
+
+    pos->m_trunk = TAILQ_FIRST(&buffer->m_trunks);
+    while(pos->m_trunk != TAILQ_END(&buffer->m_trunks) && pos->m_trunk->m_size <= 0) {
+        pos->m_trunk = TAILQ_NEXT(pos->m_trunk, m_next);
+    }
 }
 
 void mem_buffer_end(struct mem_buffer_pos * pos, struct mem_buffer * buffer) {
@@ -25,10 +29,6 @@ ssize_t mem_pos_seek(struct mem_buffer_pos * pos, ssize_t n) {
     assert(pos);
     assert(pos->m_buffer);
 
-    if (pos->m_trunk == NULL) {
-        return done;
-    }
-
     if (n > 0) {
         while(pos->m_trunk && n > 0) {
             int left = pos->m_trunk->m_size - pos->m_pos_in_trunk - 1;
@@ -38,29 +38,55 @@ ssize_t mem_pos_seek(struct mem_buffer_pos * pos, ssize_t n) {
                 n = 0;
             }
             else {
-                pos->m_trunk = TAILQ_NEXT(pos->m_trunk, m_next);
+                done += (left + 1);
+                n -= (left + 1);
+
+                do {
+                    pos->m_trunk = TAILQ_NEXT(pos->m_trunk, m_next);
+                } while(pos->m_trunk && pos->m_trunk->m_size == 0);
+
                 pos->m_pos_in_trunk = 0;
-                done += left;
-                n -= left;
             }
         }
     }
     else if (n < 0) {
-        while(pos->m_trunk && n < 0) {
-            int left = pos->m_pos_in_trunk;
-            if (left >= n) {
-                pos->m_pos_in_trunk -= n;
-                done -= n;
-                n = 0;
+        n = -n;
+        while(n > 0) {
+            int d;
+
+            if (pos->m_trunk == NULL || pos->m_pos_in_trunk == 0) {;
+                struct mem_buffer_trunk * pre = 
+                    pos->m_trunk == NULL
+                    ? TAILQ_LAST(&pos->m_buffer->m_trunks, mem_buffer_trunk_list)
+                    : TAILQ_PREV(pos->m_trunk, mem_buffer_trunk_list, m_next);
+                
+                while(pre && pre != TAILQ_FIRST(&pos->m_buffer->m_trunks) && pre->m_size <= 0) {
+                    pre = TAILQ_PREV(pre, mem_buffer_trunk_list, m_next);
+                }
+
+                if (pre && pre->m_size > 0) {
+                    pos->m_trunk = pre;
+                    pos->m_pos_in_trunk = pre->m_size - 1;
+                    done -= 1;
+                    n -= 1;
+                }
+                else {
+                    break;
+                }
             }
-            else {
-                pos->m_trunk = TAILQ_PREV(pos->m_trunk, mem_buffer_trunk_list, m_next);
-                pos->m_pos_in_trunk = pos->m_trunk->m_size;
-                done -= left;
-                n += left;
-            }
+
+            assert(pos->m_trunk);
+            assert(pos->m_trunk->m_size > 0);
+
+            d = pos->m_pos_in_trunk;
+            if (d == 0) continue;
+            if (d >= n) d = n;
+
+            assert(pos->m_pos_in_trunk >= d);
+            pos->m_pos_in_trunk -= d;
+            done -= d;
+            n -= d;
         }
-        
     }
 
     return done;

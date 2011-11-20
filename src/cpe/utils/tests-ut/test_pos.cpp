@@ -1,5 +1,18 @@
 #include "BufferTest.hpp"
 
+TEST_F(BufferTest, pos_begin_with_empty_trunk) {
+    append_string("");
+    append_string("");
+
+    struct mem_buffer_pos l;
+    mem_buffer_begin(&l, &m_buffer);
+
+    struct mem_buffer_pos e;
+    mem_buffer_end(&e, &m_buffer);
+
+    EXPECT_TRUE(mem_pos_eq(&l, &e));
+}
+
 TEST_F(BufferTest, pos_valid_head) {
     append_string("a");
 
@@ -77,4 +90,200 @@ TEST_F(BufferTest, pos_seek_fwd_to_last) {
 
     EXPECT_TRUE(t1 == p.m_trunk);
     EXPECT_EQ((size_t)2, p.m_pos_in_trunk);
+}
+
+TEST_F(BufferTest, pos_seek_fwd_from_last) {
+    append_trunk("abc");
+
+    struct mem_buffer_pos p;
+    mem_buffer_end(&p, &m_buffer);
+    EXPECT_EQ(0, mem_pos_seek(&p, 2));
+
+    EXPECT_TRUE(NULL == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+}
+
+TEST_F(BufferTest, pos_seek_fwd_multi_trunk) {
+    struct mem_buffer_trunk * t1 = append_trunk("a");
+    struct mem_buffer_trunk * t2 = append_trunk("b");
+    struct mem_buffer_trunk * t3 = append_trunk("c");
+
+    struct mem_buffer_pos p;
+    mem_buffer_begin(&p, &m_buffer);
+    EXPECT_TRUE(t1 == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_EQ('a', mem_pos_data(&p));
+
+    EXPECT_EQ(1, mem_pos_seek(&p, 1));
+    EXPECT_TRUE(t2 == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_EQ('b', mem_pos_data(&p));
+
+    EXPECT_EQ(1, mem_pos_seek(&p, 1));
+    EXPECT_TRUE(t3 == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_EQ('c', mem_pos_data(&p));
+
+    EXPECT_EQ(1, mem_pos_seek(&p, 1));
+    EXPECT_TRUE(NULL == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_FALSE(mem_pos_valide(&p));
+}
+
+TEST_F(BufferTest, pos_seek_fwd_multi_trunk_with_empty_trunk_middle) {
+    struct mem_buffer_trunk * t1 = append_trunk("a");
+    append_trunk("");
+    struct mem_buffer_trunk * t3 = append_trunk("c");
+
+    struct mem_buffer_pos p;
+    mem_buffer_begin(&p, &m_buffer);
+    EXPECT_TRUE(t1 == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_EQ('a', mem_pos_data(&p));
+
+    EXPECT_EQ(1, mem_pos_seek(&p, 1));
+    EXPECT_TRUE(t3 == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_EQ('c', mem_pos_data(&p));
+
+    EXPECT_EQ(1, mem_pos_seek(&p, 1));
+    EXPECT_TRUE(NULL == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_FALSE(mem_pos_valide(&p));
+}
+
+TEST_F(BufferTest, pos_seek_fwd_multi_trunk_with_empty_trunk_end) {
+    struct mem_buffer_trunk * t1 = append_trunk("a");
+    append_trunk("");
+    append_trunk("");
+
+    struct mem_buffer_pos p;
+    mem_buffer_begin(&p, &m_buffer);
+    EXPECT_TRUE(t1 == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_EQ('a', mem_pos_data(&p));
+
+    EXPECT_EQ(1, mem_pos_seek(&p, 1));
+    EXPECT_TRUE(NULL == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_FALSE(mem_pos_valide(&p));
+}
+
+TEST_F(BufferTest, pos_seek_fwd_empty) {
+    struct mem_buffer_pos p;
+    mem_buffer_begin(&p, &m_buffer);
+    EXPECT_FALSE(mem_pos_valide(&p));
+
+    EXPECT_EQ(0, mem_pos_seek(&p, 1));
+    EXPECT_TRUE(NULL == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_FALSE(mem_pos_valide(&p));
+}
+
+TEST_F(BufferTest, pos_seek_back_basic) {
+    struct mem_buffer_trunk * t1 = append_trunk("abc");
+
+    struct mem_buffer_pos p;
+    mem_buffer_end(&p, &m_buffer);
+    EXPECT_FALSE(mem_pos_valide(&p));
+
+    EXPECT_EQ(-1, mem_pos_seek(&p, -1));
+    EXPECT_EQ('c', mem_pos_data(&p));
+
+    EXPECT_TRUE(t1 == p.m_trunk);
+    EXPECT_EQ((size_t)2, p.m_pos_in_trunk);
+}
+
+TEST_F(BufferTest, pos_seek_back_to_head) {
+    struct mem_buffer_trunk * t1 = append_trunk("abc");
+
+    struct mem_buffer_pos p;
+    mem_buffer_end(&p, &m_buffer);
+    EXPECT_EQ(-3, mem_pos_seek(&p, -3));
+
+    EXPECT_TRUE(t1 == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+    EXPECT_EQ('a', mem_pos_data(&p));
+}
+
+TEST_F(BufferTest, pos_seek_back_from_head) {
+    struct mem_buffer_trunk * t1 = append_trunk("abc");
+
+    struct mem_buffer_pos p;
+    mem_buffer_begin(&p, &m_buffer);
+    EXPECT_EQ(0, mem_pos_seek(&p, -2));
+
+    EXPECT_TRUE(t1 == p.m_trunk);
+    EXPECT_EQ((size_t)0, p.m_pos_in_trunk);
+}
+
+TEST_F(BufferTest, pos_seek_back_multi_trunk) {
+    append_trunk("a");
+    append_trunk("b");
+    append_trunk("c");
+
+    struct mem_buffer_pos p;
+    mem_buffer_end(&p, &m_buffer);
+
+    EXPECT_EQ(-1, mem_pos_seek(&p, -1));
+    EXPECT_EQ('c', mem_pos_data(&p));
+
+    EXPECT_EQ(-1, mem_pos_seek(&p, -1));
+    EXPECT_EQ('b', mem_pos_data(&p));
+
+    EXPECT_EQ(-1, mem_pos_seek(&p, -1));
+    EXPECT_EQ('a', mem_pos_data(&p));
+}
+
+TEST_F(BufferTest, pos_seek_back_multi_trunk_with_empty_trunk_middle) {
+    append_trunk("a");
+    append_trunk("");
+    append_trunk("c");
+
+    struct mem_buffer_pos p;
+    mem_buffer_end(&p, &m_buffer);
+
+    EXPECT_EQ(-1, mem_pos_seek(&p, -1));
+    EXPECT_EQ('c', mem_pos_data(&p));
+
+    EXPECT_EQ(-1, mem_pos_seek(&p, -1));
+    EXPECT_EQ('a', mem_pos_data(&p));
+}
+
+TEST_F(BufferTest, pos_seek_back_multi_trunk_with_empty_trunk_end) {
+    append_trunk("a");
+    append_trunk("");
+    append_trunk("");
+
+    struct mem_buffer_pos p;
+    mem_buffer_end(&p, &m_buffer);
+
+    EXPECT_EQ(-1, mem_pos_seek(&p, -1));
+    EXPECT_EQ('a', mem_pos_data(&p));
+}
+
+TEST_F(BufferTest, pos_seek_back_multi_trunk_all_empty_trunk) {
+    append_trunk("");
+    append_trunk("");
+    append_trunk("");
+
+    struct mem_buffer_pos p;
+    mem_buffer_end(&p, &m_buffer);
+
+    EXPECT_EQ(0, mem_pos_seek(&p, -1));
+
+    struct mem_buffer_pos e;
+    mem_buffer_end(&e, &m_buffer);
+    EXPECT_TRUE(mem_pos_eq(&p, &e));
+}
+
+TEST_F(BufferTest, pos_seek_back_empty) {
+    struct mem_buffer_pos p;
+    mem_buffer_end(&p, &m_buffer);
+
+    EXPECT_EQ(0, mem_pos_seek(&p, -1));
+
+    struct mem_buffer_pos e;
+    mem_buffer_end(&e, &m_buffer);
+    EXPECT_TRUE(mem_pos_eq(&p, &e));
 }
