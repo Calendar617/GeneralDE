@@ -12,12 +12,14 @@ void ParseTest::SetUp() {
 
 void ParseTest::TearDown() {
     mem_buffer_clear(&m_buffer);
-    dr_lib_free(&m_metaLib);
+    m_metaLib = NULL;
     cpe_error_list_free(m_errorList);
 }
 
 void ParseTest::installMeta(const char * def) {
-    dr_lib_free(&m_metaLib);
+    m_metaLib = NULL;
+    mem_buffer_clear(&m_buffer);
+
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);
 
@@ -26,8 +28,10 @@ void ParseTest::installMeta(const char * def) {
 
     EXPECT_EQ(
         0,
-        dr_create_lib_from_xml_ex(&m_metaLib, def, strlen(def), &em))
+        dr_create_lib_from_xml_ex(&m_buffer, def, strlen(def), &em))
         << "install meta error";
+
+    m_metaLib = (LPDRMETALIB)mem_buffer_make_exactly(&m_buffer);
 }
 
 int ParseTest::read(const char * data, const char * typeName) {
@@ -44,5 +48,5 @@ int ParseTest::read(const char * data, const char * typeName) {
 }
 
 void * ParseTest::result(int startPos) {
-    return ((char *)mem_buffer_make_continuous(&m_buffer)) + startPos;
+    return ((char *)mem_buffer_make_exactly(&m_buffer)) + startPos;
 }

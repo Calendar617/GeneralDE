@@ -1,4 +1,5 @@
 #include "cpe/dr/dr_ctypes_info.h"
+#include "cpe/dr/dr_data.h"
 #include "BuildFromXmlTest.hpp"
 
 class BuildFromXmlEntryTest : public BuildFromXmlTest {
@@ -12,7 +13,6 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
         "               desc='a1.desc'\n"
         "               cname='a1.cname'\n"
         "               type='int16'\n"
-        "               defaultvalue='1'\n"
         "               id='12'/>"
         "    </struct>"
         "</metalib>"
@@ -25,6 +25,7 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
     EXPECT_STREQ("a1.cname", dr_entry_cname(e));
     EXPECT_EQ(1, dr_entry_version(e));
     EXPECT_EQ(CPE_DR_TYPE_INT16, dr_entry_type(e));
+    EXPECT_EQ(NULL, dr_entry_dft_value(e));
 }
 
 TEST_F(BuildFromXmlEntryTest, no_name) {
@@ -163,3 +164,57 @@ TEST_F(BuildFromXmlEntryTest, string_no_size) {
     EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE));
 }
 
+TEST_F(BuildFromXmlEntryTest, dftvalue_basic) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='PkgHead' version='1'>"
+        "	     <entry name='a1' defaultvalue='12' type='int16'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    LPDRMETAENTRY e = entry("PkgHead", "a1");
+    ASSERT_TRUE(e);
+
+    const void * dftValue = dr_entry_dft_value(e);
+    ASSERT_TRUE(dftValue) << "dftValue not exist";
+
+    EXPECT_EQ(13, dr_read_int32(dftValue, e));
+}
+
+TEST_F(BuildFromXmlEntryTest, string_def_value) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='PkgHead' version='1'>"
+        "	     <entry name='a1' type='string' size='5' defaultvalue='abc'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    LPDRMETAENTRY e = entry("PkgHead", "a1");
+    ASSERT_TRUE(e);
+
+    const void * dftValue = dr_entry_dft_value(e);
+    ASSERT_TRUE(dftValue) << "dftValue not exist";
+
+    EXPECT_STREQ("abc", (const char *)dftValue);
+}
+
+TEST_F(BuildFromXmlEntryTest, string_def_value_overflow) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='PkgHead' version='1'>"
+        "	     <entry name='a1' type='string' size='5' defaultvalue='abcdef'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    LPDRMETAENTRY e = entry("PkgHead", "a1");
+    ASSERT_TRUE(e);
+
+    const void * dftValue = dr_entry_dft_value(e);
+    ASSERT_TRUE(dftValue) << "dftValue not exist";
+
+    EXPECT_STREQ("abcd", (const char *)dftValue);
+    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE));
+}

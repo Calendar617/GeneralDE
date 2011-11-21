@@ -83,12 +83,13 @@ TEST_F(BuildFromXmlTest, metalib_name_overflow) {
 }
 
 TEST_F(BuildFromXmlTest, parse_no_em) {
-    dr_lib_free(&m_metaLib);
+    m_metaLib = NULL;
+    mem_buffer_clear(&m_buffer);
 
     const char * def =
         "<metalib tagsetversion='1000000000' name='net' version='1'/>";
 
     EXPECT_EQ(
         CPE_DR_ERROR_INVALID_TAGSET_VERSION,
-        dr_create_lib_from_xml_ex(&m_metaLib, def, strlen(def), NULL));
+        dr_create_lib_from_xml_ex(&m_buffer, def, strlen(def), NULL));
 }
