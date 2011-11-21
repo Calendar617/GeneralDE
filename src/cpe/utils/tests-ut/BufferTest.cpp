@@ -42,7 +42,7 @@ BufferTest::trunk_at(size_t pos) {
 
 char *
 BufferTest::as_string(void) {
-    return (char *)mem_buffer_make_continuous(&m_buffer);
+    return (char *)mem_buffer_make_continuous(&m_buffer, 0);
 }
 
 size_t BufferTest::buffer_size(void) {

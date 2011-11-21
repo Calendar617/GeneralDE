@@ -53,7 +53,12 @@ mem_trunk_alloc(struct mem_allocrator * allocrator, size_t capacity) {
 }
 
 void mem_trunk_free(struct mem_buffer * buffer, struct mem_buffer_trunk * trunk) {
-    TAILQ_REMOVE(&buffer->m_trunks, trunk, m_next);
-    buffer->m_size -= trunk->m_size;
+    if (trunk == NULL) return;
+
+    if (buffer) {
+        TAILQ_REMOVE(&buffer->m_trunks, trunk, m_next);
+        buffer->m_size -= trunk->m_size;
+    }
+
     mem_free(trunk->m_allocrator, trunk);
 }

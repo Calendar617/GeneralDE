@@ -42,15 +42,30 @@ TEST_F(BufferTest, read_basic) {
 }
 
 TEST_F(BufferTest, make_continuous_no_trunk) {
-    EXPECT_TRUE(mem_buffer_make_continuous(&m_buffer) == NULL);
+    EXPECT_TRUE(mem_buffer_make_continuous(&m_buffer, 0) == NULL);
 }
 
 TEST_F(BufferTest, make_continuous_single_trunk) {
     char buf[5] = { 0 };
 
-    EXPECT_TRUE(append_trunk("a"));
+    struct mem_buffer_trunk * told = append_trunk("a");
+    void * newDataAddr = mem_buffer_make_continuous(&m_buffer, 0);
+    EXPECT_TRUE(told == trunk_at(0));
 
-    memcpy(buf,mem_buffer_make_continuous(&m_buffer), mem_buffer_size(&m_buffer));
+    memcpy(buf, newDataAddr, mem_buffer_size(&m_buffer));
+
+    EXPECT_STREQ("a", buf);
+}
+
+TEST_F(BufferTest, make_continuous_single_trunk_with_capacity) {
+    char buf[5] = { 0 };
+
+    struct mem_buffer_trunk * told = append_trunk("a");
+    void * newDataAddr = mem_buffer_make_continuous(&m_buffer, 1024);
+    EXPECT_TRUE(told != trunk_at(0));
+    EXPECT_EQ(1, mem_buffer_size(&m_buffer));
+
+    memcpy(buf, newDataAddr, mem_buffer_size(&m_buffer));
 
     EXPECT_STREQ("a", buf);
 }
@@ -62,7 +77,7 @@ TEST_F(BufferTest, make_continuous_multi_trunk) {
     EXPECT_TRUE(append_trunk("b"));
     EXPECT_TRUE(append_trunk("c"));
 
-    memcpy(buf,mem_buffer_make_continuous(&m_buffer), mem_buffer_size(&m_buffer));
+    memcpy(buf,mem_buffer_make_continuous(&m_buffer, 0), mem_buffer_size(&m_buffer));
 
     EXPECT_STREQ("abc", buf);
 }
