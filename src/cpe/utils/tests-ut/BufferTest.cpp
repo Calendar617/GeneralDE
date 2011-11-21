@@ -31,8 +31,20 @@ BufferTest::append_trunk(const char * data) {
     }
 }
 
+size_t BufferTest::trunk_count(void) {
+    return mem_buffer_trunk_count(&m_buffer);
+}
+
+struct mem_buffer_trunk *
+BufferTest::trunk_at(size_t pos) {
+    return mem_buffer_trunk_at(&m_buffer, pos);
+}
+
 char *
 BufferTest::as_string(void) {
     return (char *)mem_buffer_make_continuous(&m_buffer);
 }
 
+size_t BufferTest::buffer_size(void) {
+    return mem_buffer_size(&m_buffer);
+}

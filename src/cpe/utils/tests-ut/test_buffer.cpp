@@ -25,7 +25,7 @@ TEST_F(BufferTest, append_multi_trunk) {
 TEST_F(BufferTest, read_from_empty) {
     char buf[5];
 
-    EXPECT_EQ((size_t)0, mem_buffer_read(buf, 5, &m_buffer));
+    EXPECT_EQ(0, mem_buffer_read(buf, 5, &m_buffer));
 }
 
 TEST_F(BufferTest, read_basic) {
@@ -35,7 +35,7 @@ TEST_F(BufferTest, read_basic) {
     EXPECT_TRUE(append_trunk("b"));
     EXPECT_TRUE(append_trunk("c"));
 
-    EXPECT_EQ((size_t)3, mem_buffer_read(buf, 5, &m_buffer));
+    EXPECT_EQ(3, mem_buffer_read(buf, 5, &m_buffer));
     buf[3] = 0;
 
     EXPECT_STREQ("abc", buf);

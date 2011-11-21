@@ -47,7 +47,7 @@ mem_buffer_append_trunk_after(
     return trunk;
 }
 
-size_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer) {
+ssize_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer) {
     size_t readedSize = 0;
     struct mem_buffer_trunk * trunk;
 
@@ -67,10 +67,10 @@ size_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer) {
         trunk = TAILQ_NEXT(trunk, m_next);
     }
 
-    return readedSize;
+    return (ssize_t)readedSize;
 }
 
-size_t mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size) {
+ssize_t mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t size) {
     size_t writedSize = 0;
     size_t newTrunkSize = 0;
     struct mem_buffer_trunk * trunk = NULL;
@@ -182,4 +182,31 @@ char * mem_buffer_strndup(struct mem_buffer * buffer, const char * s, size_t n) 
     p[n] = 0;
 
     return p;
+}
+
+size_t mem_buffer_trunk_count(mem_buffer_t buffer) {
+    size_t count;
+    struct mem_buffer_trunk * trunk;
+
+    count = 0;
+    trunk = TAILQ_FIRST(&buffer->m_trunks);
+    while (trunk != TAILQ_END(&buffer->m_trunks)) {
+        ++count;
+        trunk = TAILQ_NEXT(trunk, m_next);
+    }
+
+    return count;
+}
+
+struct mem_buffer_trunk *
+mem_buffer_trunk_at(mem_buffer_t buffer, size_t pos) {
+    struct mem_buffer_trunk * trunk;
+
+    trunk = TAILQ_FIRST(&buffer->m_trunks);
+    while (pos > 0 && trunk != TAILQ_END(&buffer->m_trunks)) {
+        --pos;
+        trunk = TAILQ_NEXT(trunk, m_next);
+    }
+
+    return trunk;
 }

@@ -384,3 +384,131 @@ TEST_F(BufferTest, pos_diff_multi_trunk_middle_to_middle) {
     EXPECT_EQ(1, mem_pos_diff(&b, &e));
     EXPECT_EQ(-1, mem_pos_diff(&e, &b));
 }
+
+TEST_F(BufferTest, pos_insert_in_empty) {
+    struct mem_buffer_pos p;
+    mem_pos_at(&p, &m_buffer, 3);
+
+    EXPECT_EQ(3, mem_pos_insert(&p, "abc", 3));
+    EXPECT_FALSE(mem_pos_valide(&p));
+
+    append_zero();
+    EXPECT_STREQ("abc", as_string());
+}
+
+TEST_F(BufferTest, pos_insert_at_trunk_first) {
+    append_trunk("def");
+
+    struct mem_buffer_pos p;
+    mem_pos_at(&p, &m_buffer, 0);
+
+    EXPECT_EQ(3, mem_pos_insert(&p, "abc", 3));
+    EXPECT_EQ((size_t)6, buffer_size());
+    EXPECT_EQ('d', mem_pos_data(&p));
+
+    append_zero();
+    EXPECT_STREQ("abcdef", as_string());
+}
+
+TEST_F(BufferTest, pos_insert_at_trunk_middle) {
+    append_trunk("def");
+
+    struct mem_buffer_pos p;
+    mem_pos_at(&p, &m_buffer, 1);
+
+    EXPECT_EQ(3, mem_pos_insert(&p, "abc", 3));
+    EXPECT_EQ('e', mem_pos_data(&p));
+
+    append_zero();
+    EXPECT_STREQ("dabcef", as_string());
+}
+
+TEST_F(BufferTest, pos_insert_at_trunk_last) {
+    append_trunk("def");
+
+    struct mem_buffer_pos p;
+    mem_pos_at(&p, &m_buffer, 3);
+
+    EXPECT_EQ(3, mem_pos_insert(&p, "abc", 3));
+    EXPECT_FALSE(mem_pos_valide(&p));
+
+    append_zero();
+    EXPECT_STREQ("defabc", as_string());
+}
+
+TEST_F(BufferTest, pos_insert_multi_trunk_at_trunk_first) {
+    append_trunk("a");
+    append_trunk("bc");
+    append_trunk("d");
+
+    struct mem_buffer_pos p;
+    mem_pos_at(&p, &m_buffer, 1);
+
+    EXPECT_EQ(3, mem_pos_insert(&p, "efg", 3));
+    EXPECT_EQ('b', mem_pos_data(&p));
+
+    append_zero();
+    EXPECT_STREQ("aefgbcd", as_string());
+}
+
+TEST_F(BufferTest, pos_insert_multi_trunk_at_trunk_last) {
+    append_trunk("a");
+    append_trunk("bc");
+    append_trunk("d");
+
+    struct mem_buffer_pos p;
+    mem_pos_at(&p, &m_buffer, 3);
+
+    EXPECT_EQ(3, mem_pos_insert(&p, "efg", 3));
+    EXPECT_EQ('d', mem_pos_data(&p));
+
+    append_zero();
+    EXPECT_STREQ("abcefgd", as_string());
+}
+
+TEST_F(BufferTest, pos_insert_not_use_empty_trunk) {
+    append_trunk("a");
+    append_trunk("bc");
+    append_trunk(NULL);
+    append_trunk("d");
+
+    struct mem_buffer_pos p;
+    mem_pos_at(&p, &m_buffer, 3);
+
+    EXPECT_EQ(3, mem_pos_insert(&p, "efg", 3));
+    EXPECT_EQ((size_t)5, trunk_count());
+    EXPECT_EQ('d', mem_pos_data(&p));
+
+    append_zero();
+    EXPECT_STREQ("abcefgd", as_string());
+}
+
+TEST_F(BufferTest, pos_insert_enouth_in_current_middle) {
+    append_trunk("a");
+    append_trunk("bc");
+    append_trunk("d");
+
+    struct mem_buffer_pos p;
+    mem_pos_at(&p, &m_buffer, 2);
+
+    EXPECT_EQ(1, mem_pos_insert(&p, "efg", 1));
+    EXPECT_EQ('c', mem_pos_data(&p));
+
+    append_zero();
+    EXPECT_STREQ("abecd", as_string());
+}
+
+
+TEST_F(BufferTest, pos_insert_zero) {
+    append_trunk("def");
+
+    struct mem_buffer_pos p;
+    mem_pos_at(&p, &m_buffer, 0);
+
+    EXPECT_EQ(0, mem_pos_insert(&p, "", 0));
+    EXPECT_EQ('d', mem_pos_data(&p));
+
+    append_zero();
+    EXPECT_STREQ("def", as_string());
+}
+

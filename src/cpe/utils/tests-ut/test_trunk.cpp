@@ -97,3 +97,30 @@ TEST_F(BufferTest, trunk_free_middle) {
     mem_trunk_free(&m_buffer, trunk2);
     EXPECT_EQ((size_t)3, mem_buffer_size(&m_buffer));
 }
+
+TEST_F(BufferTest, trunk_count_basic) {
+    append_trunk("");
+    append_trunk("");
+    append_trunk("");
+
+    EXPECT_EQ((size_t)3, mem_buffer_trunk_count(&m_buffer));
+}
+
+TEST_F(BufferTest, trunk_count_empty) {
+    EXPECT_EQ((size_t)0, mem_buffer_trunk_count(&m_buffer));
+}
+
+TEST_F(BufferTest, trunk_at_basic) {
+    struct mem_buffer_trunk * t1 = append_trunk("");
+    struct mem_buffer_trunk * t2 = append_trunk("");
+    struct mem_buffer_trunk * t3 = append_trunk("");
+
+    EXPECT_TRUE(t1 == mem_buffer_trunk_at(&m_buffer, 0));
+    EXPECT_TRUE(t2 == mem_buffer_trunk_at(&m_buffer, 1));
+    EXPECT_TRUE(t3 == mem_buffer_trunk_at(&m_buffer, 2));
+    EXPECT_TRUE(NULL == mem_buffer_trunk_at(&m_buffer, 3));
+}
+
+TEST_F(BufferTest, trunk_at_empty) {
+    EXPECT_TRUE(NULL == mem_buffer_trunk_at(&m_buffer, 0));
+}

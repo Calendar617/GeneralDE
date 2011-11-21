@@ -17,6 +17,11 @@ public:
     append_trunk(const char * data);
 
     char * as_string(void);
+
+    size_t trunk_count(void);
+    struct mem_buffer_trunk * trunk_at(size_t pos);
+
+    size_t buffer_size(void);
 };
 
 #endif

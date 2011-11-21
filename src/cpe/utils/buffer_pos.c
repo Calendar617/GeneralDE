@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <string.h>
 #include "buffer_private.h"
 
 void mem_buffer_begin(struct mem_buffer_pos * pos, struct mem_buffer * buffer) {
@@ -160,4 +161,112 @@ int mem_pos_valide(mem_buffer_pos_t l) {
 char mem_pos_data(mem_buffer_pos_t l) {
     assert(mem_pos_valide(l));
     return ((char *)mem_trunk_data(l->m_trunk))[l->m_pos_in_trunk];
+}
+
+void * mem_pos_insert_alloc(mem_buffer_pos_t pos, size_t n) {
+    struct mem_buffer_trunk * trunk;
+
+    assert(pos);
+    assert(pos->m_buffer);
+
+    if (n <= 0) return NULL;
+
+    if (pos->m_trunk == NULL) {
+        return mem_buffer_alloc(pos->m_buffer, n);
+    }
+
+    if (pos->m_pos_in_trunk == 0) {
+        /*pos at begin of trunk, alloc a new trunk to store data*/
+        trunk = mem_trunk_alloc(pos->m_buffer->m_default_allocrator, n);
+        if (trunk == NULL) {
+            return NULL;
+        }
+
+        TAILQ_INSERT_BEFORE(pos->m_trunk, trunk, m_next);
+        pos->m_buffer->m_size += n;
+        trunk->m_size = n;
+        return mem_trunk_data(trunk);
+    }
+    else if (pos->m_trunk->m_capacity >= pos->m_pos_in_trunk + n) {
+        /*new data can store in current trunk*/
+
+        char * trunkBegin = (char *)mem_trunk_data(pos->m_trunk);
+        char * result = trunkBegin + pos->m_pos_in_trunk;
+
+        /*can`t store all data in current buffer, move overflow data to a new trunk*/
+        ssize_t appendSize = pos->m_trunk->m_size + n - pos->m_trunk->m_capacity;
+        if (appendSize > 0) {
+            trunk = mem_trunk_alloc(pos->m_buffer->m_default_allocrator, appendSize);
+            if (trunk == NULL) {
+                return NULL;
+            }
+
+            TAILQ_INSERT_AFTER(&pos->m_buffer->m_trunks, pos->m_trunk, trunk, m_next);
+            memcpy(
+                mem_trunk_data(trunk),
+                trunkBegin + pos->m_trunk->m_size - appendSize,
+                appendSize);
+            
+            trunk->m_size = appendSize;
+            pos->m_trunk->m_size -= appendSize;
+        }
+
+        if (pos->m_pos_in_trunk < pos->m_trunk->m_size) {
+            memmove(
+                trunkBegin + pos->m_pos_in_trunk + n,
+                trunkBegin + pos->m_pos_in_trunk,
+                pos->m_trunk->m_size - pos->m_pos_in_trunk);
+        }
+        else {
+        }
+
+        pos->m_trunk->m_size += pos->m_trunk->m_size - appendSize + n;
+
+        pos->m_pos_in_trunk += n;
+
+        if (pos->m_pos_in_trunk >= pos->m_trunk->m_size) {
+            pos->m_pos_in_trunk = pos->m_pos_in_trunk - pos->m_trunk->m_size;
+            pos->m_trunk = trunk;
+        }
+
+        assert(pos->m_pos_in_trunk < pos->m_trunk->m_size);
+        assert(pos->m_trunk->m_size <= pos->m_trunk->m_capacity);
+        pos->m_buffer->m_size += n;
+
+        return result;
+    }
+    else {
+        /*new data can not store in current trunk*/
+        ssize_t moveSize = pos->m_trunk->m_size - pos->m_pos_in_trunk;
+        trunk = mem_trunk_alloc(pos->m_buffer->m_default_allocrator, n + moveSize);
+        if (trunk == NULL) {
+            return NULL;
+        }
+
+        TAILQ_INSERT_AFTER(&pos->m_buffer->m_trunks, pos->m_trunk, trunk, m_next);
+
+        assert(moveSize > 0);
+        memcpy(
+            (char *)mem_trunk_data(trunk) + n,
+            (char *)mem_trunk_data(pos->m_trunk) + pos->m_pos_in_trunk,
+            moveSize);
+
+        trunk->m_size = n + moveSize;
+        pos->m_trunk->m_size = pos->m_pos_in_trunk;
+        pos->m_trunk = trunk;
+        pos->m_pos_in_trunk = n;
+        pos->m_buffer->m_size += n;
+
+        return mem_trunk_data(trunk);
+    }
+}
+
+ssize_t mem_pos_insert(mem_buffer_pos_t pos, const void * buf, size_t size) {
+    void * p = mem_pos_insert_alloc(pos, size);
+    if (p == NULL) return size == 0 ? 0 : -1;
+
+    assert(buf);
+
+    memcpy(p, buf, size);
+    return (ssize_t)size;
 }
