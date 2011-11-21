@@ -8,18 +8,22 @@ PrintTest::PrintTest() : m_metaLib(0), m_errorList(0) {
 }
 
 void PrintTest::SetUp() {
+    mem_buffer_init(&m_metaLib_buffer, NULL);
     mem_buffer_init(&m_buffer, NULL);
 }
 
 void PrintTest::TearDown() {
-    m_metaLib = NULL;
     mem_buffer_clear(&m_buffer);
+
+    m_metaLib = NULL;
+    mem_buffer_clear(&m_metaLib_buffer);
+
     cpe_error_list_free(m_errorList);
 }
 
 void PrintTest::installMeta(const char * def) {
     m_metaLib = NULL;
-    mem_buffer_clear(&m_buffer);
+    mem_buffer_clear(&m_metaLib_buffer);
 
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);
@@ -29,10 +33,10 @@ void PrintTest::installMeta(const char * def) {
 
     EXPECT_EQ(
         0,
-        dr_create_lib_from_xml_ex(&m_buffer, def, strlen(def), &em))
+        dr_create_lib_from_xml_ex(&m_metaLib_buffer, def, strlen(def), &em))
         << "install meta error";
 
-    m_metaLib = (LPDRMETALIB)mem_buffer_make_exactly(&m_buffer);
+    m_metaLib = (LPDRMETALIB)mem_buffer_make_exactly(&m_metaLib_buffer);
 }
 
 int PrintTest::print(const void * data, const char * typeName) {

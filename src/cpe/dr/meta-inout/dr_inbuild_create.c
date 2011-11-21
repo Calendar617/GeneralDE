@@ -123,7 +123,7 @@ static void dr_inbuild_build_add_meta(
 }
 
 int dr_inbuild_build_lib(
-    LPDRMETALIB *a_ppstLib,
+    mem_buffer_t buffer,
     struct DRInBuildMetaLib * inBuildLib,
     error_monitor_t em)
 {
@@ -141,7 +141,7 @@ int dr_inbuild_build_lib(
         return ret;
     }
 
-    ctx.m_metaLib = (LPDRMETALIB)malloc(inBuildLib->m_data.iSize);
+    ctx.m_metaLib = (LPDRMETALIB)mem_buffer_alloc(buffer, inBuildLib->m_data.iSize);
     if (ctx.m_metaLib == NULL) {
         return -1;
     }
@@ -160,8 +160,6 @@ int dr_inbuild_build_lib(
     TAILQ_FOREACH(metaEle, &inBuildLib->m_metas, m_next) {
         dr_inbuild_build_add_meta(&ctx, metaEle);
     }
-
-    *a_ppstLib = ctx.m_metaLib;
 
     return CPE_SUCCESS;
 }

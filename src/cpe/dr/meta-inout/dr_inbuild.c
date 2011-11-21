@@ -113,6 +113,7 @@ dr_inbuild_meta_add_entry(struct DRInBuildMeta * meta) {
     newEntry->m_data.m_select_range_min = 1;
     newEntry->m_data.m_select_data_start_pos = -1;
     newEntry->m_data.m_select_entry_pos = -1;
+    newEntry->m_data.m_dft_value_pos = -1;
 
     TAILQ_INSERT_TAIL(&meta->m_entries, newEntry, m_next);
     ++meta->m_entries_count;

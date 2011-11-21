@@ -12,6 +12,8 @@ public:
     virtual void TearDown();
 
     LPDRMETALIB m_metaLib;
+    struct mem_buffer m_metaLib_buffer;
+
     struct mem_buffer m_buffer;
     error_list_t m_errorList;
 

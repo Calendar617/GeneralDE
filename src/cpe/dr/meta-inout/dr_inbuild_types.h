@@ -29,11 +29,13 @@ struct DRInBuildMetaEntry {
     TAILQ_ENTRY(DRInBuildMetaEntry) m_next;
 
     struct tagDRMetaEntry m_data;
+    int m_ignore;
     char m_name[CPE_DR_NAME_LEN];
     char m_desc[CPE_DR_DESC_LEN];
     char m_cname[CPE_DR_CHNAME_LEN];
     char * m_ref_type_name;
     char * m_selector_path;
+    char * m_dft_value;
 };
 
 struct DRInBuildMacro {

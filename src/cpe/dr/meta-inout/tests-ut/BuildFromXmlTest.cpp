@@ -37,7 +37,7 @@ int BuildFromXmlTest::parseMeta(const char * def) {
     m_errorList = cpe_error_list_create(NULL);
 
     CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
-    CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
+    //CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
 
     int r = dr_create_lib_from_xml_ex(&m_buffer, def, strlen(def), &em);
     m_metaLib = (LPDRMETALIB)mem_buffer_make_continuous(&m_buffer, 0);

@@ -11,12 +11,12 @@ extern "C" {
 #endif /* __cplusplus */
 
 CPE_DR_API int dr_create_lib_from_xml(
-    LPDRMETALIB * metaLib,
+    mem_buffer_t buffer,
     const char* buf, int bufSize,
     FILE* errorFp);
 
 CPE_DR_API int dr_create_lib_from_xml_ex(
-    LPDRMETALIB * metaLib,
+    mem_buffer_t buffer,
     const char* buf, int bufSize,
     error_monitor_t er);
 

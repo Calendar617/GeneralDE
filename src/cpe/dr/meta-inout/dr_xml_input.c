@@ -402,6 +402,9 @@ static void dr_build_xml_process_entry(
         else if (strcmp((char const *)localname, CPE_DR_TAG_SIZE) == 0) {
             DR_DO_READ_INT(newEntry->m_data.m_unitsize, CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE);
         }
+        else if (strcmp((char const *)localname, CPE_DR_TAG_DEFAULT_VALUE) == 0) {
+            DR_DO_DUP_STR(newEntry->m_dft_value);
+        }
         else {
         }
     }
@@ -577,18 +580,18 @@ void dr_build_xml_parse_ctx_clear(struct DRXmlParseCtx * ctx) {
 }
 
 int  dr_create_lib_from_xml(
-    LPDRMETALIB * metaLib,
+    mem_buffer_t buffer,
     const char* buf,
     int bufSize,
     FILE * errorFp)
 {
     CPE_DEF_ERROR_MONITOR(em, cpe_error_log_to_file, errorFp);
 
-    return dr_create_lib_from_xml_ex(metaLib, buf, bufSize, &em);
+    return dr_create_lib_from_xml_ex(buffer, buf, bufSize, &em);
 }
 
 void dr_create_lib_from_xml_ex_i(
-    LPDRMETALIB * metaLib,
+    mem_buffer_t buffer,
     const char* buf,
     int bufSize,
     int * ret,
@@ -611,13 +614,13 @@ void dr_create_lib_from_xml_ex_i(
     xmlParseChunk(parseCtx, NULL, 0, 1);
     xmlFreeParserCtxt(parseCtx);
 
-    dr_inbuild_build_lib(metaLib, ctx.m_metaLib, em);
+    dr_inbuild_build_lib(buffer, ctx.m_metaLib, em);
 
     dr_build_xml_parse_ctx_clear(&ctx);
 }
 
 int dr_create_lib_from_xml_ex(
-    LPDRMETALIB * metaLib,
+    mem_buffer_t buffer,
     const char* buf,
     int bufSize,
     error_monitor_t em)
@@ -626,12 +629,12 @@ int dr_create_lib_from_xml_ex(
 
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
-        dr_create_lib_from_xml_ex_i(metaLib, buf, bufSize, &ret, em);
+        dr_create_lib_from_xml_ex_i(buffer, buf, bufSize, &ret, em);
         CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
     }
     else {
         CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
-        dr_create_lib_from_xml_ex_i(metaLib, buf, bufSize, &ret, &logError);
+        dr_create_lib_from_xml_ex_i(buffer, buf, bufSize, &ret, &logError);
     }
 
     return ret;
