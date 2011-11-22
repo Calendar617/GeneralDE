@@ -179,7 +179,7 @@ TEST_F(BuildFromXmlEntryTest, dftvalue_basic) {
     const void * dftValue = dr_entry_dft_value(e);
     ASSERT_TRUE(dftValue) << "dftValue not exist";
 
-    EXPECT_EQ(13, dr_read_int32(dftValue, e));
+    EXPECT_EQ(12, dr_read_int32(dftValue, e));
 }
 
 TEST_F(BuildFromXmlEntryTest, string_def_value) {
@@ -216,5 +216,4 @@ TEST_F(BuildFromXmlEntryTest, string_def_value_overflow) {
     ASSERT_TRUE(dftValue) << "dftValue not exist";
 
     EXPECT_STREQ("abcd", (const char *)dftValue);
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE));
 }

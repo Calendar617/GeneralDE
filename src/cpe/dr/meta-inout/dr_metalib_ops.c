@@ -6,7 +6,7 @@
 #include "dr_metalib_ops.h"
 #include "dr_inbuild_error.h"
 
-int dr_init_lib(LPDRMETALIB pstLib, const LPDRLIBPARAM pstParam) {
+int dr_lib_init(LPDRMETALIB pstLib, const LPDRLIBPARAM pstParam) {
     bzero(pstLib, pstParam->iSize);
 
     pstLib->m_magic = CPE_DR_MAGIC;
@@ -42,35 +42,24 @@ int dr_init_lib(LPDRMETALIB pstLib, const LPDRLIBPARAM pstParam) {
     return 0;
 }
 
-int dr_add_metalib_string(
-    LPDRMETALIB metaLib, const char * data, int * usedCount,
-    error_monitor_t em)
+void * dr_lib_alloc_in_strbuf(
+    LPDRMETALIB metaLib, size_t dataSize, int * usedCount, error_monitor_t em)
 {
-    char * base;
-    int startPos;
-    int dataSize;
+    void * p;
 
-    if (data == NULL || data[0] == 0) {
-        return -1;
-    }
-
-    dataSize = strlen(data) + 1;
     if ((*usedCount + dataSize) > metaLib->m_buf_size_str) { /*overflow*/
         DR_NOTIFY_ERROR(em, CPE_DR_ERROR_NO_SPACE_FOR_STRBUF);
-        return -1;
+        return NULL;
     }
 
-    startPos = metaLib->m_startpos_str + *usedCount;
-    base = (char *)(metaLib + 1);
-
-    strncpy(base + startPos, data, dataSize);
+    p = (char *)(metaLib + 1) + metaLib->m_startpos_str + *usedCount;
 
     *usedCount += dataSize;
 
-    return startPos;
+    return p;
 }
 
-LPDRMACRO dr_add_metalib_macro(LPDRMETALIB metaLib, LPDRMACRO macro, error_monitor_t em) {
+LPDRMACRO dr_lib_add_macro(LPDRMETALIB metaLib, LPDRMACRO macro, error_monitor_t em) {
     char * base = (char*)(metaLib + 1);
     LPDRMACRO newMacro = NULL;
 
@@ -84,7 +73,7 @@ LPDRMACRO dr_add_metalib_macro(LPDRMETALIB metaLib, LPDRMACRO macro, error_monit
     return newMacro;
 }
 
-static int dr_add_metalib_meta_find_next_pos(LPDRMETALIB metaLib) {
+static int dr_lib_find_next_meta_pos(LPDRMETALIB metaLib) {
     char * base = (char*)(metaLib + 1);
     int i = 0;
 
@@ -103,7 +92,7 @@ static int dr_add_metalib_meta_find_next_pos(LPDRMETALIB metaLib) {
     return newMetaPos;
 }
 
-static void dr_add_metalib_meta_add_index_by_name(
+static void dr_lib_add_meta_index_for_name(
     LPDRMETALIB metaLib, LPDRMETA newMeta, error_monitor_t em)
 {
     char * base = (char*)(metaLib + 1);
@@ -144,7 +133,7 @@ static void dr_add_metalib_meta_add_index_by_name(
     putAt->m_diff_to_base = newMeta->m_self_pos;
 }
 
-static void dr_add_metalib_meta_add_index_by_id(
+static void dr_lib_add_meta_index_for_id(
     LPDRMETALIB metaLib, LPDRMETA newMeta, error_monitor_t em)
 {
     char * base = (char*)(metaLib + 1);
@@ -185,7 +174,7 @@ static void dr_add_metalib_meta_add_index_by_id(
 }
 
 LPDRMETA
-dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, error_monitor_t em) {
+dr_lib_add_meta(LPDRMETALIB metaLib, LPDRMETA meta, error_monitor_t em) {
     char * base = (char*)(metaLib + 1);
     LPDRMETA newMeta = NULL;
     int newMetaPos = 0;
@@ -196,7 +185,7 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, error_monitor_t em) {
         return NULL;
     }
 
-    newMetaPos = dr_add_metalib_meta_find_next_pos(metaLib);
+    newMetaPos = dr_lib_find_next_meta_pos(metaLib);
 
     if ( (newMetaPos + newMetaUsedSize)
          > (metaLib->m_startpos_meta + metaLib->m_buf_size_meta) )
@@ -211,8 +200,8 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, error_monitor_t em) {
     newMeta->m_self_pos = newMetaPos;
     newMeta->m_entry_count = 0;
 
-    dr_add_metalib_meta_add_index_by_name(metaLib, newMeta, em);
-    dr_add_metalib_meta_add_index_by_id(metaLib, newMeta, em);
+    dr_lib_add_meta_index_for_name(metaLib, newMeta, em);
+    dr_lib_add_meta_index_for_id(metaLib, newMeta, em);
 
     /*must inc m_meta_count here
       becuse dr_add_metalib_meta_add_index_by_xxx will use this */
@@ -221,7 +210,7 @@ dr_add_metalib_meta(LPDRMETALIB metaLib, LPDRMETA meta, error_monitor_t em) {
     return newMeta;;
 }
 
-void dr_add_meta_entry_calc_align(
+void dr_meta_add_entry_calc_align(
     LPDRMETA meta, LPDRMETAENTRY newEntry, int entryAlign,
     error_monitor_t em)
 {
@@ -289,7 +278,7 @@ int dr_add_meta_entry_set_type_calc_align(LPDRMETA meta, LPDRMETAENTRY entry, er
 }
 
 LPDRMETAENTRY
-dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
+dr_meta_add_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
     LPDRMETAENTRY newEntry =  (LPDRMETAENTRY)(meta + 1) + meta->m_entry_count;
     int entryAlign = 0;
 
@@ -308,7 +297,7 @@ dr_add_meta_entry(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
 
     newEntry->m_self_to_meta_pos = (char*)newEntry - (char*)meta;
 
-    dr_add_meta_entry_calc_align(meta, newEntry, entryAlign, em);
+    dr_meta_add_entry_calc_align(meta, newEntry, entryAlign, em);
 
     if (newEntry->m_version > meta->m_current_version) {
         meta->m_current_version = newEntry->m_version;
@@ -322,7 +311,7 @@ int dr_calc_meta_use_size(int entryCount) {
     return sizeof(struct tagDRMeta) + sizeof(struct tagDRMetaEntry) * entryCount;
 }
 
-void dr_meta_complete(LPDRMETA meta, error_monitor_t em) {
+void dr_meta_do_complete(LPDRMETA meta, error_monitor_t em) {
     int panding = meta->m_data_size % meta->m_align;
     if (panding) {
         panding = meta->m_align - panding;
@@ -332,4 +321,13 @@ void dr_meta_complete(LPDRMETA meta, error_monitor_t em) {
     if (meta->m_entry_count == 0) {
         CPE_ERROR_EX(em, CPE_DR_ERROR_META_NO_ENTRY, "meta %s have no entry", dr_meta_name(meta));
     }
+}
+
+int dr_lib_addr_to_pos(LPDRMETALIB metaLib, const void * addr) {
+    char * base = (char*)(metaLib + 1);
+    assert(
+        (const char *)addr >= base
+        &&
+        (const char *)addr < ((char *)metaLib) + metaLib->m_size);
+    return (const char *)addr - base;
 }

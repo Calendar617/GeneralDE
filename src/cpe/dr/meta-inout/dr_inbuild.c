@@ -110,6 +110,7 @@ dr_inbuild_meta_add_entry(struct DRInBuildMeta * meta) {
 
     bzero(newEntry, sizeof(struct DRInBuildMetaEntry));
     newEntry->m_data.m_id = -1;
+    newEntry->m_data.m_type = CPE_DR_TYPE_UNKOWN;
     newEntry->m_data.m_select_range_min = 1;
     newEntry->m_data.m_select_data_start_pos = -1;
     newEntry->m_data.m_select_entry_pos = -1;
