@@ -179,7 +179,7 @@ TEST_F(BuildFromXmlEntryTest, dftvalue_basic) {
     const void * dftValue = dr_entry_dft_value(e);
     ASSERT_TRUE(dftValue) << "dftValue not exist";
 
-    EXPECT_EQ(12, dr_read_int32(dftValue, e));
+    EXPECT_EQ(12, dr_entry_read_int32(dftValue, e));
 }
 
 TEST_F(BuildFromXmlEntryTest, string_def_value) {

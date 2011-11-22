@@ -1,5 +1,6 @@
 #include <limits.h>
 #include "cpe/dr/dr_ctypes_op.h"
+#include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_ctype_ops.h"
 
 
@@ -300,7 +301,7 @@ struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
             }                                                           \
         }                                                               \
     }                                                                   \
-    int dr_try_read_ ## __to(                                           \
+    int dr_entry_try_read_ ## __to(                                     \
         __to ## _t * result,                                            \
         const void * input, LPDRMETAENTRY entry, error_monitor_t em)    \
     {                                                                   \
@@ -324,7 +325,7 @@ struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
             }                                                           \
         }                                                               \
     }                                                                   \
-    __to ## _t dr_read_ ## __to(                                        \
+    __to ## _t dr_entry_read_ ## __to(                                  \
         const void * input, LPDRMETAENTRY entry)                        \
     {                                                                   \
         if (entry == NULL ||                                            \
@@ -343,6 +344,39 @@ struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
             }                                                           \
         }                                                               \
     }                                                                   \
+    int dr_meta_try_read_ ## __to(                                      \
+        __to ## _t * result,                                            \
+        const void * input, LPDRMETA meta, const char * entryName,      \
+        error_monitor_t em)                                             \
+    {                                                                   \
+        LPDRMETAENTRY entry = dr_meta_find_entry_by_path(meta, entryName); \
+        if (entry) {                                                    \
+            return dr_entry_try_read_ ## __to(                          \
+                result,                                                 \
+                (const char *)input + entry->m_data_start_pos,          \
+                entry,                                                  \
+                em);                                                    \
+        }                                                               \
+        else {                                                          \
+            CPE_ERROR(em, "entry %s not exist in %s",                   \
+                      entryName, dr_meta_name(meta));                   \
+            return -1;                                                  \
+        }                                                               \
+    }                                                                   \
+    __to ## _t dr_meta_read_ ## __to(                                   \
+        const void * input, LPDRMETA meta, const char * entryName)      \
+    {                                                                   \
+        LPDRMETAENTRY entry = dr_meta_find_entry_by_path(meta, entryName); \
+        if (entry) {                                                    \
+            return dr_entry_read_ ## __to(                              \
+                (const char *)input + entry->m_data_start_pos,          \
+                entry);                                                 \
+        }                                                               \
+        else {                                                          \
+            return (__to ## _t)0;                                       \
+        }                                                               \
+    }                                                                   \
+
 
 
 CPE_DEF_READ_FUN(int8);
@@ -353,3 +387,19 @@ CPE_DEF_READ_FUN(int32);
 CPE_DEF_READ_FUN(uint32);
 CPE_DEF_READ_FUN(int64);
 CPE_DEF_READ_FUN(uint64);
+
+const char * dr_entry_read_string(const void * input, LPDRMETAENTRY entry) {
+    return entry ? (const char *)input : "";
+}
+
+const char * dr_meta_read_string(const void * input, LPDRMETA meta, const char * entryName) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_path(meta, entryName);
+    if (entry) {
+        return dr_entry_read_string(
+            (const char *)input + entry->m_data_start_pos,
+            entry);
+    }
+    else {
+        return "";
+    }
+}

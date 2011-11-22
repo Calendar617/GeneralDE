@@ -61,8 +61,7 @@ static void dr_inbuild_build_calc_entry_defaultvalue(
         return;
     }
 
-    if (dr_set_from_string(p, &entryEle->m_data, entryEle->m_dft_value, ctx->m_em) != 0) {
-        printf("aaa\n");
+    if (dr_entry_set_from_string(p, &entryEle->m_data, entryEle->m_dft_value, ctx->m_em) != 0) {
         return;
     }
 

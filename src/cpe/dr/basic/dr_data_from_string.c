@@ -229,7 +229,7 @@ struct DRCtypeTypeFromStringOps g_dr_from_string_ops[] = {
     , {/*CPE_DR_TYPE_UINT8*/ dr_set_uint8_from_string}
 };
 
-int dr_set_from_string(void * output, LPDRMETAENTRY entry, const char * input, error_monitor_t em) {
+int dr_entry_set_from_string(void * output, LPDRMETAENTRY entry, const char * input, error_monitor_t em) {
     if (entry == NULL) {
         return -1;
     }

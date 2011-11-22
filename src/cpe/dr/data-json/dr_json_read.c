@@ -72,7 +72,7 @@ void dr_json_do_parse_from_string(
     }
 
     JSON_PARSE_CTX_COPY_STR_TMP(c, s, l);
-    dr_set_from_string(
+    dr_entry_set_from_string(
         parseType->m_data + parseType->m_entry->m_data_start_pos,
         parseType->m_entry,
         c->m_buf,
@@ -170,7 +170,7 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
 
         selectEntry = dr_entry_select_entry(entry);
         if (selectEntry) {
-            if (dr_try_read_int32(
+            if (dr_entry_try_read_int32(
                     &nestStackNode->m_select_data,
                     (const char *)curStack->m_data + entry->m_select_data_start_pos,
                     selectEntry, c->m_em) == 0)
@@ -233,14 +233,16 @@ static void dr_json_parse_ctx_init(
     LPDRMETA meta,
     error_monitor_t em)
 {
+    void * p;
+
     bzero(ctx, sizeof(struct dr_json_parse_ctx));
 
     ctx->m_output = buffer;
 
-    dr_json_parse_stack_init(
-        &ctx->m_typeStacks[0],
-        meta,
-        mem_buffer_alloc(buffer, dr_meta_size(meta)));
+    p = mem_buffer_alloc(buffer, dr_meta_size(meta));
+    dr_meta_set_defaults(p, meta);
+
+    dr_json_parse_stack_init(&ctx->m_typeStacks[0], meta, p);
 
     ctx->m_stackPos = -1;
     ctx->m_em = em;
