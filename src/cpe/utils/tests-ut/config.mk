@@ -1,9 +1,10 @@
 product:=gtest.cpe_utils
-$(product).sources := $(wildcard $(product-base)*.cpp)
-$(product).type:=cppprogn
+$(product).type:=progn
 $(product).buildfor:=dev
 $(product).depends:=gtest cpe_utils
-$(product).flags.ld:=
+$(product).product.c.includes:=include
+$(product).c.sources := $(wildcard $(product-base)*.cpp)
+$(product).c.flags.ld:=
 $(product).run.path:=$(product-base)
 cpe_utils.ut:=$(product)
 

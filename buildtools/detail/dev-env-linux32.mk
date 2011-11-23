@@ -1,5 +1,3 @@
-CPPFLAGS+=-I$(CPDE_ROOT)/include
-
 CFLAGS+=-Wall
 CXXFLAGS+=-Wall
 
@@ -9,4 +7,3 @@ CXXFLAGS+=-ggdb
 endif
 
 LDFLAGS.share:=--shared -z defs
-

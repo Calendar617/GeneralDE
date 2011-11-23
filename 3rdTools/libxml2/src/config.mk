@@ -1,8 +1,9 @@
 product:=xml2
-$(product).type:=clib
-$(product).libraries:=
+$(product).type:=lib
 $(product).version:=2.7.8
-$(product).sources := $(addprefix $(product-base), \
+$(product).product.c.includes:=3rdTools/libxml2/include
+
+$(product).c.sources := $(addprefix $(product-base), \
                    SAX.c \
                    entities.c \
                    encoding.c \
@@ -48,8 +49,9 @@ $(product).sources := $(addprefix $(product-base), \
                    schematron.c \
                  )
 
-$(product).product.include:=3rdTools/libxml2/include
-$(product).flags.cpp:=-DHAVE_CONFIG_H -D_REENTRANT -I$(product-base)$(OS_NAME) -Wno-format -Wno-unused
-$(product).flags.ld:=-lm -lz -ldl $(if $(dep.iconv),-liconv)
+$(product).c.libraries:=m z dl $(if $(dep.iconv),iconv)
+$(product).c.includes:=3rdTools/libxml2/src/$(dev-env)
+$(product).c.flags.cpp:= -DHAVE_CONFIG_H -D_REENTRANT -Wno-format -Wno-unused
+$(product).c.flags.ld:=
 
 $(eval $(call product-def,$(product)))

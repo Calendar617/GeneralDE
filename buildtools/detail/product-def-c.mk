@@ -3,8 +3,9 @@ CC:=$(GCC)
 
 $(call assert-not-null,GCC)
 
-product-support-types+=clib cpplib objclib cprogn cppprogn objcprogn
-product-def-all-items+= libraries sources product.include product.lib flags.cpp flags.ld
+product-support-types+=lib progn
+product-def-all-items+= c.libraries c.includes c.sources c.ldpathes c.flags.cpp c.flags.ld c.linker    \
+                        product.c.includes product.c.libraries product.c.ldpathes product.c.defs
 
 c-source-dir-to-binary-dir = $(addprefix $(CPDE_OUTPUT_ROOT)/obj,$(subst $(CPDE_ROOT),,$1))
 
@@ -14,31 +15,28 @@ c-source-to-object = $(call c-source-dir-to-binary-dir,\
 						$(subst .cc,.o,$(filter %.cc,$1))\
 						$(subst .c,.o,$(filter %.c,$1)))
 
-c-generate-depend-ld-flags=$(foreach dep,$(r.$1.depends),\
-                              $(if $(filter $(r.$(dep).type),clib cpplib objclib),\
-                                    -L$(dir $(CPDE_OUTPUT_ROOT)/$(r.$(dep).product)) -l$(dep) $(addprefix -l,$(r.$(dep).product.lib)) \
-                              ,))
+c-generate-depend-ld-flags=$(addprefix -L$(CPDE_OUTPUT_ROOT)/,\
+								 $(sort $(r.$1.c.ldpathes) $(foreach dep,$(r.$1.depends),$(r.$(dep).product.c.ldpathes)))) \
+                           $(addprefix -l,$(sort $(r.$1.c.libraries) $(foreach dep,$(r.$1.depends),$(r.$(dep).product.c.libraries)))) \
+                           $(r.$1.c.flags.ld)
 
-# $(call c-make-depend,source-file,object-file,depend-file)
+c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
+								 $(sort $(r.$1.c.includes) $(foreach p,$1 $(r.$1.depends),$(r.$(p).product.c.includes)))) \
+                           $(addprefix -D,$(sort $(foreach p,$1 $(r.$1.depends),$(r.$p.product.c.defs)))) \
+                           $(r.$1.c.flags.cpp)
+
+# $(call c-make-depend,source-file,object-file,depend-file,product-name)
 define c-make-depend
-	$(GCC) -MM -MF $3 -MP -MT $2 $(CPPFLAGS) $(TARGET_ARCH) $1
+	$(GCC) -MM -MF $3 -MP -MT $2 $(CPPFLAGS) $(call c-generate-depend-cpp-flags,$4) $(TARGET_ARCH) $1
 endef
 
 # $(call compile-rule, binary-file, source-files, product-name)
 define compile-rule.c
 
-ifneq ($(strip $(r.$3.product.include) $(r.$3.flags.cpp)),)
-$1: CPPFLAGS+=$(r.$3.flags.cpp) $(addprefix -I$(CPDE_ROOT)/,$(r.$3.product.include))
-endif
-
-$(foreach dep,$(r.$3.depends),\
-	    $(if $(r.$(dep).product.include),$(eval $1: CPPFLAGS+=$(addprefix -I$(CPDE_ROOT)/,$(r.$(dep).product.include)))) \
-    )
-
 $1: $2
-	$$(call with_message)$$(call c-make-depend,$2,$1,$(subst .o,.d,$1))
-	$$(call with_message,compiling $(subst $(CPDE_ROOT)/,,$2) --> $(subst $(CPDE_ROOT)/,,$1) ...)$$(COMPILE$(suffix $2)) -o $$@ $$<
-
+	$$(call with_message)$$(call c-make-depend,$2,$1,$(subst .o,.d,$1),$3)
+	$$(call with_message,compiling $(subst $(CPDE_ROOT)/,,$2) --> $(subst $(CPDE_ROOT)/,,$1) ...)\
+          $$(COMPILE$(suffix $2)) $$(call c-generate-depend-cpp-flags,$3) -o $$@ $$<
 
 endef
 
@@ -58,25 +56,35 @@ $(eval r.$1.product:=$(if $(filter lib,$2),\
                        $(if $(r.$1.buildfor),$(r.$1.buildfor)-bin,bin)/$1) \
 )
 
-$(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.sources)) \
+ifeq ($(filter lib,$3),)
+$(eval r.$1.product.c.libraries+=$1)
+$(eval r.$1.product.c.ldpathes+=$(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib))
+endif
+
+$(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.c.sources)) \
                      $(CPDE_OUTPUT_ROOT)/$(r.$1.product) \
 )
 
-$(call assert-not-null,r.$1.sources)
+$(eval r.$1.c.linker:=$(if $(r.$1.c.linker),$(r.$1.c.linker),\
+                           $(if $(filter %.cpp,$(r.$1.c.sources)),$$(LINK.cc),     \
+                                $$(LINK.c)))                                       \
+)
 
-auto-build-dirs += $(call c-source-dir-to-binary-dir,$(sort $(dir $(r.$1.sources))) $(r.$1.base),./)
+$(call assert-not-null,r.$1.c.sources)
+
+auto-build-dirs += $(call c-source-dir-to-binary-dir,$(sort $(dir $(r.$1.c.sources))) $(r.$1.base),./)
 auto-build-dirs += $(dir $(CPDE_OUTPUT_ROOT)/$(r.$1.product))
 
 $1: $(CPDE_OUTPUT_ROOT)/$(r.$1.product)
 
-$(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.sources))
-	$$(call with_message,linking $(r.$1.product) ...)$(if $(filter cpp%,$2),$$(LINK.c),$$(LINK.cc)) $$^ $$(LOADLIBES) \
-		$(if $(filter lib,$2),$(LDFLAGS.share))  -o $$@ $$(call c-generate-depend-ld-flags,$1) $(r.$1.flags.ld) 
+$(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
+	$$(call with_message,linking $(r.$1.product) ...) \
+		$$(r.$1.c.linker) $(if $(filter lib,$2),$(LDFLAGS.share)) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
 
 
-$(foreach f,$(r.$1.sources),$(call compile-rule$(suffix $f),$(call c-source-to-object,$f),$f,$1))
+$(foreach f,$(r.$1.c.sources),$(call compile-rule$(suffix $f),$(call c-source-to-object,$f),$f,$1))
 
-$(eval r.$1.makefile.include := $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.sources))))
+$(eval r.$1.makefile.include := $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources))))
 
 ifeq ($(filter progn,$3),)
 ifeq ($(r.$1.run),)
@@ -86,26 +94,10 @@ endif
 
 endef
 
-define product-def-rule-clib
+define product-def-rule-lib
 $(call product-def-rule-c-product,$1,lib)
 endef
 
-define product-def-rule-cpplib
-$(call product-def-rule-clib,$1)
-endef
-
-define product-def-rule-objclib
-$(call product-def-rule-c-product,$1,lib)
-endef
-
-define product-def-rule-cprogn
-$(call product-def-rule-c-product,$1,progn)
-endef
-
-define product-def-rule-cppprogn
-$(call product-def-rule-c-product,$1,progn)
-endef
-
-define product-def-rule-objcprogn
+define product-def-rule-progn
 $(call product-def-rule-c-product,$1,progn)
 endef
