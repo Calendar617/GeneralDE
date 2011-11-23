@@ -46,3 +46,4 @@ $(foreach part,$(subst /,$(space),$2),                          \
 )
 $(foreach result-part,$($1.inbuild),$(eval $1:=/$(result-part)$($1)))
 endef
+
