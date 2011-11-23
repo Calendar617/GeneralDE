@@ -1,8 +1,8 @@
 product:=curl
-curl.type:=clib
-curl.libraries:=
+$(product).type:=lib
+$(product).c.libraries:=
 
-curl.sources := $(addprefix $(product-base), \
+$(product).c.sources := $(addprefix $(product-base), \
                      amigaos.c \
                      asyn-ares.c \
                      asyn-thread.c \
@@ -103,8 +103,9 @@ curl.sources := $(addprefix $(product-base), \
                      warnless.c \
                      wildcard.c)
 
-curl.product.include:=3rdTools/curl/include 3rdTools/curl/include/$(OS_NAME) 3rdTools/curl/include/$(OS_NAME)/curl
-curl.flags.cpp:=-DHAVE_CONFIG_H -I$(product-base)$(OS_NAME)
-curl.flags.ld:=-lz
+$(product).product.c.includes:=3rdTools/curl/include 3rdTools/curl/include/$(OS_NAME) 3rdTools/curl/include/$(OS_NAME)/curl
+$(product).c.includes:=3rdTools/curl/lib/$(dev-env)
+$(product).c.flags.cpp:=-DHAVE_CONFIG_H
+$(product).c.flags.ld:=-lz
 
 $(eval $(call product-def,$(product)))
