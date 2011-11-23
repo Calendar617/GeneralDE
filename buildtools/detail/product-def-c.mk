@@ -56,6 +56,11 @@ $(eval r.$1.product:=$(if $(filter lib,$2),\
                        $(if $(r.$1.buildfor),$(r.$1.buildfor)-bin,bin)/$1) \
 )
 
+ifeq ($(filter lib,$3),)
+$(eval r.$1.product.c.libraries+=$1)
+$(eval r.$1.product.c.ldpathes+=$(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib))
+endif
+
 $(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.c.sources)) \
                      $(CPDE_OUTPUT_ROOT)/$(r.$1.product) \
 )
