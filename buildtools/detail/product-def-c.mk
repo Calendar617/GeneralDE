@@ -73,7 +73,7 @@ $1: $(CPDE_OUTPUT_ROOT)/$(r.$1.product)
 
 $(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
 	$$(call with_message,linking $(r.$1.product) ...) \
-		$$(r.$1.c.linker) $(if $(filter lib,$2),$(LDFLAGS.share)) -o $$@ $$(call c-generate-depend-ld-flags,$1) $(r.$1.c.flags.ld) 
+		$$(r.$1.c.linker) $(if $(filter lib,$2),$(LDFLAGS.share)) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
 
 
 $(foreach f,$(r.$1.c.sources),$(call compile-rule$(suffix $f),$(call c-source-to-object,$f),$f,$1))
