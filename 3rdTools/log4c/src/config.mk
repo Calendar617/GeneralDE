@@ -1,6 +1,8 @@
 product:=log4c
-$(product).type:=clib
-$(product).sources:= $(addprefix $(product-base), \
+$(product).type:=lib
+$(product).product.c.includes:=3rdTools/log4c/include
+
+$(product).c.sources:= $(addprefix $(product-base), \
                          rc.c \
                          init.c \
                          appender_type_stream.c \
@@ -35,8 +37,8 @@ $(product).sources:= $(addprefix $(product-base), \
                          domnode-xml-parser.c \
                          domnode-xml-scanner.c )
 
-$(product).product.include:=3rdTools/$(product)/include
-$(product).flags.ld:=
-$(product).flags.cpp:=-DHAVE_CONFIG_H -I$(product-base)$(OS_NAME) -I$(product-base) -DLOG4C_RCPATH=\"\" -Wno-unused
+$(product).c.flags.ld:=
+$(product).c.includes:=3rdTools/log4c/src 3rdTools/log4c/src/$(dev-env)
+$(product).c.flags.cpp:=-DHAVE_CONFIG_H -DLOG4C_RCPATH=\"\" -Wno-unused
 
 $(eval $(call product-def,$(product)))
