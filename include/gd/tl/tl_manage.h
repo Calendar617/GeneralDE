@@ -7,10 +7,12 @@
 extern "C" {
 #endif
 
-gd_time_line_t gd_time_line_create(mem_allocrator_t alloc);
-void gd_time_line_free(gd_time_line_t tl);
+gd_tl_manage_t gd_tl_manage_create(mem_allocrator_t alloc);
+void gd_tl_manage_free(gd_tl_manage_t tm);
+void gd_tl_manage_tick(gd_tl_manage_t tm);
 
-void gd_time_line_tick(gd_time_line_t tl);
+gd_tl_t gd_tl_create(gd_tl_manage_t tm);
+void gd_tl_set_opt(gd_tl_t tl, ...);
 
 #ifdef __cplusplus
 }
