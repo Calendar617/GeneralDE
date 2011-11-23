@@ -1,9 +1,9 @@
 product:=gtest
-gtest.type:=cpplib
-gtest.buildfor:=dev
-gtest.sources:=$(wildcard $(product-base)*.cc)
-gtest.product.include:=3rdTools/gtest/include
-gtest.flags.cpp:=-I$(product-base)..
-gtest.flags.ld:=-lpthread
+$(product).type:=lib
+$(product).buildfor:=dev
+$(product).product.c.includes:=3rdTools/gtest/include
+$(product).c.sources:=$(wildcard $(product-base)*.cc)
+$(product).c.includes:=3rdTools/gtest
+$(product).c.flags.ld:=-lpthread
 
 $(eval $(call product-def,$(product)))
