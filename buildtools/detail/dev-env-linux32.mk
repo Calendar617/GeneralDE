@@ -1,5 +1,3 @@
-CPPFLAGS+=-I$(CPDE_ROOT)/include
-
 CFLAGS+=-Wall
 CXXFLAGS+=-Wall
 
