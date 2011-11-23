@@ -7,5 +7,3 @@ CXXFLAGS+=-ggdb
 endif
 
 LDFLAGS.share:=--shared -z defs
-
-dep.iconv?=system
