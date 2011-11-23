@@ -1,14 +1,15 @@
 product:=ev
-$(product).type:=clib
-$(product).libraries:=
+$(product).type:=lib
+$(product).c.libraries:=
 $(product).version:=4.0.4
-$(product).sources := $(addprefix $(product-base), \
+$(product).c.sources := $(addprefix $(product-base), \
                           ev.c \
                           event.c \
                        )
 
-$(product).product.include:=3rdTools/libev/include
-$(product).flags.cpp:=-DHAVE_CONFIG_H -I$(product-base)$(dev-env) -Wno-unused -Wno-parentheses
-$(product).flags.ld:=
+$(product).product.c.includes:=3rdTools/libev/include
+$(product).c.includes:=3rdTools/libev/src/$(dev-env)
+$(product).c.flags.cpp:=-DHAVE_CONFIG_H -Wno-unused -Wno-parentheses
+$(product).c.flags.ld:=-lm
 
 $(eval $(call product-def,$(product)))
