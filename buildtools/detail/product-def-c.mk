@@ -60,8 +60,9 @@ $(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.c.sources)) \
                      $(CPDE_OUTPUT_ROOT)/$(r.$1.product) \
 )
 
-$(eval r.$1.c.linker:=$(if $(filter %.cpp,$(r.$1.c.sources)),$$(LINK.cc),     \
-                           $$(LINK.c))                                        \
+$(eval r.$1.c.linker:=$(if $(r.$1.c.linker),$(r.$1.c.linker),\
+                           $(if $(filter %.cpp,$(r.$1.c.sources)),$$(LINK.cc),     \
+                                $$(LINK.c)))                                       \
 )
 
 $(call assert-not-null,r.$1.c.sources)
@@ -73,7 +74,7 @@ $1: $(CPDE_OUTPUT_ROOT)/$(r.$1.product)
 
 $(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
 	$$(call with_message,linking $(r.$1.product) ...) \
-		$$(r.$1.c.linker) $(if $(filter lib,$2),$(LDFLAGS.share)) -o $$@ $$(call c-generate-depend-ld-flags,$1) $(r.$1.c.flags.ld) 
+		$$(r.$1.c.linker) $(if $(filter lib,$2),$(LDFLAGS.share)) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
 
 
 $(foreach f,$(r.$1.c.sources),$(call compile-rule$(suffix $f),$(call c-source-to-object,$f),$f,$1))
