@@ -6,6 +6,6 @@ CFLAGS+=-ggdb
 CXXFLAGS+=-ggdb
 endif
 
-LDFLAGS.share:=--shared -z defs
+LDFLAGS.share:=--shared
 
 dep.iconv?=system
