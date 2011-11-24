@@ -7,9 +7,16 @@ extern "C" {
 #endif
 
 gd_tl_event_t gd_tl_event_create(gd_tl_t tl, size_t dataSize);
-void * gd_tl_event_data(gd_tl_event_t event);
 
-int gd_tl_event_send(gd_tl_t tl, gd_tl_event_t event);
+void * gd_tl_event_data(gd_tl_event_t event);
+size_t gd_tl_event_capacity(gd_tl_event_t event);
+gd_tl_t gd_tl_event_tl(gd_tl_event_t event);
+
+int gd_tl_event_send_ex(
+    gd_tl_event_t event,
+    gd_tl_time_span_t delay,
+    gd_tl_time_span_t span,
+    int repeatCount);
 
 #ifdef __cplusplus
 }
