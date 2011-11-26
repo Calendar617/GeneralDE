@@ -13,6 +13,8 @@ size_t gd_tl_event_capacity(gd_tl_event_t event);
 gd_tl_t gd_tl_event_tl(gd_tl_event_t event);
 int gd_tl_event_in_queue(gd_tl_event_t event);
 
+gd_tl_event_t gd_tl_action_add(gd_tl_t tl);
+
 /* repeatCount: >= 1 execute fix count
                 < 0  repeat no limit
  */

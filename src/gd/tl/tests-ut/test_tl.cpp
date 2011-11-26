@@ -17,10 +17,10 @@ TEST_F(TimeLineTest, setopt_dispatcher) {
         0,
         gd_tl_set_opt(
             m_tl, gd_tl_set_event_dispatcher,
-            (gd_tl_event_dispatcher_t)12));
+            (gd_tl_event_process_t)12));
 
     EXPECT_TRUE(
-        m_tl->m_event_dispatcher == (gd_tl_event_dispatcher_t)12);
+        m_tl->m_event_dispatcher == (gd_tl_event_process_t)12);
 }
 
 TEST_F(TimeLineTest, setopt_dispatcher_null) {
@@ -28,10 +28,10 @@ TEST_F(TimeLineTest, setopt_dispatcher_null) {
         0,
         gd_tl_set_opt(
             m_tl, gd_tl_set_event_dispatcher,
-            (gd_tl_event_dispatcher_t)0));
+            (gd_tl_event_process_t)0));
 
     EXPECT_TRUE(
-        m_tl->m_event_dispatcher == (gd_tl_event_dispatcher_t)0);
+        m_tl->m_event_dispatcher == (gd_tl_event_process_t)0);
 }
 
 TEST_F(TimeLineTest, setopt_enqueue) {
@@ -61,10 +61,10 @@ TEST_F(TimeLineTest, setopt_destory) {
         0,
         gd_tl_set_opt(
             m_tl, gd_tl_set_event_destory,
-            (gd_tl_event_destory_t)12));
+            (gd_tl_event_process_t)12));
 
     EXPECT_TRUE(
-        m_tl->m_event_destory == (gd_tl_event_destory_t)12);
+        m_tl->m_event_destory == (gd_tl_event_process_t)12);
 }
 
 TEST_F(TimeLineTest, setopt_destory_null) {
@@ -72,10 +72,32 @@ TEST_F(TimeLineTest, setopt_destory_null) {
         0,
         gd_tl_set_opt(
             m_tl, gd_tl_set_event_destory,
-            (gd_tl_event_destory_t)0));
+            (gd_tl_event_process_t)0));
 
     EXPECT_TRUE(
-        m_tl->m_event_destory == (gd_tl_event_destory_t)0);
+        m_tl->m_event_destory == (gd_tl_event_process_t)0);
+}
+
+TEST_F(TimeLineTest, setopt_construct) {
+    EXPECT_EQ(
+        0,
+        gd_tl_set_opt(
+            m_tl, gd_tl_set_event_construct,
+            (gd_tl_event_process_t)12));
+
+    EXPECT_TRUE(
+        m_tl->m_event_construct == (gd_tl_event_process_t)12);
+}
+
+TEST_F(TimeLineTest, setopt_construct_null) {
+    EXPECT_EQ(
+        0,
+        gd_tl_set_opt(
+            m_tl, gd_tl_set_event_construct,
+            (gd_tl_event_process_t)0));
+
+    EXPECT_TRUE(
+        m_tl->m_event_construct == (gd_tl_event_process_t)0);
 }
 
 TEST_F(TimeLineTest, setopt_op_context) {

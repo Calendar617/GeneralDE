@@ -11,7 +11,11 @@ gd_tl_event_node_alloc(gd_tl_t tl, size_t capacity) {
 
     node->m_event.m_tl = tl;
     node->m_event.m_capacity = capacity;
-    
+
+    if (tl->m_event_construct) {
+        tl->m_event_construct(&node->m_event, tl->m_event_op_context);
+    }
+
     return node;
 }
 

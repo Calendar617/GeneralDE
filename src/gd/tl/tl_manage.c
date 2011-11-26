@@ -6,6 +6,8 @@
 #include "tl_internal_ops.h"
 
 gd_tl_manage_t gd_tl_manage_create(mem_allocrator_t alloc) {
+    int i;
+
     gd_tl_manage_t tm = mem_alloc(alloc, sizeof(struct gd_tl_manage));
     if (tm == NULL) return NULL;
 
@@ -17,13 +19,45 @@ gd_tl_manage_t gd_tl_manage_create(mem_allocrator_t alloc) {
     tm->m_time_current = tm->m_time_get(tm->m_time_ctx);
 
     tm->m_tl_count = 0;
-
     tm->m_action_begin_pos = tm->m_action_end_pos = 0;
 
+    for(i = 0; i < GD_TL_ACTION_MAX; ++i) {
+        union gd_tl_action * action = &tm->m_action_queue[i];
+        action->m_event.m_tl = NULL;
+        action->m_event.m_capacity = GD_TL_ACTION_MAX - sizeof(struct gd_tl_event);
+    }
+ 
     TAILQ_INIT(&tm->m_event_queue);
     TAILQ_INIT(&tm->m_event_building_queue);
 
     return tm;
+}
+
+static void gd_tl_action_queue_clear(gd_tl_manage_t tm) {
+    if (tm->m_action_begin_pos > tm->m_action_end_pos) {
+        for(; tm->m_action_begin_pos < GD_TL_ACTION_MAX;
+            ++tm->m_action_begin_pos)
+        {
+            union gd_tl_action * action = &tm->m_action_queue[tm->m_action_begin_pos];
+            if (action->m_event.m_tl->m_event_destory) {
+                action->m_event.m_tl->m_event_destory(
+                    &action->m_event,
+                    action->m_event.m_tl->m_event_op_context);
+            }
+        }
+
+        assert(tm->m_action_begin_pos >= GD_TL_ACTION_MAX);
+        tm->m_action_begin_pos = 0;
+    }
+
+    for(; tm->m_action_begin_pos < tm->m_action_end_pos; ++tm->m_action_begin_pos) {
+        union gd_tl_action * action = &tm->m_action_queue[tm->m_action_begin_pos];
+        if (action->m_event.m_tl->m_event_destory) {
+            action->m_event.m_tl->m_event_destory(
+                &action->m_event,
+                action->m_event.m_tl->m_event_op_context);
+        }
+    }
 }
 
 void gd_tl_manage_free(gd_tl_manage_t tm) {
@@ -31,6 +65,7 @@ void gd_tl_manage_free(gd_tl_manage_t tm) {
 
     gd_tl_event_queue_clear(&tm->m_event_building_queue);
     gd_tl_event_queue_clear(&tm->m_event_queue);
+    gd_tl_action_queue_clear(tm);
 
     mem_free(tm->m_alloc, tm);
 }
@@ -101,7 +136,7 @@ int gd_tl_set_opt(gd_tl_t tl, gd_tl_option_t opt, ...) {
     switch(opt) {
         case gd_tl_set_event_dispatcher: {
             rv = 0;
-            tl->m_event_dispatcher = va_arg(ap, gd_tl_event_dispatcher_t);
+            tl->m_event_dispatcher = va_arg(ap, gd_tl_event_process_t);
             break;
         }
         case gd_tl_set_event_enqueue: {
@@ -115,9 +150,14 @@ int gd_tl_set_opt(gd_tl_t tl, gd_tl_option_t opt, ...) {
             }
             break;
         }
+        case gd_tl_set_event_construct: {
+            rv = 0;
+            tl->m_event_construct = va_arg(ap, gd_tl_event_process_t);
+            break;
+        }
         case gd_tl_set_event_destory: {
             rv = 0;
-            tl->m_event_destory = va_arg(ap, gd_tl_event_destory_t);
+            tl->m_event_destory = va_arg(ap, gd_tl_event_process_t);
             break;
         }
         case gd_tl_set_event_op_context: {

@@ -29,3 +29,11 @@ TlTest::createEvent(size_t capacity) {
 
     return gd_tl_event_create(m_tl, capacity);
 }
+
+gd_tl_event_t
+TlTest::createAction() {
+    EXPECT_TRUE(m_tl != NULL);
+    if (m_tl == NULL) return NULL;
+
+    return gd_tl_action_add(m_tl);
+}

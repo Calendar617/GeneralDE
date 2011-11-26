@@ -5,7 +5,8 @@
 #include "gd/tl/tl_types.h"
 
 #define GD_TL_TL_MAX 10
-#define GD_TL_ACTION_MAX 100
+#define GD_TL_ACTION_MAX (128)
+#define GD_TL_ACTION_SIZE (128)
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,9 +15,10 @@ extern "C" {
 struct gd_tl {
     gd_tl_manage_t m_manage;
 
-    gd_tl_event_dispatcher_t m_event_dispatcher;
     gd_tl_event_enqueue_t m_event_enqueue;
-    gd_tl_event_destory_t m_event_destory;
+    gd_tl_event_process_t m_event_dispatcher;
+    gd_tl_event_process_t m_event_construct;
+    gd_tl_event_process_t m_event_destory;
     void * m_event_op_context;
 };
 
@@ -37,6 +39,11 @@ struct gd_tl_event_node {
 
 TAILQ_HEAD(gd_tl_event_node_queue, gd_tl_event_node);
 
+union gd_tl_action {
+    struct gd_tl_event m_event;
+    char m_reserve[GD_TL_ACTION_SIZE];
+};
+
 struct gd_tl_manage {
     mem_allocrator_t m_alloc;
 
@@ -53,14 +60,12 @@ struct gd_tl_manage {
     /*action*/
     int m_action_begin_pos;
     int m_action_end_pos;
-    struct gd_tl_event m_action_queue[GD_TL_ACTION_MAX];
+    union gd_tl_action m_action_queue[GD_TL_ACTION_MAX];
 
     /*event*/
     struct gd_tl_event_node_queue m_event_queue;
     struct gd_tl_event_node_queue m_event_building_queue;
 };
-
-#define GD_TL_TIME_UPDATE_DISPATCH_COUNT (10)
 
 #ifdef __cplusplus
 }

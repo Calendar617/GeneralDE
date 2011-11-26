@@ -13,6 +13,34 @@ gd_tl_event_t gd_tl_event_create(gd_tl_t tl, size_t dataSize) {
     return &node->m_event;
 }
 
+gd_tl_event_t gd_tl_action_add(gd_tl_t tl) {
+    union gd_tl_action * action;
+    int nextEndPos;
+
+    if (tl == NULL || tl->m_manage == NULL) return NULL;
+
+    gd_tl_manage_t tm = tl->m_manage;
+
+    nextEndPos = tm->m_action_end_pos + 1;
+    if (nextEndPos >= GD_TL_ACTION_MAX) {
+        nextEndPos = 0;
+    }
+
+    if (nextEndPos == tm->m_action_begin_pos) {
+        return NULL;
+    }
+
+    action = &tm->m_action_queue[tm->m_action_end_pos];
+    tm->m_action_end_pos = nextEndPos;
+
+    action->m_event.m_tl = tl;
+    if (tl->m_event_construct) {
+        tl->m_event_construct(&action->m_event, tl->m_event_op_context);
+    }
+
+    return &action->m_event;
+}
+
 void * gd_tl_event_data(gd_tl_event_t event) {
     return (void*)(event + 1);
 }
