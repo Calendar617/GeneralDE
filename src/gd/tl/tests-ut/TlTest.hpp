@@ -15,6 +15,8 @@ public:
     gd_tl_t m_tl;
 
     void installTl(void);
+
+    gd_tl_event_t createEvent(size_t capacity);
 };
 
 #endif

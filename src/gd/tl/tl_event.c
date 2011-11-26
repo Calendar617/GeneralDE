@@ -60,7 +60,9 @@ int gd_tl_event_queue_clear(struct gd_tl_event_node_queue * queue) {
     assert(queue);
 
     while(!TAILQ_EMPTY(queue)) {
-        gd_tl_event_node_free(TAILQ_FIRST(queue));
+        struct gd_tl_event_node * node = TAILQ_FIRST(queue);
+        TAILQ_REMOVE(queue, node, m_next);
+        gd_tl_event_node_free(node);
         ++count;
     }
 

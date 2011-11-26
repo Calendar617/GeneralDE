@@ -32,36 +32,66 @@ int gd_tl_event_enqueue_local(
     int repeatCount,
     void * context)
 {
-    struct gd_tl_event_node * checkEvent;
-    struct gd_tl_event_node * input;
-    struct gd_tl_event_node_queue * inputQueue;
     int r;
-
-    if (event == NULL || delay < 0 || span < 0) return -1;
-
-    inputQueue = &event->m_tl->m_manage->m_event_building_queue;
-    input = (struct gd_tl_event_node *)
-        ((char *)event
-         - (sizeof(struct gd_tl_event_node)
-            - sizeof(struct gd_tl_event)));
-
-    for(checkEvent = TAILQ_FIRST(inputQueue);
-        checkEvent != input && checkEvent != TAILQ_END(inputQueue);
-        checkEvent = TAILQ_NEXT(checkEvent, m_next))
-    {
-    }
-
-    if (checkEvent != input) return GD_TL_ERROR_EVENT_UNKNOWN;
+    struct gd_tl_event_node * input = gd_tl_event_to_node(event);
 
     input->m_execute_time =
         event->m_tl->m_manage->m_time_current +  delay;
     input->m_span = span;
     input->m_repeatCount = repeatCount;
 
-    r = gd_tl_event_node_insert(input);
-    if (r != 0) return r;
+    /*be careful, input not be managed by manage!!!*/
+    gd_tl_event_node_remove_from_building_queue(input);
 
-    TAILQ_REMOVE(inputQueue, input, m_next);
+    r = gd_tl_event_node_insert(input);
+    if (r != 0) {
+        gd_tl_event_node_free(input);
+        return r;
+    }
+
+    return 0;
+}
+
+int gd_tl_event_in_queue(gd_tl_event_t event) {
+    struct gd_tl_event_node * checkEvent;
+    struct gd_tl_event_node * input;
+    struct gd_tl_event_node_queue * queue;
+
+    if (event == NULL || event->m_tl == NULL || event->m_tl->m_manage == NULL) {
+        return 0;
+    }
+
+    queue = &event->m_tl->m_manage->m_event_queue;
+    input = gd_tl_event_to_node(event);
+
+    for(checkEvent = TAILQ_FIRST(queue);
+        checkEvent != TAILQ_END(queue);
+        checkEvent = TAILQ_NEXT(checkEvent, m_next))
+    {
+        if (checkEvent == input) return 1;
+    }
+
+    return 0;
+}
+
+int gd_tl_event_in_building_queue(gd_tl_event_t event) {
+    struct gd_tl_event_node * checkEvent;
+    struct gd_tl_event_node * input;
+    struct gd_tl_event_node_queue * queue;
+
+    if (event == NULL || event->m_tl == NULL || event->m_tl->m_manage == NULL) {
+        return 0;
+    }
+
+    queue = &event->m_tl->m_manage->m_event_building_queue;
+    input = gd_tl_event_to_node(event);
+
+    for(checkEvent = TAILQ_FIRST(queue);
+        checkEvent != TAILQ_END(queue);
+        checkEvent = TAILQ_NEXT(checkEvent, m_next))
+    {
+        if (checkEvent == input) return 1;
+    }
 
     return 0;
 }
@@ -75,10 +105,10 @@ int gd_tl_event_send_ex(
     gd_tl_t tl;
     gd_tl_manage_t tm;
 
-    if (event == NULL) return -1;
+    if (event == NULL || event->m_tl == NULL || event->m_tl->m_manage == NULL)
+        return GD_TL_ERROR_BAD_ARG;
 
     tl = event->m_tl;
-    assert(tl);
 
     tm = tl->m_manage;
     assert(tm);
@@ -87,6 +117,17 @@ int gd_tl_event_send_ex(
         span = tm->m_time_cvt(span, tm->m_time_ctx);
     }
 
-    assert(tl->m_event_enqueue);
-    return tl->m_event_enqueue(event, delay, span, repeatCount, tl->m_event_op_context);
+    if (repeatCount == 0) return GD_TL_ERROR_BAD_ARG;
+    if (delay < 0) return GD_TL_ERROR_BAD_ARG;
+    if (span < 0 || (repeatCount != 1 && span == 0)) return GD_TL_ERROR_BAD_ARG;
+    if (!gd_tl_event_in_building_queue(event)) return GD_TL_ERROR_EVENT_UNKNOWN;
+
+    if (tl->m_event_enqueue) {
+        return tl->m_event_enqueue(
+            event, delay, span, repeatCount,
+            tl->m_event_op_context);
+    }
+    else {
+        return GD_TL_ERROR_EVENT_NO_ENQUEUE;
+    }
 }
