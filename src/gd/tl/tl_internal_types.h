@@ -15,6 +15,7 @@ struct gd_tl {
     gd_tl_manage_t m_manage;
 
     gd_tl_event_dispatcher_t m_event_dispatcher;
+    gd_tl_event_enqueue_t m_event_enqueue;
     gd_tl_event_destory_t m_event_destory;
     void * m_event_op_context;
 };

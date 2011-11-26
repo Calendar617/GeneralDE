@@ -25,11 +25,12 @@ gd_tl_t gd_tl_event_tl(gd_tl_event_t event) {
     return event->m_tl;
 }
 
-int gd_tl_event_send_ex(
+int gd_tl_event_enqueue_local(
     gd_tl_event_t event,
     gd_tl_time_span_t delay,
     gd_tl_time_span_t span,
-    int repeatCount)
+    int repeatCount,
+    void * context)
 {
     struct gd_tl_event_node * checkEvent;
     struct gd_tl_event_node * input;
@@ -63,4 +64,29 @@ int gd_tl_event_send_ex(
     TAILQ_REMOVE(inputQueue, input, m_next);
 
     return 0;
+}
+
+int gd_tl_event_send_ex(
+    gd_tl_event_t event,
+    gd_tl_time_span_t delay,
+    gd_tl_time_span_t span,
+    int repeatCount)
+{
+    gd_tl_t tl;
+    gd_tl_manage_t tm;
+
+    if (event == NULL) return -1;
+
+    tl = event->m_tl;
+    assert(tl);
+
+    tm = tl->m_manage;
+    assert(tm);
+    if (tm->m_time_cvt) {
+        delay = tm->m_time_cvt(delay, tm->m_time_ctx);
+        span = tm->m_time_cvt(span, tm->m_time_ctx);
+    }
+
+    assert(tl->m_event_enqueue);
+    return tl->m_event_enqueue(event, delay, span, repeatCount, tl->m_event_op_context);
 }

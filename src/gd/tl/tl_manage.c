@@ -6,7 +6,7 @@
 #include "tl_internal_ops.h"
 
 gd_tl_manage_t gd_tl_manage_create(mem_allocrator_t alloc) {
-    gd_tl_manage_t tm = mem_alloc(alloc, sizeof(gd_tl_manage_t));
+    gd_tl_manage_t tm = mem_alloc(alloc, sizeof(struct gd_tl_manage));
     if (tm == NULL) return NULL;
 
     tm->m_alloc = alloc;
@@ -49,7 +49,13 @@ int gd_tl_manage_set_opt(gd_tl_manage_t tm, gd_tl_manage_option_t opt,...) {
             else {
                 rv = 0;
                 tm->m_time_get = ts;
+                tm->m_time_current = ts(tm->m_time_ctx);
             }
+            break;
+        }
+        case gd_tl_set_time_cvt: {
+            rv = 0;
+            tm->m_time_cvt = va_arg(ap, gd_tl_time_cvt_fun_t);
             break;
         }
         case gd_tl_set_time_source_context: {
@@ -57,6 +63,9 @@ int gd_tl_manage_set_opt(gd_tl_manage_t tm, gd_tl_manage_option_t opt,...) {
             tm->m_time_ctx = va_arg(ap, void *);
             break;
         }
+        default:
+            rv = GD_TL_ERROR_BAD_ARG;
+            break;
     }
 
     va_end(ap);
@@ -64,20 +73,24 @@ int gd_tl_manage_set_opt(gd_tl_manage_t tm, gd_tl_manage_option_t opt,...) {
     return rv;
 }
 
-gd_tl_t gd_tl_create(gd_tl_manage_t tm, gd_tl_event_dispatcher_t dispatch, void * context) {
+gd_tl_t gd_tl_create(gd_tl_manage_t tm) {
     gd_tl_t tl;
 
-    if (dispatch == NULL) return NULL;
     if (tm->m_tl_count >= GD_TL_TL_MAX) return NULL;
 
     tl = &tm->m_tls[tm->m_tl_count++];
 
     tl->m_manage = tm;
-    tl->m_event_dispatcher = dispatch;
-    tl->m_event_op_context = context;
+    tl->m_event_dispatcher = NULL;
+    tl->m_event_enqueue = gd_tl_event_enqueue_local;
     tl->m_event_destory = NULL;
+    tl->m_event_op_context = NULL;
     
     return tl;
+}
+
+gd_tl_time_t gd_tl_manage_time(gd_tl_manage_t tm) {
+    return tm->m_time_current;
 }
 
 int gd_tl_set_opt(gd_tl_t tl, gd_tl_option_t opt, ...) {
@@ -87,13 +100,18 @@ int gd_tl_set_opt(gd_tl_t tl, gd_tl_option_t opt, ...) {
 
     switch(opt) {
         case gd_tl_set_event_dispatcher: {
-            gd_tl_event_dispatcher_t dispatch = va_arg(ap, gd_tl_event_dispatcher_t);
-            if (dispatch == NULL) {
-                rv = GD_TL_ERROR_EVENT_NO_DISPATCHER;
+            rv = 0;
+            tl->m_event_dispatcher = va_arg(ap, gd_tl_event_dispatcher_t);
+            break;
+        }
+        case gd_tl_set_event_enqueue: {
+            gd_tl_event_enqueue_t enqueue = va_arg(ap, gd_tl_event_enqueue_t);
+            if (enqueue == NULL) {
+                rv = GD_TL_ERROR_EVENT_NO_ENQUEUE;
             }
             else {
                 rv = 0;
-                tl->m_event_dispatcher = dispatch;
+                tl->m_event_enqueue = enqueue;
             }
             break;
         }
@@ -107,6 +125,9 @@ int gd_tl_set_opt(gd_tl_t tl, gd_tl_option_t opt, ...) {
             tl->m_event_op_context = va_arg(ap, void *);
             break;
         }
+        default:
+            rv = GD_TL_ERROR_BAD_ARG;
+            break;
     }
 
     va_end(ap);
