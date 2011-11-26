@@ -5,7 +5,7 @@
 #include "tl_internal_ops.h"
 
 #define gd_tl_event_do_dispatch(evt) \
-    (evt)->m_tl->m_dispatcher((evt), (evt)->m_tl->m_dispatcher_context)
+    (evt)->m_tl->m_event_dispatcher((evt), (evt)->m_tl->m_event_op_context)
 
 #define gd_tl_manage_update_time(tm) \
     (tm)->m_time_current = (tm)->m_time_get((tm)->m_time_ctx)

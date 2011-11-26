@@ -18,7 +18,21 @@ int gd_tl_manage_tick(gd_tl_manage_t tm);
 int gd_tl_manage_set_opt(gd_tl_manage_t tm, gd_tl_manage_option_t opt,...);
 gd_tl_time_t gd_tl_manage_time(gd_tl_manage_t tm);
 
+typedef enum gd_tl_option {
+    gd_tl_set_event_dispatcher
+    , gd_tl_set_event_destory
+    , gd_tl_set_event_op_context
+} gd_tl_option_t;
+
 gd_tl_t gd_tl_create(gd_tl_manage_t tm, gd_tl_event_dispatcher_t dispatch, void * context);
+int gd_tl_set_opt(gd_tl_t tl, gd_tl_option_t opt, ...);
+
+gd_tl_time_t gd_tl_time_source_msec(void * context);
+gd_tl_time_t gd_tl_time_source_usec(void * context);
+gd_tl_time_t gd_tl_time_source_next_event(void * context);
+
+gd_tl_time_span_t gd_tl_time_cvt_sec2msec(gd_tl_time_span_t sec, void *);
+gd_tl_time_span_t gd_tl_time_cvt_sec2usec(gd_tl_time_span_t sec, void *);
 
 #ifdef __cplusplus
 }

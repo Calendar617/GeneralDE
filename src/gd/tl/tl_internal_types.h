@@ -13,8 +13,10 @@ extern "C" {
 
 struct gd_tl {
     gd_tl_manage_t m_manage;
-    gd_tl_event_dispatcher_t m_dispatcher;
-    void * m_dispatcher_context;
+
+    gd_tl_event_dispatcher_t m_event_dispatcher;
+    gd_tl_event_destory_t m_event_destory;
+    void * m_event_op_context;
 };
 
 struct gd_tl_event {
@@ -39,6 +41,7 @@ struct gd_tl_manage {
 
     /*time*/
     gd_tl_time_fun_t m_time_get;
+    gd_tl_time_cvt_fun_t m_time_cvt;
     void * m_time_ctx;
     gd_tl_time_t m_time_current;
 
@@ -63,5 +66,3 @@ struct gd_tl_manage {
 #endif
 
 #endif
-
-
