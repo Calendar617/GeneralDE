@@ -49,7 +49,7 @@ int gd_tl_event_node_insert(struct gd_tl_event_node * node) {
     }
 
     if (insertPos == TAILQ_END(&tm->m_event_queue)) {
-        TAILQ_INSERT_HEAD(&tm->m_event_queue, node, m_next);
+        TAILQ_INSERT_TAIL(&tm->m_event_queue, node, m_next);
     }
     else {
         TAILQ_INSERT_BEFORE(insertPos, node, m_next);
