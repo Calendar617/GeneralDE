@@ -66,9 +66,11 @@ void dr_meta_set_defaults(void * inout, LPDRMETA meta) {
 
         if (curEntryPos >= curMeta->m_entry_count) {
             --stackPos;
+            if (stackPos >= 0) {
+                processStack[stackPos].m_entry_pos++;
+            }
         }
         else {
-            curMeta->m_entry_count = curEntryPos + 1;
             ++stackPos;
         }
     }
