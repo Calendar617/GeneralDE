@@ -66,7 +66,11 @@ static int gd_tl_manage_dispatch_event(gd_tl_manage_t tm, int maxCount) {
     int rv = 0;
     int count = 0;
 
-    for(; rv == 0 && maxCount > 0; --maxCount) {
+    for(; rv == 0
+            && maxCount > 0
+            && tm->m_action_begin_pos == tm->m_action_end_pos;
+        --maxCount)
+    {
         struct gd_tl_event_node * node = TAILQ_FIRST(&tm->m_event_queue);
 
         if (node == TAILQ_END(tm->m_event_queue)
