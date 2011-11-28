@@ -118,6 +118,7 @@ gd_tl_t gd_tl_create(gd_tl_manage_t tm) {
     tl->m_manage = tm;
     tl->m_event_dispatcher = NULL;
     tl->m_event_enqueue = gd_tl_event_enqueue_local;
+    tl->m_event_construct = NULL;
     tl->m_event_destory = NULL;
     tl->m_event_op_context = NULL;
     
