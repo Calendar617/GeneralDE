@@ -5,7 +5,7 @@ $(call assert-not-null,GCC)
 
 product-support-types+=lib progn
 product-def-all-items+= c.libraries c.includes c.sources c.ldpathes c.flags.cpp c.flags.ld c.linker    \
-                        product.c.includes product.c.libraries product.c.ldpathes product.c.defs
+                        product.c.includes product.c.libraries product.c.flags.ld product.c.ldpathes product.c.defs
 
 c-source-dir-to-binary-dir = $(addprefix $(CPDE_OUTPUT_ROOT)/obj,$(subst $(CPDE_ROOT),,$1))
 
@@ -18,6 +18,7 @@ c-source-to-object = $(call c-source-dir-to-binary-dir,\
 c-generate-depend-ld-flags=$(addprefix -L$(CPDE_OUTPUT_ROOT)/,\
 								 $(sort $(r.$1.c.ldpathes) $(foreach dep,$(r.$1.depends),$(r.$(dep).product.c.ldpathes)))) \
                            $(addprefix -l,$(sort $(r.$1.c.libraries) $(foreach dep,$(r.$1.depends),$(r.$(dep).product.c.libraries)))) \
+                           $(foreach dep,$(r.$1.depends),$(r.$(dep).product.c.flags.ld)) \
                            $(r.$1.c.flags.ld)
 
 c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
