@@ -10,7 +10,7 @@ gd_dp_manage_t gd_dp_manage_create(mem_allocrator_t alloc, gd_tl_t timerTl) {
     bzero(dpm, allocSize);
 
     dpm->m_alloc = alloc;
-    dmp->m_timerTl = timerTl;
+    dpm->m_timerTl = timerTl;
 
     return dpm;
 }
