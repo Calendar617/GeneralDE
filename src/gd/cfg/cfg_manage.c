@@ -36,3 +36,10 @@ void gd_cfg_free(gd_cfg_t dp) {
         gd_cfg_struct_item_free(gd_cfg_to_struct_item(dp));
     }
 }
+
+gd_cfg_t gd_cfg_struct_add_struct(gd_cfg_t s, const char * name) {
+    gd_cfg_t rv = gd_cfg_struct_item_create((struct gd_cfg_struct *)s, name, CPE_DR_TYPE_STRUCT, sizeof(struct gd_cfg_struct));
+    if (rv == NULL) return NULL;
+    gd_cfg_struct_init((struct gd_cfg_struct *)rv);
+    return rv;
+}

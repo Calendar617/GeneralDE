@@ -29,6 +29,19 @@ struct gd_cfg_struct {
     struct gd_cfg_struct_item_tree m_items;
 };
 
+#define GD_CFG_SEQ_BLOCK_ITEM_COUNT 64
+
+struct gd_cfg_seq_block {
+    struct gd_cfg_seq_block * m_next;
+    gd_cfg_t m_items[GD_CFG_SEQ_BLOCK_ITEM_COUNT];
+};
+
+struct gd_cfg_seq {
+    GD_CFG_HEAD_DATA
+    int m_count;
+    struct gd_cfg_seq_block * m_blocks; 
+};
+
 struct gd_cfg_manage {
     mem_allocrator_t m_alloc;
     struct gd_cfg_struct m_root;

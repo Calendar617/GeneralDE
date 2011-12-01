@@ -46,10 +46,6 @@ gd_cfg_t gd_cfg_struct_item_create(struct gd_cfg_struct * s, const char * name, 
     item->m_data.m_type = type;
     item->m_name = data;
 
-    if (type == CPE_DR_TYPE_STRUCT) {
-        gd_cfg_struct_init((struct gd_cfg_struct *)&item->m_data);
-    }
-
     RB_INSERT(gd_cfg_struct_item_tree, &s->m_items, item);
 
     return &item->m_data;
