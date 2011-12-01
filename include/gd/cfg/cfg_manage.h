@@ -14,6 +14,7 @@ void gd_cfg_free(gd_cfg_t cfg);
 
 /*struct operation*/
 gd_cfg_t gd_cfg_struct_add_struct(gd_cfg_t s, const char * name);
+gd_cfg_t gd_cfg_struct_add_seq(gd_cfg_t s, const char * name);
 gd_cfg_t gd_cfg_struct_add_int8(gd_cfg_t s, const char * name, int8_t v);
 gd_cfg_t gd_cfg_struct_add_uint8(gd_cfg_t s, const char * name, uint8_t v);
 gd_cfg_t gd_cfg_struct_add_int16(gd_cfg_t s, const char * name, int16_t v);

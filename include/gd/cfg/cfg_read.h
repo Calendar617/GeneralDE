@@ -30,7 +30,7 @@ gd_cfg_t gd_cfg_struct_find_cfg(gd_cfg_t cfg, const char * name);
 
 /*sequence operations*/
 int gd_cfg_seq_count(gd_cfg_t cfg);
-gd_cfg_t gd_cfg_seq_at(gd_cfg_t cfg);
+gd_cfg_t gd_cfg_seq_at(gd_cfg_t cfg, int pos);
 
 #ifdef __cplusplus
 }
