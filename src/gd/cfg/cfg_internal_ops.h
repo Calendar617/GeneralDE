@@ -19,6 +19,8 @@ void gd_cfg_struct_init(struct gd_cfg_struct * s);
     ((struct gd_cfg_struct_item *)                                      \
      (((char*)__dp) - (sizeof(struct gd_cfg_struct_item) - sizeof(struct gd_cfg))))
 
+RB_PROTOTYPE(gd_cfg_struct_item_tree, gd_cfg_struct_item, m_linkage, gd_cfg_struct_item_cmp);
+
 /*sequence operations*/
 gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity);
 void gd_cfg_seq_item_delete(struct gd_cfg_seq * s, gd_cfg_t cfg);

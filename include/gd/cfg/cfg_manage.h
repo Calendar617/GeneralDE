@@ -38,7 +38,8 @@ gd_cfg_t gd_cfg_seq_add_uint32(gd_cfg_t s, uint32_t v);
 gd_cfg_t gd_cfg_seq_add_int64(gd_cfg_t s, int64_t v);
 gd_cfg_t gd_cfg_seq_add_uint64(gd_cfg_t s, uint64_t v);
 
-int gd_cfg_load_from_stream(gd_cfg_t cfg, read_stream_t stream);
+int gd_cfg_read(gd_cfg_t cfg, read_stream_t stream, error_monitor_t em);
+int gd_cfg_write(write_stream_t stream, gd_cfg_t cfg, error_monitor_t em);
 
 #ifdef __cplusplus
 }

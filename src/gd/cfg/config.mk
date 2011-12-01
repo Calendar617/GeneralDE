@@ -1,6 +1,6 @@
 product:=gd_cfg
 $(product).type:=lib
-$(product).depends:=cpe_utils cpe_dr
+$(product).depends:=cpe_utils cpe_dr yaml
 $(product).libraries:=
 $(product).c.sources:=$(wildcard $(product-base)*.c)
 

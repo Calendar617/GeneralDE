@@ -4,11 +4,10 @@
 #include "cfg_internal_types.h"
 #include "cfg_internal_ops.h"
 
-static int gd_cfg_struct_item_cmp(struct gd_cfg_struct_item * l, struct gd_cfg_struct_item * r) {
+int gd_cfg_struct_item_cmp(struct gd_cfg_struct_item * l, struct gd_cfg_struct_item * r) {
     return strcmp(l->m_name, r->m_name);
 }
 
-RB_PROTOTYPE(gd_cfg_struct_item_tree, gd_cfg_struct_item, m_linkage, gd_cfg_struct_item_cmp);
 RB_GENERATE(gd_cfg_struct_item_tree, gd_cfg_struct_item, m_linkage, gd_cfg_struct_item_cmp);
 
 void gd_cfg_struct_init(struct gd_cfg_struct * s) {
