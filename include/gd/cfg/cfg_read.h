@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 /*basic operations*/
-char * gd_cfg_name(gd_cfg_t cfg);
+const char * gd_cfg_name(gd_cfg_t cfg);
 void * gd_cfg_data(gd_cfg_t cfg);
 int gd_cfg_type(gd_cfg_t cfg);
 gd_cfg_t gd_cfg_parent(gd_cfg_t cfg);
