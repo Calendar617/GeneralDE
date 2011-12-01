@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_struct * s, const char * name, int type, size_t capacity);
+gd_cfg_t gd_cfg_seq_add(struct gd_cfg_struct * s, const char * name, int type, size_t capacity);
 void gd_cfg_seq_free_items(struct gd_cfg_struct * s);
 void gd_cfg_seq_init(struct gd_cfg_seq * s);
 

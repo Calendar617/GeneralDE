@@ -33,15 +33,26 @@ int gd_cfg_is_value(gd_cfg_t cfg) {
     return cfg->m_type > CPE_DR_TYPE_COMPOSITE;
 }
 
-int32_t gd_cfg_get_int32(gd_cfg_t cfg, const char * path, int32_t dft) {
-    int32_t rv;
-    gd_cfg_t at = gd_cfg_find_cfg(cfg, path);
-    if (at == NULL || !gd_cfg_is_value(at) ) return dft;
-
-    return dr_ctype_try_read_int32(&rv, gd_cfg_data(at), at->m_type, NULL) == 0
-        ? rv
-        : dft;
+#define GD_CFG_GEN_READ_TYPE(__type)                            \
+__type ## _t gd_cfg_get_  ## __type(                            \
+        gd_cfg_t cfg, const char * path, __type ## _t dft) {    \
+    __type ## _t rv;                                            \
+    gd_cfg_t at = gd_cfg_find_cfg(cfg, path);                   \
+    if (at == NULL || !gd_cfg_is_value(at) ) return dft;        \
+    return dr_ctype_try_read_ ## __type(                        \
+        &rv, gd_cfg_data(at), at->m_type, NULL) == 0            \
+        ? rv                                                    \
+        : dft;                                                  \
 }
+
+GD_CFG_GEN_READ_TYPE(int8);
+GD_CFG_GEN_READ_TYPE(uint8);
+GD_CFG_GEN_READ_TYPE(int16);
+GD_CFG_GEN_READ_TYPE(uint16);
+GD_CFG_GEN_READ_TYPE(int32);
+GD_CFG_GEN_READ_TYPE(uint32);
+GD_CFG_GEN_READ_TYPE(int64);
+GD_CFG_GEN_READ_TYPE(uint64);
 
 const char * gd_cfg_get_string(gd_cfg_t cfg, const char * path, const char * dft) {
     gd_cfg_t at = gd_cfg_find_cfg(cfg, path);
