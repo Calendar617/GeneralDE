@@ -20,6 +20,10 @@ void gd_cfg_struct_init(struct gd_cfg_struct * s);
      ((char*)__dp) - (sizeof(struct gd_cfg_struct_item) - sizeof(struct gd_cfg)))
 
 /*sequence operations*/
+gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity);
+void gd_cfg_seq_item_delete(struct gd_cfg_seq * s, gd_cfg_t cfg);
+void gd_cfg_seq_init(struct gd_cfg_seq * s);
+void gd_cfg_seq_fini(struct gd_cfg_seq * s);
 
 #ifdef __cplusplus
 }

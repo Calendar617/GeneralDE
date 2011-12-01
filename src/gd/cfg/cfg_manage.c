@@ -13,7 +13,7 @@ gd_cfg_t gd_cfg_create(mem_allocrator_t alloc) {
     bzero(cm, allocSize);
 
     cm->m_alloc = alloc;
-    cm->m_root.m_type = CPE_DR_TYPE_STRUCT;
+    cm->m_root.m_type = GD_CFG_TYPE_STRUCT;
     cm->m_root.m_manage = cm;
     cm->m_root.m_parent = NULL;
 
@@ -22,38 +22,55 @@ gd_cfg_t gd_cfg_create(mem_allocrator_t alloc) {
     return (gd_cfg_t)&cm->m_root;
 }
 
-void gd_cfg_free(gd_cfg_t dp) {
-    if (dp == NULL) return;
+void gd_cfg_free(gd_cfg_t cfg) {
+    if (cfg == NULL) return;
 
-    assert(dp->m_manage);
+    assert(cfg->m_manage);
 
-    if ((gd_cfg_t)&dp->m_manage->m_root == dp) {
-        gd_cfg_struct_fini(&dp->m_manage->m_root);
+    if ((gd_cfg_t)&cfg->m_manage->m_root == cfg) {
+        gd_cfg_struct_fini(&cfg->m_manage->m_root);
         mem_free(
-            dp->m_manage->m_alloc,
-            ((char*)dp) - (sizeof(struct gd_cfg_manage) - sizeof(struct gd_cfg_struct)));
+            cfg->m_manage->m_alloc,
+            ((char*)cfg) - (sizeof(struct gd_cfg_manage) - sizeof(struct gd_cfg_struct)));
     }
     else {
-        assert(dp->m_parent);
+        assert(cfg->m_parent);
 
-        if (dp->m_parent->m_type == CPE_DR_TYPE_STRUCT) {
-            gd_cfg_struct_item_delete((struct gd_cfg_struct *)dp->m_parent, dp);
+        if (cfg->m_parent->m_type == GD_CFG_TYPE_STRUCT) {
+            gd_cfg_struct_item_delete((struct gd_cfg_struct *)cfg->m_parent, cfg);
         }
         else {
+            assert(cfg->m_parent->m_type == GD_CFG_TYPE_SEQUENCE);
+            gd_cfg_seq_item_delete((struct gd_cfg_seq *)cfg->m_parent, cfg);
         }
     }
 }
 
 void gd_cfg_fini(gd_cfg_t cfg) {
-    if (cfg->m_type == CPE_DR_TYPE_STRUCT) {
+    switch (cfg->m_type) {
+    case GD_CFG_TYPE_STRUCT:
         gd_cfg_struct_fini((struct gd_cfg_struct *)(cfg));
+        break;
+    case GD_CFG_TYPE_SEQUENCE:
+        gd_cfg_seq_fini((struct gd_cfg_seq *)(cfg));
+        break;
+    default:
+        //do nothing for other
+        break;
     }
 }
 
 gd_cfg_t gd_cfg_struct_add_struct(gd_cfg_t s, const char * name) {
-    gd_cfg_t rv = gd_cfg_struct_item_create((struct gd_cfg_struct *)s, name, CPE_DR_TYPE_STRUCT, sizeof(struct gd_cfg_struct));
+    gd_cfg_t rv = gd_cfg_struct_item_create((struct gd_cfg_struct *)s, name, GD_CFG_TYPE_STRUCT, sizeof(struct gd_cfg_struct));
     if (rv == NULL) return NULL;
     gd_cfg_struct_init((struct gd_cfg_struct *)rv);
+    return rv;
+}
+
+gd_cfg_t gd_cfg_struct_add_seq(gd_cfg_t s, const char * name) {
+    gd_cfg_t rv = gd_cfg_struct_item_create((struct gd_cfg_struct *)s, name, GD_CFG_TYPE_SEQUENCE, sizeof(struct gd_cfg_seq));
+    if (rv == NULL) return NULL;
+    gd_cfg_seq_init((struct gd_cfg_seq *)rv);
     return rv;
 }
 
@@ -67,11 +84,11 @@ gd_cfg_t gd_cfg_struct_add_ ## __type(                                  \
     return rv;                                                          \
 }
 
-GD_CFG_GEN_STRUCT_ADD_TYPE(int8, CPE_DR_TYPE_INT8)
-GD_CFG_GEN_STRUCT_ADD_TYPE(uint8, CPE_DR_TYPE_UINT8)
-GD_CFG_GEN_STRUCT_ADD_TYPE(int16, CPE_DR_TYPE_INT16)
-GD_CFG_GEN_STRUCT_ADD_TYPE(uint16, CPE_DR_TYPE_UINT16)
-GD_CFG_GEN_STRUCT_ADD_TYPE(int32, CPE_DR_TYPE_INT32)
-GD_CFG_GEN_STRUCT_ADD_TYPE(uint32, CPE_DR_TYPE_UINT32)
-GD_CFG_GEN_STRUCT_ADD_TYPE(int64, CPE_DR_TYPE_INT64)
-GD_CFG_GEN_STRUCT_ADD_TYPE(uint64, CPE_DR_TYPE_UINT64)
+GD_CFG_GEN_STRUCT_ADD_TYPE(int8, GD_CFG_TYPE_INT8)
+GD_CFG_GEN_STRUCT_ADD_TYPE(uint8, GD_CFG_TYPE_UINT8)
+GD_CFG_GEN_STRUCT_ADD_TYPE(int16, GD_CFG_TYPE_INT16)
+GD_CFG_GEN_STRUCT_ADD_TYPE(uint16, GD_CFG_TYPE_UINT16)
+GD_CFG_GEN_STRUCT_ADD_TYPE(int32, GD_CFG_TYPE_INT32)
+GD_CFG_GEN_STRUCT_ADD_TYPE(uint32, GD_CFG_TYPE_UINT32)
+GD_CFG_GEN_STRUCT_ADD_TYPE(int64, GD_CFG_TYPE_INT64)
+GD_CFG_GEN_STRUCT_ADD_TYPE(uint64, GD_CFG_TYPE_UINT64)

@@ -2,7 +2,6 @@
 #define GD_CFG_IMPL_INTERNAL_TYPES_H
 #include "cpe/pal/tree.h"
 #include "cpe/utils/memory.h"
-#include "cpe/dr/dr_ctypes_info.h"
 #include "gd/cfg/cfg_types.h"
 
 typedef struct gd_cfg_manage * gd_cfg_manage_t;
@@ -39,7 +38,7 @@ struct gd_cfg_seq_block {
 struct gd_cfg_seq {
     GD_CFG_HEAD_DATA
     int m_count;
-    struct gd_cfg_seq_block * m_blocks; 
+    struct gd_cfg_seq_block m_block_head; 
 };
 
 struct gd_cfg_manage {

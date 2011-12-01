@@ -1,10 +1,10 @@
 #include "cpe/dr/dr_ctypes_op.h"
 #include "gd/cfg/cfg_read.h"
 #include "cfg_internal_types.h"
-#include "cfg_struct_op.h"
+#include "cfg_internal_ops.h"
 
 void * gd_cfg_data(gd_cfg_t cfg) {
-    if (cfg == NULL || cfg->m_type <= CPE_DR_TYPE_COMPOSITE) {
+    if (cfg == NULL || !gd_cfg_is_value(cfg)) {
         return NULL;
     }
 
