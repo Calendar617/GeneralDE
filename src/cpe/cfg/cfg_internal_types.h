@@ -4,46 +4,46 @@
 #include "cpe/utils/memory.h"
 #include "cpe/cfg/cfg_types.h"
 
-typedef struct gd_cfg_manage * gd_cfg_manage_t;
+typedef struct cfg_manage * cfg_manage_t;
 
 #define CPE_CFG_HEAD_DATA           \
-    gd_cfg_manage_t m_manage;      \
+    cfg_manage_t m_manage;      \
     int m_type;                    \
-    gd_cfg_t m_parent;
+    cfg_t m_parent;
 
-struct gd_cfg {
+struct cfg {
     CPE_CFG_HEAD_DATA
 };
 
-struct gd_cfg_struct_item {
-    RB_ENTRY(gd_cfg_struct_item) m_linkage;
+struct cfg_struct_item {
+    RB_ENTRY(cfg_struct_item) m_linkage;
     const char * m_name;
-    struct gd_cfg m_data;
+    struct cfg m_data;
 };
 
-RB_HEAD(gd_cfg_struct_item_tree, gd_cfg_struct_item);
+RB_HEAD(cfg_struct_item_tree, cfg_struct_item);
 
-struct gd_cfg_struct {
+struct cfg_struct {
     CPE_CFG_HEAD_DATA
-    struct gd_cfg_struct_item_tree m_items;
+    struct cfg_struct_item_tree m_items;
 };
 
 #define CPE_CFG_SEQ_BLOCK_ITEM_COUNT 64
 
-struct gd_cfg_seq_block {
-    struct gd_cfg_seq_block * m_next;
-    gd_cfg_t m_items[CPE_CFG_SEQ_BLOCK_ITEM_COUNT];
+struct cfg_seq_block {
+    struct cfg_seq_block * m_next;
+    cfg_t m_items[CPE_CFG_SEQ_BLOCK_ITEM_COUNT];
 };
 
-struct gd_cfg_seq {
+struct cfg_seq {
     CPE_CFG_HEAD_DATA
     int m_count;
-    struct gd_cfg_seq_block m_block_head; 
+    struct cfg_seq_block m_block_head; 
 };
 
-struct gd_cfg_manage {
+struct cfg_manage {
     mem_allocrator_t m_alloc;
-    struct gd_cfg_struct m_root;
+    struct cfg_struct m_root;
 };
 
 #endif

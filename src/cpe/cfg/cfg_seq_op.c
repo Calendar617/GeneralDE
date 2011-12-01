@@ -3,18 +3,18 @@
 #include "cpe/cfg/cfg_manage.h"
 #include "cfg_internal_ops.h"
 
-int gd_cfg_seq_count(gd_cfg_t cfg) {
-    return ((struct gd_cfg_seq *)cfg)->m_count;
+int cfg_seq_count(cfg_t cfg) {
+    return ((struct cfg_seq *)cfg)->m_count;
 }
 
-gd_cfg_t gd_cfg_seq_at(gd_cfg_t cfg, int pos) {
-    struct gd_cfg_seq_block * block;
-    struct gd_cfg_seq * s;
+cfg_t cfg_seq_at(cfg_t cfg, int pos) {
+    struct cfg_seq_block * block;
+    struct cfg_seq * s;
 
     assert(cfg);
     if (cfg->m_type != CPE_CFG_TYPE_SEQUENCE) return NULL;
 
-    s = (struct gd_cfg_seq *)cfg;
+    s = (struct cfg_seq *)cfg;
     if (pos < 0 || pos >= s->m_count) return NULL;
 
     block = &s->m_block_head;
@@ -30,11 +30,11 @@ gd_cfg_t gd_cfg_seq_at(gd_cfg_t cfg, int pos) {
     return block->m_items[pos];
 }
 
-gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity) {
-    gd_cfg_t rv;
+cfg_t cfg_seq_item_create(struct cfg_seq * s, int type, size_t capacity) {
+    cfg_t rv;
     int insertIdx;
-    struct gd_cfg_seq_block * head;
-    struct gd_cfg_seq_block ** insertBlocl;
+    struct cfg_seq_block * head;
+    struct cfg_seq_block ** insertBlocl;
 
     if (s->m_type != CPE_CFG_TYPE_SEQUENCE) return NULL;
 
@@ -51,8 +51,8 @@ gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity
         assert(*insertBlocl);
         insertBlocl = &(*insertBlocl)->m_next;
         if (*insertBlocl == NULL) {
-            *insertBlocl = (struct gd_cfg_seq_block *)
-                mem_alloc(s->m_manage->m_alloc, sizeof(struct gd_cfg_seq_block));
+            *insertBlocl = (struct cfg_seq_block *)
+                mem_alloc(s->m_manage->m_alloc, sizeof(struct cfg_seq_block));
             if (*insertBlocl == NULL) return NULL;
             (*insertBlocl)->m_next = NULL;
         }
@@ -61,12 +61,12 @@ gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity
     assert(*insertBlocl);
     assert(insertIdx < CPE_CFG_SEQ_BLOCK_ITEM_COUNT);
 
-    rv = (gd_cfg_t)mem_alloc(s->m_manage->m_alloc, sizeof(struct gd_cfg) + capacity);
+    rv = (cfg_t)mem_alloc(s->m_manage->m_alloc, sizeof(struct cfg) + capacity);
     if (rv == NULL) return NULL;
 
     rv->m_manage = s->m_manage;
     rv->m_type = type;
-    rv->m_parent = (gd_cfg_t)s;
+    rv->m_parent = (cfg_t)s;
 
     (*insertBlocl)->m_items[insertIdx] = rv;
 
@@ -75,7 +75,7 @@ gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity
     return rv;
 }
 
-int gd_cfg_seq_find_in_block(struct gd_cfg_seq_block * b, int count, gd_cfg_t cfg) {
+int cfg_seq_find_in_block(struct cfg_seq_block * b, int count, cfg_t cfg) {
     int i;
 
     for(i = 0; i < count; ++i) {
@@ -87,8 +87,8 @@ int gd_cfg_seq_find_in_block(struct gd_cfg_seq_block * b, int count, gd_cfg_t cf
     return -1;
 }
 
-void gd_cfg_seq_item_delete(struct gd_cfg_seq * s, gd_cfg_t cfg) {
-    struct gd_cfg_seq_block * b;
+void cfg_seq_item_delete(struct cfg_seq * s, cfg_t cfg) {
+    struct cfg_seq_block * b;
     int leftCount;
     int posInB;
 
@@ -103,7 +103,7 @@ void gd_cfg_seq_item_delete(struct gd_cfg_seq * s, gd_cfg_t cfg) {
             ? CPE_CFG_SEQ_BLOCK_ITEM_COUNT
             : leftCount;
 
-        posInB = gd_cfg_seq_find_in_block(b, countInB, cfg);
+        posInB = cfg_seq_find_in_block(b, countInB, cfg);
         if (posInB < 0) {
             leftCount -= countInB;
             b = b->m_next;
@@ -117,7 +117,7 @@ void gd_cfg_seq_item_delete(struct gd_cfg_seq * s, gd_cfg_t cfg) {
     if (posInB < 0) return; //not found
 
     /*free cfg*/
-    gd_cfg_fini(cfg);
+    cfg_fini(cfg);
     mem_free(s->m_manage->m_alloc, cfg);
     cfg = NULL;
 
@@ -132,7 +132,7 @@ void gd_cfg_seq_item_delete(struct gd_cfg_seq * s, gd_cfg_t cfg) {
             memmove(
                 &b->m_items[posInB],
                 &b->m_items[posInB + 1],
-                sizeof(gd_cfg_t) * leftCountInB);
+                sizeof(cfg_t) * leftCountInB);
 
             leftCount -= leftCountInB;
         }
@@ -152,34 +152,34 @@ void gd_cfg_seq_item_delete(struct gd_cfg_seq * s, gd_cfg_t cfg) {
     --s->m_count;
 }
 
-void gd_cfg_seq_init(struct gd_cfg_seq * s) {
+void cfg_seq_init(struct cfg_seq * s) {
     s->m_count = 0;
     s->m_block_head.m_next = NULL;
 }
 
-static void gd_cfg_seq_fini_block(mem_allocrator_t alloc, struct gd_cfg_seq_block * b, int count) {
+static void cfg_seq_fini_block(mem_allocrator_t alloc, struct cfg_seq_block * b, int count) {
     int i;
 
     for(i = 0; i < count; ++i) {
-        gd_cfg_fini(b->m_items[i]);
+        cfg_fini(b->m_items[i]);
         mem_free(alloc, b->m_items[i]);
     }
 }
 
-void gd_cfg_seq_fini(struct gd_cfg_seq * s) {
-    struct gd_cfg_seq_block * b;
+void cfg_seq_fini(struct cfg_seq * s) {
+    struct cfg_seq_block * b;
     int blockFreeSize;
     
     b = &s->m_block_head;
     while(b) {
-        struct gd_cfg_seq_block * n = b->m_next;
+        struct cfg_seq_block * n = b->m_next;
 
         blockFreeSize = 
             s->m_count > CPE_CFG_SEQ_BLOCK_ITEM_COUNT
             ? CPE_CFG_SEQ_BLOCK_ITEM_COUNT
             : s->m_count;
 
-        gd_cfg_seq_fini_block(s->m_manage->m_alloc, b, blockFreeSize);
+        cfg_seq_fini_block(s->m_manage->m_alloc, b, blockFreeSize);
 
         s->m_count -= blockFreeSize;
 

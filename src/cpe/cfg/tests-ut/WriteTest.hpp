@@ -15,7 +15,7 @@ public:
     struct mem_buffer m_buffer;
     error_list_t m_errorList;
 
-    int write(gd_cfg_t cfg);
+    int write(cfg_t cfg);
     const char * result(void);
 };
 

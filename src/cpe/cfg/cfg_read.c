@@ -3,51 +3,51 @@
 #include "cfg_internal_types.h"
 #include "cfg_internal_ops.h"
 
-void * gd_cfg_data(gd_cfg_t cfg) {
-    if (cfg == NULL || !gd_cfg_is_value(cfg)) {
+void * cfg_data(cfg_t cfg) {
+    if (cfg == NULL || !cfg_is_value(cfg)) {
         return NULL;
     }
 
     return (void*)(cfg + 1);
 }
 
-const char * gd_cfg_name(gd_cfg_t cfg) {
+const char * cfg_name(cfg_t cfg) {
     if (cfg == NULL || cfg->m_parent == NULL) return "";
 
     switch (cfg->m_parent->m_type) {
     case CPE_CFG_TYPE_STRUCT:
-        return gd_cfg_to_struct_item(cfg)->m_name;
+        return cfg_to_struct_item(cfg)->m_name;
     case CPE_CFG_TYPE_SEQUENCE:
-        return gd_cfg_name(cfg->m_parent);
+        return cfg_name(cfg->m_parent);
     default:
         return "";
     }
 }
 
-int gd_cfg_type(gd_cfg_t cfg) {
+int cfg_type(cfg_t cfg) {
     if (cfg == NULL) return CPE_DR_TYPE_UNKOWN;
 
     return cfg->m_type;
 }
 
-gd_cfg_t gd_cfg_parent(gd_cfg_t cfg) {
+cfg_t cfg_parent(cfg_t cfg) {
     if (cfg == NULL) return NULL;
 
     return cfg->m_parent;
 }
 
-int gd_cfg_is_value(gd_cfg_t cfg) {
+int cfg_is_value(cfg_t cfg) {
     return cfg->m_type > CPE_DR_TYPE_COMPOSITE;
 }
 
 #define CPE_CFG_GEN_READ_TYPE(__type)                            \
-__type ## _t gd_cfg_get_  ## __type(                            \
-        gd_cfg_t cfg, const char * path, __type ## _t dft) {    \
+__type ## _t cfg_get_  ## __type(                            \
+        cfg_t cfg, const char * path, __type ## _t dft) {    \
     __type ## _t rv;                                            \
-    gd_cfg_t at = gd_cfg_find_cfg(cfg, path);                   \
-    if (at == NULL || !gd_cfg_is_value(at) ) return dft;        \
+    cfg_t at = cfg_find_cfg(cfg, path);                   \
+    if (at == NULL || !cfg_is_value(at) ) return dft;        \
     return dr_ctype_try_read_ ## __type(                        \
-        &rv, gd_cfg_data(at), at->m_type, NULL) == 0            \
+        &rv, cfg_data(at), at->m_type, NULL) == 0            \
         ? rv                                                    \
         : dft;                                                  \
 }
@@ -61,15 +61,15 @@ CPE_CFG_GEN_READ_TYPE(uint32);
 CPE_CFG_GEN_READ_TYPE(int64);
 CPE_CFG_GEN_READ_TYPE(uint64);
 
-const char * gd_cfg_get_string(gd_cfg_t cfg, const char * path, const char * dft) {
-    gd_cfg_t at = gd_cfg_find_cfg(cfg, path);
+const char * cfg_get_string(cfg_t cfg, const char * path, const char * dft) {
+    cfg_t at = cfg_find_cfg(cfg, path);
     if (at == NULL) return dft;
 
     return at->m_type == CPE_DR_TYPE_STRING
-        ? (const char *)gd_cfg_data(at)
+        ? (const char *)cfg_data(at)
         : dft;
 }
 
-gd_cfg_t gd_cfg_find_cfg(gd_cfg_t cfg, const char * path) {
+cfg_t cfg_find_cfg(cfg_t cfg, const char * path) {
     return cfg;
 }

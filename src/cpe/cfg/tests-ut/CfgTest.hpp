@@ -10,7 +10,7 @@ public:
     virtual void SetUp();
     virtual void TearDown();
 
-    gd_cfg_t m_root;
+    cfg_t m_root;
 };
 
 #endif

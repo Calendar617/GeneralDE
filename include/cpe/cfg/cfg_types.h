@@ -3,7 +3,7 @@
 #include "cpe/pal/types.h"
 #include "cpe/dr/dr_ctypes_info.h"
 
-typedef struct gd_cfg * gd_cfg_t;
+typedef struct cfg * cfg_t;
 
 #define CPE_CFG_TYPE_SEQUENCE    CPE_DR_TYPE_UNION
 #define CPE_CFG_TYPE_STRUCT      CPE_DR_TYPE_STRUCT

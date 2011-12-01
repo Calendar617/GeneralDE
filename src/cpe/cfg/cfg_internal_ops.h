@@ -6,26 +6,26 @@
 extern "C" {
 #endif
 
-void gd_cfg_fini(gd_cfg_t cfg);
+void cfg_fini(cfg_t cfg);
 
 /*struct operations*/
-gd_cfg_t gd_cfg_struct_item_create(struct gd_cfg_struct * s, const char * name, int type, size_t capacity);
-void gd_cfg_struct_item_delete(struct gd_cfg_struct * s, gd_cfg_t cfg);
+cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type, size_t capacity);
+void cfg_struct_item_delete(struct cfg_struct * s, cfg_t cfg);
 
-void gd_cfg_struct_fini(struct gd_cfg_struct * s);
-void gd_cfg_struct_init(struct gd_cfg_struct * s);
+void cfg_struct_fini(struct cfg_struct * s);
+void cfg_struct_init(struct cfg_struct * s);
 
-#define gd_cfg_to_struct_item(__dp) \
-    ((struct gd_cfg_struct_item *)                                      \
-     (((char*)__dp) - (sizeof(struct gd_cfg_struct_item) - sizeof(struct gd_cfg))))
+#define cfg_to_struct_item(__dp) \
+    ((struct cfg_struct_item *)                                      \
+     (((char*)__dp) - (sizeof(struct cfg_struct_item) - sizeof(struct cfg))))
 
-RB_PROTOTYPE(gd_cfg_struct_item_tree, gd_cfg_struct_item, m_linkage, gd_cfg_struct_item_cmp);
+RB_PROTOTYPE(cfg_struct_item_tree, cfg_struct_item, m_linkage, cfg_struct_item_cmp);
 
 /*sequence operations*/
-gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity);
-void gd_cfg_seq_item_delete(struct gd_cfg_seq * s, gd_cfg_t cfg);
-void gd_cfg_seq_init(struct gd_cfg_seq * s);
-void gd_cfg_seq_fini(struct gd_cfg_seq * s);
+cfg_t cfg_seq_item_create(struct cfg_seq * s, int type, size_t capacity);
+void cfg_seq_item_delete(struct cfg_seq * s, cfg_t cfg);
+void cfg_seq_init(struct cfg_seq * s);
+void cfg_seq_fini(struct cfg_seq * s);
 
 #ifdef __cplusplus
 }

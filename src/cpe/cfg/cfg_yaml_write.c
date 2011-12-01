@@ -5,13 +5,13 @@
 #include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_ops.h"
 
-struct gd_cfg_yaml_write_ctx {
+struct cfg_yaml_write_ctx {
     yaml_document_t m_document;
 
     error_monitor_t m_em;
 };
 
-static int gd_cfg_write_to_stream_handler(void *data, unsigned char *buffer, size_t size) {
+static int cfg_write_to_stream_handler(void *data, unsigned char *buffer, size_t size) {
     int writeSize;
 
     writeSize = stream_write((write_stream_t)data, (char*)buffer, size);
@@ -19,11 +19,11 @@ static int gd_cfg_write_to_stream_handler(void *data, unsigned char *buffer, siz
     return writeSize == size ? 1 : 0;
 }
 
-static int gd_cfg_yaml_write_ctx_init(
-    struct gd_cfg_yaml_write_ctx * ctx,
+static int cfg_yaml_write_ctx_init(
+    struct cfg_yaml_write_ctx * ctx,
     error_monitor_t em)
 {
-    bzero(ctx, sizeof(struct gd_cfg_yaml_write_ctx));
+    bzero(ctx, sizeof(struct cfg_yaml_write_ctx));
 
     if (!yaml_document_initialize(&ctx->m_document, NULL, NULL, NULL, 0, 0)) {
         CPE_ERROR(ctx->m_em, "yaml document initialize fail!");
@@ -35,27 +35,27 @@ static int gd_cfg_yaml_write_ctx_init(
     return 0;
 }
 
-static void gd_cfg_yaml_write_ctx_fini(struct gd_cfg_yaml_write_ctx * ctx) {
+static void cfg_yaml_write_ctx_fini(struct cfg_yaml_write_ctx * ctx) {
     yaml_document_delete(&ctx->m_document);
 }
 
-static void gd_cfg_yaml_notify_document_error(struct gd_cfg_yaml_write_ctx * ctx) {
+static void cfg_yaml_notify_document_error(struct cfg_yaml_write_ctx * ctx) {
     CPE_ERROR(ctx->m_em, "Memory error: Not enough memory for creating a document");
 }
 
-static int gd_cfg_yaml_do_write_cfg(struct gd_cfg_yaml_write_ctx * ctx, gd_cfg_t cfg);
+static int cfg_yaml_do_write_cfg(struct cfg_yaml_write_ctx * ctx, cfg_t cfg);
 
-static int gd_cfg_yaml_do_write_cfg_scalar(struct gd_cfg_yaml_write_ctx * ctx, gd_cfg_t cfg) {
+static int cfg_yaml_do_write_cfg_scalar(struct cfg_yaml_write_ctx * ctx, cfg_t cfg) {
     int v;
 
     if (cfg->m_type == CPE_CFG_TYPE_STRING) {
         v = yaml_document_add_scalar( 
-            &ctx->m_document, (yaml_char_t *)"str", (yaml_char_t *)gd_cfg_data(cfg), -1, YAML_PLAIN_SCALAR_STYLE);
+            &ctx->m_document, (yaml_char_t *)"str", (yaml_char_t *)cfg_data(cfg), -1, YAML_PLAIN_SCALAR_STYLE);
     }
     else {
         char buf[20 + 1];
         struct write_stream_mem bufS = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, 20);
-        int len = dr_ctype_print_to_stream((write_stream_t)&bufS, gd_cfg_data(cfg), cfg->m_type, ctx->m_em);
+        int len = dr_ctype_print_to_stream((write_stream_t)&bufS, cfg_data(cfg), cfg->m_type, ctx->m_em);
         if (len > 0) {
             buf[len] = 0;
             v = yaml_document_add_scalar( 
@@ -67,29 +67,29 @@ static int gd_cfg_yaml_do_write_cfg_scalar(struct gd_cfg_yaml_write_ctx * ctx, g
     }
 
     if (!v) {
-        gd_cfg_yaml_notify_document_error(ctx);
+        cfg_yaml_notify_document_error(ctx);
     }
 
     return v;
 }
 
-static int gd_cfg_yaml_do_write_cfg_struct(struct gd_cfg_yaml_write_ctx * ctx, struct gd_cfg_struct * cfg) {
-    struct gd_cfg_struct_item * item;
+static int cfg_yaml_do_write_cfg_struct(struct cfg_yaml_write_ctx * ctx, struct cfg_struct * cfg) {
+    struct cfg_struct_item * item;
 
     int mapNode = yaml_document_add_mapping(&ctx->m_document, NULL, YAML_BLOCK_MAPPING_STYLE);
     if (!mapNode) {
-        gd_cfg_yaml_notify_document_error(ctx);
+        cfg_yaml_notify_document_error(ctx);
         return mapNode;
     }
 
-    RB_FOREACH(item, gd_cfg_struct_item_tree, &cfg->m_items) {
+    RB_FOREACH(item, cfg_struct_item_tree, &cfg->m_items) {
         int key = yaml_document_add_scalar(
             &ctx->m_document, NULL, (yaml_char_t *) item->m_name, -1, YAML_PLAIN_SCALAR_STYLE);
-        int value = gd_cfg_yaml_do_write_cfg(ctx, &item->m_data);
+        int value = cfg_yaml_do_write_cfg(ctx, &item->m_data);
 
         if (key && value) {
             if (!yaml_document_append_mapping_pair(&ctx->m_document, mapNode, key, value)) {
-                gd_cfg_yaml_notify_document_error(ctx);
+                cfg_yaml_notify_document_error(ctx);
             }
         }
     }
@@ -97,14 +97,14 @@ static int gd_cfg_yaml_do_write_cfg_struct(struct gd_cfg_yaml_write_ctx * ctx, s
     return mapNode;
 }
 
-static int gd_cfg_yaml_do_write_cfg_seq(struct gd_cfg_yaml_write_ctx * ctx, struct gd_cfg_seq * cfg) {
+static int cfg_yaml_do_write_cfg_seq(struct cfg_yaml_write_ctx * ctx, struct cfg_seq * cfg) {
     int i = 0;
     int count = cfg->m_count;
-    struct gd_cfg_seq_block * b = &cfg->m_block_head;
+    struct cfg_seq_block * b = &cfg->m_block_head;
 
     int seqNode = yaml_document_add_sequence(&ctx->m_document, NULL, YAML_BLOCK_SEQUENCE_STYLE);
     if (!seqNode) {
-        gd_cfg_yaml_notify_document_error(ctx);
+        cfg_yaml_notify_document_error(ctx);
         return seqNode;
     }
 
@@ -115,31 +115,31 @@ static int gd_cfg_yaml_do_write_cfg_seq(struct gd_cfg_yaml_write_ctx * ctx, stru
             if (b == NULL) break;
         }
 
-        int subNode = gd_cfg_yaml_do_write_cfg(ctx, b->m_items[i]);
+        int subNode = cfg_yaml_do_write_cfg(ctx, b->m_items[i]);
         if (!subNode) {
             continue;
         }
 
         if (!yaml_document_append_sequence_item(&ctx->m_document, seqNode, subNode)) {
-            gd_cfg_yaml_notify_document_error(ctx);
+            cfg_yaml_notify_document_error(ctx);
         }
     }
     
     return seqNode;
 }
 
-static int gd_cfg_yaml_do_write_cfg(struct gd_cfg_yaml_write_ctx * ctx, gd_cfg_t cfg) {
+static int cfg_yaml_do_write_cfg(struct cfg_yaml_write_ctx * ctx, cfg_t cfg) {
     switch(cfg->m_type) {
     case CPE_CFG_TYPE_STRUCT:
-        return gd_cfg_yaml_do_write_cfg_struct(ctx, (struct gd_cfg_struct *)cfg);
+        return cfg_yaml_do_write_cfg_struct(ctx, (struct cfg_struct *)cfg);
     case CPE_CFG_TYPE_SEQUENCE:
-        return gd_cfg_yaml_do_write_cfg_seq(ctx, (struct gd_cfg_seq *)cfg);
+        return cfg_yaml_do_write_cfg_seq(ctx, (struct cfg_seq *)cfg);
     default:
-        return gd_cfg_yaml_do_write_cfg_scalar(ctx, cfg);
+        return cfg_yaml_do_write_cfg_scalar(ctx, cfg);
     }
 }
 
-static void gd_cfg_yaml_notify_emitter_error(yaml_emitter_t * emitter, error_monitor_t em) {
+static void cfg_yaml_notify_emitter_error(yaml_emitter_t * emitter, error_monitor_t em) {
     switch (emitter->error) {
     case YAML_MEMORY_ERROR:
         CPE_ERROR(em, "Memory error: Not enough memory for emitting\n");
@@ -157,7 +157,7 @@ static void gd_cfg_yaml_notify_emitter_error(yaml_emitter_t * emitter, error_mon
     }
 }
 
-static void gd_cfg_dump_document_stream(struct gd_cfg_yaml_write_ctx * ctx, write_stream_t stream) {
+static void cfg_dump_document_stream(struct cfg_yaml_write_ctx * ctx, write_stream_t stream) {
     yaml_emitter_t emitter;
     bzero(&emitter, sizeof(emitter));
 
@@ -166,7 +166,7 @@ static void gd_cfg_dump_document_stream(struct gd_cfg_yaml_write_ctx * ctx, writ
         return;
     }
 
-    yaml_emitter_set_output(&emitter, gd_cfg_write_to_stream_handler, stream);
+    yaml_emitter_set_output(&emitter, cfg_write_to_stream_handler, stream);
     /* yaml_emitter_set_canonical(&emitter, canonical); */
     yaml_emitter_set_unicode(&emitter, YAML_UTF8_ENCODING);
     yaml_emitter_set_indent(&emitter, 4);
@@ -175,34 +175,34 @@ static void gd_cfg_dump_document_stream(struct gd_cfg_yaml_write_ctx * ctx, writ
         || !yaml_emitter_dump(&emitter, &ctx->m_document)
         || !yaml_emitter_close(&emitter))
     {
-        gd_cfg_yaml_notify_emitter_error(&emitter, ctx->m_em);
+        cfg_yaml_notify_emitter_error(&emitter, ctx->m_em);
     }
 
     yaml_emitter_delete(&emitter);
 }
 
-static void gd_cfg_write_i(write_stream_t stream, gd_cfg_t cfg, error_monitor_t em) {
-    struct gd_cfg_yaml_write_ctx ctx;
+static void cfg_write_i(write_stream_t stream, cfg_t cfg, error_monitor_t em) {
+    struct cfg_yaml_write_ctx ctx;
 
-    if (gd_cfg_yaml_write_ctx_init(&ctx, em) != 0) return;
+    if (cfg_yaml_write_ctx_init(&ctx, em) != 0) return;
 
-    gd_cfg_yaml_do_write_cfg(&ctx, cfg);
+    cfg_yaml_do_write_cfg(&ctx, cfg);
 
-    gd_cfg_dump_document_stream(&ctx, stream);
+    cfg_dump_document_stream(&ctx, stream);
 
-    gd_cfg_yaml_write_ctx_fini(&ctx);
+    cfg_yaml_write_ctx_fini(&ctx);
 }
 
-int gd_cfg_write(write_stream_t stream, gd_cfg_t cfg, error_monitor_t em) {
+int cfg_write(write_stream_t stream, cfg_t cfg, error_monitor_t em) {
     int ret = 0;
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
-        gd_cfg_write_i(stream, cfg, em);
+        cfg_write_i(stream, cfg, em);
         CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
     }
     else {
         CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
-        gd_cfg_write_i(stream, cfg, &logError);
+        cfg_write_i(stream, cfg, &logError);
     }
 
     return ret;
