@@ -36,6 +36,8 @@ gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity
     struct gd_cfg_seq_block * head;
     struct gd_cfg_seq_block ** insertBlocl;
 
+    if (s->m_type != GD_CFG_TYPE_SEQUENCE) return NULL;
+
     assert(s);
     assert(s->m_manage);
 
