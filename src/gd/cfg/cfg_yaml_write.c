@@ -54,7 +54,7 @@ static int gd_cfg_yaml_do_write_cfg_scalar(struct gd_cfg_yaml_write_ctx * ctx, g
     }
     else {
         char buf[20 + 1];
-        struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, 20);
+        struct write_stream_mem bufS = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, 20);
         int len = dr_ctype_print_to_stream((write_stream_t)&bufS, gd_cfg_data(cfg), cfg->m_type, ctx->m_em);
         if (len > 0) {
             buf[len] = 0;

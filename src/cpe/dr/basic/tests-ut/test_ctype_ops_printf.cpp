@@ -10,7 +10,7 @@ public:
         const struct tagDRCTypeInfo * typeInfo =
             dr_find_ctype_info_by_name(name);
 
-        struct write_stream_mem S = CPE_STREAM_MEM_INITIALIZER(m_buf, 128);
+        struct write_stream_mem S = CPE_WRITE_STREAM_MEM_INITIALIZER(m_buf, 128);
         bzero(m_buf, 128);
         return dr_ctype_print_to_stream((write_stream_t)&S, data, typeInfo->m_id, NULL);
     }

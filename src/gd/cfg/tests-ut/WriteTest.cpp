@@ -23,7 +23,7 @@ int WriteTest::write(gd_cfg_t cfg) {
     CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
     CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
 
-    struct write_stream_buffer stream = CPE_STREAM_BUFFER_INITIALIZER(&m_buffer);
+    struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&m_buffer);
 
     int r = gd_cfg_write((write_stream_t)&stream, cfg, &em);
     stream_putc((write_stream_t)&stream, 0);

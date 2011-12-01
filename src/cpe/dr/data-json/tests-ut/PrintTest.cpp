@@ -49,7 +49,7 @@ int PrintTest::print(const void * data, const char * typeName) {
     CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
     CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
 
-    struct write_stream_buffer stream = CPE_STREAM_BUFFER_INITIALIZER(&m_buffer);
+    struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&m_buffer);
 
     int r = dr_json_print((write_stream_t)&stream, data, meta, DR_JSON_PRINT_BEAUTIFY, &em);
     stream_putc((write_stream_t)&stream, 0);

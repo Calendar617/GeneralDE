@@ -16,8 +16,8 @@ int stream_do_write_to_buffer(struct write_stream * stream, const void * buf, si
 
 void write_stream_buffer_init(struct write_stream_buffer * stream, struct mem_buffer * buffer);
 
-#define CPE_STREAM_BUFFER_INITIALIZER(buffer) \
-    { CPE_STREAM_INITIALIZER(stream_do_write_to_buffer, stream_do_flush_dummy), buffer }
+#define CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer) \
+    { CPE_WRITE_STREAM_INITIALIZER(stream_do_write_to_buffer, stream_do_flush_dummy), buffer }
 
 #ifdef __cplusplus
 }

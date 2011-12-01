@@ -16,18 +16,21 @@ TEST_F(ParseTest, type_union_no_select_use_large) {
         );
 
 #pragma pack(push,1)
-    struct {
+    struct T {
         union {
             int16_t a1;
             int32_t a2;
         } m_s;
         int16_t a2;
-    } expect = { { 12 }, 14  };
+    };
 #pragma pack(pop)
 
     ASSERT_EQ(0, read("{ \"m_s\" : { \"a2\" : 12 }, \"a2\" : 14 }", "S2"));
 
-    ASSERT_JSON_READ_RESULT(expect);
+    struct T * r = (struct T*)result();
+    ASSERT_TRUE(r);
+    EXPECT_EQ(12, r->m_s.a1);
+    EXPECT_EQ(14, r->a2);
 }
 
 TEST_F(ParseTest, type_union_no_select_use_small) {

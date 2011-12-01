@@ -48,7 +48,7 @@ static const char * yajl_errno_to_string(yajl_gen_status s) {
 
 static void dr_print_print_numeric(yajl_gen g, int typeId, const void * data, error_monitor_t em) {
     char buf[20 + 1];
-    struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, 20);
+    struct write_stream_mem bufS = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, 20);
     int len = dr_ctype_print_to_stream((write_stream_t)&bufS, data, typeId, em);
     if (len > 0) {
         buf[len] = 0;
@@ -61,7 +61,7 @@ static void dr_print_print_numeric(yajl_gen g, int typeId, const void * data, er
 
 static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, const void * data, error_monitor_t em) {
     char buf[bufLen + 1];
-    struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, bufLen + 1);
+    struct write_stream_mem bufS = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, bufLen + 1);
     int len = dr_ctype_print_to_stream((write_stream_t)&bufS, data, typeId, em);
     if (len > 0) {
         buf[len] = 0;
@@ -132,6 +132,22 @@ static void dr_json_print_union(yajl_gen g, LPDRMETA meta, LPDRMETAENTRY parentE
     int entryPos = 0;
     LPDRMETAENTRY selectEntry = dr_entry_select_entry(parentEntry);
     if (selectEntry) {
+        int32_t selectValue;
+        if (dr_ctype_try_read_int32(
+                &selectValue,
+                ((const char*)data) + parentEntry->m_select_data_start_pos,
+                selectEntry->m_type,
+                em) == 0)
+        {
+            for(; entryPos < meta->m_entry_count; ++entryPos) {
+                LPDRMETAENTRY curEntry = dr_meta_entry_at(meta, entryPos);
+
+                if (curEntry->m_select_range_min <= selectValue && curEntry->m_select_range_max >= selectValue) {
+                    printEntry = curEntry;
+                    break;
+                }
+            }
+        }
     }
     else { /*have select entry*/
         for(; entryPos < meta->m_entry_count; ++entryPos) {
