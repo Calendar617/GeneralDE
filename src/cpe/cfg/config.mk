@@ -1,4 +1,4 @@
-product:=gd_cfg
+product:=cpe_cfg
 $(product).type:=lib
 $(product).depends:=cpe_utils cpe_dr yaml
 $(product).libraries:=

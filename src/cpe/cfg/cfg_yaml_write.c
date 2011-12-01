@@ -1,8 +1,8 @@
 #include "yaml.h"
 #include "cpe/utils/stream_mem.h"
 #include "cpe/dr/dr_ctypes_op.h"
-#include "gd/cfg/cfg_manage.h"
-#include "gd/cfg/cfg_read.h"
+#include "cpe/cfg/cfg_manage.h"
+#include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_ops.h"
 
 struct gd_cfg_yaml_write_ctx {
@@ -48,7 +48,7 @@ static int gd_cfg_yaml_do_write_cfg(struct gd_cfg_yaml_write_ctx * ctx, gd_cfg_t
 static int gd_cfg_yaml_do_write_cfg_scalar(struct gd_cfg_yaml_write_ctx * ctx, gd_cfg_t cfg) {
     int v;
 
-    if (cfg->m_type == GD_CFG_TYPE_STRING) {
+    if (cfg->m_type == CPE_CFG_TYPE_STRING) {
         v = yaml_document_add_scalar( 
             &ctx->m_document, (yaml_char_t *)"str", (yaml_char_t *)gd_cfg_data(cfg), -1, YAML_PLAIN_SCALAR_STYLE);
     }
@@ -109,7 +109,7 @@ static int gd_cfg_yaml_do_write_cfg_seq(struct gd_cfg_yaml_write_ctx * ctx, stru
     }
 
     for(; count > 0 && b; ++i, --count) {
-        if (i >= GD_CFG_SEQ_BLOCK_ITEM_COUNT) {
+        if (i >= CPE_CFG_SEQ_BLOCK_ITEM_COUNT) {
             i = 0;
             b = b->m_next;
             if (b == NULL) break;
@@ -130,9 +130,9 @@ static int gd_cfg_yaml_do_write_cfg_seq(struct gd_cfg_yaml_write_ctx * ctx, stru
 
 static int gd_cfg_yaml_do_write_cfg(struct gd_cfg_yaml_write_ctx * ctx, gd_cfg_t cfg) {
     switch(cfg->m_type) {
-    case GD_CFG_TYPE_STRUCT:
+    case CPE_CFG_TYPE_STRUCT:
         return gd_cfg_yaml_do_write_cfg_struct(ctx, (struct gd_cfg_struct *)cfg);
-    case GD_CFG_TYPE_SEQUENCE:
+    case CPE_CFG_TYPE_SEQUENCE:
         return gd_cfg_yaml_do_write_cfg_seq(ctx, (struct gd_cfg_seq *)cfg);
     default:
         return gd_cfg_yaml_do_write_cfg_scalar(ctx, cfg);

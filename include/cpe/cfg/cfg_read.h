@@ -1,5 +1,5 @@
-#ifndef GD_CFG_READ_H
-#define GD_CFG_READ_H
+#ifndef CPE_CFG_READ_H
+#define CPE_CFG_READ_H
 #include "cfg_types.h"
 
 #ifdef __cplusplus

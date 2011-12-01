@@ -1,5 +1,5 @@
-#ifndef GD_CFG_IMPL_INTERNAL_OP_H
-#define GD_CFG_IMPL_INTERNAL_OP_H
+#ifndef CPE_CFG_IMPL_INTERNAL_OP_H
+#define CPE_CFG_IMPL_INTERNAL_OP_H
 #include "cfg_internal_types.h"
 
 #ifdef __cplusplus

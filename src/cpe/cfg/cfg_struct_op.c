@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "gd/cfg/cfg_manage.h"
+#include "cpe/cfg/cfg_manage.h"
 #include "cfg_internal_types.h"
 #include "cfg_internal_ops.h"
 
@@ -27,7 +27,7 @@ gd_cfg_t gd_cfg_struct_find_cfg(gd_cfg_t cfg, const char * name) {
     assert(cfg);
     assert(name);
 
-    if (cfg->m_type != GD_CFG_TYPE_STRUCT) return NULL;
+    if (cfg->m_type != CPE_CFG_TYPE_STRUCT) return NULL;
 
     tmp.m_name = name;
     found = RB_FIND(gd_cfg_struct_item_tree, &((struct gd_cfg_struct *)cfg)->m_items, &tmp);

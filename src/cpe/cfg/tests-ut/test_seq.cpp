@@ -31,7 +31,7 @@ TEST_F(SeqTest, add_basic) {
     ASSERT_TRUE(s);
     EXPECT_STREQ("a", gd_cfg_name(s));
 
-    EXPECT_EQ(GD_CFG_TYPE_STRUCT, gd_cfg_type(s));
+    EXPECT_EQ(CPE_CFG_TYPE_STRUCT, gd_cfg_type(s));
     EXPECT_TRUE(m_seq == gd_cfg_parent(s));
 
     EXPECT_EQ(1, gd_cfg_seq_count(m_seq));
@@ -51,17 +51,17 @@ TEST_F(SeqTest, add_order) {
 }
 
 TEST_F(SeqTest, add_to_next_trunk) {
-    fill(GD_CFG_SEQ_BLOCK_ITEM_COUNT);
+    fill(CPE_CFG_SEQ_BLOCK_ITEM_COUNT);
     gd_cfg_t s1 = gd_cfg_seq_add_struct(m_seq);
     ASSERT_TRUE(s1);
 
     gd_cfg_t s2 = gd_cfg_seq_add_struct(m_seq);
     ASSERT_TRUE(s2);
 
-    EXPECT_EQ(GD_CFG_SEQ_BLOCK_ITEM_COUNT + 2, gd_cfg_seq_count(m_seq));
+    EXPECT_EQ(CPE_CFG_SEQ_BLOCK_ITEM_COUNT + 2, gd_cfg_seq_count(m_seq));
 
-    EXPECT_TRUE(s1 == gd_cfg_seq_at(m_seq, GD_CFG_SEQ_BLOCK_ITEM_COUNT + 0));
-    EXPECT_TRUE(s2 == gd_cfg_seq_at(m_seq, GD_CFG_SEQ_BLOCK_ITEM_COUNT + 1));
+    EXPECT_TRUE(s1 == gd_cfg_seq_at(m_seq, CPE_CFG_SEQ_BLOCK_ITEM_COUNT + 0));
+    EXPECT_TRUE(s2 == gd_cfg_seq_at(m_seq, CPE_CFG_SEQ_BLOCK_ITEM_COUNT + 1));
 }
 
 TEST_F(SeqTest, add_not_from_seq) {
@@ -129,37 +129,37 @@ TEST_F(SeqTest, remove_first) {
 }
 
 TEST_F(SeqTest, remove_trunk_last_no_left) {
-    fill(GD_CFG_SEQ_BLOCK_ITEM_COUNT - 2);
+    fill(CPE_CFG_SEQ_BLOCK_ITEM_COUNT - 2);
     gd_cfg_t l0 = gd_cfg_seq_add_struct(m_seq);
     gd_cfg_t l1 = gd_cfg_seq_add_struct(m_seq);
 
     gd_cfg_free(l1);
 
-    EXPECT_EQ(GD_CFG_SEQ_BLOCK_ITEM_COUNT - 1, gd_cfg_seq_count(m_seq));
-    EXPECT_EQ(l0, gd_cfg_seq_at(m_seq, GD_CFG_SEQ_BLOCK_ITEM_COUNT - 2));
+    EXPECT_EQ(CPE_CFG_SEQ_BLOCK_ITEM_COUNT - 1, gd_cfg_seq_count(m_seq));
+    EXPECT_EQ(l0, gd_cfg_seq_at(m_seq, CPE_CFG_SEQ_BLOCK_ITEM_COUNT - 2));
 }
 
 TEST_F(SeqTest, remove_trunk_last_with_one_left) {
-    fill(GD_CFG_SEQ_BLOCK_ITEM_COUNT - 1);
+    fill(CPE_CFG_SEQ_BLOCK_ITEM_COUNT - 1);
     gd_cfg_t l0 = gd_cfg_seq_add_struct(m_seq);
     gd_cfg_t l1 = gd_cfg_seq_add_struct(m_seq);
 
     gd_cfg_free(l0);
 
-    EXPECT_EQ(GD_CFG_SEQ_BLOCK_ITEM_COUNT, gd_cfg_seq_count(m_seq));
-    EXPECT_EQ(l1, gd_cfg_seq_at(m_seq, GD_CFG_SEQ_BLOCK_ITEM_COUNT - 1));
+    EXPECT_EQ(CPE_CFG_SEQ_BLOCK_ITEM_COUNT, gd_cfg_seq_count(m_seq));
+    EXPECT_EQ(l1, gd_cfg_seq_at(m_seq, CPE_CFG_SEQ_BLOCK_ITEM_COUNT - 1));
 }
 
 TEST_F(SeqTest, remove_trunk_last_with_more_left) {
-    fill(GD_CFG_SEQ_BLOCK_ITEM_COUNT - 1);
+    fill(CPE_CFG_SEQ_BLOCK_ITEM_COUNT - 1);
     gd_cfg_t l0 = gd_cfg_seq_add_struct(m_seq);
     gd_cfg_t l1 = gd_cfg_seq_add_struct(m_seq);
     gd_cfg_t l2 = gd_cfg_seq_add_struct(m_seq);
 
     gd_cfg_free(l0);
 
-    EXPECT_EQ(GD_CFG_SEQ_BLOCK_ITEM_COUNT + 1, gd_cfg_seq_count(m_seq));
-    EXPECT_EQ(l1, gd_cfg_seq_at(m_seq, GD_CFG_SEQ_BLOCK_ITEM_COUNT - 1));
-    EXPECT_EQ(l2, gd_cfg_seq_at(m_seq, GD_CFG_SEQ_BLOCK_ITEM_COUNT));
+    EXPECT_EQ(CPE_CFG_SEQ_BLOCK_ITEM_COUNT + 1, gd_cfg_seq_count(m_seq));
+    EXPECT_EQ(l1, gd_cfg_seq_at(m_seq, CPE_CFG_SEQ_BLOCK_ITEM_COUNT - 1));
+    EXPECT_EQ(l2, gd_cfg_seq_at(m_seq, CPE_CFG_SEQ_BLOCK_ITEM_COUNT));
 }
 

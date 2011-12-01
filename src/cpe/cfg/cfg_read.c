@@ -1,5 +1,5 @@
 #include "cpe/dr/dr_ctypes_op.h"
-#include "gd/cfg/cfg_read.h"
+#include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_types.h"
 #include "cfg_internal_ops.h"
 
@@ -15,9 +15,9 @@ const char * gd_cfg_name(gd_cfg_t cfg) {
     if (cfg == NULL || cfg->m_parent == NULL) return "";
 
     switch (cfg->m_parent->m_type) {
-    case GD_CFG_TYPE_STRUCT:
+    case CPE_CFG_TYPE_STRUCT:
         return gd_cfg_to_struct_item(cfg)->m_name;
-    case GD_CFG_TYPE_SEQUENCE:
+    case CPE_CFG_TYPE_SEQUENCE:
         return gd_cfg_name(cfg->m_parent);
     default:
         return "";
@@ -40,7 +40,7 @@ int gd_cfg_is_value(gd_cfg_t cfg) {
     return cfg->m_type > CPE_DR_TYPE_COMPOSITE;
 }
 
-#define GD_CFG_GEN_READ_TYPE(__type)                            \
+#define CPE_CFG_GEN_READ_TYPE(__type)                            \
 __type ## _t gd_cfg_get_  ## __type(                            \
         gd_cfg_t cfg, const char * path, __type ## _t dft) {    \
     __type ## _t rv;                                            \
@@ -52,14 +52,14 @@ __type ## _t gd_cfg_get_  ## __type(                            \
         : dft;                                                  \
 }
 
-GD_CFG_GEN_READ_TYPE(int8);
-GD_CFG_GEN_READ_TYPE(uint8);
-GD_CFG_GEN_READ_TYPE(int16);
-GD_CFG_GEN_READ_TYPE(uint16);
-GD_CFG_GEN_READ_TYPE(int32);
-GD_CFG_GEN_READ_TYPE(uint32);
-GD_CFG_GEN_READ_TYPE(int64);
-GD_CFG_GEN_READ_TYPE(uint64);
+CPE_CFG_GEN_READ_TYPE(int8);
+CPE_CFG_GEN_READ_TYPE(uint8);
+CPE_CFG_GEN_READ_TYPE(int16);
+CPE_CFG_GEN_READ_TYPE(uint16);
+CPE_CFG_GEN_READ_TYPE(int32);
+CPE_CFG_GEN_READ_TYPE(uint32);
+CPE_CFG_GEN_READ_TYPE(int64);
+CPE_CFG_GEN_READ_TYPE(uint64);
 
 const char * gd_cfg_get_string(gd_cfg_t cfg, const char * path, const char * dft) {
     gd_cfg_t at = gd_cfg_find_cfg(cfg, path);

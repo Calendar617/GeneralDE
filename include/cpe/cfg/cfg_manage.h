@@ -1,5 +1,5 @@
-#ifndef GD_CFG_MANAGE_H
-#define GD_CFG_MANAGE_H
+#ifndef CPE_CFG_MANAGE_H
+#define CPE_CFG_MANAGE_H
 #include "cpe/utils/memory.h"
 #include "cpe/utils/stream.h"
 #include "cpe/utils/error.h"
