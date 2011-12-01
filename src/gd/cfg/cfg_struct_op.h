@@ -1,5 +1,5 @@
-#ifndef GD_CFG_IMPL_DATAOP_H
-#define GD_CFG_IMPL_DATAOP_H
+#ifndef GD_CFG_IMPL_STRUCTOP_H
+#define GD_CFG_IMPL_STRUCTOP_H
 #include "cfg_internal_types.h"
 
 #ifdef __cplusplus
