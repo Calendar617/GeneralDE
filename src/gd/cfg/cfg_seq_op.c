@@ -13,9 +13,9 @@ gd_cfg_t gd_cfg_seq_at(gd_cfg_t cfg, int pos) {
 
     assert(cfg);
     if (cfg->m_type != GD_CFG_TYPE_SEQUENCE) return NULL;
-    if (pos < 0) return NULL;
 
     s = (struct gd_cfg_seq *)cfg;
+    if (pos < 0 || pos >= s->m_count) return NULL;
 
     block = &s->m_block_head;
     while(pos >= GD_CFG_SEQ_BLOCK_ITEM_COUNT) {
@@ -67,6 +67,8 @@ gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity
     rv->m_parent = (gd_cfg_t)s;
 
     (*insertBlocl)->m_items[insertIdx] = rv;
+
+    ++s->m_count;
 
     return rv;
 }
@@ -125,14 +127,21 @@ void gd_cfg_seq_item_delete(struct gd_cfg_seq * s, gd_cfg_t cfg) {
             : leftCount;
 
         if (leftCountInB > 0) {
-            memmove(&b->m_items[posInB], b->m_items[posInB + 1], sizeof(gd_cfg_t) * leftCountInB);
+            memmove(
+                &b->m_items[posInB],
+                &b->m_items[posInB + 1],
+                sizeof(gd_cfg_t) * leftCountInB);
+
             leftCount -= leftCountInB;
-            posInB = 0;
         }
 
         if (leftCount && b->m_next) {
             b->m_items[GD_CFG_SEQ_BLOCK_ITEM_COUNT - 1] = b->m_next->m_items[0];
             leftCount -= 1;
+            posInB = 0;
+        }
+        else {
+            posInB = -1;
         }
 
         b = b->m_next;
