@@ -3,6 +3,7 @@
 
 #include "cfg_types.h"
 #include "cfg_read.h"
+#include "cfg_manage.h"
 
 #endif
 
