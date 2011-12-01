@@ -25,7 +25,8 @@ int stream_do_flush_dummy(struct write_stream * stream);
 #define stream_putc(stream, c) do{ char __b = c; (stream)->write((stream), &__b, 1); } while(0)
 #define stream_read(stream, buf, size) (stream)->read((stream), buf, size)
 
-#define CPE_STREAM_INITIALIZER(_write, _flush) { (_write), (_flush) }
+#define CPE_WRITE_STREAM_INITIALIZER(_write, _flush) { (_write), (_flush) }
+#define CPE_READ_STREAM_INITIALIZER(_read) { (_read) }
 
 #ifdef __cplusplus
 }

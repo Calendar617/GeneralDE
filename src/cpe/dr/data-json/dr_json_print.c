@@ -48,7 +48,7 @@ static const char * yajl_errno_to_string(yajl_gen_status s) {
 
 static void dr_print_print_numeric(yajl_gen g, int typeId, const void * data, error_monitor_t em) {
     char buf[20 + 1];
-    struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, 20);
+    struct write_stream_mem bufS = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, 20);
     int len = dr_ctype_print_to_stream((write_stream_t)&bufS, data, typeId, em);
     if (len > 0) {
         buf[len] = 0;
@@ -61,7 +61,7 @@ static void dr_print_print_numeric(yajl_gen g, int typeId, const void * data, er
 
 static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, const void * data, error_monitor_t em) {
     char buf[bufLen + 1];
-    struct write_stream_mem bufS = CPE_STREAM_MEM_INITIALIZER(buf, bufLen + 1);
+    struct write_stream_mem bufS = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, bufLen + 1);
     int len = dr_ctype_print_to_stream((write_stream_t)&bufS, data, typeId, em);
     if (len > 0) {
         buf[len] = 0;
