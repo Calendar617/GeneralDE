@@ -64,6 +64,12 @@ TEST_F(SeqTest, add_to_next_trunk) {
     EXPECT_TRUE(s2 == gd_cfg_seq_at(m_seq, GD_CFG_SEQ_BLOCK_ITEM_COUNT + 1));
 }
 
+TEST_F(SeqTest, add_not_from_seq) {
+    gd_cfg_t not_seq = gd_cfg_struct_add_int8(m_root, "aa", 4);
+    EXPECT_FALSE(gd_cfg_seq_add_struct(not_seq));
+}
+
+
 TEST_F(SeqTest, at_from_empty) {
     EXPECT_TRUE(NULL == gd_cfg_seq_at(m_seq, 0));
 }

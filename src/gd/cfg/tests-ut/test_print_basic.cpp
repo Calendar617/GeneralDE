@@ -5,14 +5,17 @@ TEST_F(WriteTest, data_string) {
 
     EXPECT_EQ(0, write(m_root));
     EXPECT_STREQ(
-        ""
+        "---\n"
+        "a: !<str> 123\n"
+        "...\n"
         , result());
 }
 
 TEST_F(WriteTest, map_empty) {
     EXPECT_EQ(0, write(m_root));
     EXPECT_STREQ(
-        ""
+        "--- {}\n"
+        "...\n"
         , result());
 }
 
@@ -21,7 +24,9 @@ TEST_F(WriteTest, map_basic) {
 
     EXPECT_EQ(0, write(m_root));
     EXPECT_STREQ(
-        "--- {a: 12}"
+        "---\n"
+        "a: 12\n"
+        "...\n"
         , result());
 }
 
@@ -32,7 +37,11 @@ TEST_F(WriteTest, map_map) {
 
     EXPECT_EQ(0, write(m_root));
     EXPECT_STREQ(
-        "--- {a: 12}"
+        "---\n"
+        "a:\n"
+        "    b1: 12\n"
+        "    b2: 12\n"
+        "...\n"
         , result());
 }
 
@@ -41,7 +50,23 @@ TEST_F(WriteTest, seq_empty) {
 
     EXPECT_EQ(0, write(seq));
     EXPECT_STREQ(
-        ""
+        "--- []\n"
+        "...\n"
+        , result());
+}
+
+TEST_F(WriteTest, seq_basic) {
+    gd_cfg_t seq = gd_cfg_struct_add_seq(m_root, "a");
+
+    gd_cfg_seq_add_int8(seq, 12);
+    gd_cfg_seq_add_int8(seq, 13);
+
+    EXPECT_EQ(0, write(seq));
+    EXPECT_STREQ(
+        "---\n"
+        "- 12\n"
+        "- 13\n"
+        "...\n"
         , result());
 }
 

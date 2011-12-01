@@ -76,7 +76,7 @@ static int gd_cfg_yaml_do_write_cfg_scalar(struct gd_cfg_yaml_write_ctx * ctx, g
 static int gd_cfg_yaml_do_write_cfg_struct(struct gd_cfg_yaml_write_ctx * ctx, struct gd_cfg_struct * cfg) {
     struct gd_cfg_struct_item * item;
 
-    int mapNode = yaml_document_add_mapping(&ctx->m_document, NULL, YAML_FLOW_MAPPING_STYLE);
+    int mapNode = yaml_document_add_mapping(&ctx->m_document, NULL, YAML_BLOCK_MAPPING_STYLE);
     if (!mapNode) {
         gd_cfg_yaml_notify_document_error(ctx);
         return mapNode;
@@ -85,11 +85,11 @@ static int gd_cfg_yaml_do_write_cfg_struct(struct gd_cfg_yaml_write_ctx * ctx, s
     RB_FOREACH(item, gd_cfg_struct_item_tree, &cfg->m_items) {
         int key = yaml_document_add_scalar(
             &ctx->m_document, NULL, (yaml_char_t *) item->m_name, -1, YAML_PLAIN_SCALAR_STYLE);
-        int value = gd_cfg_yaml_do_write_cfg_scalar(ctx, &item->m_data);
+        int value = gd_cfg_yaml_do_write_cfg(ctx, &item->m_data);
 
         if (key && value) {
             if (!yaml_document_append_mapping_pair(&ctx->m_document, mapNode, key, value)) {
-                CPE_ERROR(ctx->m_em, "Memory error: Not enough memory for creating a document");
+                gd_cfg_yaml_notify_document_error(ctx);
             }
         }
     }
@@ -169,6 +169,7 @@ static void gd_cfg_dump_document_stream(struct gd_cfg_yaml_write_ctx * ctx, writ
     yaml_emitter_set_output(&emitter, gd_cfg_write_to_stream_handler, stream);
     /* yaml_emitter_set_canonical(&emitter, canonical); */
     yaml_emitter_set_unicode(&emitter, YAML_UTF8_ENCODING);
+    yaml_emitter_set_indent(&emitter, 4);
 
     if (!yaml_emitter_open(&emitter)
         || !yaml_emitter_dump(&emitter, &ctx->m_document)
