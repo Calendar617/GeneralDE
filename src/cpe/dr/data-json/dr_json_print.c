@@ -132,6 +132,22 @@ static void dr_json_print_union(yajl_gen g, LPDRMETA meta, LPDRMETAENTRY parentE
     int entryPos = 0;
     LPDRMETAENTRY selectEntry = dr_entry_select_entry(parentEntry);
     if (selectEntry) {
+        int32_t selectValue;
+        if (dr_ctype_try_read_int32(
+                &selectValue,
+                ((const char*)data) + parentEntry->m_select_data_start_pos,
+                selectEntry->m_type,
+                em) == 0)
+        {
+            for(; entryPos < meta->m_entry_count; ++entryPos) {
+                LPDRMETAENTRY curEntry = dr_meta_entry_at(meta, entryPos);
+
+                if (curEntry->m_select_range_min <= selectValue && curEntry->m_select_range_max >= selectValue) {
+                    printEntry = curEntry;
+                    break;
+                }
+            }
+        }
     }
     else { /*have select entry*/
         for(; entryPos < meta->m_entry_count; ++entryPos) {
