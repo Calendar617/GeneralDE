@@ -24,7 +24,7 @@ int ReadTest::read(const char * input) {
     //CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
     //CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
 
-    //return gd_cfg_read(m_root, data, meta, &em);
+    //return cfg_read(m_root, data, meta, &em);
     return 0;
 }
 
@@ -34,7 +34,7 @@ const char * ReadTest::result(void) {
     mem_buffer_clear(&m_result_buffer);
     struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&m_result_buffer);
 
-    EXPECT_EQ(0, gd_cfg_write((write_stream_t)&stream, m_root, &em));
+    EXPECT_EQ(0, cfg_write((write_stream_t)&stream, m_root, &em));
     stream_putc((write_stream_t)&stream, 0);
 
     return (const char *)mem_buffer_make_exactly(&m_result_buffer);

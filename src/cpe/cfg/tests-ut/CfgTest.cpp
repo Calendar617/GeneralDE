@@ -6,12 +6,12 @@ CfgTest::CfgTest()
 }
 
 void CfgTest::SetUp() {
-    m_root = gd_cfg_create(NULL);
+    m_root = cfg_create(NULL);
     ASSERT_TRUE(m_root) << "manage create fail!";
 }
 
 void CfgTest::TearDown() {
-    gd_cfg_free(m_root);
+    cfg_free(m_root);
     m_root = NULL;
 }
 

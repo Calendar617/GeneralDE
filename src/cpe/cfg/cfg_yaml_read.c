@@ -1,15 +1,15 @@
 #include "yaml.h"
-#include "gd/cfg/cfg_manage.h"
+#include "cpe/cfg/cfg_manage.h"
 #include "cfg_internal_types.h"
 
-struct gd_cfg_yaml_read_ctx {
+struct cfg_yaml_read_ctx {
     yaml_parser_t m_parser;
     yaml_event_t m_input_event;
 
     error_monitor_t m_em;
 };
 
-static int gd_cfg_read_from_stream_read_handler(
+static int cfg_read_from_stream_read_handler(
     void *data,
     unsigned char *buffer,
     size_t size,
@@ -28,61 +28,61 @@ static int gd_cfg_read_from_stream_read_handler(
     }
 }
 
-static int gd_cfg_yaml_read_ctx_init(
-    struct gd_cfg_yaml_read_ctx * ctx,
+static int cfg_yaml_read_ctx_init(
+    struct cfg_yaml_read_ctx * ctx,
     read_stream_t stream,
     error_monitor_t em)
 {
-    bzero(ctx, sizeof(struct gd_cfg_yaml_read_ctx));
+    bzero(ctx, sizeof(struct cfg_yaml_read_ctx));
 
     if (!yaml_parser_initialize(&ctx->m_parser)) {
         CPE_ERROR(em, "yaml parsser initialize fail!");
         return -1;
     }
 
-    yaml_parser_set_input(&ctx->m_parser, gd_cfg_read_from_stream_read_handler, stream);
+    yaml_parser_set_input(&ctx->m_parser, cfg_read_from_stream_read_handler, stream);
 
     ctx->m_em = em;
 
     return 0;
 }
 
-static void gd_cfg_yaml_read_ctx_fini(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_read_ctx_fini(struct cfg_yaml_read_ctx * ctx) {
     yaml_parser_delete(&ctx->m_parser);
     yaml_event_delete(&ctx->m_input_event);
 }
 
-static void gd_cfg_yaml_on_stream_begin(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_stream_begin(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_on_stream_end(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_stream_end(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_on_document_begin(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_document_begin(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_on_document_end(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_document_end(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_on_alias(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_alias(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_on_scalar(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_on_sequence_begin(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_sequence_begin(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_on_sequence_end(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_sequence_end(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_on_map_begin(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_map_begin(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_on_map_end(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_on_map_end(struct cfg_yaml_read_ctx * ctx) {
 }
 
-static void gd_cfg_yaml_notify_parse_error(struct gd_cfg_yaml_read_ctx * ctx) {
+static void cfg_yaml_notify_parse_error(struct cfg_yaml_read_ctx * ctx) {
     switch (ctx->m_parser.error) {
         case YAML_MEMORY_ERROR:
             CPE_ERROR(ctx->m_em, "Memory error: Not enough memory for parsing\n");
@@ -141,46 +141,46 @@ static void gd_cfg_yaml_notify_parse_error(struct gd_cfg_yaml_read_ctx * ctx) {
     }
 }
 
-typedef void (*gd_cfg_yaml_read_event_process_fun_t)(struct gd_cfg_yaml_read_ctx * ctx);
+typedef void (*cfg_yaml_read_event_process_fun_t)(struct cfg_yaml_read_ctx * ctx);
 
 static
-gd_cfg_yaml_read_event_process_fun_t
+cfg_yaml_read_event_process_fun_t
 g_yaml_read_event_processors[YAML_MAPPING_END_EVENT + 1] = {
     /*YAML_NO_EVENT*/ 0,
-    /*YAML_STREAM_START_EVENT*/ gd_cfg_yaml_on_stream_begin,
-    /*YAML_STREAM_END_EVENT*/ gd_cfg_yaml_on_stream_end,
-    /*YAML_DOCUMENT_START_EVENT*/ gd_cfg_yaml_on_document_begin,
-    /*YAML_DOCUMENT_END_EVENT*/ gd_cfg_yaml_on_document_end,
-    /*YAML_ALIAS_EVENT*/ gd_cfg_yaml_on_alias,
-    /*YAML_SCALAR_EVENT*/ gd_cfg_yaml_on_scalar,
-    /*YAML_SEQUENCE_START_EVENT*/ gd_cfg_yaml_on_sequence_begin,
-    /*YAML_SEQUENCE_END_EVENT*/ gd_cfg_yaml_on_sequence_end,
-    /*YAML_MAPPING_START_EVENT*/ gd_cfg_yaml_on_map_begin,
-    /*YAML_MAPPING_END_EVENT*/ gd_cfg_yaml_on_map_end
+    /*YAML_STREAM_START_EVENT*/ cfg_yaml_on_stream_begin,
+    /*YAML_STREAM_END_EVENT*/ cfg_yaml_on_stream_end,
+    /*YAML_DOCUMENT_START_EVENT*/ cfg_yaml_on_document_begin,
+    /*YAML_DOCUMENT_END_EVENT*/ cfg_yaml_on_document_end,
+    /*YAML_ALIAS_EVENT*/ cfg_yaml_on_alias,
+    /*YAML_SCALAR_EVENT*/ cfg_yaml_on_scalar,
+    /*YAML_SEQUENCE_START_EVENT*/ cfg_yaml_on_sequence_begin,
+    /*YAML_SEQUENCE_END_EVENT*/ cfg_yaml_on_sequence_end,
+    /*YAML_MAPPING_START_EVENT*/ cfg_yaml_on_map_begin,
+    /*YAML_MAPPING_END_EVENT*/ cfg_yaml_on_map_end
 };
 
-static void gd_cfg_read_i(gd_cfg_t cfg, read_stream_t stream, error_monitor_t em) {
-    struct gd_cfg_yaml_read_ctx ctx;
+static void cfg_read_i(cfg_t cfg, read_stream_t stream, error_monitor_t em) {
+    struct cfg_yaml_read_ctx ctx;
     int done = 0;
 
-    if (gd_cfg_yaml_read_ctx_init(&ctx, stream, em) != 0) return;
+    if (cfg_yaml_read_ctx_init(&ctx, stream, em) != 0) return;
 
     while (!done) {
         if (!yaml_parser_parse(&ctx.m_parser, &ctx.m_input_event)) {
-            gd_cfg_yaml_notify_parse_error(&ctx);
+            cfg_yaml_notify_parse_error(&ctx);
             break;
         }
 
         if (ctx.m_input_event.type == YAML_STREAM_END_EVENT) done = 1;
 
         if (ctx.m_input_event.type < 0
-            || ctx.m_input_event.type >= sizeof(g_yaml_read_event_processors)/sizeof(gd_cfg_yaml_read_event_process_fun_t))
+            || ctx.m_input_event.type >= sizeof(g_yaml_read_event_processors)/sizeof(cfg_yaml_read_event_process_fun_t))
         {
             CPE_ERROR(em, "unknown yaml event %d!", ctx.m_input_event.type);
             done = 1;
         }
         else {
-            gd_cfg_yaml_read_event_process_fun_t processor = g_yaml_read_event_processors[ctx.m_input_event.type];
+            cfg_yaml_read_event_process_fun_t processor = g_yaml_read_event_processors[ctx.m_input_event.type];
             if (processor == NULL) {
                 CPE_ERROR(em, "no processor for yaml event %d!", ctx.m_input_event.type);
                 done = 1;
@@ -193,19 +193,19 @@ static void gd_cfg_read_i(gd_cfg_t cfg, read_stream_t stream, error_monitor_t em
         yaml_event_delete(&ctx.m_input_event);
     }
 
-    gd_cfg_yaml_read_ctx_fini(&ctx);
+    cfg_yaml_read_ctx_fini(&ctx);
 }
 
-int gd_cfg_read_stream(gd_cfg_t cfg, read_stream_t stream, error_monitor_t em) {
+int cfg_read_stream(cfg_t cfg, read_stream_t stream, error_monitor_t em) {
     int ret = 0;
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
-        gd_cfg_read_i(cfg, stream, em);
+        cfg_read_i(cfg, stream, em);
         CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
     }
     else {
         CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
-        gd_cfg_read_i(cfg, stream, &logError);
+        cfg_read_i(cfg, stream, &logError);
     }
 
     return ret;

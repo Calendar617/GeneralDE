@@ -16,7 +16,7 @@ void WriteTest::TearDown() {
     CfgTest::TearDown();
 }
 
-int WriteTest::write(gd_cfg_t cfg) {
+int WriteTest::write(cfg_t cfg) {
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);
 
@@ -25,7 +25,7 @@ int WriteTest::write(gd_cfg_t cfg) {
 
     struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&m_buffer);
 
-    int r = gd_cfg_write((write_stream_t)&stream, cfg, &em);
+    int r = cfg_write((write_stream_t)&stream, cfg, &em);
     stream_putc((write_stream_t)&stream, 0);
     return r;
 }
