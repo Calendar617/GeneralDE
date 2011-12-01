@@ -17,7 +17,7 @@ struct gd_cfg {
 
 struct gd_cfg_struct_item {
     RB_ENTRY(gd_cfg_struct_item) m_linkage;
-    char * m_name;
+    const char * m_name;
     struct gd_cfg m_data;
 };
 

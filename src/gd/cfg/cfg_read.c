@@ -11,10 +11,17 @@ void * gd_cfg_data(gd_cfg_t cfg) {
     return (void*)(cfg + 1);
 }
 
-char * gd_cfg_name(gd_cfg_t cfg) {
+const char * gd_cfg_name(gd_cfg_t cfg) {
     if (cfg == NULL || cfg->m_parent == NULL) return "";
 
-    return gd_cfg_to_struct_item(cfg)->m_name;
+    switch (cfg->m_parent->m_type) {
+    case GD_CFG_TYPE_STRUCT:
+        return gd_cfg_to_struct_item(cfg)->m_name;
+    case GD_CFG_TYPE_SEQUENCE:
+        return gd_cfg_name(cfg->m_parent);
+    default:
+        return "";
+    }
 }
 
 int gd_cfg_type(gd_cfg_t cfg) {
@@ -64,5 +71,5 @@ const char * gd_cfg_get_string(gd_cfg_t cfg, const char * path, const char * dft
 }
 
 gd_cfg_t gd_cfg_find_cfg(gd_cfg_t cfg, const char * path) {
-    return NULL;
+    return cfg;
 }

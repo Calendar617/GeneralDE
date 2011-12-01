@@ -22,7 +22,17 @@ void gd_cfg_struct_fini(struct gd_cfg_struct * cfg) {
 }
 
 gd_cfg_t gd_cfg_struct_find_cfg(gd_cfg_t cfg, const char * name) {
-    return NULL;
+    struct gd_cfg_struct_item tmp;
+    struct gd_cfg_struct_item * found;
+
+    assert(cfg);
+    assert(name);
+
+    if (cfg->m_type != GD_CFG_TYPE_STRUCT) return NULL;
+
+    tmp.m_name = name;
+    found = RB_FIND(gd_cfg_struct_item_tree, &((struct gd_cfg_struct *)cfg)->m_items, &tmp);
+    return found ? &found->m_data : NULL;
 }
 
 void gd_cfg_struct_item_delete(struct gd_cfg_struct * s, gd_cfg_t cfg) {
@@ -39,7 +49,7 @@ void gd_cfg_struct_item_delete(struct gd_cfg_struct * s, gd_cfg_t cfg) {
     gd_cfg_fini(&item->m_data);
 
     /*name is the alloc start adress, see gd_cfg_struct_add_item*/
-    mem_free(item->m_data.m_manage->m_alloc, item->m_name);
+    mem_free(item->m_data.m_manage->m_alloc, (void*)item->m_name);
 }
 
 gd_cfg_t gd_cfg_struct_item_create(struct gd_cfg_struct * s, const char * name, int type, size_t capacity) {

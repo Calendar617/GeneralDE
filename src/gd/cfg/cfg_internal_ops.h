@@ -17,7 +17,7 @@ void gd_cfg_struct_init(struct gd_cfg_struct * s);
 
 #define gd_cfg_to_struct_item(__dp) \
     ((struct gd_cfg_struct_item *)                                      \
-     ((char*)__dp) - (sizeof(struct gd_cfg_struct_item) - sizeof(struct gd_cfg)))
+     (((char*)__dp) - (sizeof(struct gd_cfg_struct_item) - sizeof(struct gd_cfg))))
 
 /*sequence operations*/
 gd_cfg_t gd_cfg_seq_item_create(struct gd_cfg_seq * s, int type, size_t capacity);

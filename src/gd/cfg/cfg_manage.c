@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <string.h>
 #include <strings.h>
 #include "gd/cfg/cfg_manage.h"
 #include "gd/cfg/cfg_read.h"
@@ -61,20 +62,65 @@ void gd_cfg_fini(gd_cfg_t cfg) {
 }
 
 gd_cfg_t gd_cfg_struct_add_struct(gd_cfg_t s, const char * name) {
-    gd_cfg_t rv = gd_cfg_struct_item_create((struct gd_cfg_struct *)s, name, GD_CFG_TYPE_STRUCT, sizeof(struct gd_cfg_struct));
+    gd_cfg_t rv = gd_cfg_struct_item_create(
+        (struct gd_cfg_struct *)s,
+        name,
+        GD_CFG_TYPE_STRUCT,
+        sizeof(struct gd_cfg_struct) - sizeof(struct gd_cfg));
+    if (rv == NULL) return NULL;
+    gd_cfg_struct_init((struct gd_cfg_struct *)rv);
+    return rv;
+}
+
+gd_cfg_t gd_cfg_seq_add_struct(gd_cfg_t s) {
+    gd_cfg_t rv = gd_cfg_seq_item_create(
+        (struct gd_cfg_seq *)s,
+        GD_CFG_TYPE_STRUCT,
+        sizeof(struct gd_cfg_struct) - sizeof(struct gd_cfg));
     if (rv == NULL) return NULL;
     gd_cfg_struct_init((struct gd_cfg_struct *)rv);
     return rv;
 }
 
 gd_cfg_t gd_cfg_struct_add_seq(gd_cfg_t s, const char * name) {
-    gd_cfg_t rv = gd_cfg_struct_item_create((struct gd_cfg_struct *)s, name, GD_CFG_TYPE_SEQUENCE, sizeof(struct gd_cfg_seq));
+    gd_cfg_t rv = gd_cfg_struct_item_create(
+        (struct gd_cfg_struct *)s,
+        name,
+        GD_CFG_TYPE_SEQUENCE,
+        sizeof(struct gd_cfg_seq) - sizeof(struct gd_cfg));
     if (rv == NULL) return NULL;
     gd_cfg_seq_init((struct gd_cfg_seq *)rv);
     return rv;
 }
 
-#define GD_CFG_GEN_STRUCT_ADD_TYPE(__type, __typeId)                    \
+gd_cfg_t gd_cfg_seq_add_seq(gd_cfg_t s) {
+    gd_cfg_t rv = gd_cfg_seq_item_create(
+        (struct gd_cfg_seq *)s,
+        GD_CFG_TYPE_SEQUENCE,
+        sizeof(struct gd_cfg_seq) - sizeof(struct gd_cfg));
+    if (rv == NULL) return NULL;
+    gd_cfg_seq_init((struct gd_cfg_seq *)rv);
+    return rv;
+}
+
+gd_cfg_t gd_cfg_struct_add_string(gd_cfg_t s, const char * name, const char * value) {
+    size_t len = strlen(value) + 1;
+    gd_cfg_t rv = gd_cfg_struct_item_create(
+        (struct gd_cfg_struct *)s, name, GD_CFG_TYPE_STRING, len);
+    if (rv == NULL) return NULL;
+    memcpy(gd_cfg_data(rv), value, len);
+    return rv;
+}
+
+gd_cfg_t gd_cfg_seq_add_string(gd_cfg_t s, const char * value) {
+    size_t len = strlen(value) + 1;
+    gd_cfg_t rv = gd_cfg_seq_item_create((struct gd_cfg_seq *)s, GD_CFG_TYPE_STRING, len);
+    if (rv == NULL) return NULL;
+    memcpy(gd_cfg_data(rv), value, len);
+    return rv;
+}
+
+#define GD_CFG_GEN_ADD_FUN_TYPE(__type, __typeId)                       \
 gd_cfg_t gd_cfg_struct_add_ ## __type(                                  \
         gd_cfg_t s, const char * name, __type ## _t v) {                \
     gd_cfg_t rv = gd_cfg_struct_item_create(                            \
@@ -82,13 +128,21 @@ gd_cfg_t gd_cfg_struct_add_ ## __type(                                  \
     if (rv == NULL) return NULL;                                        \
     *(( __type ## _t*)gd_cfg_data(rv)) = v;                             \
     return rv;                                                          \
+}                                                                       \
+gd_cfg_t gd_cfg_seq_add_ ## __type(gd_cfg_t s, __type ## _t v) {        \
+    gd_cfg_t rv = gd_cfg_seq_item_create(                               \
+        (struct gd_cfg_seq *)s, __typeId, sizeof(v));                   \
+    if (rv == NULL) return NULL;                                        \
+    *(( __type ## _t*)gd_cfg_data(rv)) = v;                             \
+    return rv;                                                          \
 }
 
-GD_CFG_GEN_STRUCT_ADD_TYPE(int8, GD_CFG_TYPE_INT8)
-GD_CFG_GEN_STRUCT_ADD_TYPE(uint8, GD_CFG_TYPE_UINT8)
-GD_CFG_GEN_STRUCT_ADD_TYPE(int16, GD_CFG_TYPE_INT16)
-GD_CFG_GEN_STRUCT_ADD_TYPE(uint16, GD_CFG_TYPE_UINT16)
-GD_CFG_GEN_STRUCT_ADD_TYPE(int32, GD_CFG_TYPE_INT32)
-GD_CFG_GEN_STRUCT_ADD_TYPE(uint32, GD_CFG_TYPE_UINT32)
-GD_CFG_GEN_STRUCT_ADD_TYPE(int64, GD_CFG_TYPE_INT64)
-GD_CFG_GEN_STRUCT_ADD_TYPE(uint64, GD_CFG_TYPE_UINT64)
+GD_CFG_GEN_ADD_FUN_TYPE(int8, GD_CFG_TYPE_INT8)
+GD_CFG_GEN_ADD_FUN_TYPE(uint8, GD_CFG_TYPE_UINT8)
+GD_CFG_GEN_ADD_FUN_TYPE(int16, GD_CFG_TYPE_INT16)
+GD_CFG_GEN_ADD_FUN_TYPE(uint16, GD_CFG_TYPE_UINT16)
+GD_CFG_GEN_ADD_FUN_TYPE(int32, GD_CFG_TYPE_INT32)
+GD_CFG_GEN_ADD_FUN_TYPE(uint32, GD_CFG_TYPE_UINT32)
+GD_CFG_GEN_ADD_FUN_TYPE(int64, GD_CFG_TYPE_INT64)
+GD_CFG_GEN_ADD_FUN_TYPE(uint64, GD_CFG_TYPE_UINT64)
+
