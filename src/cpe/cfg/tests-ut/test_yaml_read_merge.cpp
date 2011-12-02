@@ -9,7 +9,7 @@ TEST_F(ReadMergeTest, scalar_to_scalar___replace) {
             "b: 2\n"
             "b: 3\n"
             ,
-            cfg_read_replace
+            cfg_replace
             ));
 
     EXPECT_STREQ(
@@ -27,7 +27,7 @@ TEST_F(ReadMergeTest, scalar_to_scalar___merge_mine) {
             "b: 2\n"
             "b: 3\n"
             ,
-            cfg_read_merge_mine
+            cfg_merge_mine
             ));
 
     EXPECT_STREQ(
@@ -45,7 +45,7 @@ TEST_F(ReadMergeTest, scalar_to_scalar_merge_yours) {
             "b: 2\n"
             "b: 3\n"
             ,
-            cfg_read_merge_yours
+            cfg_merge_yours
             ));
 
     EXPECT_STREQ(
@@ -67,7 +67,7 @@ TEST_F(ReadMergeTest, map_to_map___replace) {
             "  a3: 3\n"
             "c: 4\n"
             ,
-            cfg_read_replace));
+            cfg_replace));
 
     EXPECT_STREQ(
         "---\n"
@@ -91,7 +91,7 @@ TEST_F(ReadMergeTest, map_to_map___merge_mine) {
             "  a3: 4\n"
             "c: 4\n"
             ,
-            cfg_read_merge_mine));
+            cfg_merge_mine));
 
     EXPECT_STREQ(
         "---\n"
@@ -117,7 +117,7 @@ TEST_F(ReadMergeTest, map_to_map___merge_yours) {
             "  a3: 4\n"
             "c: 4\n"
             ,
-            cfg_read_merge_yours));
+            cfg_merge_yours));
 
     EXPECT_STREQ(
         "---\n"
@@ -141,7 +141,7 @@ TEST_F(ReadMergeTest, map_to_schela___merge_yours) {
             "  a3: 4\n"
             "c: 4\n"
             ,
-            cfg_read_merge_yours));
+            cfg_merge_yours));
 
     EXPECT_STREQ(
         "---\n"
@@ -162,7 +162,7 @@ TEST_F(ReadMergeTest, map_to_schela___merge_mine) {
             "  a3: 4\n"
             "c: 4\n"
             ,
-            cfg_read_merge_mine));
+            cfg_merge_mine));
 
     EXPECT_STREQ(
         "---\n"
@@ -187,7 +187,7 @@ TEST_F(ReadMergeTest, seq_to_seq___replace) {
             "  - 4\n"
             "c: 4\n"
             ,
-            cfg_read_replace));
+            cfg_replace));
 
     EXPECT_STREQ(
         "---\n"
@@ -212,7 +212,7 @@ TEST_F(ReadMergeTest, seq_to_seq___merge_mine) {
             "  - 4\n"
             "c: 4\n"
             ,
-            cfg_read_merge_mine));
+            cfg_merge_mine));
 
     EXPECT_STREQ(
         "---\n"
@@ -239,7 +239,7 @@ TEST_F(ReadMergeTest, seq_to_seq___merge_yours) {
             "  - 4\n"
             "c: 4\n"
             ,
-            cfg_read_merge_yours));
+            cfg_merge_yours));
 
     EXPECT_STREQ(
         "---\n"
@@ -266,7 +266,7 @@ TEST_F(ReadMergeTest, seq_to_map___replace) {
             "  - 4\n"
             "c: 4\n"
             ,
-            cfg_read_replace));
+            cfg_replace));
 
     EXPECT_STREQ(
         "---\n"
@@ -291,7 +291,7 @@ TEST_F(ReadMergeTest, seq_to_map___merge_mine) {
             "  - 4\n"
             "c: 4\n"
             ,
-            cfg_read_merge_mine));
+            cfg_merge_mine));
 
     EXPECT_STREQ(
         "---\n"
@@ -316,7 +316,7 @@ TEST_F(ReadMergeTest, seq_to_map___merge_yours) {
             "  - 4\n"
             "c: 4\n"
             ,
-            cfg_read_merge_yours));
+            cfg_merge_yours));
 
     EXPECT_STREQ(
         "---\n"
@@ -339,7 +339,7 @@ TEST_F(ReadMergeTest, null___replace) {
             "a: !!null\n"
             "c: 4\n"
             ,
-            cfg_read_replace));
+            cfg_replace));
 
     EXPECT_STREQ(
         "---\n"
@@ -359,7 +359,7 @@ TEST_F(ReadMergeTest, null___merge_mine) {
             "a: !!null\n"
             "c: 4\n"
             ,
-            cfg_read_merge_mine));
+            cfg_merge_mine));
 
     EXPECT_STREQ(
         "---\n"
@@ -379,7 +379,7 @@ TEST_F(ReadMergeTest, null___merge_yours) {
             "a: !!null\n"
             "c: 4\n"
             ,
-            cfg_read_merge_yours));
+            cfg_merge_yours));
 
     EXPECT_STREQ(
         "---\n"
@@ -391,3 +391,146 @@ TEST_F(ReadMergeTest, null___merge_yours) {
         "...\n"
         , result());
 }
+
+TEST_F(ReadMergeTest, map_to_seq___replace) {
+    EXPECT_EQ(
+        0, read(
+            "a:\n"
+            "  - 1\n"
+            "  - 2\n"
+            "b: 3\n"
+            "a:\n"
+            "  a2: 3\n"
+            "  a3: 4\n"
+            "c: 4\n"
+            ,
+            cfg_replace));
+
+    EXPECT_STREQ(
+        "---\n"
+        "a:\n"
+        "    a2: 3\n"
+        "    a3: 4\n"
+        "b: 3\n"
+        "c: 4\n"
+        "...\n"
+        , result());
+}
+
+TEST_F(ReadMergeTest, map_to_seq___merge_mine) {
+    EXPECT_EQ(
+        0, read(
+            "a:\n"
+            "  - 1\n"
+            "  - 2\n"
+            "b: 3\n"
+            "a:\n"
+            "  '': - 3"
+            "  a2: 3\n"
+            "  a3: 4\n"
+            "c: 4\n"
+            ,
+            cfg_merge_mine));
+
+    EXPECT_STREQ(
+        "---\n"
+        "a:\n"
+        "    '':\n"
+        "    - 1\n"
+        "    - 2\n"
+        "    - 3\n"
+        "    a2: 3\n"
+        "    a3: 4\n"
+        "b: 3\n"
+        "c: 4\n"
+        "...\n"
+        , result());
+}
+
+TEST_F(ReadMergeTest, map_to_seq___merge_mine_no_sub_seq) {
+    EXPECT_EQ(
+        0, read(
+            "a:\n"
+            "  - 1\n"
+            "  - 2\n"
+            "b: 3\n"
+            "a:\n"
+            "  a2: 3\n"
+            "  a3: 4\n"
+            "c: 4\n"
+            ,
+            cfg_merge_mine));
+
+    EXPECT_STREQ(
+        "---\n"
+        "a:\n"
+        "    '':\n"
+        "    - 1\n"
+        "    - 2\n"
+        "    a2: 3\n"
+        "    a3: 4\n"
+        "b: 3\n"
+        "c: 4\n"
+        "...\n"
+        , result());
+}
+
+TEST_F(ReadMergeTest, map_to_seq___merge_yours) {
+    EXPECT_EQ(
+        0, read(
+            "a:\n"
+            "  - 1\n"
+            "  - 2\n"
+            "b: 3\n"
+            "a:\n"
+            "  '':\n"
+            "  - 3\n"
+            "  a2: 3\n"
+            "  a3: 4\n"
+            "c: 4\n"
+            ,
+            cfg_merge_yours));
+
+    EXPECT_STREQ(
+        "---\n"
+        "a:\n"
+        "    '':\n"
+        "    - 1\n"
+        "    - 2\n"
+        "    - 3\n"
+        "    a2: 3\n"
+        "    a3: 4\n"
+        "b: 3\n"
+        "c: 4\n"
+        "...\n"
+        , result());
+}
+
+TEST_F(ReadMergeTest, map_to_seq___merge_yours_no_sub_seq) {
+    EXPECT_EQ(
+        0, read(
+            "a:\n"
+            "  - 1\n"
+            "  - 2\n"
+            "b: 3\n"
+            "a:\n"
+            "  a2: 3\n"
+            "  a3: 4\n"
+            "c: 4\n"
+            ,
+            cfg_merge_yours));
+
+    EXPECT_STREQ(
+        "---\n"
+        "a:\n"
+        "    '':\n"
+        "    - 1\n"
+        "    - 2\n"
+        "    a2: 3\n"
+        "    a3: 4\n"
+        "b: 3\n"
+        "c: 4\n"
+        "...\n"
+        , result());
+}
+

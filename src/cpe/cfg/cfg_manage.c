@@ -62,12 +62,13 @@ void cfg_fini(cfg_t cfg) {
     }
 }
 
-cfg_t cfg_struct_add_struct(cfg_t s, const char * name) {
+cfg_t cfg_struct_add_struct(cfg_t s, const char * name, cfg_policy_t policy) {
     cfg_t rv = cfg_struct_item_create(
         (struct cfg_struct *)s,
         name,
         CPE_CFG_TYPE_STRUCT,
-        sizeof(struct cfg_struct) - sizeof(struct cfg));
+        sizeof(struct cfg_struct) - sizeof(struct cfg),
+        policy);
     if (rv == NULL) return NULL;
     cfg_struct_init((struct cfg_struct *)rv);
     return rv;
@@ -83,12 +84,13 @@ cfg_t cfg_seq_add_struct(cfg_t s) {
     return rv;
 }
 
-cfg_t cfg_struct_add_seq(cfg_t s, const char * name) {
+cfg_t cfg_struct_add_seq(cfg_t s, const char * name, cfg_policy_t policy) {
     cfg_t rv = cfg_struct_item_create(
         (struct cfg_struct *)s,
         name,
         CPE_CFG_TYPE_SEQUENCE,
-        sizeof(struct cfg_seq) - sizeof(struct cfg));
+        sizeof(struct cfg_seq) - sizeof(struct cfg),
+        policy);
     if (rv == NULL) return NULL;
     cfg_seq_init((struct cfg_seq *)rv);
     return rv;
@@ -104,10 +106,10 @@ cfg_t cfg_seq_add_seq(cfg_t s) {
     return rv;
 }
 
-cfg_t cfg_struct_add_string(cfg_t s, const char * name, const char * value) {
+cfg_t cfg_struct_add_string(cfg_t s, const char * name, const char * value, cfg_policy_t policy) {
     size_t len = strlen(value) + 1;
     cfg_t rv = cfg_struct_item_create(
-        (struct cfg_struct *)s, name, CPE_CFG_TYPE_STRING, len);
+        (struct cfg_struct *)s, name, CPE_CFG_TYPE_STRING, len, policy);
     if (rv == NULL) return NULL;
     memcpy(cfg_data(rv), value, len);
     return rv;
@@ -123,9 +125,9 @@ cfg_t cfg_seq_add_string(cfg_t s, const char * value) {
 
 #define CPE_CFG_GEN_ADD_FUN_TYPE(__type, __typeId)                       \
 cfg_t cfg_struct_add_ ## __type(                                  \
-        cfg_t s, const char * name, __type ## _t v) {                \
+        cfg_t s, const char * name, __type ## _t v, cfg_policy_t policy) {                \
     cfg_t rv = cfg_struct_item_create(                            \
-        (struct cfg_struct *)s, name, __typeId, sizeof(v));          \
+        (struct cfg_struct *)s, name, __typeId, sizeof(v), policy);            \
     if (rv == NULL) return NULL;                                        \
     *(( __type ## _t*)cfg_data(rv)) = v;                             \
     return rv;                                                          \
@@ -168,17 +170,17 @@ cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value) {
     return rv;
 }
 
-cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * value) {
+cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * value, cfg_policy_t policy) {
     int capacity;
 
-    if (typeId == CPE_CFG_TYPE_STRING) return cfg_struct_add_string(s, name, value);
-    if (typeId == CPE_CFG_TYPE_STRUCT) return cfg_struct_add_struct(s, name);
-    if (typeId == CPE_CFG_TYPE_SEQUENCE) return cfg_struct_add_seq(s, name);
+    if (typeId == CPE_CFG_TYPE_STRING) return cfg_struct_add_string(s, name, value, policy);
+    if (typeId == CPE_CFG_TYPE_STRUCT) return cfg_struct_add_struct(s, name, policy);
+    if (typeId == CPE_CFG_TYPE_SEQUENCE) return cfg_struct_add_seq(s, name, policy);
 
     capacity = dr_type_size(typeId);
     if (capacity <= 0) return NULL;
 
-    cfg_t rv = cfg_struct_item_create((struct cfg_struct *)s, name, typeId, capacity);
+    cfg_t rv = cfg_struct_item_create((struct cfg_struct *)s, name, typeId, capacity, policy);
     if (rv == NULL) return NULL;
 
     if (dr_ctype_set_from_string(cfg_data(rv), typeId, value, NULL) != 0) {
@@ -189,18 +191,18 @@ cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * 
     return rv;
 }
 
-cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value) {
+cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value, cfg_policy_t policy) {
     int32_t v32;
     if (dr_ctype_set_from_string(&v32, CPE_DR_TYPE_INT32, value, NULL) == 0) {
-        return cfg_struct_add_int32(s, name, v32);
+        return cfg_struct_add_int32(s, name, v32, policy);
     }
 
     int64_t v64;
     if (dr_ctype_set_from_string(&v64, CPE_DR_TYPE_INT64, value, NULL) == 0) {
-        return cfg_struct_add_int64(s, name, v64);
+        return cfg_struct_add_int64(s, name, v64, policy);
     }
 
-    return cfg_struct_add_string(s, name, value);
+    return cfg_struct_add_string(s, name, value, policy);
 }
 
 cfg_t cfg_seq_add_value_auto(cfg_t s, const char * value) {

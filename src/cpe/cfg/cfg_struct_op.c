@@ -51,7 +51,7 @@ void cfg_struct_item_delete(struct cfg_struct * s, cfg_t cfg) {
     mem_free(item->m_data.m_manage->m_alloc, (void*)item->m_name);
 }
 
-cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type, size_t capacity) {
+cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type, size_t capacity, cfg_policy_t policy) {
     assert(s);
     assert(s->m_manage);
     assert(name);

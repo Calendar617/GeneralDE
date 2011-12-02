@@ -21,7 +21,7 @@ struct cfg_yaml_read_ctx {
         parse_in_seq
     } m_state;
 
-    cfg_read_policy_t m_policy;
+    cfg_policy_t m_policy;
     error_monitor_t m_em;
 };
 
@@ -48,7 +48,7 @@ static int cfg_yaml_read_ctx_init(
     struct cfg_yaml_read_ctx * ctx,
     cfg_t root,
     read_stream_t stream,
-    cfg_read_policy_t policy,
+    cfg_policy_t policy,
     error_monitor_t em)
 {
     bzero(ctx, sizeof(struct cfg_yaml_read_ctx));
@@ -134,56 +134,39 @@ int32_t cfg_yaml_read_bool(const char * value) {
     }
 }
 
-static void cfg_yaml_struct_add_value(struct cfg_yaml_read_ctx * ctx, const char * value) {
-    const char * tag = (const char *)ctx->m_input_event.data.scalar.tag;
-    if (tag) {
-        if (strcmp(tag, YAML_BOOL_TAG) == 0) {
-            int32_t v = cfg_yaml_read_bool(value);
-            if (v >= 0) {
-                cfg_struct_add_int32(ctx->m_curent, ctx->m_name, v);
-            }
-            return;
-        }
-        if (strcmp(tag, YAML_INT_TAG) == 0) {
-            cfg_struct_add_value(ctx->m_curent, ctx->m_name, CPE_CFG_TYPE_INT32, value);
-            return;
-        }
-    }
-    else {
-        if (!ctx->m_input_event.data.scalar.quoted_implicit) {
-            cfg_struct_add_value_auto(ctx->m_curent, ctx->m_name, value);
-            return;
-        }
-    }
-
-    int typeId = cfg_yaml_get_type_from_tag(ctx) ;
-    cfg_struct_add_value(ctx->m_curent, ctx->m_name, typeId, value);
+#define cfg_yaml_do_add_value(__type, __ctx, args...)                   \
+if ((__ctx)->m_curent->m_type == CPE_CFG_TYPE_STRUCT) {                 \
+    cfg_struct_add_ ## __type(                                          \
+        (__ctx)->m_curent, (__ctx)->m_name, ##args, (__ctx)->m_policy); \
+}                                                                       \
+else {                                                                  \
+    cfg_seq_add_ ## __type((__ctx)->m_curent, ##args);                  \
 }
 
-static void cfg_yaml_seq_add_value(struct cfg_yaml_read_ctx * ctx, const char * value) {
+static void cfg_yaml_add_value(struct cfg_yaml_read_ctx * ctx, const char * value) {
     const char * tag = (const char *)ctx->m_input_event.data.scalar.tag;
     if (tag) {
         if (strcmp(tag, YAML_BOOL_TAG) == 0) {
             int32_t v = cfg_yaml_read_bool(value);
             if (v >= 0) {
-                cfg_seq_add_int32(ctx->m_curent, v);
+                cfg_yaml_do_add_value(int32, ctx, v);
             }
             return;
         }
         if (strcmp(tag, YAML_INT_TAG) == 0) {
-            cfg_seq_add_value(ctx->m_curent, CPE_CFG_TYPE_INT32, value);
+            cfg_yaml_do_add_value(value, ctx, CPE_CFG_TYPE_INT32, value);
             return;
         }
     }
     else {
         if (!ctx->m_input_event.data.scalar.quoted_implicit) {
-            cfg_seq_add_value_auto(ctx->m_curent, value);
+            cfg_yaml_do_add_value(value_auto, ctx, value);
             return;
         }
     }
 
     int typeId = cfg_yaml_get_type_from_tag(ctx) ;
-    cfg_seq_add_value(ctx->m_curent, typeId, value);
+    cfg_yaml_do_add_value(value, ctx, typeId, value);
 }
 
 static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
@@ -213,7 +196,7 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
             if (tag && strcmp(tag, YAML_NULL_TAG) == 0) {
                 cfg_t oldValue = cfg_struct_find_cfg(ctx->m_curent, ctx->m_name);
                 if (oldValue
-                    && (ctx->m_policy == cfg_read_replace || ctx->m_policy == cfg_read_merge_mine))
+                    && (ctx->m_policy == cfg_replace || ctx->m_policy == cfg_merge_mine))
                 {
                     cfg_struct_item_delete((struct cfg_struct *)ctx->m_curent, oldValue);
                 }
@@ -230,18 +213,18 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
                 else {
                     cfg_t oldValue = cfg_struct_find_cfg(ctx->m_curent, ctx->m_name);
                     if (oldValue) {
-                        if (ctx->m_policy == cfg_read_replace || ctx->m_policy == cfg_read_merge_mine) {
+                        if (ctx->m_policy == cfg_replace || ctx->m_policy == cfg_merge_mine) {
                             cfg_struct_item_delete((struct cfg_struct *)ctx->m_curent, oldValue);
-                            cfg_yaml_struct_add_value(ctx, value);
+                            cfg_yaml_add_value(ctx, value);
                         }
                     }
                     else {
-                        cfg_yaml_struct_add_value(ctx, value);
+                        cfg_yaml_add_value(ctx, value);
                     }
                 }
             }
             else {
-                cfg_struct_add_string(ctx->m_curent, ctx->m_name, "");
+                cfg_struct_add_string(ctx->m_curent, ctx->m_name, "", ctx->m_policy);
             }
             ctx->m_name = NULL;
         }
@@ -259,7 +242,7 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
                 CPE_ERROR(ctx->m_em, "dump scalar as seq value, no memory!");
             }
             else {
-                cfg_yaml_seq_add_value(ctx, value);
+                cfg_yaml_add_value(ctx, value);
             }
         }
         else {
@@ -285,16 +268,16 @@ static void cfg_yaml_on_sequence_begin(struct cfg_yaml_read_ctx * ctx) {
         }
 
         if (name) {
-            cfg_t newNode = cfg_struct_add_seq(ctx->m_curent, name);
+            cfg_t newNode = cfg_struct_add_seq(ctx->m_curent, name, ctx->m_policy);
             if (newNode == NULL) {
                 cfg_t oldValue = cfg_struct_find_cfg(ctx->m_curent, name);
                 if (oldValue) {
-                    if (ctx->m_policy == cfg_read_replace
-                        || (ctx->m_policy == cfg_read_merge_mine
+                    if (ctx->m_policy == cfg_replace
+                        || (ctx->m_policy == cfg_merge_mine
                             && oldValue->m_type != CPE_CFG_TYPE_SEQUENCE))
                     {
                         cfg_struct_item_delete((struct cfg_struct *)ctx->m_curent, oldValue);
-                        newNode = cfg_struct_add_seq(ctx->m_curent, name);
+                        newNode = cfg_struct_add_seq(ctx->m_curent, name, ctx->m_policy);
                     }
                     else {
                         newNode = oldValue;
@@ -343,16 +326,16 @@ static void cfg_yaml_on_map_begin(struct cfg_yaml_read_ctx * ctx) {
         if (ctx->m_curent->m_type != CPE_CFG_TYPE_STRUCT) return;
 
         if (ctx->m_name != NULL) {
-            cfg_t newNode = cfg_struct_add_struct(ctx->m_curent, ctx->m_name);
+            cfg_t newNode = cfg_struct_add_struct(ctx->m_curent, ctx->m_name, ctx->m_policy);
             if (newNode == NULL) {
                 cfg_t oldValue = cfg_struct_find_cfg(ctx->m_curent, ctx->m_name);
                 if (oldValue) {
-                    if (ctx->m_policy == cfg_read_replace
-                        || (ctx->m_policy == cfg_read_merge_mine
+                    if (ctx->m_policy == cfg_replace
+                        || (ctx->m_policy == cfg_merge_mine
                             && oldValue->m_type != CPE_CFG_TYPE_STRUCT))
                     {
                         cfg_struct_item_delete((struct cfg_struct *)ctx->m_curent, oldValue);
-                        newNode = cfg_struct_add_struct(ctx->m_curent, ctx->m_name);
+                        newNode = cfg_struct_add_struct(ctx->m_curent, ctx->m_name, ctx->m_policy);
                     }
                     else {
                         newNode = oldValue;
@@ -479,7 +462,7 @@ g_yaml_read_event_processors[YAML_MAPPING_END_EVENT + 1] = {
     /*YAML_MAPPING_END_EVENT*/ cfg_yaml_on_map_end
 };
 
-static void cfg_read_i(cfg_t cfg, read_stream_t stream, cfg_read_policy_t policy, error_monitor_t em) {
+static void cfg_read_i(cfg_t cfg, read_stream_t stream, cfg_policy_t policy, error_monitor_t em) {
     struct cfg_yaml_read_ctx ctx;
     int done = 0;
 
@@ -516,7 +499,7 @@ static void cfg_read_i(cfg_t cfg, read_stream_t stream, cfg_read_policy_t policy
     cfg_yaml_read_ctx_fini(&ctx);
 }
 
-int cfg_read(cfg_t cfg, read_stream_t stream, cfg_read_policy_t policy, error_monitor_t em) {
+int cfg_read(cfg_t cfg, read_stream_t stream, cfg_policy_t policy, error_monitor_t em) {
     int ret = 0;
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);

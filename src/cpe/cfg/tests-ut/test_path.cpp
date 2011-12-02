@@ -114,6 +114,22 @@ TEST_F(PathTest, map_seq_seq_map) {
     EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 
+TEST_F(PathTest, map_map_seq_no_name) {
+    cfg_t subMap = cfg_struct_add_struct(m_root, "a", cfg_replace);
+    cfg_seq_add_int8(
+        cfg_struct_add_seq(subMap, "", cfg_replace),
+        12);
+    cfg_struct_add_int8(subMap, "b", 33, cfg_replace);
+
+    cfg_t cfg1 = cfg_find_cfg(m_root, "a[0]");
+    ASSERT_TRUE(cfg1);
+    EXPECT_EQ(12, cfg_as_int32(cfg1, -1));
+
+    cfg_t cfg2 = cfg_find_cfg(m_root, "a.b");
+    ASSERT_TRUE(cfg2);
+    EXPECT_EQ(33, cfg_as_int32(cfg2, -1));
+}
+
 TEST_F(PathTest, map_noname_seq_seq_map) {
     EXPECT_EQ(
         0, read(
@@ -172,7 +188,7 @@ TEST_F(PathTest, map_name_with_space) {
 }
 
 TEST_F(PathTest, seq_root_map) {
-    cfg_t r = cfg_struct_add_seq(m_root, "xxx");
+    cfg_t r = cfg_struct_add_seq(m_root, "xxx", cfg_replace);
 
     EXPECT_EQ(
         0, read(

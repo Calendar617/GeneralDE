@@ -8,7 +8,7 @@ public:
     virtual void SetUp() {
         CfgTest::SetUp();
 
-        m_seq = cfg_struct_add_seq(m_root, "a");
+        m_seq = cfg_struct_add_seq(m_root, "a", cfg_replace);
         ASSERT_TRUE(m_seq);
     }
 
@@ -65,7 +65,7 @@ TEST_F(SeqTest, add_to_next_trunk) {
 }
 
 TEST_F(SeqTest, add_not_from_seq) {
-    cfg_t not_seq = cfg_struct_add_int8(m_root, "aa", 4);
+    cfg_t not_seq = cfg_struct_add_int8(m_root, "aa", 4, cfg_replace);
     EXPECT_FALSE(cfg_seq_add_struct(not_seq));
 }
 
