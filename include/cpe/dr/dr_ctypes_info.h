@@ -41,6 +41,7 @@ extern "C" {
 
 CPE_DR_API const char * dr_type_name(int typeId);
 CPE_DR_API int dr_type_size(int typeId);
+CPE_DR_API int dr_type_id_from_name(const char * name);
 
 CPE_DR_API char *dr_drip_to_ineta(dr_ip_t a_iTDRIp);
 CPE_DR_API const char *dr_drip_ntop(dr_ip_t a_iTDRIp, char *a_pszDstBuff, int a_iBuffSize);
