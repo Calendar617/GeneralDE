@@ -5,6 +5,8 @@
 
 typedef struct cfg * cfg_t;
 
+#define CPE_CFG_NAME_MAX_LEN (128)
+
 #define CPE_CFG_TYPE_SEQUENCE    CPE_DR_TYPE_UNION
 #define CPE_CFG_TYPE_STRUCT      CPE_DR_TYPE_STRUCT
 #define CPE_CFG_TYPE_INT8        CPE_DR_TYPE_INT8
