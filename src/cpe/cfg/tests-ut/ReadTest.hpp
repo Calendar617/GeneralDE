@@ -15,9 +15,11 @@ public:
     error_list_t m_errorList;
 
     int read(const char * input);
+    int read(cfg_t cfg, const char * input);
 
     struct mem_buffer m_result_buffer;
     const char * result(void);
+    const char * result(cfg_t cfg);
 };
 
 #endif

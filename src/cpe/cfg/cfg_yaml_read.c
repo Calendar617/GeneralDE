@@ -190,7 +190,12 @@ static void cfg_yaml_on_sequence_begin(struct cfg_yaml_read_ctx * ctx) {
     }
     else {
         assert(ctx->m_curent->m_type == CPE_CFG_TYPE_SEQUENCE);
-        ctx->m_curent = cfg_seq_add_seq(ctx->m_curent);
+        if (ctx->m_curent == ctx->m_root) {
+            //DO NOTHING
+        }
+        else {
+            ctx->m_curent = cfg_seq_add_seq(ctx->m_curent);
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 #include "ReadTest.hpp"
 
-TEST_F(ReadTest, root_map_basic) {
+TEST_F(ReadTest, map_basic) {
     EXPECT_EQ(
         0, read(
             "a: abc\n"
@@ -13,7 +13,7 @@ TEST_F(ReadTest, root_map_basic) {
         , result());
 }
 
-TEST_F(ReadTest, root_map_no_value) {
+TEST_F(ReadTest, map_no_value) {
     EXPECT_EQ(
         0, read(
             "a: \n"
@@ -26,7 +26,7 @@ TEST_F(ReadTest, root_map_no_value) {
         , result());
 }
 
-TEST_F(ReadTest, root_map_name_empty) {
+TEST_F(ReadTest, map_name_empty) {
     EXPECT_EQ(
         0, read(
             "'': 1\n"
@@ -39,7 +39,7 @@ TEST_F(ReadTest, root_map_name_empty) {
         , result());
 }
 
-TEST_F(ReadTest, root_map_two_item) {
+TEST_F(ReadTest, map_two_item) {
     EXPECT_EQ(
         0, read(
             "a: abc\n"
@@ -54,7 +54,7 @@ TEST_F(ReadTest, root_map_two_item) {
         , result());
 }
 
-TEST_F(ReadTest, root_map_map) {
+TEST_F(ReadTest, map_map) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -71,7 +71,7 @@ TEST_F(ReadTest, root_map_map) {
         , result());
 }
 
-TEST_F(ReadTest, root_map_map_multi_item) {
+TEST_F(ReadTest, map_map_multi_item) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -90,7 +90,7 @@ TEST_F(ReadTest, root_map_map_multi_item) {
         , result());
 }
 
-TEST_F(ReadTest, root_map_to_parent) {
+TEST_F(ReadTest, map_to_parent) {
     EXPECT_EQ(
         -1, read(
             "    a: abc\n"
@@ -104,7 +104,7 @@ TEST_F(ReadTest, root_map_to_parent) {
         , result());
 }
 
-TEST_F(ReadTest, root_map_map_map) {
+TEST_F(ReadTest, map_map_map) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -123,7 +123,7 @@ TEST_F(ReadTest, root_map_map_map) {
         , result());
 }
 
-TEST_F(ReadTest, root_map_seq) {
+TEST_F(ReadTest, map_seq) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -146,7 +146,7 @@ TEST_F(ReadTest, root_map_seq) {
         , result());
 }
 
-TEST_F(ReadTest, root_map_seq_map) {
+TEST_F(ReadTest, map_seq_map) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -167,7 +167,7 @@ TEST_F(ReadTest, root_map_seq_map) {
         , result());
 }
 
-TEST_F(ReadTest, root_seq) {
+TEST_F(ReadTest, map_input_seq) {
     EXPECT_EQ(
         0, read(
             "- 1\n"
@@ -183,7 +183,7 @@ TEST_F(ReadTest, root_seq) {
         , result());
 }
 
-TEST_F(ReadTest, root_seq_seq) {
+TEST_F(ReadTest, map_input_seq_seq) {
     EXPECT_EQ(
         0, read(
             "-\n"
@@ -205,7 +205,7 @@ TEST_F(ReadTest, root_seq_seq) {
         , result());
 }
 
-TEST_F(ReadTest, root_seq_map_seq) {
+TEST_F(ReadTest, map_input_seq_map_seq) {
     EXPECT_EQ(
         0, read(
             "- a:\n"
@@ -252,7 +252,7 @@ TEST_F(ReadTest, root_seq_no_value) {
         , result());
 }
 
-TEST_F(ReadTest, set_basic) {
+TEST_F(ReadTest, map_set_basic) {
     EXPECT_EQ(
         0, read(
             "--- !!set\n"
@@ -269,3 +269,47 @@ TEST_F(ReadTest, set_basic) {
         "...\n"
         , result());
 }
+
+TEST_F(ReadTest, seq_basic) {
+    cfg_t seq = cfg_struct_add_seq(m_root, "xxx");
+
+    EXPECT_EQ(
+        0, read(
+            seq, 
+            "- a:\n"
+            "  - \n"
+            "  - 1.2\n"
+            "- b:\n"
+            "  - 2.1\n"
+            "  - 2.2\n"
+            ));
+
+    EXPECT_STREQ(
+        "---\n"
+        "-   a:\n"
+        "    - 1.2\n"
+        "-   b:\n"
+        "    - 2.1\n"
+        "    - 2.2\n"
+        "...\n"
+        , result(seq));
+}
+
+TEST_F(ReadTest, seq_input_map) {
+    cfg_t seq = cfg_struct_add_seq(m_root, "xxx");
+
+    EXPECT_EQ(
+        0, read(
+            seq, 
+            "a: 1\n"
+            "b: 1\n"
+            ));
+
+    EXPECT_STREQ(
+        "---\n"
+        "-   a: 1\n"
+        "    b: 1\n"
+        "...\n"
+        , result(seq));
+}
+
