@@ -40,7 +40,7 @@ cfg_t cfg_seq_add_int64(cfg_t s, int64_t v);
 cfg_t cfg_seq_add_uint64(cfg_t s, uint64_t v);
 cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value);
 
-int cfg_read(cfg_t cfg, read_stream_t stream, error_monitor_t em);
+int cfg_read(cfg_t cfg, read_stream_t stream, cfg_read_policy_t policy, error_monitor_t em);
 int cfg_write(write_stream_t stream, cfg_t cfg, error_monitor_t em);
 
 #ifdef __cplusplus

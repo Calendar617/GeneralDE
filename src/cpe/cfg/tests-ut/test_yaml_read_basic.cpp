@@ -313,3 +313,71 @@ TEST_F(ReadTest, seq_input_map) {
         , result(seq));
 }
 
+TEST_F(ReadTest, map_schela) {
+
+    EXPECT_EQ(
+        0, read(
+            "a\n"
+            ));
+
+    EXPECT_STREQ(
+        "--- {}\n"
+        "...\n"
+        , result());
+}
+
+TEST_F(ReadTest, seq_schela) {
+    cfg_t seq = cfg_struct_add_seq(m_root, "xxx");
+
+    EXPECT_EQ(
+        0, read(
+            seq,
+            "a\n"
+            ));
+
+    EXPECT_STREQ(
+        "---\n"
+        "- a\n"
+        "...\n"
+        , result(seq));
+}
+
+TEST_F(ReadTest, map_multi_document) {
+    EXPECT_EQ(
+        0, read(
+            "a: 1\n"
+            "b: 2\n"
+            "---\n"
+            "c: 3\n"
+            ));
+
+    EXPECT_STREQ(
+        "---\n"
+        "a: 1\n"
+        "b: 2\n"
+        "c: 3\n"
+        "...\n"
+        , result());
+}
+
+TEST_F(ReadTest, seq_multi_document) {
+    cfg_t seq = cfg_struct_add_seq(m_root, "xxx");
+
+    EXPECT_EQ(
+        0, read(
+            seq,
+            "a: 1\n"
+            "b: 2\n"
+            "---\n"
+            "c: 3\n"
+            ));
+
+    EXPECT_STREQ(
+        "---\n"
+        "-   a: 1\n"
+        "    b: 2\n"
+        "-   c: 3\n"
+        "...\n"
+        , result(seq));
+}
+
