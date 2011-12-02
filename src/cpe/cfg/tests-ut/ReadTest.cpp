@@ -18,6 +18,10 @@ void ReadTest::TearDown() {
 }
 
 int ReadTest::read(const char * input) {
+    return read(m_root, input);
+}
+
+int ReadTest::read(cfg_t cfg, const char * input) {
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);
 
@@ -25,16 +29,20 @@ int ReadTest::read(const char * input) {
     CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
 
     struct read_stream_mem stream = CPE_READ_STREAM_MEM_INITIALIZER(input, strlen(input));
-    return cfg_read(m_root, (read_stream_t)&stream, &em);
+    return cfg_read(cfg, (read_stream_t)&stream, &em);
 }
 
 const char * ReadTest::result(void) {
+    return result(m_root);
+}
+
+const char * ReadTest::result(cfg_t cfg) {
     CPE_DEF_ERROR_MONITOR(em, cpe_error_log_to_consol, NULL);
 
     mem_buffer_clear(&m_result_buffer);
     struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&m_result_buffer);
 
-    EXPECT_EQ(0, cfg_write((write_stream_t)&stream, m_root, &em));
+    EXPECT_EQ(0, cfg_write((write_stream_t)&stream, cfg, &em));
     stream_putc((write_stream_t)&stream, 0);
 
     return (const char *)mem_buffer_make_exactly(&m_result_buffer);

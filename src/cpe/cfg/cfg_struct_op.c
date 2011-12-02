@@ -76,7 +76,11 @@ cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type,
     item->m_data.m_type = type;
     item->m_name = data;
 
-    RB_INSERT(cfg_struct_item_tree, &s->m_items, item);
-
-    return &item->m_data;
+    if (RB_INSERT(cfg_struct_item_tree, &s->m_items, item) != NULL) {
+        mem_free(item->m_data.m_manage->m_alloc, data);
+        return NULL;
+    }
+    else {
+        return &item->m_data;
+    }
 }

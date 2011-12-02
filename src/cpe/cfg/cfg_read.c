@@ -1,3 +1,4 @@
+#include <string.h>
 #include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_types.h"
@@ -70,6 +71,88 @@ const char * cfg_get_string(cfg_t cfg, const char * path, const char * dft) {
         : dft;
 }
 
+static cfg_t cfg_do_find_cfg_from_struct(cfg_t cfg, const char * path, const char * end) {
+    char buf[CPE_CFG_NAME_MAX_LEN + 1];
+
+    int size = end - path;
+    if (size > CPE_CFG_NAME_MAX_LEN) return NULL;
+
+    memcpy(buf, path, size);
+    buf[size] = 0;
+    return cfg_struct_find_cfg(cfg, buf);
+}
+
+static cfg_t cfg_do_find_cfg_from_seq(cfg_t cfg, const char * path, const char * end) {
+    char buf[20 + 1];
+    uint32_t seqPos;
+    int size = end - path;
+    if (size > 20) return NULL;
+
+    memcpy(buf, path, size);
+    buf[size] = 0;
+
+    if (dr_ctype_set_from_string(&seqPos, CPE_DR_TYPE_UINT32, buf, NULL) != 0) return NULL;
+    return cfg_seq_at(cfg, seqPos);
+}
+
 cfg_t cfg_find_cfg(cfg_t cfg, const char * path) {
+    const char * end = path + strlen(path);
+    const char * nextSeqTag = strchr(path, '[');
+    const char * nextNameTag = strchr(path, '.');
+
+    if (nextSeqTag == NULL) nextSeqTag = end;
+    if (nextNameTag == NULL) nextNameTag = end;
+
+    while(cfg && path < end) {
+        if (path[0] == '[') {
+            if (cfg->m_type != CPE_CFG_TYPE_SEQUENCE) {
+                if (cfg->m_type == CPE_CFG_TYPE_STRUCT) {
+                    cfg = cfg_struct_find_cfg(cfg, "");
+                    if (cfg && cfg->m_type == CPE_CFG_TYPE_SEQUENCE) {
+                        continue;
+                    }
+                }
+
+                return NULL;
+            }
+
+            const char * seqEndTag = strchr(nextSeqTag, ']');
+            if (seqEndTag == NULL) return NULL;
+
+            cfg = cfg_do_find_cfg_from_seq(cfg, path + 1, seqEndTag);
+            path = seqEndTag + 1;
+            nextSeqTag = strchr(path, '[');
+            if (nextSeqTag == NULL) nextSeqTag = end;
+
+            if (*path == '.') {
+                path += 1;
+                nextNameTag = strchr(path, '.');
+                if (nextNameTag == NULL) nextNameTag = end;
+            }
+        }
+        else {
+            if (cfg->m_type != CPE_CFG_TYPE_STRUCT) {
+                return NULL;
+            }
+
+            if (nextSeqTag < nextNameTag) {
+                cfg = cfg_do_find_cfg_from_struct(cfg, path, nextSeqTag);
+                path = nextSeqTag;
+                nextSeqTag = strchr(nextSeqTag, '[');
+                if (nextSeqTag == NULL) nextSeqTag = end;
+            }
+            else if (nextNameTag < nextSeqTag) {
+                cfg = cfg_do_find_cfg_from_struct(cfg, path, nextNameTag);
+                path = nextNameTag + 1;
+                nextNameTag = strchr(path, '.');
+                if (nextNameTag == NULL) nextNameTag = end;
+            }
+            else {
+                cfg = cfg_struct_find_cfg(cfg, path);
+                path = end;
+            }
+        }
+    }
+
     return cfg;
 }

@@ -22,6 +22,13 @@ TEST_F(StructTest, add_seq) {
     EXPECT_EQ(0, cfg_seq_count(seq));
 }
 
+TEST_F(StructTest, add_duplicate) {
+    cfg_t seq = cfg_struct_add_seq(m_root, "a");
+    EXPECT_TRUE(seq);
+
+    EXPECT_FALSE(cfg_struct_add_seq(m_root, "a"));
+}
+
 TEST_F(StructTest, add_not_from_struct) {
     cfg_t not_struct = cfg_struct_add_int8(m_root, "a", 3);
     ASSERT_TRUE(not_struct);
