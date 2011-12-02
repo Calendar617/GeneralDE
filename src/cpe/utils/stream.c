@@ -42,3 +42,22 @@ void write_stream_mem_init(struct write_stream_mem * stream, void * buf, size_t 
     stream->m_capacity = size;
     stream->m_pos = 0;
 }
+
+int stream_do_read_from_mem(struct read_stream * input_stream, void * buf, size_t size) {
+    struct read_stream_mem * stream = (struct read_stream_mem *) input_stream;
+
+    if (size + stream->m_pos > stream->m_capacity) {
+        size = stream->m_capacity - stream->m_pos;
+    }
+
+    memcpy(buf, stream->m_buffer + stream->m_pos, size);
+    stream->m_pos += size;
+    return size;
+}
+
+void read_stream_mem_init(struct read_stream_mem * stream, const void * buf, size_t size) {
+    stream->m_stream.read = stream_do_read_from_mem;
+    stream->m_buffer = buf;
+    stream->m_capacity = size;
+    stream->m_pos = 0;
+}

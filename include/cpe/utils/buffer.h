@@ -41,9 +41,11 @@ void mem_trunk_set_size(mem_buffer_t buffer, struct mem_buffer_trunk * trunk, si
 
 /* buffer basic operations */
 size_t mem_buffer_size(mem_buffer_t buffer);
+size_t mem_buffer_set_size(mem_buffer_t buffer, size_t size);
 
 void mem_buffer_init(mem_buffer_t buffer, struct mem_allocrator * allocrator);
 void mem_buffer_clear(mem_buffer_t buffer);
+void mem_buffer_clear_data(mem_buffer_t buffer);
 
 /* buffer position operations */
 void mem_buffer_begin(mem_buffer_pos_t pos, mem_buffer_t buffer);
