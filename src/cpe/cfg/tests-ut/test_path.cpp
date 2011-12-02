@@ -87,7 +87,7 @@ TEST_F(PathTest, map_seq_seq) {
 
     cfg_t cfg = cfg_find_cfg(m_root, "a[0][0]");
     ASSERT_TRUE(cfg);
-    EXPECT_STREQ("123", (const char *)cfg_data(cfg));
+    EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 TEST_F(PathTest, map_seq_map) {
     EXPECT_EQ(
@@ -98,7 +98,7 @@ TEST_F(PathTest, map_seq_map) {
 
     cfg_t cfg = cfg_find_cfg(m_root, "a[0].b");
     ASSERT_TRUE(cfg);
-    EXPECT_STREQ("123", (const char *)cfg_data(cfg));
+    EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 
 TEST_F(PathTest, map_seq_seq_map) {
@@ -111,7 +111,7 @@ TEST_F(PathTest, map_seq_seq_map) {
 
     cfg_t cfg = cfg_find_cfg(m_root, "a[0][0].b");
     ASSERT_TRUE(cfg);
-    EXPECT_STREQ("123", (const char *)cfg_data(cfg));
+    EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 
 TEST_F(PathTest, map_noname_seq_seq_map) {
@@ -123,7 +123,7 @@ TEST_F(PathTest, map_noname_seq_seq_map) {
 
     cfg_t cfg = cfg_find_cfg(m_root, "[0][0].b");
     ASSERT_TRUE(cfg);
-    EXPECT_STREQ("123", (const char *)cfg_data(cfg));
+    EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 
 TEST_F(PathTest, map_seq_not_close) {
@@ -168,7 +168,7 @@ TEST_F(PathTest, map_name_with_space) {
 
     cfg_t cfg = cfg_find_cfg(m_root, "a c[0].b");
     ASSERT_TRUE(cfg);
-    EXPECT_STREQ("123", (const char *)cfg_data(cfg));
+    EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 
 TEST_F(PathTest, seq_root_map) {
@@ -182,5 +182,5 @@ TEST_F(PathTest, seq_root_map) {
 
     cfg_t cfg = cfg_find_cfg(r, "[0].b");
     ASSERT_TRUE(cfg);
-    EXPECT_STREQ("123", (const char *)cfg_data(cfg));
+    EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }

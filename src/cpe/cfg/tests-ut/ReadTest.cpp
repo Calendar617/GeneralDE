@@ -17,11 +17,11 @@ void ReadTest::TearDown() {
     CfgTest::TearDown();
 }
 
-int ReadTest::read(const char * input) {
-    return read(m_root, input);
+int ReadTest::read(const char * input, cfg_read_policy_t policy) {
+    return read(m_root, input, policy);
 }
 
-int ReadTest::read(cfg_t cfg, const char * input) {
+int ReadTest::read(cfg_t cfg, const char * input, cfg_read_policy_t policy) {
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);
 
@@ -29,7 +29,7 @@ int ReadTest::read(cfg_t cfg, const char * input) {
     CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
 
     struct read_stream_mem stream = CPE_READ_STREAM_MEM_INITIALIZER(input, strlen(input));
-    return cfg_read(cfg, (read_stream_t)&stream, &em);
+    return cfg_read(cfg, (read_stream_t)&stream, policy, &em);
 }
 
 const char * ReadTest::result(void) {

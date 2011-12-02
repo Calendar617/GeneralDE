@@ -188,3 +188,32 @@ cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * 
 
     return rv;
 }
+
+cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value) {
+    int32_t v32;
+    if (dr_ctype_set_from_string(&v32, CPE_DR_TYPE_INT32, value, NULL) == 0) {
+        return cfg_struct_add_int32(s, name, v32);
+    }
+
+    int64_t v64;
+    if (dr_ctype_set_from_string(&v64, CPE_DR_TYPE_INT64, value, NULL) == 0) {
+        return cfg_struct_add_int64(s, name, v64);
+    }
+
+    return cfg_struct_add_string(s, name, value);
+}
+
+cfg_t cfg_seq_add_value_auto(cfg_t s, const char * value) {
+    int32_t v32;
+    if (dr_ctype_set_from_string(&v32, CPE_DR_TYPE_INT32, value, NULL) == 0) {
+        return cfg_seq_add_int32(s, v32);
+    }
+
+    int64_t v64;
+    if (dr_ctype_set_from_string(&v64, CPE_DR_TYPE_INT64, value, NULL) == 0) {
+        return cfg_seq_add_int64(s, v64);
+    }
+
+    return cfg_seq_add_string(s, value);
+}
+
