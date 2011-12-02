@@ -36,7 +36,7 @@ void cpe_error_log_to_consol(struct error_info * info, void * context, const cha
 void cpe_error_save_last_errno(struct error_info * info, void * context, const char * fmt, va_list args);
 
 /*operations*/
-void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...);
+void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...) __attribute__((format(printf,2,3)));
 void cpe_error_do_notify_var(error_monitor_t monitor, const char * fmt, va_list args);
 void cpe_error_monitor_add_node(error_monitor_t monitor, struct error_monitor_node * node);
 void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor_node * node);

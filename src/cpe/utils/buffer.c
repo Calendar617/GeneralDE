@@ -21,6 +21,16 @@ size_t mem_buffer_size(struct mem_buffer * buffer) {
     return buffer->m_size;
 }
 
+void mem_buffer_clear_data(mem_buffer_t buffer) {
+    struct mem_buffer_trunk * trunk;
+
+    TAILQ_FOREACH(trunk, &buffer->m_trunks, m_next) {
+        trunk->m_size = 0;
+    }
+
+    buffer->m_size = 0;
+}
+
 struct mem_buffer_trunk *
 mem_buffer_append_trunk(struct mem_buffer * buffer, size_t capacity) {
     struct mem_buffer_trunk * trunk = mem_trunk_alloc(buffer->m_default_allocrator, capacity);

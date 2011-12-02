@@ -1,3 +1,4 @@
+#include <strings.h>
 #include <stdio.h>
 #include "cpe/utils/error.h"
 
@@ -5,22 +6,28 @@ void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...) {
     struct error_monitor_node * node = &monitor->m_node;
     va_list args;
 
-    va_start(args, fmt);
-
     while(node) {
-            node->on_error(&monitor->m_curent_location, node->m_context, fmt, args);
-            node = node->m_next;
+        va_start(args, fmt);
+        node->on_error(&monitor->m_curent_location, node->m_context, fmt, args);
+        node = node->m_next;
+        va_end(args);
     }
-
-    va_end(args);
 }
 
 void cpe_error_do_notify_var(error_monitor_t monitor, const char * fmt, va_list args) {
     struct error_monitor_node * node = &monitor->m_node;
 
     while(node) {
+        if (node->m_next) {
+            va_list tmp;
+            va_copy(tmp, args);
+            node->on_error(&monitor->m_curent_location, node->m_context, fmt, tmp);
+            va_end(tmp);
+        }
+        else {
             node->on_error(&monitor->m_curent_location, node->m_context, fmt, args);
-            node = node->m_next;
+        }
+        node = node->m_next;
     }
 }
 

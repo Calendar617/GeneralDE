@@ -23,12 +23,13 @@ void write_stream_mem_init(struct write_stream_mem * stream, void * buf, size_t 
 
 struct read_stream_mem {
     struct read_stream m_stream;
-    void * m_buffer;
+    const void * m_buffer;
     size_t m_capacity;
     size_t m_pos;
 };
 
-int stream_do_read_from_mem(struct read_stream * stream, const void * buf, size_t size);
+int stream_do_read_from_mem(struct read_stream * stream, void * buf, size_t size);
+void read_stream_mem_init(struct read_stream_mem * stream, const void * buf, size_t size);
 
 #define CPE_READ_STREAM_MEM_INITIALIZER(__buf, __len)                        \
     { CPE_READ_STREAM_INITIALIZER(stream_do_read_from_mem), __buf, __len, 0 }
