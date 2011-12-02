@@ -1,5 +1,7 @@
+#include <assert.h>
 #include "yaml.h"
 #include "cpe/utils/buffer.h"
+#include "cpe/dr/dr_ctypes_info.h"
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_types.h"
@@ -91,46 +93,113 @@ static void cfg_yaml_on_alias(struct cfg_yaml_read_ctx * ctx) {
     if (ctx->m_curent == NULL) return;
 }
 
+static int cfg_yaml_get_type_from_tag(struct cfg_yaml_read_ctx * ctx) {
+    const char * tag = (const char *)ctx->m_input_event.data.scalar.tag;
+
+    if (tag == NULL) return CPE_CFG_TYPE_STRING;
+
+    if (tag[0] == '!') {
+        int id = dr_type_id_from_name(tag + 1);
+        return id == CPE_DR_TYPE_UNKOWN
+            ? CPE_CFG_TYPE_STRING
+            : id;
+    }
+    else {
+        return CPE_CFG_TYPE_STRING;
+    }
+}
+
 static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
     if (ctx->m_curent == NULL) return;
 
     if(ctx->m_curent->m_type == CPE_CFG_TYPE_STRUCT) {
         if (ctx->m_name == NULL) {
             mem_buffer_clear_data(&ctx->m_name_buffer);
-            ctx->m_name = mem_buffer_strndup(
-                &ctx->m_name_buffer,
-                (const char *)ctx->m_input_event.data.scalar.value,
-                ctx->m_input_event.data.scalar.length);
-            if (ctx->m_name == NULL) {
-                CPE_ERROR(ctx->m_em, "dump scalar as name, no memory!");
+            if (ctx->m_input_event.data.scalar.length > 0) {
+                ctx->m_name = mem_buffer_strndup(
+                    &ctx->m_name_buffer,
+                    (const char *)ctx->m_input_event.data.scalar.value,
+                    ctx->m_input_event.data.scalar.length);
+                if (ctx->m_name == NULL) {
+                    CPE_ERROR(ctx->m_em, "dump scalar as name, no memory!");
+                    ctx->m_name = "";
+                }
+            }
+            else {
                 ctx->m_name = "";
             }
         }
         else {
+            if (ctx->m_input_event.data.scalar.length > 0) {
+                const char * value = 
+                    mem_buffer_strndup(
+                        &ctx->m_name_buffer,
+                        (const char *)ctx->m_input_event.data.scalar.value,
+                        ctx->m_input_event.data.scalar.length);
+                if (value == NULL) {
+                    CPE_ERROR(ctx->m_em, "dump scalar as map value, no memory!");
+                }
+                else {
+                    cfg_struct_add_value(ctx->m_curent, ctx->m_name, cfg_yaml_get_type_from_tag(ctx) , value);
+                    ctx->m_name = NULL;
+                }
+            }
+            else {
+                cfg_struct_add_string(ctx->m_curent, ctx->m_name, "");
+                ctx->m_name = NULL;
+            }
+        }
+    }
+    else {
+        assert(ctx->m_curent->m_type == CPE_CFG_TYPE_SEQUENCE);
+
+        if (ctx->m_input_event.data.scalar.length > 0) {
             const char * value = 
                 mem_buffer_strndup(
                     &ctx->m_name_buffer,
                     (const char *)ctx->m_input_event.data.scalar.value,
                     ctx->m_input_event.data.scalar.length);
             if (value == NULL) {
-                CPE_ERROR(ctx->m_em, "dump scalar as name, no memory!");
+                CPE_ERROR(ctx->m_em, "dump scalar as seq value, no memory!");
             }
             else {
-                cfg_struct_add_string(ctx->m_curent, ctx->m_name, value);
-                ctx->m_name = NULL;
+                cfg_seq_add_value(ctx->m_curent, cfg_yaml_get_type_from_tag(ctx), value);
             }
         }
-    }
-    else {
+        else {
+            //ignore empty in sequence
+        }
     }
 }
 
 static void cfg_yaml_on_sequence_begin(struct cfg_yaml_read_ctx * ctx) {
     if (ctx->m_curent == NULL) return;
+
+    if (ctx->m_curent->m_type == CPE_CFG_TYPE_STRUCT) {
+        if (ctx->m_name != NULL) {
+            ctx->m_curent = cfg_struct_add_seq(ctx->m_curent, ctx->m_name);
+            ctx->m_name = NULL;
+        }
+        else if (ctx->m_curent == ctx->m_root) {
+            ctx->m_curent = cfg_struct_add_seq(ctx->m_curent, "");
+        }
+        else {
+            CPE_ERROR(ctx->m_em, "no name for new seq!");
+            ctx->m_curent = NULL;
+        }
+    }
+    else {
+        assert(ctx->m_curent->m_type == CPE_CFG_TYPE_SEQUENCE);
+        ctx->m_curent = cfg_seq_add_seq(ctx->m_curent);
+    }
 }
 
 static void cfg_yaml_on_sequence_end(struct cfg_yaml_read_ctx * ctx) {
     if (ctx->m_curent == NULL) return;
+
+    if (ctx->m_curent != ctx->m_root) {
+        ctx->m_curent = cfg_parent(ctx->m_curent);
+    }
 }
 
 static void cfg_yaml_on_map_begin(struct cfg_yaml_read_ctx * ctx) {
@@ -141,8 +210,17 @@ static void cfg_yaml_on_map_begin(struct cfg_yaml_read_ctx * ctx) {
             ctx->m_curent = cfg_struct_add_struct(ctx->m_curent, ctx->m_name);
             ctx->m_name = NULL;
         }
+        else if (ctx->m_curent == ctx->m_root) {
+            //DO NOTHING
+        }
+        else {
+            CPE_ERROR(ctx->m_em, "no name for new map!");
+            ctx->m_curent = NULL;
+        }
     }
     else {
+        assert(ctx->m_curent->m_type == CPE_CFG_TYPE_SEQUENCE);
+        ctx->m_curent = cfg_seq_add_struct(ctx->m_curent);
     }
 }
 

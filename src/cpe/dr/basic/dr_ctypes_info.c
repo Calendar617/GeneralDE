@@ -72,3 +72,8 @@ int dr_type_size(int typeId) {
         return g_dr_ctypeinfos[typeId].m_size;
     }
 }
+
+int dr_type_id_from_name(const char * name) {
+    const struct tagDRCTypeInfo * info = dr_find_ctype_info_by_name(name);
+    return info ? info->m_id : CPE_DR_TYPE_UNKOWN;
+}

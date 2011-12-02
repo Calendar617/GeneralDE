@@ -5,10 +5,13 @@
 #include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_ops.h"
 
+#define CFG_YAML_TAG_BUF_LEN 128
+
 struct cfg_yaml_write_ctx {
     yaml_document_t m_document;
 
     error_monitor_t m_em;
+    char m_tag_buffer[CFG_YAML_TAG_BUF_LEN];
 };
 
 static int cfg_write_to_stream_handler(void *data, unsigned char *buffer, size_t size) {
@@ -62,8 +65,14 @@ static int cfg_yaml_do_write_cfg_scalar(struct cfg_yaml_write_ctx * ctx, cfg_t c
         int len = dr_ctype_print_to_stream((write_stream_t)&bufS, cfg_data(cfg), cfg->m_type, ctx->m_em);
         if (len > 0) {
             buf[len] = 0;
+            snprintf(ctx->m_tag_buffer, CFG_YAML_TAG_BUF_LEN, "!%s", dr_type_name(cfg->m_type));
+
             v = yaml_document_add_scalar( 
-                &ctx->m_document, NULL, (yaml_char_t *)buf, -1, YAML_PLAIN_SCALAR_STYLE);
+                &ctx->m_document,
+                (yaml_char_t*)ctx->m_tag_buffer,
+                (yaml_char_t *)buf,
+                -1,
+                YAML_PLAIN_SCALAR_STYLE);
         }
         else {
             v = 0;

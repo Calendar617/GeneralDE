@@ -16,6 +16,8 @@ typedef struct cfg * cfg_t;
 #define CPE_CFG_TYPE_INT64       CPE_DR_TYPE_INT64
 #define CPE_CFG_TYPE_UINT64      CPE_DR_TYPE_UINT64
 #define CPE_CFG_TYPE_STRING      CPE_DR_TYPE_STRING
+#define CPE_CFG_TYPE_FLOAT       CPE_DR_TYPE_FLOAT
+#define CPE_CFG_TYPE_DOUBLE      CPE_DR_TYPE_DOUBLE
 
 #endif
 
