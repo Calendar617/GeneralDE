@@ -57,7 +57,7 @@ static int cfg_yaml_do_write_cfg_scalar(struct cfg_yaml_write_ctx * ctx, cfg_t c
             (yaml_char_t *)YAML_STR_TAG,
             (yaml_char_t *)cfg_data(cfg),
             -1,
-            YAML_PLAIN_SCALAR_STYLE);
+            YAML_SINGLE_QUOTED_SCALAR_STYLE);
     }
     else {
         char buf[20 + 1];

@@ -14,7 +14,7 @@ TEST_F(WriteTest, map_basic) {
     EXPECT_EQ(0, write(m_root));
     EXPECT_STREQ(
         "---\n"
-        "a: 12\n"
+        "a: '12'\n"
         "...\n"
         , result());
 }
@@ -28,8 +28,8 @@ TEST_F(WriteTest, map_map) {
     EXPECT_STREQ(
         "---\n"
         "a:\n"
-        "    b1: 12\n"
-        "    b2: 12\n"
+        "    b1: '12'\n"
+        "    b2: '12'\n"
         "...\n"
         , result());
 }
@@ -53,8 +53,8 @@ TEST_F(WriteTest, seq_basic) {
     EXPECT_EQ(0, write(seq));
     EXPECT_STREQ(
         "---\n"
-        "- 12\n"
-        "- 13\n"
+        "- '12'\n"
+        "- '13'\n"
         "...\n"
         , result());
 }

@@ -150,8 +150,10 @@ static void cfg_yaml_struct_add_value(struct cfg_yaml_read_ctx * ctx, const char
         }
     }
     else {
-        cfg_struct_add_value_auto(ctx->m_curent, ctx->m_name, value);
-        return;
+        if (ctx->m_input_event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE) {
+            cfg_struct_add_value_auto(ctx->m_curent, ctx->m_name, value);
+            return;
+        }
     }
 
     int typeId = cfg_yaml_get_type_from_tag(ctx) ;

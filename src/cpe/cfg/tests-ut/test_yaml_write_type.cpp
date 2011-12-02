@@ -6,7 +6,7 @@ TEST_F(WriteTest, data_string) {
     EXPECT_EQ(0, write(m_root));
     EXPECT_STREQ(
         "---\n"
-        "a: 123\n"
+        "a: '123'\n"
         "...\n"
         , result());
 }

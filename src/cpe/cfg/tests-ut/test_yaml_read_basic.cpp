@@ -8,7 +8,7 @@ TEST_F(ReadTest, map_basic) {
 
     EXPECT_STREQ(
         "---\n"
-        "a: abc\n"
+        "a: 'abc'\n"
         "...\n"
         , result());
 }
@@ -21,7 +21,7 @@ TEST_F(ReadTest, map_no_value) {
 
     EXPECT_STREQ(
         "---\n"
-        "a: \n"
+        "a: ''\n"
         "...\n"
         , result());
 }
@@ -48,8 +48,8 @@ TEST_F(ReadTest, map_two_item) {
 
     EXPECT_STREQ(
         "---\n"
-        "a: abc\n"
-        "b: abc\n"
+        "a: 'abc'\n"
+        "b: 'abc'\n"
         "...\n"
         , result());
 }
@@ -65,8 +65,8 @@ TEST_F(ReadTest, map_map) {
     EXPECT_STREQ(
         "---\n"
         "a:\n"
-        "    b: abc\n"
-        "c: def\n"
+        "    b: 'abc'\n"
+        "c: 'def'\n"
         "...\n"
         , result());
 }
@@ -83,9 +83,9 @@ TEST_F(ReadTest, map_map_multi_item) {
     EXPECT_STREQ(
         "---\n"
         "a:\n"
-        "    b: abc\n"
-        "    c: def\n"
-        "d: gh\n"
+        "    b: 'abc'\n"
+        "    c: 'def'\n"
+        "d: 'gh'\n"
         "...\n"
         , result());
 }
@@ -99,7 +99,7 @@ TEST_F(ReadTest, map_to_parent) {
 
     EXPECT_STREQ(
         "---\n"
-        "a: abc\n"
+        "a: 'abc'\n"
         "...\n"
         , result());
 }
@@ -117,8 +117,8 @@ TEST_F(ReadTest, map_map_map) {
         "---\n"
         "a:\n"
         "    b:\n"
-        "        c: def\n"
-        "d: gh\n"
+        "        c: 'def'\n"
+        "d: 'gh'\n"
         "...\n"
         , result());
 }
@@ -197,10 +197,10 @@ TEST_F(ReadTest, map_input_seq_seq) {
     EXPECT_STREQ(
         "---\n"
         "'':\n"
-        "-   - 1.1\n"
-        "    - 1.2\n"
-        "-   - 2.1\n"
-        "    - 2.2\n"
+        "-   - '1.1'\n"
+        "    - '1.2'\n"
+        "-   - '2.1'\n"
+        "    - '2.2'\n"
         "...\n"
         , result());
 }
@@ -220,11 +220,11 @@ TEST_F(ReadTest, map_input_seq_map_seq) {
         "---\n"
         "'':\n"
         "-   a:\n"
-        "    - 1.1\n"
-        "    - 1.2\n"
+        "    - '1.1'\n"
+        "    - '1.2'\n"
         "-   b:\n"
-        "    - 2.1\n"
-        "    - 2.2\n"
+        "    - '2.1'\n"
+        "    - '2.2'\n"
         "...\n"
         , result());
 }
@@ -244,10 +244,10 @@ TEST_F(ReadTest, root_seq_no_value) {
         "---\n"
         "'':\n"
         "-   a:\n"
-        "    - 1.2\n"
+        "    - '1.2'\n"
         "-   b:\n"
-        "    - 2.1\n"
-        "    - 2.2\n"
+        "    - '2.1'\n"
+        "    - '2.2'\n"
         "...\n"
         , result());
 }
@@ -263,9 +263,9 @@ TEST_F(ReadTest, map_set_basic) {
 
     EXPECT_STREQ(
         "---\n"
-        "a: \n"
-        "b: \n"
-        "c: \n"
+        "a: ''\n"
+        "b: ''\n"
+        "c: ''\n"
         "...\n"
         , result());
 }
@@ -287,10 +287,10 @@ TEST_F(ReadTest, seq_basic) {
     EXPECT_STREQ(
         "---\n"
         "-   a:\n"
-        "    - 1.2\n"
+        "    - '1.2'\n"
         "-   b:\n"
-        "    - 2.1\n"
-        "    - 2.2\n"
+        "    - '2.1'\n"
+        "    - '2.2'\n"
         "...\n"
         , result(seq));
 }
@@ -337,7 +337,7 @@ TEST_F(ReadTest, seq_schela) {
 
     EXPECT_STREQ(
         "---\n"
-        "- a\n"
+        "- 'a'\n"
         "...\n"
         , result(seq));
 }
