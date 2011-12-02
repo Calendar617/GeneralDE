@@ -150,7 +150,7 @@ static void cfg_yaml_struct_add_value(struct cfg_yaml_read_ctx * ctx, const char
         }
     }
     else {
-        if (ctx->m_input_event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE) {
+        if (!ctx->m_input_event.data.scalar.quoted_implicit) {
             cfg_struct_add_value_auto(ctx->m_curent, ctx->m_name, value);
             return;
         }
@@ -176,8 +176,10 @@ static void cfg_yaml_seq_add_value(struct cfg_yaml_read_ctx * ctx, const char * 
         }
     }
     else {
-        cfg_seq_add_value_auto(ctx->m_curent, value);
-        return;
+        if (!ctx->m_input_event.data.scalar.quoted_implicit) {
+            cfg_seq_add_value_auto(ctx->m_curent, value);
+            return;
+        }
     }
 
     int typeId = cfg_yaml_get_type_from_tag(ctx) ;
