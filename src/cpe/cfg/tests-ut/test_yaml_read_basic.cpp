@@ -26,6 +26,19 @@ TEST_F(ReadTest, root_map_no_value) {
         , result());
 }
 
+TEST_F(ReadTest, root_map_name_empty) {
+    EXPECT_EQ(
+        0, read(
+            "'': 1\n"
+            ));
+
+    EXPECT_STREQ(
+        "---\n"
+        "'': 1\n"
+        "...\n"
+        , result());
+}
+
 TEST_F(ReadTest, root_map_two_item) {
     EXPECT_EQ(
         0, read(

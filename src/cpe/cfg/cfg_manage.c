@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include <strings.h>
+#include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_types.h"
@@ -146,3 +147,44 @@ CPE_CFG_GEN_ADD_FUN_TYPE(uint32, CPE_CFG_TYPE_UINT32)
 CPE_CFG_GEN_ADD_FUN_TYPE(int64, CPE_CFG_TYPE_INT64)
 CPE_CFG_GEN_ADD_FUN_TYPE(uint64, CPE_CFG_TYPE_UINT64)
 
+cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value) {
+    int capacity;
+
+    if (typeId == CPE_CFG_TYPE_STRING) return cfg_seq_add_string(s, value);
+    if (typeId == CPE_CFG_TYPE_STRUCT) return cfg_seq_add_struct(s);
+    if (typeId == CPE_CFG_TYPE_SEQUENCE) return cfg_seq_add_seq(s);
+
+    capacity = dr_type_size(typeId);
+    if (capacity <= 0) return NULL;
+
+    cfg_t rv = cfg_seq_item_create((struct cfg_seq *)s, typeId, capacity);
+    if (rv == NULL) return NULL;
+
+    if (dr_ctype_set_from_string(cfg_data(rv), typeId, value, NULL) != 0) {
+        cfg_seq_item_delete((struct cfg_seq *)s, rv);
+        return NULL;
+    }
+
+    return rv;
+}
+
+cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * value) {
+    int capacity;
+
+    if (typeId == CPE_CFG_TYPE_STRING) return cfg_struct_add_string(s, name, value);
+    if (typeId == CPE_CFG_TYPE_STRUCT) return cfg_struct_add_struct(s, name);
+    if (typeId == CPE_CFG_TYPE_SEQUENCE) return cfg_struct_add_seq(s, name);
+
+    capacity = dr_type_size(typeId);
+    if (capacity <= 0) return NULL;
+
+    cfg_t rv = cfg_struct_item_create((struct cfg_struct *)s, name, typeId, capacity);
+    if (rv == NULL) return NULL;
+
+    if (dr_ctype_set_from_string(cfg_data(rv), typeId, value, NULL) != 0) {
+        cfg_struct_item_delete((struct cfg_struct *)s, rv);
+        return NULL;
+    }
+
+    return rv;
+}
