@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "yaml.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/cfg/cfg_manage.h"
@@ -122,15 +123,50 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
         }
     }
     else {
+        assert(ctx->m_curent->m_type == CPE_CFG_TYPE_SEQUENCE);
+
+        const char * value = 
+            mem_buffer_strndup(
+                &ctx->m_name_buffer,
+                (const char *)ctx->m_input_event.data.scalar.value,
+                ctx->m_input_event.data.scalar.length);
+        if (value == NULL) {
+            CPE_ERROR(ctx->m_em, "dump scalar as name, no memory!");
+        }
+        else {
+            cfg_seq_add_string(ctx->m_curent, value);
+        }
     }
 }
 
 static void cfg_yaml_on_sequence_begin(struct cfg_yaml_read_ctx * ctx) {
     if (ctx->m_curent == NULL) return;
+
+    if (ctx->m_curent->m_type == CPE_CFG_TYPE_STRUCT) {
+        if (ctx->m_name != NULL) {
+            ctx->m_curent = cfg_struct_add_seq(ctx->m_curent, ctx->m_name);
+            ctx->m_name = NULL;
+        }
+        else if (ctx->m_curent == ctx->m_root) {
+            ctx->m_curent = cfg_struct_add_seq(ctx->m_curent, "");
+        }
+        else {
+            CPE_ERROR(ctx->m_em, "no name for new seq!");
+            ctx->m_curent = NULL;
+        }
+    }
+    else {
+        assert(ctx->m_curent->m_type == CPE_CFG_TYPE_SEQUENCE);
+        ctx->m_curent = cfg_seq_add_seq(ctx->m_curent);
+    }
 }
 
 static void cfg_yaml_on_sequence_end(struct cfg_yaml_read_ctx * ctx) {
     if (ctx->m_curent == NULL) return;
+
+    if (ctx->m_curent != ctx->m_root) {
+        ctx->m_curent = cfg_parent(ctx->m_curent);
+    }
 }
 
 static void cfg_yaml_on_map_begin(struct cfg_yaml_read_ctx * ctx) {
@@ -141,8 +177,17 @@ static void cfg_yaml_on_map_begin(struct cfg_yaml_read_ctx * ctx) {
             ctx->m_curent = cfg_struct_add_struct(ctx->m_curent, ctx->m_name);
             ctx->m_name = NULL;
         }
+        else if (ctx->m_curent == ctx->m_root) {
+            //DO NOTHING
+        }
+        else {
+            CPE_ERROR(ctx->m_em, "no name for new map!");
+            ctx->m_curent = NULL;
+        }
     }
     else {
+        assert(ctx->m_curent->m_type == CPE_CFG_TYPE_SEQUENCE);
+        ctx->m_curent = cfg_seq_add_struct(ctx->m_curent);
     }
 }
 
