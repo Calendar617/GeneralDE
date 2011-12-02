@@ -122,6 +122,50 @@ static int cfg_yaml_get_type_from_tag(struct cfg_yaml_read_ctx * ctx) {
     }
 }
 
+int32_t cfg_yaml_read_bool(const char * value) {
+    if (strcmp(value, "true") == 0 || strcmp(value, "y") == 0) {
+        return 1;
+    }
+    else if (strcmp(value, "false") == 0 || strcmp(value, "n") == 0) {
+        return 0;
+    }
+    else {
+        return -1;
+    }
+}
+
+static void cfg_yaml_struct_add_value(struct cfg_yaml_read_ctx * ctx, const char * value) {
+    const char * tag = (const char *)ctx->m_input_event.data.scalar.tag;
+    if (tag) {
+        if (strcmp(tag, YAML_BOOL_TAG) == 0) {
+            int32_t v = cfg_yaml_read_bool(value);
+            if (v >= 0) {
+                cfg_struct_add_int32(ctx->m_curent, ctx->m_name, v);
+            }
+            return;
+        }
+    }
+
+    int typeId = cfg_yaml_get_type_from_tag(ctx) ;
+    cfg_struct_add_value(ctx->m_curent, ctx->m_name, typeId, value);
+}
+
+static void cfg_yaml_seq_add_value(struct cfg_yaml_read_ctx * ctx, const char * value) {
+    const char * tag = (const char *)ctx->m_input_event.data.scalar.tag;
+    if (tag) {
+        if (strcmp(tag, YAML_BOOL_TAG) == 0) {
+            int32_t v = cfg_yaml_read_bool(value);
+            if (v >= 0) {
+                cfg_seq_add_int32(ctx->m_curent, v);
+            }
+            return;
+        }
+    }
+
+    int typeId = cfg_yaml_get_type_from_tag(ctx) ;
+    cfg_seq_add_value(ctx->m_curent, typeId, value);
+}
+
 static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
     if (ctx->m_curent == NULL) return;
 
@@ -155,25 +199,22 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
                     CPE_ERROR(ctx->m_em, "dump scalar as map value, no memory!");
                 }
                 else {
-                    int typeId = cfg_yaml_get_type_from_tag(ctx) ;
-                    if (cfg_struct_add_value(ctx->m_curent, ctx->m_name, typeId, value) == NULL) {
-                        /*process replace policy*/
+                    cfg_t oldValue = cfg_struct_find_cfg(ctx->m_curent, ctx->m_name);
+                    if (oldValue) {
                         if (ctx->m_policy == cfg_read_replace || ctx->m_policy == cfg_read_merge_mine) {
-                            cfg_t oldValue = cfg_struct_find_cfg(ctx->m_curent, ctx->m_name);
-                            if (oldValue) {
-                                cfg_struct_item_delete((struct cfg_struct *)ctx->m_curent, oldValue);
-                                cfg_struct_add_value(ctx->m_curent, ctx->m_name, typeId, value);
-                            }
+                            cfg_struct_item_delete((struct cfg_struct *)ctx->m_curent, oldValue);
+                            cfg_yaml_struct_add_value(ctx, value);
                         }
                     }
-
-                    ctx->m_name = NULL;
+                    else {
+                        cfg_yaml_struct_add_value(ctx, value);
+                    }
                 }
             }
             else {
                 cfg_struct_add_string(ctx->m_curent, ctx->m_name, "");
-                ctx->m_name = NULL;
             }
+            ctx->m_name = NULL;
         }
     }
     else {
@@ -189,7 +230,7 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
                 CPE_ERROR(ctx->m_em, "dump scalar as seq value, no memory!");
             }
             else {
-                cfg_seq_add_value(ctx->m_curent, cfg_yaml_get_type_from_tag(ctx), value);
+                cfg_yaml_seq_add_value(ctx, value);
             }
         }
         else {
