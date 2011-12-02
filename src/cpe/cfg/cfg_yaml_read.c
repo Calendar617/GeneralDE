@@ -108,16 +108,22 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
             }
         }
         else {
-            const char * value = 
-                mem_buffer_strndup(
-                    &ctx->m_name_buffer,
-                    (const char *)ctx->m_input_event.data.scalar.value,
-                    ctx->m_input_event.data.scalar.length);
-            if (value == NULL) {
-                CPE_ERROR(ctx->m_em, "dump scalar as name, no memory!");
+            if (ctx->m_input_event.data.scalar.length > 0) {
+                const char * value = 
+                    mem_buffer_strndup(
+                        &ctx->m_name_buffer,
+                        (const char *)ctx->m_input_event.data.scalar.value,
+                        ctx->m_input_event.data.scalar.length);
+                if (value == NULL) {
+                    CPE_ERROR(ctx->m_em, "dump scalar as map value, no memory!");
+                }
+                else {
+                    cfg_struct_add_string(ctx->m_curent, ctx->m_name, value);
+                    ctx->m_name = NULL;
+                }
             }
             else {
-                cfg_struct_add_string(ctx->m_curent, ctx->m_name, value);
+                cfg_struct_add_string(ctx->m_curent, ctx->m_name, "");
                 ctx->m_name = NULL;
             }
         }
@@ -125,16 +131,21 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
     else {
         assert(ctx->m_curent->m_type == CPE_CFG_TYPE_SEQUENCE);
 
-        const char * value = 
-            mem_buffer_strndup(
-                &ctx->m_name_buffer,
-                (const char *)ctx->m_input_event.data.scalar.value,
-                ctx->m_input_event.data.scalar.length);
-        if (value == NULL) {
-            CPE_ERROR(ctx->m_em, "dump scalar as name, no memory!");
+        if (ctx->m_input_event.data.scalar.length > 0) {
+            const char * value = 
+                mem_buffer_strndup(
+                    &ctx->m_name_buffer,
+                    (const char *)ctx->m_input_event.data.scalar.value,
+                    ctx->m_input_event.data.scalar.length);
+            if (value == NULL) {
+                CPE_ERROR(ctx->m_em, "dump scalar as seq value, no memory!");
+            }
+            else {
+                cfg_seq_add_string(ctx->m_curent, value);
+            }
         }
         else {
-            cfg_seq_add_string(ctx->m_curent, value);
+            //ignore empty in sequence
         }
     }
 }
