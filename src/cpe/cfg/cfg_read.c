@@ -42,15 +42,23 @@ int cfg_is_value(cfg_t cfg) {
 }
 
 #define CPE_CFG_GEN_READ_TYPE(__type)                            \
-__type ## _t cfg_get_  ## __type(                            \
-        cfg_t cfg, const char * path, __type ## _t dft) {    \
-    __type ## _t rv;                                            \
-    cfg_t at = cfg_find_cfg(cfg, path);                   \
-    if (at == NULL || !cfg_is_value(at) ) return dft;        \
-    return dr_ctype_try_read_ ## __type(                        \
-        &rv, cfg_data(at), at->m_type, NULL) == 0            \
-        ? rv                                                    \
-        : dft;                                                  \
+__type ## _t cfg_as_  ## __type(cfg_t at, __type ## _t dft) {    \
+    __type ## _t rv;                                             \
+    if (at == NULL || !cfg_is_value(at) ) return dft;            \
+    return dr_ctype_try_read_ ## __type(                         \
+        &rv, cfg_data(at), at->m_type, NULL) == 0                \
+        ? rv                                                     \
+        : dft;                                                   \
+}                                                                \
+__type ## _t cfg_get_  ## __type(                                \
+    cfg_t cfg, const char * path, __type ## _t dft) {            \
+    __type ## _t rv;                                             \
+    cfg_t at = cfg_find_cfg(cfg, path);                          \
+    if (at == NULL || !cfg_is_value(at) ) return dft;            \
+    return dr_ctype_try_read_ ## __type(                         \
+        &rv, cfg_data(at), at->m_type, NULL) == 0                \
+        ? rv                                                     \
+        : dft;                                                   \
 }
 
 CPE_CFG_GEN_READ_TYPE(int8);

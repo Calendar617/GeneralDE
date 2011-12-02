@@ -149,6 +149,10 @@ static void cfg_yaml_struct_add_value(struct cfg_yaml_read_ctx * ctx, const char
             return;
         }
     }
+    else {
+        cfg_struct_add_value_auto(ctx->m_curent, ctx->m_name, value);
+        return;
+    }
 
     int typeId = cfg_yaml_get_type_from_tag(ctx) ;
     cfg_struct_add_value(ctx->m_curent, ctx->m_name, typeId, value);
@@ -168,6 +172,10 @@ static void cfg_yaml_seq_add_value(struct cfg_yaml_read_ctx * ctx, const char * 
             cfg_seq_add_value(ctx->m_curent, CPE_CFG_TYPE_INT32, value);
             return;
         }
+    }
+    else {
+        cfg_seq_add_value_auto(ctx->m_curent, value);
+        return;
     }
 
     int typeId = cfg_yaml_get_type_from_tag(ctx) ;

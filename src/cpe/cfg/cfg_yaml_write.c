@@ -64,12 +64,18 @@ static int cfg_yaml_do_write_cfg_scalar(struct cfg_yaml_write_ctx * ctx, cfg_t c
         struct write_stream_mem bufS = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, 20);
         int len = dr_ctype_print_to_stream((write_stream_t)&bufS, cfg_data(cfg), cfg->m_type, ctx->m_em);
         if (len > 0) {
+            const char * tag = NULL;
+
             buf[len] = 0;
-            snprintf(ctx->m_tag_buffer, CFG_YAML_TAG_BUF_LEN, "!%s", dr_type_name(cfg->m_type));
+
+            if (cfg->m_type != CPE_CFG_TYPE_INT32) {
+                snprintf(ctx->m_tag_buffer, CFG_YAML_TAG_BUF_LEN, "!%s", dr_type_name(cfg->m_type));
+                tag = ctx->m_tag_buffer;
+            }
 
             v = yaml_document_add_scalar( 
                 &ctx->m_document,
-                (yaml_char_t*)ctx->m_tag_buffer,
+                (yaml_char_t*)tag,
                 (yaml_char_t *)buf,
                 -1,
                 YAML_PLAIN_SCALAR_STYLE);
