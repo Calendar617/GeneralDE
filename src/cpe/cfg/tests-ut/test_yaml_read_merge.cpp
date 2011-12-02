@@ -328,3 +328,66 @@ TEST_F(ReadMergeTest, seq_to_map___merge_yours) {
         "...\n"
         , result());
 }
+
+TEST_F(ReadMergeTest, null___replace) {
+    EXPECT_EQ(
+        0, read(
+            "a:\n"
+            "  a1: 1\n"
+            "  a2: 2\n"
+            "b: 3\n"
+            "a: !!null\n"
+            "c: 4\n"
+            ,
+            cfg_read_replace));
+
+    EXPECT_STREQ(
+        "---\n"
+        "b: 3\n"
+        "c: 4\n"
+        "...\n"
+        , result());
+}
+
+TEST_F(ReadMergeTest, null___merge_mine) {
+    EXPECT_EQ(
+        0, read(
+            "a:\n"
+            "  a1: 1\n"
+            "  a2: 2\n"
+            "b: 3\n"
+            "a: !!null\n"
+            "c: 4\n"
+            ,
+            cfg_read_merge_mine));
+
+    EXPECT_STREQ(
+        "---\n"
+        "b: 3\n"
+        "c: 4\n"
+        "...\n"
+        , result());
+}
+
+TEST_F(ReadMergeTest, null___merge_yours) {
+    EXPECT_EQ(
+        0, read(
+            "a:\n"
+            "  a1: 1\n"
+            "  a2: 2\n"
+            "b: 3\n"
+            "a: !!null\n"
+            "c: 4\n"
+            ,
+            cfg_read_merge_yours));
+
+    EXPECT_STREQ(
+        "---\n"
+        "a:\n"
+        "    a1: 1\n"
+        "    a2: 2\n"
+        "b: 3\n"
+        "c: 4\n"
+        "...\n"
+        , result());
+}

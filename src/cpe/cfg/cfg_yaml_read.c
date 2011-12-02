@@ -144,6 +144,10 @@ static void cfg_yaml_struct_add_value(struct cfg_yaml_read_ctx * ctx, const char
             }
             return;
         }
+        if (strcmp(tag, YAML_INT_TAG) == 0) {
+            cfg_struct_add_value(ctx->m_curent, ctx->m_name, CPE_CFG_TYPE_INT32, value);
+            return;
+        }
     }
 
     int typeId = cfg_yaml_get_type_from_tag(ctx) ;
@@ -158,6 +162,10 @@ static void cfg_yaml_seq_add_value(struct cfg_yaml_read_ctx * ctx, const char * 
             if (v >= 0) {
                 cfg_seq_add_int32(ctx->m_curent, v);
             }
+            return;
+        }
+        if (strcmp(tag, YAML_INT_TAG) == 0) {
+            cfg_seq_add_value(ctx->m_curent, CPE_CFG_TYPE_INT32, value);
             return;
         }
     }
@@ -189,7 +197,16 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
             }
         }
         else {
-            if (ctx->m_input_event.data.scalar.length > 0) {
+            const char * tag = (const char *)ctx->m_input_event.data.scalar.tag;
+            if (tag && strcmp(tag, YAML_NULL_TAG) == 0) {
+                cfg_t oldValue = cfg_struct_find_cfg(ctx->m_curent, ctx->m_name);
+                if (oldValue
+                    && (ctx->m_policy == cfg_read_replace || ctx->m_policy == cfg_read_merge_mine))
+                {
+                    cfg_struct_item_delete((struct cfg_struct *)ctx->m_curent, oldValue);
+                }
+            }
+            else if (ctx->m_input_event.data.scalar.length > 0) {
                 const char * value = 
                     mem_buffer_strndup(
                         &ctx->m_name_buffer,

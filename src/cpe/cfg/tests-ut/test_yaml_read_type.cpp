@@ -46,4 +46,5 @@ DEF_CFG_YAML_READ_TYPE_TESTCASE_EX(bool_false, "!!bool", false, "!int32 ", 0)
 DEF_CFG_YAML_READ_TYPE_TESTCASE_EX(bool_t, "!!bool", y, "!int32 ", 1)
 DEF_CFG_YAML_READ_TYPE_TESTCASE_EX(bool_f, "!!bool", n, "!int32 ", 0)
 DEF_CFG_YAML_READ_TYPE_TESTCASE_EX(bool_no_tag, "", true, "", true)
+DEF_CFG_YAML_READ_TYPE_TESTCASE_EX(int, "!!int", 12, "!int32 ", 12)
 
