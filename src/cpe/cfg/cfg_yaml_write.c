@@ -50,7 +50,11 @@ static int cfg_yaml_do_write_cfg_scalar(struct cfg_yaml_write_ctx * ctx, cfg_t c
 
     if (cfg->m_type == CPE_CFG_TYPE_STRING) {
         v = yaml_document_add_scalar( 
-            &ctx->m_document, (yaml_char_t *)"str", (yaml_char_t *)cfg_data(cfg), -1, YAML_PLAIN_SCALAR_STYLE);
+            &ctx->m_document,
+            (yaml_char_t *)YAML_STR_TAG,
+            (yaml_char_t *)cfg_data(cfg),
+            -1,
+            YAML_PLAIN_SCALAR_STYLE);
     }
     else {
         char buf[20 + 1];

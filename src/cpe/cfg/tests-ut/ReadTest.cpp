@@ -21,11 +21,11 @@ int ReadTest::read(const char * input) {
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);
 
-    //CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
+    CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
     //CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
 
-    //return cfg_read(m_root, data, meta, &em);
-    return 0;
+    struct read_stream_mem stream = CPE_READ_STREAM_MEM_INITIALIZER(input, strlen(input));
+    return cfg_read(m_root, (read_stream_t)&stream, &em);
 }
 
 const char * ReadTest::result(void) {
