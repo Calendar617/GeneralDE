@@ -11,6 +11,16 @@ typedef enum cfg_policy {
     cfg_replace
 } cfg_policy_t;
 
+typedef struct cfg_struct_it {
+    cfg_t m_curent;
+} cfg_struct_it_t;
+
+typedef struct cfg_seq_it {
+    void * m_block;
+    int32_t m_pos_in_block;
+    int32_t m_left_count;
+} cfg_seq_it_t;
+
 #define CPE_CFG_NAME_MAX_LEN (128)
 #define CPE_CFG_MAX_LEVEL (128)
 

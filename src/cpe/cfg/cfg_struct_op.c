@@ -167,3 +167,39 @@ cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type,
         return cfg_struct_item_do_create(s, name, type, capacity);
     }
 }
+
+void cfg_struct_it_init(cfg_struct_it_t * it, cfg_t cfg) {
+    struct cfg_struct_item * item;
+
+    assert(it);
+
+    if (cfg == NULL || cfg->m_type != CPE_CFG_TYPE_STRUCT) {
+        it->m_curent = NULL;
+        return;
+    }
+
+    item = RB_MIN(cfg_struct_item_tree, &((struct cfg_struct *)cfg)->m_items);
+    it->m_curent = (item == NULL) ? NULL : &item->m_data;
+}
+
+cfg_t cfg_struct_it_next(cfg_struct_it_t * it) {
+    struct cfg_struct_item * item;
+    cfg_t rv;
+
+    assert(it);
+
+    if (it == NULL || it->m_curent == NULL || it->m_curent->m_parent == NULL) {
+        return NULL;
+    }
+
+    rv = it->m_curent;
+
+    item = RB_NEXT(
+        cfg_struct_item_tree,
+        &((struct cfg_struct *)it->m_curent->m_parent)->m_items,
+        cfg_to_struct_item(it->m_curent));
+
+    it->m_curent = (item == NULL) ? NULL : &item->m_data;
+
+    return rv;
+}

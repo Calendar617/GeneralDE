@@ -39,10 +39,14 @@ const char * cfg_get_string(cfg_t cfg, const char * path, const char * dft);
 
 /*struct operations*/
 cfg_t cfg_struct_find_cfg(cfg_t cfg, const char * name);
+void cfg_struct_it_init(cfg_struct_it_t * it, cfg_t cfg);
+cfg_t cfg_struct_it_next(cfg_struct_it_t * it);
 
 /*sequence operations*/
 int cfg_seq_count(cfg_t cfg);
 cfg_t cfg_seq_at(cfg_t cfg, int pos);
+void cfg_seq_it_init(cfg_seq_it_t * it, cfg_t cfg);
+cfg_t cfg_seq_it_next(cfg_seq_it_t * it);
 
 #ifdef __cplusplus
 }
