@@ -3,7 +3,7 @@
 class StructTest : public CfgTest {};
 
 TEST_F(StructTest, add_basic) {
-    cfg_t s = cfg_struct_add_struct(m_root, "a");
+    cfg_t s = cfg_struct_add_struct(m_root, "a", cfg_replace);
     ASSERT_TRUE(s);
     EXPECT_STREQ("a", cfg_name(s));
 
@@ -13,7 +13,7 @@ TEST_F(StructTest, add_basic) {
 }
 
 TEST_F(StructTest, add_seq) {
-    cfg_t seq = cfg_struct_add_seq(m_root, "a");
+    cfg_t seq = cfg_struct_add_seq(m_root, "a", cfg_replace);
     ASSERT_TRUE(seq);
 
     EXPECT_EQ(CPE_CFG_TYPE_SEQUENCE, cfg_type(seq));
@@ -22,18 +22,20 @@ TEST_F(StructTest, add_seq) {
     EXPECT_EQ(0, cfg_seq_count(seq));
 }
 
-TEST_F(StructTest, add_duplicate) {
-    cfg_t seq = cfg_struct_add_seq(m_root, "a");
+TEST_F(StructTest, add_seq_seq_duplicate) {
+    cfg_t seq = cfg_struct_add_seq(m_root, "a", cfg_replace);
     EXPECT_TRUE(seq);
 
-    EXPECT_FALSE(cfg_struct_add_seq(m_root, "a"));
+    cfg_t newCfg = cfg_struct_add_seq(m_root, "a", cfg_replace);
+
+    EXPECT_TRUE(seq == newCfg);
 }
 
 TEST_F(StructTest, add_not_from_struct) {
-    cfg_t not_struct = cfg_struct_add_int8(m_root, "a", 3);
+    cfg_t not_struct = cfg_struct_add_int8(m_root, "a", 3, cfg_replace);
     ASSERT_TRUE(not_struct);
 
-    cfg_t s = cfg_struct_add_struct(not_struct, "a");
+    cfg_t s = cfg_struct_add_struct(not_struct, "a", cfg_replace);
     ASSERT_FALSE(s);
 }
 
@@ -42,18 +44,18 @@ TEST_F(StructTest, find_empty) {
 }
 
 TEST_F(StructTest, find_success) {
-    cfg_t s = cfg_struct_add_struct(m_root, "a");
+    cfg_t s = cfg_struct_add_struct(m_root, "a", cfg_replace);
     ASSERT_TRUE(s);
 
     EXPECT_TRUE(s == cfg_struct_find_cfg(m_root, "a"));
 }
 
 TEST_F(StructTest, find_not_from_struct) {
-    EXPECT_FALSE(cfg_struct_find_cfg(cfg_struct_add_seq(m_root, "a"), ""));
+    EXPECT_FALSE(cfg_struct_find_cfg(cfg_struct_add_seq(m_root, "a", cfg_replace), ""));
 }
 
 TEST_F(StructTest, free_child) {
-    cfg_t s = cfg_struct_add_struct(m_root, "a");
+    cfg_t s = cfg_struct_add_struct(m_root, "a", cfg_replace);
     ASSERT_TRUE(s);
 
     EXPECT_TRUE(s == cfg_struct_find_cfg(m_root, "a"));

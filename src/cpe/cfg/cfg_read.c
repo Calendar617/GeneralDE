@@ -37,6 +37,10 @@ cfg_t cfg_parent(cfg_t cfg) {
     return cfg->m_parent;
 }
 
+int cfg_type_is_value(int type) {
+    return type > CPE_DR_TYPE_COMPOSITE;
+}
+
 int cfg_is_value(cfg_t cfg) {
     return cfg->m_type > CPE_DR_TYPE_COMPOSITE;
 }

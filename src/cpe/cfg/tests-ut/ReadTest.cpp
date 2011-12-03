@@ -17,11 +17,11 @@ void ReadTest::TearDown() {
     CfgTest::TearDown();
 }
 
-int ReadTest::read(const char * input, cfg_read_policy_t policy) {
+int ReadTest::read(const char * input, cfg_policy_t policy) {
     return read(m_root, input, policy);
 }
 
-int ReadTest::read(cfg_t cfg, const char * input, cfg_read_policy_t policy) {
+int ReadTest::read(cfg_t cfg, const char * input, cfg_policy_t policy) {
     cpe_error_list_free(m_errorList);
     m_errorList = cpe_error_list_create(NULL);
 

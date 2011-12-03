@@ -1,7 +1,7 @@
 #include "WriteTest.hpp"
 
 TEST_F(WriteTest, data_string) {
-    cfg_struct_add_string(m_root, "a", "123");
+    cfg_struct_add_string(m_root, "a", "123", cfg_replace);
 
     EXPECT_EQ(0, write(m_root));
     EXPECT_STREQ(
@@ -12,7 +12,7 @@ TEST_F(WriteTest, data_string) {
 }
 
 TEST_F(WriteTest, data_int32) {
-    cfg_struct_add_int32(m_root, "a", 123);
+    cfg_struct_add_int32(m_root, "a", 123, cfg_replace);
 
     EXPECT_EQ(0, write(m_root));
     EXPECT_STREQ(
@@ -24,7 +24,8 @@ TEST_F(WriteTest, data_int32) {
 
 #define DEF_CFG_YAML_WRITE_TYPE_TESTCASE(__type, __value)    \
 TEST_F(WriteTest, data_ ## __type) {                         \
-    cfg_struct_add_ ##__type(m_root, "a", __value);          \
+    cfg_struct_add_ ##__type(                                \
+        m_root, "a", __value, cfg_replace);                  \
                                                              \
     EXPECT_EQ(0, write(m_root));                             \
     EXPECT_STREQ(                                            \
