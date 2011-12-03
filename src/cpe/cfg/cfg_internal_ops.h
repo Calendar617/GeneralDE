@@ -9,7 +9,7 @@ extern "C" {
 void cfg_fini(cfg_t cfg);
 
 /*struct operations*/
-cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type, size_t capacity);
+cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type, size_t capacity, cfg_policy_t policy);
 void cfg_struct_item_delete(struct cfg_struct * s, cfg_t cfg);
 
 void cfg_struct_fini(struct cfg_struct * s);

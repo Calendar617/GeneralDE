@@ -72,6 +72,13 @@ cfg_t cfg_seq_item_create(struct cfg_seq * s, int type, size_t capacity) {
 
     ++s->m_count;
 
+    if (type == CPE_CFG_TYPE_STRUCT) {
+        cfg_struct_init((struct cfg_struct *)rv);
+    }
+    else if (type == CPE_CFG_TYPE_SEQUENCE) {
+        cfg_seq_init((struct cfg_seq *)rv);
+    }
+
     return rv;
 }
 

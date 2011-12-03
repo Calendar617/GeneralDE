@@ -251,8 +251,26 @@ TEST_F(ReadTest, root_seq_no_value) {
         "...\n"
         , result());
 }
+/*
+TEST_F(ReadTest, omap_basic) {
+    EXPECT_EQ(
+        0, read(
+            "--- !!omap\n"
+            "a: 1\n"
+            "c: 3\n"
+            "b: 2\n"
+            ));
 
-TEST_F(ReadTest, map_set_basic) {
+    EXPECT_STREQ(
+        "---\n"
+        "- a: 1\n"
+        "- b: 2\n"
+        "- c: 3\n"
+        "...\n"
+        , result());
+}
+*/
+TEST_F(ReadTest, set_basic) {
     EXPECT_EQ(
         0, read(
             "--- !!set\n"
@@ -271,7 +289,7 @@ TEST_F(ReadTest, map_set_basic) {
 }
 
 TEST_F(ReadTest, seq_basic) {
-    cfg_t seq = cfg_struct_add_seq(m_root, "xxx");
+    cfg_t seq = cfg_struct_add_seq(m_root, "xxx", cfg_replace);
 
     EXPECT_EQ(
         0, read(
@@ -296,7 +314,7 @@ TEST_F(ReadTest, seq_basic) {
 }
 
 TEST_F(ReadTest, seq_input_map) {
-    cfg_t seq = cfg_struct_add_seq(m_root, "xxx");
+    cfg_t seq = cfg_struct_add_seq(m_root, "xxx", cfg_replace);
 
     EXPECT_EQ(
         0, read(
@@ -327,7 +345,7 @@ TEST_F(ReadTest, map_schela) {
 }
 
 TEST_F(ReadTest, seq_schela) {
-    cfg_t seq = cfg_struct_add_seq(m_root, "xxx");
+    cfg_t seq = cfg_struct_add_seq(m_root, "xxx", cfg_replace);
 
     EXPECT_EQ(
         0, read(
@@ -361,7 +379,7 @@ TEST_F(ReadTest, map_multi_document) {
 }
 
 TEST_F(ReadTest, seq_multi_document) {
-    cfg_t seq = cfg_struct_add_seq(m_root, "xxx");
+    cfg_t seq = cfg_struct_add_seq(m_root, "xxx", cfg_replace);
 
     EXPECT_EQ(
         0, read(

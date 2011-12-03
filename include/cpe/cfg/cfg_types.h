@@ -5,13 +5,14 @@
 
 typedef struct cfg * cfg_t;
 
-typedef enum cfg_read_policy {
-    cfg_read_merge_mine,
-    cfg_read_merge_yours,
-    cfg_read_replace
-} cfg_read_policy_t;
+typedef enum cfg_policy {
+    cfg_merge_use_new,
+    cfg_merge_use_exist,
+    cfg_replace
+} cfg_policy_t;
 
 #define CPE_CFG_NAME_MAX_LEN (128)
+#define CPE_CFG_MAX_LEVEL (128)
 
 #define CPE_CFG_TYPE_SEQUENCE    CPE_DR_TYPE_UNION
 #define CPE_CFG_TYPE_STRUCT      CPE_DR_TYPE_STRUCT

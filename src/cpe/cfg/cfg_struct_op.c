@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include "cpe/cfg/cfg_manage.h"
+#include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_types.h"
 #include "cfg_internal_ops.h"
 
@@ -20,26 +21,26 @@ void cfg_struct_fini(struct cfg_struct * cfg) {
     }
 }
 
-cfg_t cfg_struct_find_cfg(cfg_t cfg, const char * name) {
+struct cfg_struct_item * cfg_struct_find_item(struct cfg_struct * s, const char * name) {
     struct cfg_struct_item tmp;
-    struct cfg_struct_item * found;
 
-    assert(cfg);
-    assert(name);
-
-    if (cfg->m_type != CPE_CFG_TYPE_STRUCT) return NULL;
+    if (!s || s->m_type != CPE_CFG_TYPE_STRUCT) return NULL;
 
     tmp.m_name = name;
-    found = RB_FIND(cfg_struct_item_tree, &((struct cfg_struct *)cfg)->m_items, &tmp);
+    return RB_FIND(cfg_struct_item_tree, &s->m_items, &tmp);
+}
+
+cfg_t cfg_struct_find_cfg(cfg_t cfg, const char * name) {
+    struct cfg_struct_item * found = cfg_struct_find_item((struct cfg_struct *)cfg, name);
     return found ? &found->m_data : NULL;
 }
 
 void cfg_struct_item_delete(struct cfg_struct * s, cfg_t cfg) {
     struct cfg_struct_item * item;
 
-    assert(s);
-    assert(s->m_manage);
-    assert(cfg);
+    assert(s || s->m_manage);
+
+    if (s == NULL || cfg == NULL) return;
 
     item = cfg_to_struct_item(cfg);
 
@@ -51,22 +52,42 @@ void cfg_struct_item_delete(struct cfg_struct * s, cfg_t cfg) {
     mem_free(item->m_data.m_manage->m_alloc, (void*)item->m_name);
 }
 
-cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type, size_t capacity) {
-    assert(s);
-    assert(s->m_manage);
-    assert(name);
+/*0: return old
+  1: delete old, create new
+  2: old-add-to-new
+  3: new-as-sub-of-old
+*/
+static int cfg_struct_decide_do_old(int oldType, int newType, cfg_policy_t policy) {
+    if (policy == cfg_replace) return 1;
 
+    if (cfg_type_is_value(oldType) || cfg_type_is_value(newType))
+        return policy == cfg_merge_use_exist ? 4 : 1;
+
+    if (oldType == newType) return 0;
+
+    if (oldType == CPE_CFG_TYPE_STRUCT) {
+        assert(newType == CPE_CFG_TYPE_SEQUENCE);
+        return 3;
+    }
+    else {
+        assert(oldType == CPE_CFG_TYPE_SEQUENCE);
+        assert(newType == CPE_CFG_TYPE_STRUCT);
+        return 2;
+    }
+}
+
+cfg_t cfg_struct_item_do_create(struct cfg_struct * s, const char * name, int type, size_t capacity) {
     int nameLen;
     int allocSize;
     void * data;
     struct cfg_struct_item * item;
 
-    if (s->m_type != CPE_DR_TYPE_STRUCT) return NULL;
-
     nameLen = strlen(name) + 1;
     allocSize = nameLen + sizeof(struct cfg_struct_item) + capacity;
 
     data = mem_alloc(s->m_manage->m_alloc, allocSize);
+    if (data == NULL) return NULL;
+
     memcpy(data, name, nameLen);
 
     item = (struct cfg_struct_item *)(((char*)data) + nameLen);
@@ -81,6 +102,68 @@ cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type,
         return NULL;
     }
     else {
-        return &item->m_data;
+        cfg_t newCfg = &item->m_data;
+        if (type == CPE_CFG_TYPE_STRUCT) {
+            cfg_struct_init((struct cfg_struct *)newCfg);
+        }
+        else if (type == CPE_CFG_TYPE_SEQUENCE) {
+            cfg_seq_init((struct cfg_seq *)newCfg);
+        }
+
+        return newCfg;
+    }
+}
+
+cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type, size_t capacity, cfg_policy_t policy) {
+    struct cfg_struct_item * old_item;
+
+    assert(s || s->m_manage);
+    assert(name);
+
+    if (!s || s->m_type != CPE_DR_TYPE_STRUCT) return NULL;
+
+    old_item = cfg_struct_find_item(s, name);
+    if (old_item) {
+        int do_old_op = cfg_struct_decide_do_old(old_item->m_data.m_type, type, policy);
+        switch(do_old_op) {
+        case 0: /*return old*/
+            return &old_item->m_data;
+        case 1: /*delete old, create new*/
+            cfg_struct_item_delete(s, &old_item->m_data);
+            return cfg_struct_item_do_create(s, name, type, capacity);
+        case 2: {/*old(seq)-add-to-new(struct)*/
+            assert(old_item->m_data.m_type == CPE_CFG_TYPE_SEQUENCE);
+            RB_REMOVE(cfg_struct_item_tree, &s->m_items, old_item);
+            cfg_t newCfg = cfg_struct_item_do_create(s, name, type, capacity);
+            if (newCfg) {
+                struct cfg_seq * subSeq = (struct cfg_seq *)cfg_struct_add_seq(newCfg, "", cfg_replace);
+                assert(subSeq);
+
+                cfg_seq_fini(subSeq);
+                memcpy(
+                    ((char*)subSeq) + sizeof(struct cfg),
+                    ((char*)&old_item->m_data) + sizeof(struct cfg),
+                    sizeof(struct cfg_seq) - sizeof(struct cfg));
+
+                cfg_seq_init((struct cfg_seq *)&old_item->m_data);
+            }
+
+            if (old_item) {
+                cfg_fini(&old_item->m_data);
+                /*name is the alloc start adress, see cfg_struct_add_item*/
+                mem_free(old_item->m_data.m_manage->m_alloc, (void*)old_item->m_name);
+            }
+
+            return newCfg;
+        }
+        case 3: /*new-as-sub-of-old(struct)*/
+            return cfg_struct_item_create(
+                (struct cfg_struct *)&old_item->m_data, "", type, capacity, policy);
+        default: /*4*/
+            return NULL;
+        }
+    }
+    else {
+        return cfg_struct_item_do_create(s, name, type, capacity);
     }
 }

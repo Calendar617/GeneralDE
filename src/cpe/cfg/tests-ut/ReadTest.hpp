@@ -14,8 +14,8 @@ public:
 
     error_list_t m_errorList;
 
-    int read(const char * input, cfg_read_policy_t policy = cfg_read_replace);
-    int read(cfg_t cfg, const char * input, cfg_read_policy_t policy = cfg_read_replace);
+    int read(const char * input, cfg_policy_t policy = cfg_replace);
+    int read(cfg_t cfg, const char * input, cfg_policy_t policy = cfg_replace);
 
     struct mem_buffer m_result_buffer;
     const char * result(void);
