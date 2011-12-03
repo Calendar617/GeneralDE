@@ -63,47 +63,35 @@ void cfg_fini(cfg_t cfg) {
 }
 
 cfg_t cfg_struct_add_struct(cfg_t s, const char * name, cfg_policy_t policy) {
-    cfg_t rv = cfg_struct_item_create(
+    return cfg_struct_item_create(
         (struct cfg_struct *)s,
         name,
         CPE_CFG_TYPE_STRUCT,
         sizeof(struct cfg_struct) - sizeof(struct cfg),
         policy);
-    if (rv == NULL) return NULL;
-    cfg_struct_init((struct cfg_struct *)rv);
-    return rv;
 }
 
 cfg_t cfg_seq_add_struct(cfg_t s) {
-    cfg_t rv = cfg_seq_item_create(
+    return cfg_seq_item_create(
         (struct cfg_seq *)s,
         CPE_CFG_TYPE_STRUCT,
         sizeof(struct cfg_struct) - sizeof(struct cfg));
-    if (rv == NULL) return NULL;
-    cfg_struct_init((struct cfg_struct *)rv);
-    return rv;
 }
 
 cfg_t cfg_struct_add_seq(cfg_t s, const char * name, cfg_policy_t policy) {
-    cfg_t rv = cfg_struct_item_create(
+    return cfg_struct_item_create(
         (struct cfg_struct *)s,
         name,
         CPE_CFG_TYPE_SEQUENCE,
         sizeof(struct cfg_seq) - sizeof(struct cfg),
         policy);
-    if (rv == NULL) return NULL;
-    cfg_seq_init((struct cfg_seq *)rv);
-    return rv;
 }
 
 cfg_t cfg_seq_add_seq(cfg_t s) {
-    cfg_t rv = cfg_seq_item_create(
+    return cfg_seq_item_create(
         (struct cfg_seq *)s,
         CPE_CFG_TYPE_SEQUENCE,
         sizeof(struct cfg_seq) - sizeof(struct cfg));
-    if (rv == NULL) return NULL;
-    cfg_seq_init((struct cfg_seq *)rv);
-    return rv;
 }
 
 cfg_t cfg_struct_add_string(cfg_t s, const char * name, const char * value, cfg_policy_t policy) {

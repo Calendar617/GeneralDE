@@ -11,6 +11,7 @@ const char * cfg_name(cfg_t cfg);
 void * cfg_data(cfg_t cfg);
 int cfg_type(cfg_t cfg);
 cfg_t cfg_parent(cfg_t cfg);
+int cfg_type_is_value(int type);
 int cfg_is_value(cfg_t cfg);
 cfg_t cfg_find_cfg(cfg_t cfg, const char * path);
 
