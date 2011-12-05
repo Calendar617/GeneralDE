@@ -38,6 +38,11 @@ void cpe_error_save_last_errno(struct error_info * info, void * context, const c
 /*operations*/
 void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...) __attribute__((format(printf,2,3)));
 void cpe_error_do_notify_var(error_monitor_t monitor, const char * fmt, va_list args);
+
+void cpe_error_monitor_init(
+    error_monitor_t monitor, 
+    void (*on_error)(struct error_info * info, void * context, const char * fmt, va_list args),
+    void * context);
 void cpe_error_monitor_add_node(error_monitor_t monitor, struct error_monitor_node * node);
 void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor_node * node);
 
@@ -48,8 +53,11 @@ void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor
         cpe_error_do_notify((monitor), format, ##args);             \
     }
 
+#define CPE_DEF_ERROR_MONITOR_INITIALIZER(fun, context) \
+    { { (fun), (context), NULL }, { NULL, -1, 0, CPE_EL_ERROR } }
+
 #define CPE_DEF_ERROR_MONITOR(name, fun, context) \
-    struct error_monitor name = { { fun, context, NULL }, { NULL, -1, 0, CPE_EL_ERROR } }
+    struct error_monitor name = CPE_DEF_ERROR_MONITOR_INITIALIZER(fun, context)
 
 #define CPE_DEF_ERROR_MONITOR_ADD(name, monitor, fun, context)          \
     struct error_monitor_node name = { fun, context, NULL };            \
