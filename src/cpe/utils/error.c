@@ -79,6 +79,17 @@ void cpe_error_save_last_errno(struct error_info * info, void * context, const c
     }
 }
 
+void cpe_error_monitor_node_init(
+    struct error_monitor_node * node, 
+    void (*on_error)(struct error_info * info, void * context, const char * fmt, va_list args),
+    void * context)
+{
+    node->on_error = on_error;
+    node->m_context = context;
+    node->m_next = NULL;
+}
+
+
 void cpe_error_monitor_init(
     error_monitor_t monitor, 
     void (*on_error)(struct error_info * info, void * context, const char * fmt, va_list args),

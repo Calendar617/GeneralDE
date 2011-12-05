@@ -15,7 +15,7 @@ void ParseTest::TearDown() {
     mem_buffer_clear(&m_buffer);
 
     m_metaLib = NULL;
-    mem_buffer_init(&m_metaLib_buffer, NULL);
+    mem_buffer_clear(&m_metaLib_buffer);
 
     cpe_error_list_free(m_errorList);
 }
