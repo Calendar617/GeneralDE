@@ -78,3 +78,29 @@ void cpe_error_save_last_errno(struct error_info * info, void * context, const c
         *((int*)context) = info->m_errno;
     }
 }
+
+void cpe_error_monitor_node_init(
+    struct error_monitor_node * node, 
+    void (*on_error)(struct error_info * info, void * context, const char * fmt, va_list args),
+    void * context)
+{
+    node->on_error = on_error;
+    node->m_context = context;
+    node->m_next = NULL;
+}
+
+
+void cpe_error_monitor_init(
+    error_monitor_t monitor, 
+    void (*on_error)(struct error_info * info, void * context, const char * fmt, va_list args),
+    void * context)
+{
+    monitor->m_node.on_error = on_error;
+    monitor->m_node.m_context = context;
+    monitor->m_node.m_next = NULL;
+
+    monitor->m_curent_location.m_file = NULL;
+    monitor->m_curent_location.m_line = -1;
+    monitor->m_curent_location.m_errno = 0;
+    monitor->m_curent_location.m_level = CPE_EL_ERROR;
+}
