@@ -200,3 +200,42 @@ void cfg_seq_fini(struct cfg_seq * s) {
     s->m_count = 0;
     s->m_block_head.m_next = NULL;
 }
+
+void cfg_seq_it_init(cfg_seq_it_t * it, cfg_t cfg) {
+    struct cfg_seq * seq;
+
+    assert(it);
+
+    if (cfg == NULL || cfg->m_type != CPE_CFG_TYPE_SEQUENCE) {
+        it->m_block = NULL;
+        it->m_pos_in_block = 0;
+        it->m_left_count = 0;
+    }
+    else {
+        seq = (struct cfg_seq *)cfg;
+        it->m_block = &seq->m_block_head;
+        it->m_pos_in_block = 0;
+        it->m_left_count = seq->m_count;
+    }
+}
+
+cfg_t cfg_seq_it_next(cfg_seq_it_t * it) {
+    cfg_t rv;
+    struct cfg_seq_block * block;
+    assert(it);
+
+    if (it->m_left_count == 0 || it->m_block == NULL) {
+        return NULL;
+    }
+
+    block = (struct cfg_seq_block *)it->m_block;
+    rv = block->m_items[it->m_pos_in_block];
+
+    --it->m_left_count;
+    ++it->m_pos_in_block;
+    if (it->m_pos_in_block >= CPE_CFG_SEQ_BLOCK_ITEM_COUNT) {
+        it->m_pos_in_block -= CPE_CFG_SEQ_BLOCK_ITEM_COUNT;
+        it->m_block = block->m_next;
+    }
+    return rv;
+}

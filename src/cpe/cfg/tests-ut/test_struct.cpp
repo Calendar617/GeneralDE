@@ -65,3 +65,35 @@ TEST_F(StructTest, free_child) {
     EXPECT_TRUE(NULL == cfg_struct_find_cfg(m_root, "a"));
 }
 
+TEST_F(StructTest, it_empty) {
+    cfg_struct_it_t it;
+    cfg_struct_it_init(&it, m_root);
+
+    ASSERT_FALSE(cfg_struct_it_next(&it));
+}
+
+TEST_F(StructTest, it_basic) {
+    cfg_struct_add_int32(m_root, "a", 1, cfg_replace);
+    cfg_struct_add_int32(m_root, "b", 2, cfg_replace);
+
+    cfg_struct_it_t it;
+    cfg_struct_it_init(&it, m_root);
+
+    cfg_t cfg_a = cfg_struct_it_next(&it);
+    ASSERT_TRUE(cfg_a);
+    ASSERT_EQ(1, cfg_as_int32(cfg_a, -1));
+
+    cfg_t cfg_b = cfg_struct_it_next(&it);
+    ASSERT_TRUE(cfg_b);
+    ASSERT_EQ(2, cfg_as_int32(cfg_b, -1));
+
+    ASSERT_FALSE(cfg_struct_it_next(&it));
+}
+
+TEST_F(StructTest, it_init_cfg_null) {
+    cfg_struct_it_t it;
+    cfg_struct_it_init(&it, NULL);
+
+    ASSERT_FALSE(cfg_struct_it_next(&it));
+}
+
