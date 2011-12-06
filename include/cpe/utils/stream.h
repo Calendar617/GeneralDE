@@ -17,6 +17,8 @@ typedef struct read_stream {
 } * read_stream_t;
 
 int stream_write(struct write_stream * stream, const void * buf, size_t size);
+#define stream_flush(stream) (stream)->flush(stream)
+
 int stream_printf(struct write_stream * stream, const char * fmt, ...);
 int stream_vprintf(struct write_stream * stream, const char * fmt, va_list ap);
 

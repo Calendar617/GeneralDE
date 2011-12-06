@@ -8,7 +8,7 @@ TEST_F(FileTest, dir_mk_recursion_basic) {
             DIR_DEFAULT_MODE,
             &m_em, NULL));
 
-    EXPECT_TRUE(dir_exist(make_path_name("a/b")));
+    EXPECT_TRUE(dir_exist(make_path_name("a/b"), NULL));
 }
 
 TEST_F(FileTest, dir_mk_recursion_one_level) {
@@ -19,7 +19,18 @@ TEST_F(FileTest, dir_mk_recursion_one_level) {
             DIR_DEFAULT_MODE,
             &m_em, NULL));
 
-    EXPECT_TRUE(dir_exist(make_path_name("a")));
+    EXPECT_TRUE(dir_exist(make_path_name("a"), NULL));
+}
+
+TEST_F(FileTest, dir_rm_recursion_with_file) {
+    dir_mk(make_path_name("a"), DIR_DEFAULT_MODE, &m_em);
+    write_file("a/a.txt", "abc");
+
+    EXPECT_EQ(
+        0,
+        dir_rm_recursion(make_path_name("a"), &m_em, NULL));
+
+    EXPECT_FALSE(dir_exist(make_path_name("a"), NULL));
 }
 
 TEST_F(FileTest, dir_mk_recursion_empty) {
@@ -34,13 +45,13 @@ TEST_F(FileTest, dir_mk_recursion_empty) {
 TEST_F(FileTest, dir_exist_basic) {
     EXPECT_EQ(
         1,
-        dir_exist(make_path_name(".")));
+        dir_exist(make_path_name("."), &m_em));
 }
 
 TEST_F(FileTest, dir_exist_not_exist) {
     EXPECT_EQ(
         0,
-        dir_exist(make_path_name("not-exist")));
+        dir_exist(make_path_name("not-exist"), &m_em));
 }
 
 TEST_F(FileTest, dir_exist_file) {
@@ -53,5 +64,5 @@ TEST_F(FileTest, dir_exist_file) {
 
     EXPECT_EQ(
         0,
-        dir_exist(make_path_name("not-exist")));
+        dir_exist(make_path_name("not-exist"), &m_em));
 }

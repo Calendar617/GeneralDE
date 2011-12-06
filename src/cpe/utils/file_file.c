@@ -1,126 +1,155 @@
 #include <string.h>
-#include <stdio.h>
-#include "cpe/utils/file.h"
+#include "file_internal.h"
 #include "cpe/utils/stream_buffer.h"
 
-FILE * file_open(const char *path, const char *mode, error_monitor_t em);
-
-int file_write_from_buf(const char * file, const void * buf, size_t size, error_monitor_t em) {
+ssize_t file_write_from_buf(const char * file, const void * buf, size_t size, error_monitor_t em) {
+    ssize_t totalSize;
     FILE * fp;
-    size_t writeSize;
-    int rv;
-
-    fp = file_open(file, "w", em);
+    
+    fp = file_stream_open(file, "w", em);
     if (fp == NULL) return -1;
 
-    while((writeSize = fwrite(buf, 1, size, fp)) > 0) {
-        size -= writeSize;
-    }
+    totalSize = file_stream_write_from_buf(fp, buf, size, em);
 
-    rv = ferror(fp) == 0 ? 0 : -1;
-    fclose(fp);
+    file_stream_close(fp, em);
 
-    return rv;
+    return totalSize;
 }
 
-int file_write_from_str(const char * file, const char * str, error_monitor_t em) {
+ssize_t file_write_from_str(const char * file, const char * str, error_monitor_t em) {
     return file_write_from_buf(file, str, strlen(str), em);
 }
 
-int file_write_from_stream(const char * file, read_stream_t stream, error_monitor_t em) {
+ssize_t file_write_from_stream(const char * file, read_stream_t stream, error_monitor_t em) {
+    ssize_t totalSize;
     FILE * fp;
-    size_t writeSize;
-    size_t writeOkSize;
-    size_t size;
-    int rv;
-    char buf[128];
 
-    fp = file_open(file, "w", em);
+    fp = file_stream_open(file, "w", em);
     if (fp == NULL) return -1;
 
-    while((size = stream_read(stream, buf, 128)) > 0) {
-        writeOkSize = 0;
-        while(size > writeOkSize
-              && (writeSize = fwrite(buf + writeOkSize, 1, size - writeOkSize, fp)) > 0)
-        {
-            writeOkSize += writeSize;
-        }
+    totalSize = file_stream_write_from_stream(fp, stream, em);
 
-        if (writeOkSize < size) break;
-    }
+    file_stream_close(fp, em);
 
-    rv = ferror(fp) == 0 ? 0 : -1;
-    fclose(fp);
-
-    return rv;
+    return totalSize;
 }
 
-int file_append_from_buf(const char * file, const void * buf, size_t size, error_monitor_t em) {
+ssize_t file_append_from_buf(const char * file, const void * buf, size_t size, error_monitor_t em) {
+    ssize_t totalSize;
     FILE * fp;
-    size_t writeSize;
-    int rv;
 
-    fp = file_open(file, "a", em);
+    fp = file_stream_open(file, "a", em);
     if (fp == NULL) return -1;
 
-    while((writeSize = fwrite(buf, 1, size, fp)) > 0) {
-        size -= writeSize;
-    }
+    totalSize = file_stream_write_from_buf(fp, buf, size, em);
 
-    rv = ferror(fp) == 0 ? 0 : -1;
-    fclose(fp);
+    file_stream_close(fp, em);
 
-    return rv;
+    return totalSize;
 }
 
-int file_append_from_str(const char * file, const char * str, error_monitor_t em) {
+ssize_t file_append_from_str(const char * file, const char * str, error_monitor_t em) {
     return file_append_from_buf(file, str, strlen(str), em);
 }
 
-int file_append_from_stream(const char * file, read_stream_t stream, error_monitor_t em) {
+ssize_t file_append_from_stream(const char * file, read_stream_t stream, error_monitor_t em) {
     FILE * fp;
-    size_t writeSize;
-    size_t writeOkSize;
-    size_t size;
-    int rv;
-    char buf[128];
+    ssize_t totalSize;
 
-    fp = file_open(file, "a", em);
+    fp = file_stream_open(file, "a", em);
     if (fp == NULL) return -1;
 
-    while((size = stream_read(stream, buf, 128)) > 0) {
-        writeOkSize = 0;
-        while(size > writeOkSize
-              && (writeSize = fwrite(buf + writeOkSize, 1, size - writeOkSize, fp)) > 0)
-        {
-            writeOkSize += writeSize;
-        }
+    totalSize = file_stream_write_from_stream(fp, stream, em);
 
-        if (writeOkSize < size) break;
-    }
+    file_stream_close(fp, em);
 
-    rv = ferror(fp) == 0 ? 0 : -1;
-    fclose(fp);
-
-    return rv;
+    return totalSize;
 }
 
-int file_load_to_buffer(mem_buffer_t buffer, const char * file, error_monitor_t em) {
+ssize_t file_load_to_buffer(mem_buffer_t buffer, const char * file, error_monitor_t em) {
     struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
     return file_load_to_stream((write_stream_t)&stream, file, em);
 }
 
-int file_load_to_stream(write_stream_t stream, const char * file, error_monitor_t em) {
+ssize_t file_load_to_stream(write_stream_t stream, const char * file, error_monitor_t em) {
     FILE * fp;
+    ssize_t totalSize;
+
+    fp = file_stream_open(file, "r", em);
+    if (fp == NULL) return -1;
+
+    totalSize = file_stream_load_to_stream(stream, fp, em);
+
+    if (!feof(fp)) {
+        totalSize = -1;
+    }
+
+    file_stream_close(fp, em);
+    return totalSize;
+}
+
+ssize_t file_stream_write_from_buf(FILE * fp, const void * buf, size_t size, error_monitor_t em) {
+    ssize_t totalSize;
+    size_t writeSize;
+
+    totalSize = 0;
+    while((writeSize = fwrite(buf, 1, size, fp)) > 0) {
+        size -= writeSize;
+        totalSize += writeSize;
+    }
+
+    if (ferror(fp)) {
+        totalSize = -1;
+    }
+
+    return totalSize;
+}
+
+ssize_t file_stream_write_from_str(FILE * fp, const char * str, error_monitor_t em) {
+    return file_stream_write_from_buf(fp, str, strlen(str), em);
+}
+
+ssize_t file_stream_write_from_stream(FILE * fp, read_stream_t stream, error_monitor_t em) {
+    ssize_t totalSize;
     size_t writeSize;
     size_t writeOkSize;
     size_t size;
-    int rv;
     char buf[128];
 
-    fp = file_open(file, "r", em);
-    if (fp == NULL) return -1;
+    totalSize = 0;
+    while((size = stream_read(stream, buf, 128)) > 0) {
+        writeOkSize = 0;
+        while(size > writeOkSize
+              && (writeSize = fwrite(buf + writeOkSize, 1, size - writeOkSize, fp)) > 0)
+        {
+            writeOkSize += writeSize;
+        }
 
+        totalSize += writeOkSize;
+
+        if (writeOkSize < size) break;
+    }
+
+    if (ferror(fp)) {
+        totalSize = -1;
+    }
+
+    return totalSize;
+}
+
+ssize_t file_stream_load_to_buffer(mem_buffer_t buffer, FILE * fp, error_monitor_t em) {
+    struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
+    return file_stream_load_to_stream((write_stream_t)&stream, fp, em);
+}
+
+ssize_t file_stream_load_to_stream(write_stream_t stream, FILE * fp, error_monitor_t em) {
+    size_t writeSize;
+    size_t writeOkSize;
+    size_t size;
+    ssize_t totalSize;
+    char buf[128];
+
+    totalSize = 0;
     while((size = fread(buf, 1, 128, fp)) > 0) {
         writeOkSize = 0;
         while(size > writeOkSize
@@ -129,12 +158,52 @@ int file_load_to_stream(write_stream_t stream, const char * file, error_monitor_
             writeOkSize += writeSize;
         }
 
+        totalSize += writeOkSize;
         if (writeOkSize < size) break;
     }
 
-    rv = feof(fp) == 1 ? 0 : -1;
+    if (ferror(fp)) {
+        totalSize = -1;
+    }
 
-    fclose(fp);
-
-    return rv;
+    return totalSize;
 }
+
+int file_exist(const char * path, error_monitor_t em) {
+    struct stat buffer;
+    int status;
+    status = inode_stat_by_path(path, &buffer, ENOENT, em);
+    if (status != 0) {
+        return 0;
+    }
+
+    return S_ISREG(buffer.st_mode);
+}
+
+ssize_t file_size(const char * path, error_monitor_t em) {
+    struct stat buffer;
+    int status;
+    status = inode_stat_by_path(path, &buffer, 0, em);
+    if (status != 0) {
+        return -1;
+    }
+
+    if (!S_ISREG(buffer.st_mode)) {
+        CPE_ERROR(em, "%s is not file.", path);
+        return -1;
+    }
+
+    return (ssize_t)buffer.st_size;
+}
+
+ssize_t file_stream_size(FILE * fp, error_monitor_t em) {
+    struct stat buffer;
+    int status;
+    status = inode_stat_by_fileno(fileno(fp), &buffer, 0, em);
+    if (status != 0) {
+        return -1;
+    }
+
+    return (ssize_t)buffer.st_size;
+}
+
