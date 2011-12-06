@@ -239,12 +239,19 @@ int file_rm(const char *path, error_monitor_t em) {
     return rv;
 }
 
-FILE * file_open(const char *path, const char *mode, error_monitor_t em) {
+FILE * file_stream_open(const char *path, const char *mode, error_monitor_t em) {
     FILE * fp = fopen(path, mode);
     if (fp == NULL) {
         CPE_ERROR(em, "open file %s fail!", path);
     }
     return fp;
+}
+
+void file_stream_close(FILE * fp, error_monitor_t em) {
+    int rv = fclose(fp);
+    if (rv != 0) {
+        CPE_ERROR(em, "close file fail, errno=%d!", errno);
+    }
 }
 
 int file_exist(const char * path) {

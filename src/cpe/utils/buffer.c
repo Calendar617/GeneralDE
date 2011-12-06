@@ -108,6 +108,10 @@ ssize_t mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t s
     return size;
 }
 
+ssize_t mem_buffer_append_char(mem_buffer_t buffer, char data) {
+    return mem_buffer_append(buffer, &data, 1);
+}
+
 void * mem_buffer_make_continuous(struct mem_buffer * buffer, size_t reserve) {
     struct mem_buffer_trunk * trunk;
 
