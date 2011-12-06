@@ -62,6 +62,7 @@ char mem_pos_data(mem_buffer_pos_t l);
 
 /* buffer read write operations */
 ssize_t mem_buffer_append(mem_buffer_t buffer, const void * buf, size_t size);
+ssize_t mem_buffer_append_char(mem_buffer_t buffer, char);
 ssize_t mem_buffer_read(void * buf, size_t size, mem_buffer_t buffer);
 void * mem_buffer_make_continuous(mem_buffer_t buffer, size_t reserve);
 void * mem_buffer_make_exactly(mem_buffer_t buffer);

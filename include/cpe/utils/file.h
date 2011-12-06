@@ -1,5 +1,6 @@
 #ifndef CPE_UTILS_FILE_H
 #define CPE_UTILS_FILE_H
+#include <stdio.h>
 #include "error.h"
 #include "memory.h"
 #include "stream.h"
@@ -10,23 +11,34 @@ extern "C" {
 #endif
 
 /*file operations*/
-int file_write_from_buf(const char * file, const void * buf, size_t size, error_monitor_t em);
-int file_write_from_str(const char * file, const char * str, error_monitor_t em);
-int file_write_from_stream(const char * file, read_stream_t stream, error_monitor_t em);
+ssize_t file_write_from_buf(const char * file, const void * buf, size_t size, error_monitor_t em);
+ssize_t file_write_from_str(const char * file, const char * str, error_monitor_t em);
+ssize_t file_write_from_stream(const char * file, read_stream_t stream, error_monitor_t em);
 
-int file_append_from_buf(const char * file, const void * buf, size_t size, error_monitor_t em);
-int file_append_from_str(const char * file, const char * str, error_monitor_t em);
-int file_append_from_stream(const char * file, read_stream_t stream, error_monitor_t em);
+ssize_t file_append_from_buf(const char * file, const void * buf, size_t size, error_monitor_t em);
+ssize_t file_append_from_str(const char * file, const char * str, error_monitor_t em);
+ssize_t file_append_from_stream(const char * file, read_stream_t stream, error_monitor_t em);
 
-int file_load_to_buffer(mem_buffer_t buffer, const char * file, error_monitor_t em);
-int file_load_to_stream(write_stream_t stream, const char * file, error_monitor_t em);
+ssize_t file_load_to_buffer(mem_buffer_t buffer, const char * file, error_monitor_t em);
+ssize_t file_load_to_stream(write_stream_t stream, const char * file, error_monitor_t em);
 
 int file_rm(const char * file, error_monitor_t em);
-int file_exist(const char * file);
+int file_exist(const char * file, error_monitor_t em);
+ssize_t file_size(const char * file, error_monitor_t em);
+
+/*file stream operations*/
+FILE * file_stream_open(const char *path, const char *mode, error_monitor_t em);
+void file_stream_close(FILE * fp, error_monitor_t em);
+ssize_t file_stream_size(FILE * fp, error_monitor_t em);
+ssize_t file_stream_write_from_buf(FILE * fp, const void * buf, size_t size, error_monitor_t em);
+ssize_t file_stream_write_from_str(FILE * fp, const char * str, error_monitor_t em);
+ssize_t file_stream_write_from_stream(FILE * fp, read_stream_t stream, error_monitor_t em);
+ssize_t file_stream_load_to_buffer(mem_buffer_t buffer, FILE * fp, error_monitor_t em);
+ssize_t file_stream_load_to_stream(write_stream_t stream, FILE * fp, error_monitor_t em);
 
 /*dir operations*/
-int dir_exist(const char * path);
-int dir_is_empty(const char * path);
+int dir_exist(const char * path, error_monitor_t em);
+int dir_is_empty(const char * path, error_monitor_t em);
 int dir_rm(const char * path, error_monitor_t em);
 int dir_mk(const char * path, mode_t mode, error_monitor_t em);
 int dir_mk_recursion(const char * path, mode_t mode, error_monitor_t em, mem_allocrator_t talloc);
