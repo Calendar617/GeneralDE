@@ -1,5 +1,5 @@
 #include <string.h>
-#include "cpe/utils/file.h"
+#include "file_internal.h"
 #include "cpe/utils/stream_buffer.h"
 
 ssize_t file_write_from_buf(const char * file, const void * buf, size_t size, error_monitor_t em) {
@@ -168,3 +168,42 @@ ssize_t file_stream_load_to_stream(write_stream_t stream, FILE * fp, error_monit
 
     return totalSize;
 }
+
+int file_exist(const char * path, error_monitor_t em) {
+    struct stat buffer;
+    int status;
+    status = inode_stat_by_path(path, &buffer, ENOENT, em);
+    if (status != 0) {
+        return 0;
+    }
+
+    return S_ISREG(buffer.st_mode);
+}
+
+ssize_t file_size(const char * path, error_monitor_t em) {
+    struct stat buffer;
+    int status;
+    status = inode_stat_by_path(path, &buffer, 0, em);
+    if (status != 0) {
+        return -1;
+    }
+
+    if (!S_ISREG(buffer.st_mode)) {
+        CPE_ERROR(em, "%s is not file.", path);
+        return -1;
+    }
+
+    return (ssize_t)buffer.st_size;
+}
+
+ssize_t file_stream_size(FILE * fp, error_monitor_t em) {
+    struct stat buffer;
+    int status;
+    status = inode_stat_by_fileno(fileno(fp), &buffer, 0, em);
+    if (status != 0) {
+        return -1;
+    }
+
+    return (ssize_t)buffer.st_size;
+}
+

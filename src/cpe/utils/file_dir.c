@@ -1,12 +1,5 @@
-#include <sys/stat.h>
-#include <dirent.h>
 #include <string.h>
-#include <errno.h>
-#include "cpe/utils/file.h"
-#include "cpe/utils/buffer.h"
-
-DIR * dir_open(const char * path, error_monitor_t em);
-void dir_close(DIR * dirp, error_monitor_t em);
+#include "file_internal.h"
 
 int dir_mk_recursion(const char * path, mode_t mode, error_monitor_t em, mem_allocrator_t talloc) {
     size_t path_len = strlen(path) + 1;
@@ -93,7 +86,7 @@ int dir_rm_recursion(const char * path, error_monitor_t em, mem_allocrator_t tal
     return rv;
 }
 
-int dir_is_empty(const char * path) {
+int dir_is_empty(const char * path, error_monitor_t em) {
     DIR * dirp;
     struct dirent dbuf;
     struct dirent * dp;
@@ -108,3 +101,13 @@ int dir_is_empty(const char * path) {
 
     return rv == 0 ? 0 : 1;
 }
+
+int dir_exist(const char * path, error_monitor_t em) {
+    struct stat buffer;
+    int status;
+    status = inode_stat_by_path(path, &buffer, ENOENT, em);
+    if (status != 0) return 0;
+
+    return S_ISDIR(buffer.st_mode);
+}
+

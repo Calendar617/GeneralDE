@@ -4,7 +4,7 @@
 #include <dirent.h>
 #include <string.h>
 #include <errno.h>
-#include "cpe/utils/file.h"
+#include "file_internal.h"
 
 int dir_mk(const char * path, mode_t mode, error_monitor_t em) {
     int rv;
@@ -254,23 +254,80 @@ void file_stream_close(FILE * fp, error_monitor_t em) {
     }
 }
 
-int file_exist(const char * path) {
-    struct stat buffer;
+int inode_stat_by_path(const char * path, struct stat * buf, int ignoreError, error_monitor_t em) {
     int status;
-    status = stat(path, &buffer);
-    if (status != 0) return 0;
+    status = stat(path, buf);
+    if (status == 0) {
+        if (errno == ignoreError) return status;
 
-    return S_ISREG(buffer.st_mode);
+        switch(errno) {
+        case EACCES:
+            CPE_ERROR_EX(em, errno, "Search permission is denied for a component of the path prefix.");
+            break;
+        case EIO:
+            CPE_ERROR_EX(em, errno, "An error occurred while reading from the file system.");
+            break;
+        case ELOOP:
+            CPE_ERROR_EX(em, errno, "A loop exists in symbolic links encountered during resolution of the path argument.");
+            break;
+        case ENAMETOOLONG:
+            CPE_ERROR_EX(em, errno, "The length of the path argument exceeds {PATH_MAX} or a pathname component is longer than {NAME_MAX}.");
+            break;
+        case ENOENT:
+            CPE_ERROR_EX(em, errno, "A component of path does not name an existing file or path is an empty string.");
+            break;
+        case ENOTDIR:
+            CPE_ERROR_EX(em, errno, "A component of the path prefix is not a directory.");
+            break;
+        case EOVERFLOW:
+            CPE_ERROR_EX(
+                em, errno,
+                "The file size in bytes or the number of blocks allocated to the file "
+                "or the file serial number cannot be represented correctly in the structure "
+                "pointed  to  by buf.");
+            break;
+        }
+    }
+    return status;
 }
 
-int dir_exist(const char * path) {
-    struct stat buffer;
+int inode_stat_by_fileno(int fno, struct stat * buf, int ignoreError, error_monitor_t em) {
     int status;
-    status = stat(path, &buffer);
-    if (status != 0) return 0;
+    status = fstat(fno, buf);
+    if (status == 0) {
+        if (errno == ignoreError) return status;
 
-    return S_ISDIR(buffer.st_mode);
+        switch(errno) {
+        case EACCES:
+            CPE_ERROR_EX(em, errno, "Search permission is denied for a component of the path prefix.");
+            break;
+        case EIO:
+            CPE_ERROR_EX(em, errno, "An error occurred while reading from the file system.");
+            break;
+        case ELOOP:
+            CPE_ERROR_EX(em, errno, "A loop exists in symbolic links encountered during resolution of the path argument.");
+            break;
+        case ENAMETOOLONG:
+            CPE_ERROR_EX(em, errno, "The length of the path argument exceeds {PATH_MAX} or a pathname component is longer than {NAME_MAX}.");
+            break;
+        case ENOENT:
+            CPE_ERROR_EX(em, errno, "A component of path does not name an existing file or path is an empty string.");
+            break;
+        case ENOTDIR:
+            CPE_ERROR_EX(em, errno, "A component of the path prefix is not a directory.");
+            break;
+        case EOVERFLOW:
+            CPE_ERROR_EX(
+                em, errno,
+                "The file size in bytes or the number of blocks allocated to the file "
+                "or the file serial number cannot be represented correctly in the structure "
+                "pointed  to  by buf.");
+            break;
+        }
+    }
+    return status;
 }
+
 
 int DIR_DEFAULT_MODE = S_IRWXU | S_IRGRP | S_IXGRP;
 int FILE_DEFAULT_MODE = S_IRUSR | S_IWUSR | S_IRGRP | S_IXGRP;

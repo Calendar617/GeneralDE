@@ -16,9 +16,13 @@ public:
     struct error_monitor m_em;
     struct error_monitor_node m_printer;
     const char * m_base;
-    struct mem_buffer m_buffer;
+    struct mem_buffer m_path_buffer;
+    struct mem_buffer m_file_load_buffer;
 
     char * make_path_name(const char * sub);
+
+    void write_file(const char * sub, const char * data);
+    char * file_as_str(const char * sub); 
 };
 
 #endif
