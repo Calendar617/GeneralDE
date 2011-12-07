@@ -47,7 +47,6 @@ char * with_file::t_file_to_str(const char * sub) {
 
     int size  = file_stream_size(fp, &tem);
     if (size < 0) return NULL;
-    if (size == 0) return "";
 
     char * buf = (char*)t_tmp_alloc(size + 1);
 
