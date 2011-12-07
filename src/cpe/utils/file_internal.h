@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-DIR * dir_open(const char * path, error_monitor_t em);
+DIR * dir_open(const char * path, int ignoreError, error_monitor_t em);
 void dir_close(DIR * dirp, error_monitor_t em);
 int inode_stat_by_path(const char * path, struct stat * buf, int ignoreError, error_monitor_t em);
 int inode_stat_by_fileno(int fno, struct stat * buf, int ignoreError, error_monitor_t em);

@@ -129,6 +129,8 @@ void * mem_buffer_make_continuous(struct mem_buffer * buffer, size_t reserve) {
         return mem_trunk_data(trunk);
     }
 
+    if (reserve < buffer->m_auto_inc_size) reserve = buffer->m_auto_inc_size;
+
     trunk = mem_trunk_alloc(buffer->m_default_allocrator, buffer->m_size + reserve);
     if (trunk == NULL) {
         return NULL;
@@ -192,7 +194,11 @@ void * mem_buffer_alloc(struct mem_buffer * buffer, size_t size) {
 
     trunk = TAILQ_LAST(&buffer->m_trunks, mem_buffer_trunk_list);
     if (trunk == NULL || trunk->m_size + size > trunk->m_capacity) {
-        trunk = mem_buffer_append_trunk(buffer, size);
+        trunk = mem_buffer_append_trunk(
+            buffer,
+            buffer->m_auto_inc_size > size
+            ? buffer->m_auto_inc_size
+            : size);
     }
 
     if (trunk == NULL) {

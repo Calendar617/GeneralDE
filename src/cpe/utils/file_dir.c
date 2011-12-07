@@ -40,7 +40,7 @@ int dir_rm_recursion(const char * path, error_monitor_t em, mem_allocrator_t tal
     char * subPath = NULL;
     size_t pathSize;
 
-    dirp = dir_open(path, em);
+    dirp = dir_open(path, ENOENT, em);
     if (dirp == NULL) {
         return errno == ENOENT ? 0 : -1;
     }
@@ -92,7 +92,7 @@ int dir_is_empty(const char * path, error_monitor_t em) {
     struct dirent * dp;
     int rv;
 
-    dirp = dir_open(path, NULL);
+    dirp = dir_open(path, 0, NULL);
     if (dirp == NULL) { return 1; }
 
     rv = readdir_r(dirp, &dbuf, &dp);
