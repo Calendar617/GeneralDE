@@ -6,12 +6,12 @@ TEST_F(FileTest, file_write_from_buf_basic) {
     EXPECT_EQ(
         3, 
         file_write_from_buf(
-            make_path_name("a.txt"),
+            t_path_make("a.txt"),
             data,
             3,
-            &m_em));
+            t_em()));
 
-    EXPECT_STREQ("abc", file_as_str("a.txt"));
+    EXPECT_STREQ("abc", t_file_to_str("a.txt"));
 }
 
 TEST_F(FileTest, file_write_from_string_basic) {
@@ -20,61 +20,61 @@ TEST_F(FileTest, file_write_from_string_basic) {
     EXPECT_EQ(
         3, 
         file_write_from_str(
-            make_path_name("a.txt"),
+            t_path_make("a.txt"),
             data,
-            &m_em));
+            t_em()));
 
-    EXPECT_STREQ("abc", file_as_str("a.txt"));
+    EXPECT_STREQ("abc", t_file_to_str("a.txt"));
 }
 
 TEST_F(FileTest, file_size_basic) {
-    write_file("a.txt", "abc");
+    t_write_to_file("a.txt", "abc");
 
     EXPECT_EQ(
         3, 
-        file_size(make_path_name("a.txt"), &m_em));
+        file_size(t_path_make("a.txt"), t_em()));
 }
 
 TEST_F(FileTest, file_size_not_exist) {
     EXPECT_EQ(
         -1, 
-        file_size(make_path_name("a.txt"), &m_em));
+        file_size(t_path_make("a.txt"), t_em()));
 }
 
 TEST_F(FileTest, file_stream_size) {
-    write_file("a.txt", "abc");
+    t_write_to_file("a.txt", "abc");
 
-    FILE * fp = file_stream_open(make_path_name("a.txt"), "r", &m_em);
+    FILE * fp = file_stream_open(t_path_make("a.txt"), "r", t_em());
     ASSERT_TRUE(fp);
 
     EXPECT_EQ(
         3, 
-        file_stream_size(fp, &m_em));
+        file_stream_size(fp, t_em()));
 }
 
 TEST_F(FileTest, file_append_from_buf_basic) {
-    write_file("a.txt", "abc");
+    t_write_to_file("a.txt", "abc");
 
     EXPECT_EQ(
         3, 
         file_append_from_buf(
-            make_path_name("a.txt"),
+            t_path_make("a.txt"),
             "def",
             3,
-            &m_em));
+            t_em()));
 
-    EXPECT_STREQ("abcdef", file_as_str("a.txt"));
+    EXPECT_STREQ("abcdef", t_file_to_str("a.txt"));
 }
 
 TEST_F(FileTest, file_append_from_string_basic) {
-    write_file("a.txt", "abc");
+    t_write_to_file("a.txt", "abc");
 
     EXPECT_EQ(
         3, 
         file_append_from_str(
-            make_path_name("a.txt"),
+            t_path_make("a.txt"),
             "def",
-            &m_em));
+            t_em()));
 
-    EXPECT_STREQ("abcdef", file_as_str("a.txt"));
+    EXPECT_STREQ("abcdef", t_file_to_str("a.txt"));
 }

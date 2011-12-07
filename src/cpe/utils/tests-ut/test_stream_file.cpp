@@ -28,7 +28,7 @@ public:
             m_fp = NULL;
         }
 
-        m_fp = file_stream_open(make_path_name(name), mode, &tem);
+        m_fp = file_stream_open(t_path_make(name), mode, &tem);
         EXPECT_TRUE(m_fp);
         return m_fp;
     }
@@ -37,10 +37,10 @@ public:
 };
 
 TEST_F(FileStreamTest, read_basic) {
-    write_file("a.txt", "abcd");
+    t_write_to_file("a.txt", "abcd");
 
     struct read_stream_file stream;
-    read_stream_file_init(&stream, open("a.txt", "r"), &m_em);
+    read_stream_file_init(&stream, open("a.txt", "r"), t_em());
 
     char buf[256];
 
@@ -57,7 +57,7 @@ TEST_F(FileStreamTest, read_basic) {
 
 TEST_F(FileStreamTest, write_basic) {
     struct write_stream_file stream;
-    write_stream_file_init(&stream, open("a.txt", "w"), &m_em);
+    write_stream_file_init(&stream, open("a.txt", "w"), t_em());
 
     EXPECT_EQ(
         4,
@@ -65,5 +65,5 @@ TEST_F(FileStreamTest, write_basic) {
     
     stream_flush((write_stream_t)&stream);
 
-    EXPECT_STREQ("abcd", file_as_str("a.txt"));
+    EXPECT_STREQ("abcd", t_file_to_str("a.txt"));
 }

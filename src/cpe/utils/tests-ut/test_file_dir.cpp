@@ -1,36 +1,38 @@
 #include "FileTest.hpp"
 
 TEST_F(FileTest, dir_mk_recursion_basic) {
+    t_em_set_print();
+    printf("path=%sXXX\n", t_path_make("a/b"));
     EXPECT_EQ(
         0,
         dir_mk_recursion(
-            make_path_name("a/b"),
+            t_path_make("a/b"),
             DIR_DEFAULT_MODE,
-            &m_em, NULL));
+            t_em(), NULL));
 
-    EXPECT_TRUE(dir_exist(make_path_name("a/b"), NULL));
+    EXPECT_TRUE(dir_exist(t_path_make("a/b"), NULL));
 }
 
 TEST_F(FileTest, dir_mk_recursion_one_level) {
     EXPECT_EQ(
         0,
         dir_mk_recursion(
-            make_path_name("a"),
+            t_path_make("a"),
             DIR_DEFAULT_MODE,
-            &m_em, NULL));
+            t_em(), NULL));
 
-    EXPECT_TRUE(dir_exist(make_path_name("a"), NULL));
+    EXPECT_TRUE(dir_exist(t_path_make("a"), NULL));
 }
 
 TEST_F(FileTest, dir_rm_recursion_with_file) {
-    dir_mk(make_path_name("a"), DIR_DEFAULT_MODE, &m_em);
-    write_file("a/a.txt", "abc");
+    dir_mk(t_path_make("a"), DIR_DEFAULT_MODE, t_em());
+    t_write_to_file("a/a.txt", "abc");
 
     EXPECT_EQ(
         0,
-        dir_rm_recursion(make_path_name("a"), &m_em, NULL));
+        dir_rm_recursion(t_path_make("a"), t_em(), NULL));
 
-    EXPECT_FALSE(dir_exist(make_path_name("a"), NULL));
+    EXPECT_FALSE(dir_exist(t_path_make("a"), NULL));
 }
 
 TEST_F(FileTest, dir_mk_recursion_empty) {
@@ -39,30 +41,30 @@ TEST_F(FileTest, dir_mk_recursion_empty) {
         dir_mk_recursion(
             "",
             DIR_DEFAULT_MODE,
-            &m_em, NULL));
+            t_em(), NULL));
 }
 
 TEST_F(FileTest, dir_exist_basic) {
     EXPECT_EQ(
         1,
-        dir_exist(make_path_name("."), &m_em));
+        dir_exist(t_path_make("."), t_em()));
 }
 
 TEST_F(FileTest, dir_exist_not_exist) {
     EXPECT_EQ(
         0,
-        dir_exist(make_path_name("not-exist"), &m_em));
+        dir_exist(t_path_make("not-exist"), t_em()));
 }
 
 TEST_F(FileTest, dir_exist_file) {
     EXPECT_EQ(
         0,
         file_write_from_str(
-            make_path_name("f1"),
+            t_path_make("f1"),
             "",
-            &m_em));
+            t_em()));
 
     EXPECT_EQ(
         0,
-        dir_exist(make_path_name("not-exist"), &m_em));
+        dir_exist(t_path_make("not-exist"), t_em()));
 }
