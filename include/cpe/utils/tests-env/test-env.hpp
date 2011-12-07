@@ -13,11 +13,11 @@ struct env_gen<Loki::Typelist<Head, Tail> >
 {
     void SetUp() {
         Head::SetUp();
-        Tail::SetUp();
+        env_gen<Tail>::SetUp();
     }
 
     void TearDown() {
-        Tail::TearDown();
+        env_gen<Tail>::TearDown();
         Head::TearDown();
     }
 };

@@ -48,7 +48,7 @@ struct fixture_gen<Loki::NullType> {
     void TearDown() {}
 };
 
-template<typename EnvListT, typename BaseT = Test>
+template<typename EnvListT = Loki::NullType, typename BaseT = Test>
 class fixture : public BaseT, public fixture_gen<EnvListT> {
 public:
     typedef fixture Base;
@@ -60,7 +60,7 @@ public:
 
     virtual void TearDown() {
         BaseT::TearDown();
-        fixture_gen<EnvListT>::SetUp();
+        fixture_gen<EnvListT>::TearDown();
     }
 
     using BaseT::t_allocrator;

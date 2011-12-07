@@ -11,7 +11,9 @@ void with_file::SetUp() {
 
 void with_file::TearDown() {
     if (m_path_base) {
-        dir_rm_recursion(m_path_base, NULL, NULL);
+        CPE_DEF_ERROR_MONITOR(tem, cpe_error_log_to_consol, NULL);
+        dir_rm_recursion(m_path_base, &tem, t_allocrator());
+        m_path_base = NULL;
     }
 }
 
@@ -30,7 +32,35 @@ with_file::t_path_make(const char * subpath) {
     memcpy(buf + baselen, "/", 1);
     memcpy(buf + baselen + 1, subpath, len);
     buf[len + baselen + 1] = 0;
+
     return buf;
+}
+
+char * with_file::t_file_to_str(const char * sub) {
+    CPE_DEF_ERROR_MONITOR(tem, cpe_error_log_to_consol, NULL);
+
+    char * path = t_path_make(sub);
+
+    FILE * fp = file_stream_open(path, "r", &tem);
+    if (fp == NULL) return NULL;
+
+    int size  = file_stream_size(fp, &tem);
+    if (size < 0) return NULL;
+    if (size == 0) return "";
+
+    char * buf = (char*)t_alloc(size + 1);
+
+    int loadSize = file_stream_load_to_buf(buf, size, fp, &tem);
+    if (loadSize < 0 || loadSize > size) return NULL;
+
+    buf[size] = 0;
+
+    return buf;
+}
+
+void with_file::t_write_to_file(const char * subname, const char * data) {
+    CPE_DEF_ERROR_MONITOR(tem, cpe_error_log_to_consol, NULL);
+    EXPECT_LT(0, file_write_from_str( t_path_make(subname), data, &tem));
 }
 
 }}

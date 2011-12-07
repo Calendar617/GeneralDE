@@ -12,6 +12,9 @@ public:
 
     const char * t_dir_base(void);
     char * t_path_make(const char * subpath);
+    char * t_file_to_str(const char * subpath);
+    void t_write_to_file(const char * subpath, const char * data);
+
 private:
     const char * m_path_base;
 };
