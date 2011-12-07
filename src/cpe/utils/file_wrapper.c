@@ -65,9 +65,11 @@ int dir_mk(const char * path, mode_t mode, error_monitor_t em) {
     return rv;
 }
 
-DIR * dir_open(const char * path, error_monitor_t em) {
+DIR * dir_open(const char * path, int ignoreError, error_monitor_t em) {
     DIR * dp = opendir(path);
     if (dp == NULL) {
+        if (errno == ignoreError) return dp;
+
         switch(errno) {
         case EACCES:
             CPE_ERROR_EX(em, errno, "open dir %s: Permission denied.", path);
@@ -79,6 +81,7 @@ DIR * dir_open(const char * path, error_monitor_t em) {
             CPE_ERROR_EX(em, errno, "open dir %s: Too many files are currently open in the system.", path);
             break;
         case ENOENT:
+            CPE_ERROR_EX(em, errno, "open dir %s: not exist.", path);
             break;
         case ENOMEM:
             CPE_ERROR_EX(em, errno, "open dir %s: Insufficient memory to complete the operation.", path);
