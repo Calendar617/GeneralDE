@@ -44,6 +44,25 @@ int dir_mk(const char * path, mode_t mode, error_monitor_t em);
 int dir_mk_recursion(const char * path, mode_t mode, error_monitor_t em, mem_allocrator_t talloc);
 int dir_rm_recursion(const char * path, error_monitor_t em, mem_allocrator_t talloc);
 
+/*dir visit*/
+typedef enum dir_visit_next_op {
+    dir_visit_next_go
+    , dir_visit_next_ignore
+    , dir_visit_next_uplevel
+    , dir_visit_next_exit
+} dir_visit_next_op_t;
+
+typedef struct dir_visitor {
+    dir_visit_next_op_t (*on_dir_enter)(const char * full, const char * base, void * ctx);
+    dir_visit_next_op_t (*on_dir_leave)(const char * full, const char * base, void * ctx);
+    dir_visit_next_op_t (*on_file)(const char * full, const char * base, void * ctx);
+} * dir_visitor_t;
+
+void dir_search(
+    dir_visitor_t visitor, void * ctx,
+    const char * path, int maxLevel,
+    error_monitor_t em, mem_allocrator_t talloc);
+
 extern int DIR_DEFAULT_MODE;
 extern int FILE_DEFAULT_MODE;
 
