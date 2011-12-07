@@ -1,7 +1,7 @@
 product:=gtest.cpe_utils
 $(product).type:=progn
 $(product).buildfor:=dev
-$(product).depends:=gtest cpe_utils
+$(product).depends:=gtest loki testenv.utils cpe_utils
 $(product).product.c.includes:=include
 $(product).c.sources := $(wildcard $(product-base)*.cpp)
 $(product).c.flags.ld:=
