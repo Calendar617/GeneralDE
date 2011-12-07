@@ -12,7 +12,8 @@ void with_file::SetUp() {
 void with_file::TearDown() {
     if (m_path_base) {
         CPE_DEF_ERROR_MONITOR(tem, cpe_error_log_to_consol, NULL);
-        dir_rm_recursion(m_path_base, &tem, t_allocrator());
+        dir_rm_recursion(m_path_base, &tem, t_tmp_allocrator());
+        mem_free(t_tmp_allocrator(), m_path_base);
         m_path_base = NULL;
     }
 }
@@ -27,7 +28,7 @@ with_file::t_path_make(const char * subpath) {
     int len = strlen(subpath);
     int baselen = strlen(m_path_base);
 
-    char * buf = (char*)t_alloc(baselen + len + 1 + 1);
+    char * buf = (char*)t_tmp_alloc(baselen + len + 1 + 1);
     memcpy(buf, m_path_base, baselen);
     memcpy(buf + baselen, "/", 1);
     memcpy(buf + baselen + 1, subpath, len);
@@ -48,7 +49,7 @@ char * with_file::t_file_to_str(const char * sub) {
     if (size < 0) return NULL;
     if (size == 0) return "";
 
-    char * buf = (char*)t_alloc(size + 1);
+    char * buf = (char*)t_tmp_alloc(size + 1);
 
     int loadSize = file_stream_load_to_buf(buf, size, fp, &tem);
     if (loadSize < 0 || loadSize > size) return NULL;

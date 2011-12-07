@@ -39,6 +39,10 @@ public:
     template<typename T2>
     T2 & envOf(void) { return dynamic_cast<T2 &>(*this); }
 
+    mem_allocrator_t t_tmp_allocrator() { return envOf<Test>().t_tmp_allocrator(); }
+    void * t_tmp_alloc(size_t size) { return envOf<Test>().t_tmp_alloc(size); }
+    char * t_tmp_strdup(const char * str) { return envOf<Test>().t_tmp_strdup(str); }
+
     mem_allocrator_t t_allocrator() { return envOf<Test>().t_allocrator(); }
     void * t_alloc(size_t size) { return envOf<Test>().t_alloc(size); }
     char * t_strdup(const char * str) { return envOf<Test>().t_strdup(str); }

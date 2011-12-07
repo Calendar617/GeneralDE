@@ -16,12 +16,24 @@ public:
     virtual void SetUp();
     virtual void TearDown();
 
+
+    mem_allocrator_t t_tmp_allocrator();
+    void * t_tmp_alloc(size_t size);
+    char * t_tmp_strdup(const char * str);
+
     mem_allocrator_t t_allocrator();
     void * t_alloc(size_t size);
     char * t_strdup(const char * str);
+
+    int t_alloc_count(void) const;
+    int t_free_count(void) const;
 private:
+    struct mem_allocrator m_tmp_allocrator;
+    struct mem_buffer m_tmp_alloc_buf;
     struct mem_allocrator m_allocrator;
     struct mem_buffer m_alloc_buf;
+    int m_alloc_count;
+    int m_free_count;
 };
 
 template <typename TList> struct fixture_gen;
@@ -69,5 +81,10 @@ public:
 };
 
 }
+
+#define CHECK_NO_MEMLEAK()                                              \
+    EXPECT_TRUE(this->t_alloc_count() == this->t_free_count())          \
+    << "allocrator use error! alloc count is " << this->t_alloc_count() \
+    << ", free count is " << t_free_count()
 
 #endif

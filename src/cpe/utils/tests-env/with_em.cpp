@@ -3,7 +3,7 @@
 namespace utils { namespace testenv {
 
 void with_em::SetUp() {
-    m_el = cpe_error_list_create(t_allocrator());
+    m_el = cpe_error_list_create(t_tmp_allocrator());
     cpe_error_monitor_init(&m_em, cpe_error_list_collect, m_el);
     cpe_error_monitor_node_init(&m_printer, cpe_error_log_to_consol, NULL);
 }

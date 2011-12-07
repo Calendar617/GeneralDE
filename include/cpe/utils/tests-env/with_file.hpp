@@ -16,7 +16,7 @@ public:
     void t_write_to_file(const char * subpath, const char * data);
 
 private:
-    const char * m_path_base;
+    char * m_path_base;
 };
 
 }}
