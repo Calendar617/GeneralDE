@@ -24,6 +24,7 @@ include $(CPED_BUILD_DETAIL_DIR)/dev-env-$(dev-env).mk
 include $(CPED_BUILD_DETAIL_DIR)/product-def.mk
 include $(CPED_BUILD_DETAIL_DIR)/product-def-c.mk
 include $(CPED_BUILD_DETAIL_DIR)/product-def-install.mk
+include $(CPED_BUILD_DETAIL_DIR)/product-def-virtual.mk
 include $(CPED_BUILD_DETAIL_DIR)/gtags.mk
 
 endif
