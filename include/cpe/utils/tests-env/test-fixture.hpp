@@ -18,7 +18,7 @@ public:
 
     mem_allocrator_t t_allocrator();
     void * t_alloc(size_t size);
-
+    char * t_strdup(const char * str);
 private:
     struct mem_allocrator m_allocrator;
     struct mem_buffer m_alloc_buf;
@@ -33,11 +33,11 @@ struct fixture_gen<Loki::Typelist<Head, Tail> >
 {
     void SetUp() {
         Head::SetUp();
-        Tail::SetUp();
+        fixture_gen<Tail>::SetUp();
     }
 
     void TearDown() {
-        Tail::TearDown();
+        fixture_gen<Tail>::TearDown();
         Head::TearDown();
     }
 };
@@ -51,6 +51,8 @@ struct fixture_gen<Loki::NullType> {
 template<typename EnvListT, typename BaseT = Test>
 class fixture : public BaseT, public fixture_gen<EnvListT> {
 public:
+    typedef fixture Base;
+
     virtual void SetUp() {
         fixture_gen<EnvListT>::SetUp();
         BaseT::SetUp();
@@ -63,6 +65,7 @@ public:
 
     using BaseT::t_allocrator;
     using BaseT::t_alloc;
+    using BaseT::t_strdup;
 };
 
 }

@@ -34,4 +34,9 @@ Test::t_alloc(size_t size) {
     return mem_buffer_alloc(&m_alloc_buf, size);
 }
 
+char *
+Test::t_strdup(const char * str) {
+    return mem_buffer_strdup(&m_alloc_buf, str);
+}
+
 }

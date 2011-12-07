@@ -31,6 +31,8 @@ struct env_gen<Loki::NullType> {
 template<typename EnvListT = Loki::NullType>
 class env : public env_gen<EnvListT> {
 public:
+    virtual ~env() {}
+
     template<typename T2>
     T2 * tryEnvOf(void) { return dynamic_cast<T2 *>(this); }
 
@@ -39,6 +41,7 @@ public:
 
     mem_allocrator_t t_allocrator() { return envOf<Test>().t_allocrator(); }
     void * t_alloc(size_t size) { return envOf<Test>().t_alloc(size); }
+    char * t_strdup(const char * str) { return envOf<Test>().t_strdup(str); }
 };
 
 }
