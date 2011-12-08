@@ -32,7 +32,7 @@ enum DRXmlParseState {
     sscanf(buf, "%d", &(__d))
 
 #define DR_DO_DUP_STR(buf)                                              \
-    buf =  mem_buffer_strndup(                                          \
+    buf =  mem_buffer_strdup_len(                                       \
         &ctx->m_metaLib->m_tmp_buf, (char const *)valueBegin, len);
 
 struct DRXmlParseCtx {
