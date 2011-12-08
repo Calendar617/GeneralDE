@@ -162,6 +162,11 @@ TEST_F(BufferTest, strdup_basic) {
     EXPECT_EQ((size_t)4, mem_buffer_size(&m_buffer));
 }
 
+TEST_F(BufferTest, strdup_len_basic) {
+    EXPECT_STREQ("abc", mem_buffer_strdup_len(&m_buffer, "abc", 2));
+    EXPECT_EQ((size_t)3, mem_buffer_size(&m_buffer));
+}
+
 TEST_F(BufferTest, strcat_to_empty) {
     EXPECT_EQ(0, mem_buffer_strcat(&m_buffer, "abc"));
     EXPECT_STREQ("abc", (char*)mem_buffer_make_continuous(&m_buffer, 0));

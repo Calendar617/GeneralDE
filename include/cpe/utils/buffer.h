@@ -69,6 +69,7 @@ void * mem_buffer_make_exactly(mem_buffer_t buffer);
 void * mem_buffer_alloc(mem_buffer_t buffer, size_t size);
 
 char * mem_buffer_strdup(mem_buffer_t buffer, const char * s);
+char * mem_buffer_strdup_len(mem_buffer_t buffer, const char * s, size_t sLen);
 int mem_buffer_strcat(mem_buffer_t buffer, const char * s);
 
 #ifdef __cplusplus
