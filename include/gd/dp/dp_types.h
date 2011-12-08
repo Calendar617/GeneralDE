@@ -2,8 +2,9 @@
 #define GD_DP_TYPES_H
 #include "cpe/pal/types.h"
 
-typedef struct gd_dp_context * gd_dp_context_t;
-typedef struct gd_dp_manage * gd_dp_manage_t;
+typedef struct gd_dp_rsp * gd_dp_rsp_t;
+typedef struct gd_dp_req * gd_dp_req_t;
+typedef struct gd_dp_mgr * gd_dp_mgr_t;
 
 #endif
 

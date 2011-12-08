@@ -8,12 +8,10 @@
 extern "C" {
 #endif
 
-gd_dp_manage_t gd_dp_manage_create(mem_allocrator_t alloc, gd_tl_t timerTl);
-void gd_dp_manage_free(gd_dp_manage_t dp);
+gd_dp_mgr_t gd_dp_mgr_create(mem_allocrator_t alloc, gd_tl_t timerTl);
+void gd_dp_mgr_free(gd_dp_mgr_t dp);
 
-void gd_dp_manage_dispatch(gd_dp_manage_t dp, void * data, size_t len);
-
-gd_dp_context_t gd_dp_context_create(gd_dp_manage_t, gd_tl_time_span_t life);
+void gd_dp_mgr_dispatch(gd_dp_mgr_t dp, void * data, size_t len);
 
 #ifdef __cplusplus
 }
