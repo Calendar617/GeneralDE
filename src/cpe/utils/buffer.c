@@ -229,6 +229,21 @@ char * mem_buffer_strdup(struct mem_buffer * buffer, const char * s) {
     return p;
 }
 
+char * mem_buffer_strdup_len(mem_buffer_t buffer, const char * s, size_t sLen) {
+    char * p;
+
+    if (!s) return NULL;
+
+    p = (char*)mem_buffer_alloc(buffer, sLen + 1);
+    if (p == NULL) return NULL;
+
+    memcpy(p, s, sLen);
+
+    p[sLen] = 0;
+
+    return p;
+}
+
 size_t mem_buffer_trunk_count(mem_buffer_t buffer) {
     size_t count;
     struct mem_buffer_trunk * trunk;

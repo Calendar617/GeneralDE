@@ -184,7 +184,7 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
         if (ctx->m_name == NULL) {
             mem_buffer_clear_data(&ctx->m_name_buffer);
             if (ctx->m_input_event.data.scalar.length > 0) {
-                ctx->m_name = mem_buffer_strndup(
+                ctx->m_name = mem_buffer_strdup_len(
                     &ctx->m_name_buffer,
                     (const char *)ctx->m_input_event.data.scalar.value,
                     ctx->m_input_event.data.scalar.length);
@@ -209,7 +209,7 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
             }
             else if (ctx->m_input_event.data.scalar.length > 0) {
                 const char * value = 
-                    mem_buffer_strndup(
+                    mem_buffer_strdup_len(
                         &ctx->m_name_buffer,
                         (const char *)ctx->m_input_event.data.scalar.value,
                         ctx->m_input_event.data.scalar.length);
@@ -231,7 +231,7 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
 
         if (ctx->m_input_event.data.scalar.length > 0) {
             const char * value = 
-                mem_buffer_strndup(
+                mem_buffer_strdup_len(
                     &ctx->m_name_buffer,
                     (const char *)ctx->m_input_event.data.scalar.value,
                     ctx->m_input_event.data.scalar.length);
