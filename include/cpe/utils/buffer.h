@@ -41,7 +41,7 @@ void mem_trunk_set_size(mem_buffer_t buffer, struct mem_buffer_trunk * trunk, si
 
 /* buffer basic operations */
 size_t mem_buffer_size(mem_buffer_t buffer);
-size_t mem_buffer_set_size(mem_buffer_t buffer, size_t size);
+ssize_t mem_buffer_set_size(mem_buffer_t buffer, size_t size);
 
 void mem_buffer_init(mem_buffer_t buffer, struct mem_allocrator * allocrator);
 void mem_buffer_clear(mem_buffer_t buffer);
@@ -69,7 +69,7 @@ void * mem_buffer_make_exactly(mem_buffer_t buffer);
 void * mem_buffer_alloc(mem_buffer_t buffer, size_t size);
 
 char * mem_buffer_strdup(mem_buffer_t buffer, const char * s);
-char * mem_buffer_strndup(mem_buffer_t buffer, const char * s, size_t n);
+int mem_buffer_strcat(mem_buffer_t buffer, const char * s);
 
 #ifdef __cplusplus
 }

@@ -11,8 +11,7 @@ void with_file::SetUp() {
 
 void with_file::TearDown() {
     if (m_path_base) {
-        CPE_DEF_ERROR_MONITOR(tem, cpe_error_log_to_consol, NULL);
-        dir_rm_recursion(m_path_base, &tem, t_tmp_allocrator());
+        dir_rm_recursion(m_path_base, NULL, t_tmp_allocrator());
         mem_free(t_tmp_allocrator(), m_path_base);
         m_path_base = NULL;
     }
@@ -42,6 +41,8 @@ char * with_file::t_file_to_str(const char * sub) {
 
     char * path = t_path_make(sub);
 
+    if (!file_exist(path, &tem)) return NULL;
+
     FILE * fp = file_stream_open(path, "r", &tem);
     if (fp == NULL) return NULL;
 
@@ -61,7 +62,7 @@ char * with_file::t_file_to_str(const char * sub) {
 
 void with_file::t_write_to_file(const char * subname, const char * data) {
     CPE_DEF_ERROR_MONITOR(tem, cpe_error_log_to_consol, NULL);
-    EXPECT_LT(0, file_write_from_str( t_path_make(subname), data, &tem));
+    EXPECT_LE(0, file_write_from_str( t_path_make(subname), data, &tem));
 }
 
 }}

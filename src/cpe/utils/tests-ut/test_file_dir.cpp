@@ -1,7 +1,6 @@
 #include "FileTest.hpp"
 
 TEST_F(FileTest, dir_mk_recursion_basic) {
-    t_em_set_print();
     EXPECT_EQ(
         0,
         dir_mk_recursion(
