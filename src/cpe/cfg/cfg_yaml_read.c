@@ -52,6 +52,7 @@ static int cfg_read_from_stream_read_handler(
 static int cfg_yaml_read_ctx_init(
     struct cfg_yaml_read_ctx * ctx,
     cfg_t root,
+    const char * name,
     read_stream_t stream,
     cfg_policy_t policy,
     error_monitor_t em)
@@ -70,7 +71,7 @@ static int cfg_yaml_read_ctx_init(
 
     yaml_parser_set_input(&ctx->m_parser, cfg_read_from_stream_read_handler, stream);
 
-    ctx->m_name = NULL;
+    ctx->m_name = name;
     mem_buffer_init(&ctx->m_name_buffer, NULL);
 
     ctx->m_state =
@@ -433,11 +434,11 @@ g_yaml_read_event_processors[YAML_MAPPING_END_EVENT + 1] = {
     /*YAML_MAPPING_END_EVENT*/ cfg_yaml_on_state_end
 };
 
-static void cfg_read_i(cfg_t cfg, read_stream_t stream, cfg_policy_t policy, error_monitor_t em) {
+static void cfg_read_i(cfg_t cfg, const char * name, read_stream_t stream, cfg_policy_t policy, error_monitor_t em) {
     struct cfg_yaml_read_ctx ctx;
     int done = 0;
 
-    if (cfg_yaml_read_ctx_init(&ctx, cfg, stream, policy, em) != 0) return;
+    if (cfg_yaml_read_ctx_init(&ctx, cfg, name, stream, policy, em) != 0) return;
 
     while (!done) {
         if (!yaml_parser_parse(&ctx.m_parser, &ctx.m_input_event)) {
@@ -471,16 +472,21 @@ static void cfg_read_i(cfg_t cfg, read_stream_t stream, cfg_policy_t policy, err
 }
 
 int cfg_read(cfg_t cfg, read_stream_t stream, cfg_policy_t policy, error_monitor_t em) {
+    return cfg_read_with_name(cfg, NULL, stream, policy, em);
+}
+
+int cfg_read_with_name(cfg_t cfg, const char * name, read_stream_t stream, cfg_policy_t policy, error_monitor_t em) {
     int ret = 0;
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
-        cfg_read_i(cfg, stream, policy, em);
+        cfg_read_i(cfg, name, stream, policy, em);
         CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
     }
     else {
         CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
-        cfg_read_i(cfg, stream, policy, &logError);
+        cfg_read_i(cfg, name, stream, policy, &logError);
     }
 
     return ret;
 }
+

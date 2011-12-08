@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 #include "file_internal.h"
 #include "cpe/utils/stream_mem.h"
@@ -213,3 +214,63 @@ ssize_t file_stream_size(FILE * fp, error_monitor_t em) {
     return (ssize_t)buffer.st_size;
 }
 
+const char * file_name_suffix(const char * input) {
+    int len;
+
+    if (input == NULL) return NULL;
+
+    len = strlen(input);
+
+    while(len > 0) {
+        char c = input[--len];
+        if (c == '.') return input + len + 1;
+        if (c == '/') return "";
+    }
+
+    return input;
+}
+
+const char *
+file_name_base(const char * input, mem_buffer_t tbuf) {
+    int len;
+    int endPos;
+    int beginPos;
+    int pos;
+
+    if (input == NULL) return NULL;
+
+    len = strlen(input);
+    
+    endPos = len + 1;
+    beginPos = 0;
+
+    pos = len + 1;
+    while(pos > 0) {
+        char c = input[--pos];
+        if (c == '.') {
+            if (endPos == len + 1) {
+                endPos = pos;
+            }
+        }
+
+        if (c == '/') {
+            beginPos = pos + 1;
+            break;
+        }
+    }
+
+    if (endPos == len + 1) {
+        return input + beginPos;
+    }
+    else {
+        char * r;
+        int resultLen = endPos - beginPos;
+        if (resultLen <= 0) return "";
+
+        assert(beginPos < endPos);
+        r = mem_buffer_alloc(tbuf, resultLen + 1);
+        memcpy(r, input + beginPos, resultLen);
+        r[resultLen] = 0;
+        return r;
+    }
+}

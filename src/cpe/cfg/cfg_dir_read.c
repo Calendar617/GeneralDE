@@ -12,6 +12,7 @@ struct cfg_dir_read_ctx {
     cfg_policy_t m_policy;
     cfg_t m_curent;
     error_monitor_t m_em;
+    struct mem_buffer m_tbuffer;
 
     struct {
         cfg_t m_node;
@@ -64,17 +65,13 @@ dir_visit_next_op_t cfg_read_dir_on_file(const char * full, const char * base, v
     struct cfg_dir_read_ctx * readCtx = (struct cfg_dir_read_ctx *)ctx;
     struct read_stream_file fstream;
     FILE * fp;
-    cfg_t readRoot;
+    const char * fileSuffix;
 
-    if (readCtx->m_curent == NULL || cfg_is_value(readCtx->m_curent)) return dir_visit_next_exit;
+    if (readCtx->m_curent == NULL || cfg_is_value(readCtx->m_curent)) return dir_visit_next_ignore;
 
-    if (readCtx->m_curent->m_type == CPE_CFG_TYPE_STRUCT) {
-        readRoot = cfg_struct_add_struct(readCtx->m_curent, base, readCtx->m_policy);
-    }
-    else {
-        readRoot = cfg_seq_add_struct(readCtx->m_curent);
-    }
-    
+    fileSuffix = file_name_suffix(base);
+    if (strcmp(fileSuffix, "yml") != 0) return dir_visit_next_go;
+
     CPE_ERROR_SET_FILE(readCtx->m_em, full);
     fp = file_stream_open(full, "r", readCtx->m_em);
     CPE_ERROR_SET_FILE(readCtx->m_em, NULL);
@@ -83,14 +80,20 @@ dir_visit_next_op_t cfg_read_dir_on_file(const char * full, const char * base, v
 
     read_stream_file_init(&fstream, fp, readCtx->m_em);
 
-    cfg_read(readRoot, (read_stream_t)&fstream, readCtx->m_policy, readCtx->m_em);
+    
+    cfg_read_with_name(
+        readCtx->m_curent,
+        file_name_base(base, &readCtx->m_tbuffer),
+        (read_stream_t)&fstream,
+        readCtx->m_policy,
+        readCtx->m_em);
     
     file_stream_close(fp, readCtx->m_em);
 
     return dir_visit_next_go;
 }
 
-void cfg_read_dir_i(cfg_t cfg, const char * path, cfg_policy_t policy, error_monitor_t em) {
+static void cfg_read_dir_i(cfg_t cfg, const char * path, cfg_policy_t policy, error_monitor_t em, mem_allocrator_t talloc) {
     struct cfg_dir_read_ctx ctx;
     struct dir_visitor dirVisitor;
 
@@ -103,19 +106,21 @@ void cfg_read_dir_i(cfg_t cfg, const char * path, cfg_policy_t policy, error_mon
     dirVisitor.on_dir_leave = cfg_read_dir_on_leave;
     dirVisitor.on_file = cfg_read_dir_on_file;
 
+    mem_buffer_init(&ctx.m_tbuffer, talloc);
     dir_search(&dirVisitor, &ctx, path, -1, em, NULL);
+    mem_buffer_clear(&ctx.m_tbuffer);
 }
 
-int cfg_read_dir(cfg_t cfg, const char * path, cfg_policy_t policy, error_monitor_t em) {
+int cfg_read_dir(cfg_t cfg, const char * path, cfg_policy_t policy, error_monitor_t em, mem_allocrator_t talloc) {
     int ret = 0;
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
-        cfg_read_dir_i(cfg, path, policy, em);
+        cfg_read_dir_i(cfg, path, policy, em, talloc);
         CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
     }
     else {
         CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
-        cfg_read_dir_i(cfg, path, policy, &logError);
+        cfg_read_dir_i(cfg, path, policy, &logError, talloc);
     }
 
     return ret;

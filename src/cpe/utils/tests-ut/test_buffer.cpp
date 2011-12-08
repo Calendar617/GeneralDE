@@ -163,7 +163,7 @@ TEST_F(BufferTest, strdup_basic) {
 }
 
 TEST_F(BufferTest, strdup_len_basic) {
-    EXPECT_STREQ("abc", mem_buffer_strdup_len(&m_buffer, "abc", 2));
+    EXPECT_STREQ("ab", mem_buffer_strdup_len(&m_buffer, "abc", 2));
     EXPECT_EQ((size_t)3, mem_buffer_size(&m_buffer));
 }
 

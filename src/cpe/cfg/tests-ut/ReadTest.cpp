@@ -2,19 +2,17 @@
 #include "cpe/utils/stream_buffer.h"
 #include "ReadTest.hpp"
 
-ReadTest::ReadTest() : m_errorList(0) {
+ReadTest::ReadTest() {
 }
 
 void ReadTest::SetUp() {
-    CfgTest::SetUp();
+    Base::SetUp();
     mem_buffer_init(&m_result_buffer, NULL);
 }
 
 void ReadTest::TearDown() {
     mem_buffer_clear(&m_result_buffer);
-    cpe_error_list_free(m_errorList);
-
-    CfgTest::TearDown();
+    Base::TearDown();
 }
 
 int ReadTest::read(const char * input, cfg_policy_t policy) {
@@ -22,14 +20,8 @@ int ReadTest::read(const char * input, cfg_policy_t policy) {
 }
 
 int ReadTest::read(cfg_t cfg, const char * input, cfg_policy_t policy) {
-    cpe_error_list_free(m_errorList);
-    m_errorList = cpe_error_list_create(NULL);
-
-    CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
-    CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
-
     struct read_stream_mem stream = CPE_READ_STREAM_MEM_INITIALIZER(input, strlen(input));
-    return cfg_read(cfg, (read_stream_t)&stream, policy, &em);
+    return cfg_read(cfg, (read_stream_t)&stream, policy, t_em());
 }
 
 const char * ReadTest::result(void) {

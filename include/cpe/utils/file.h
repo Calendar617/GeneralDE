@@ -37,6 +37,10 @@ ssize_t file_stream_load_to_buf(char * buf, size_t size, FILE * fp, error_monito
 ssize_t file_stream_load_to_buffer(mem_buffer_t buffer, FILE * fp, error_monitor_t em);
 ssize_t file_stream_load_to_stream(write_stream_t stream, FILE * fp, error_monitor_t em);
 
+/*file name operations*/
+const char * file_name_suffix(const char * input);
+const char * file_name_base(const char * input, mem_buffer_t tbuf);
+
 /*dir operations*/
 int dir_exist(const char * path, error_monitor_t em);
 int dir_is_empty(const char * path, error_monitor_t em);
