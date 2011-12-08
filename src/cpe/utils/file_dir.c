@@ -18,6 +18,7 @@ int dir_mk_recursion(const char * path, mode_t mode, error_monitor_t em, mem_all
         *nextSepPos = 0;
 
         rv = dir_mk(path_buf, mode, em);
+        printf("errno=%d, EEXIST=%d\n", errno, EEXIST);
         if (rv && errno == EEXIST) rv = 0;
 
         *nextSepPos = '/';
