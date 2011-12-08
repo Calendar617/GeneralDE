@@ -72,7 +72,6 @@ TEST_F(PathTest, map_seq) {
             "   - abc"
             ));
 
-    printf("%s\n", result());
     cfg_t cfg = cfg_find_cfg(m_root, "a[0]");
     ASSERT_TRUE(cfg);
     EXPECT_STREQ("abc", (const char *)cfg_data(cfg));

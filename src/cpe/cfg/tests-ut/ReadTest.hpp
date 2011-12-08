@@ -1,18 +1,16 @@
 #ifndef CPE_DR_DATAJSON_TEST_PRINTTEST_H
 #define CPE_DR_DATAJSON_TEST_PRINTTEST_H
 #include <string.h>
-#include "gtest/gtest.h"
-#include "cpe/utils/error_list.h"
-#include "cpe/utils/buffer.h"
+#include "cpe/utils/tests-env/with_em.hpp"
 #include "CfgTest.hpp"
 
-class ReadTest : public CfgTest {
+class ReadTest
+    : public testenv::fixture<LOKI_TYPELIST_1(utils::testenv::with_em), CfgTest>
+{
 public:
     ReadTest();
     virtual void SetUp();
     virtual void TearDown();
-
-    error_list_t m_errorList;
 
     int read(const char * input, cfg_policy_t policy = cfg_replace);
     int read(cfg_t cfg, const char * input, cfg_policy_t policy = cfg_replace);

@@ -43,8 +43,9 @@ cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value);
 cfg_t cfg_seq_add_value_auto(cfg_t s, const char * value);
 
 int cfg_read(cfg_t cfg, read_stream_t stream, cfg_policy_t policy, error_monitor_t em);
+int cfg_read_with_name(cfg_t cfg, const char * name, read_stream_t stream, cfg_policy_t policy, error_monitor_t em);
 int cfg_write(write_stream_t stream, cfg_t cfg, error_monitor_t em);
-int cfg_read_dir(cfg_t cfg, const char * path, cfg_policy_t policy, error_monitor_t em);
+int cfg_read_dir(cfg_t cfg, const char * path, cfg_policy_t policy, error_monitor_t em, mem_allocrator_t talloc);
 
 #ifdef __cplusplus
 }
