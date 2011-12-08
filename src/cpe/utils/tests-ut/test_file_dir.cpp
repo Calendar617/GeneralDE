@@ -2,7 +2,6 @@
 
 TEST_F(FileTest, dir_mk_recursion_basic) {
     t_em_set_print();
-    printf("path=%sXXX\n", t_path_make("a/b"));
     EXPECT_EQ(
         0,
         dir_mk_recursion(
