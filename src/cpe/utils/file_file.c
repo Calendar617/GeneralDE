@@ -213,3 +213,18 @@ ssize_t file_stream_size(FILE * fp, error_monitor_t em) {
     return (ssize_t)buffer.st_size;
 }
 
+const char * file_suffix(const char * input) {
+    int len;
+
+    if (input == NULL) return NULL;
+
+    len = strlen(input);
+
+    while(len > 0) {
+        char c = input[--len];
+        if (c == '.') return input + len + 1;
+        if (c == '/') return "";
+    }
+
+    return input;
+}
