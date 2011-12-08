@@ -229,22 +229,6 @@ char * mem_buffer_strdup(struct mem_buffer * buffer, const char * s) {
     return p;
 }
 
-char * mem_buffer_strndup(struct mem_buffer * buffer, const char * s, size_t n) {
-    char * p;
-
-    if (!s || n <= 0) return NULL;
-
-    p = (char*)mem_buffer_alloc(buffer, n + 1);
-    if (p == NULL) {
-        return NULL;
-    }
-
-    memcpy(p, s, n);
-    p[n] = 0;
-
-    return p;
-}
-
 size_t mem_buffer_trunk_count(mem_buffer_t buffer) {
     size_t count;
     struct mem_buffer_trunk * trunk;
@@ -259,6 +243,46 @@ size_t mem_buffer_trunk_count(mem_buffer_t buffer) {
     return count;
 }
 
+int mem_buffer_strcat(mem_buffer_t buffer, const char * s) {
+    struct mem_buffer_trunk * trunk;
+    char * buf;
+    size_t copySize;
+    size_t copyLeft;
+
+    if (buffer->m_size == 0)
+        return mem_buffer_strdup(buffer, s) ? 0 : -1;
+
+    trunk = TAILQ_LAST(&buffer->m_trunks, mem_buffer_trunk_list);
+    assert(trunk);
+
+    while(trunk && trunk->m_size == 0) {
+        trunk = TAILQ_PREV(trunk, mem_buffer_trunk_list, m_next);
+    }
+
+    if (trunk == NULL) return -1;
+    assert(trunk->m_size > 0);
+
+    buf = (char*)mem_trunk_data(trunk);
+    if (buf[trunk->m_size - 1] != 0) return -1;
+
+    copyLeft = strlen(s) + 1;
+    copySize = trunk->m_capacity - trunk->m_size + 1;
+    if (copySize > copyLeft) copySize = copyLeft;
+
+    memcpy(buf + (trunk->m_size - 1), s, copySize);
+    trunk->m_size += (copySize - 1);
+    buffer->m_size += (copySize - 1);
+    copyLeft -= copySize;
+    
+    if (copyLeft > 0) {
+        buf = mem_buffer_alloc(buffer, copyLeft);
+        if (buf == NULL) return -1;
+        memcpy(buf, s + copySize, copyLeft);
+    }
+
+    return 0;
+}
+
 struct mem_buffer_trunk *
 mem_buffer_trunk_at(mem_buffer_t buffer, size_t pos) {
     struct mem_buffer_trunk * trunk;
@@ -270,4 +294,30 @@ mem_buffer_trunk_at(mem_buffer_t buffer, size_t pos) {
     }
 
     return trunk;
+}
+
+int mem_buffer_set_size(mem_buffer_t buffer, size_t size) {
+    struct mem_buffer_trunk * trunk;
+    size_t delta;
+
+    if (size == buffer->m_size) return 0;
+
+    if (size > buffer->m_size) {
+        return mem_buffer_alloc(buffer, size - buffer->m_size) ? 0 : -1;
+    }
+
+    /*size < buffer->m_size*/
+    delta = buffer->m_size - size;
+    trunk = TAILQ_LAST(&buffer->m_trunks, mem_buffer_trunk_list);
+
+    while(trunk && delta > 0) {
+        size_t releaseSize = trunk->m_size;
+        if (releaseSize > delta) releaseSize = delta;
+        trunk->m_size -= releaseSize;
+        buffer->m_size -= releaseSize;
+        delta -= releaseSize;
+        trunk = TAILQ_PREV(trunk, mem_buffer_trunk_list, m_next);
+    }
+
+    return delta == 0 ? 0 : -1;
 }

@@ -13,6 +13,8 @@ int dir_mk_recursion(const char * path, mode_t mode, error_monitor_t em, mem_all
         nextSepPos && rv == 0;
         nextSepPos = strchr(nextSepPos + 1, '/'))
     {
+        if (nextSepPos == path_buf) continue; /*ignore root dir*/
+
         *nextSepPos = 0;
 
         rv = dir_mk(path_buf, mode, em);

@@ -4,7 +4,8 @@
 #include "cpe/utils/buffer.h"
 #include "file_internal.h"
 
-void dir_search_i(
+enum dir_visit_next_op
+dir_search_i(
     dir_visitor_t visitor, void * ctx,
     int maxLevel,
     error_monitor_t em,
@@ -15,34 +16,84 @@ void dir_search_i(
     struct dirent * dp;
     char * path;
     int rv;
+    size_t bufSize;
+    enum dir_visit_next_op nextOp;
 
-    if (maxLevel == 0)  return;
+    if (maxLevel == 0) return dir_visit_next_go;
 
     path = mem_buffer_make_continuous(buffer, 0);
+    bufSize = mem_buffer_size(buffer);
 
     dirp = dir_open(path, 0, em);
-    if (dirp == NULL) return;
+    if (dirp == NULL) return dir_visit_next_go;
+
+    nextOp = dir_visit_next_go;
 
     while((rv = readdir_r(dirp, &dbuf, &dp)) == 0 && dp) {
-        int nameLen;
-
         if (strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0) continue;
 
-        nameLen = strlen(dp->d_name);
-        path = mem_buffer_make_continuous(buffer, nameLen);
-        //assert(mem_buffer_trunk_count(buffer) == 1);
+        if (
+            mem_buffer_strcat(buffer, "/") != 0 || 
+            mem_buffer_strcat(buffer, dp->d_name) != 0) break;
 
-        
         if (S_ISDIR(DTTOIF(dp->d_type))) {
-            //rv = dir_rm_recursion(subPath, em, talloc);
+            if (visitor->on_dir_enter) {
+                nextOp = visitor->on_dir_enter(
+                    mem_buffer_make_continuous(buffer, 0),
+                    dp->d_name,
+                    ctx);
+
+                if (nextOp == dir_visit_next_exit) break;
+            }
+            else {
+                nextOp = dir_visit_next_go;
+            }
+
+            if (nextOp == dir_visit_next_go) {
+                nextOp = dir_search_i(
+                    visitor, ctx,
+                    maxLevel > 0 ? maxLevel - 1 : maxLevel,
+                    em, buffer);
+
+                if (nextOp == dir_visit_next_exit) break;
+            }
+
+            if (visitor->on_dir_leave) {
+                nextOp = visitor->on_dir_leave(
+                    mem_buffer_make_continuous(buffer, 0),
+                    dp->d_name,
+                    ctx);
+
+                if (nextOp == dir_visit_next_exit) break;
+            }
         }
         else if (S_ISREG(DTTOIF(dp->d_type))) {
-            //rv = file_rm(subPath, em);
+            if (visitor->on_file) {
+                nextOp = visitor->on_file(
+                    mem_buffer_make_continuous(buffer, 0),
+                    dp->d_name,
+                    ctx);
+
+                if (nextOp == dir_visit_next_exit) break;
+            }
         }
+
+        /*restore curent path*/
+        mem_buffer_set_size(buffer, bufSize);
+        path = mem_buffer_make_continuous(buffer, 0);
+        if (path == NULL) {
+            CPE_ERROR_EX(em, ENOMEM, "no memory for dir search path");
+            nextOp = dir_visit_next_exit;
+            break;
+        }
+        path[bufSize - 1] = 0;
+
     }
 
     /*clear resources*/
     dir_close(dirp, em);
+
+    return nextOp == dir_visit_next_exit ?  dir_visit_next_exit : dir_visit_next_go;
 }
 
 void dir_search(
@@ -50,5 +101,13 @@ void dir_search(
     const char * path, int maxLevel,
     error_monitor_t em, mem_allocrator_t talloc)
 {
+    struct mem_buffer buffer;
+    mem_buffer_init(&buffer, talloc);
+
+    mem_buffer_strcat(&buffer, path);
+
+    dir_search_i(visitor, ctx, maxLevel, em, &buffer);
+
+    mem_buffer_clear(&buffer);
 }
 

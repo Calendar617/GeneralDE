@@ -119,6 +119,38 @@ TEST_F(BufferTest, alloc_empty) {
     EXPECT_STREQ("abc", as_string());
 }
 
+TEST_F(BufferTest, set_size_empty) {
+     mem_buffer_alloc(&m_buffer, 12);
+
+     EXPECT_EQ(0, mem_buffer_set_size(&m_buffer, 12));
+     EXPECT_EQ((size_t)12, mem_buffer_size(&m_buffer));
+}
+
+TEST_F(BufferTest, set_size_bigger) {
+     mem_buffer_alloc(&m_buffer, 12);
+
+     EXPECT_EQ(0, mem_buffer_set_size(&m_buffer, 14));
+     EXPECT_EQ((size_t)14, mem_buffer_size(&m_buffer));
+}
+
+TEST_F(BufferTest, set_size_small) {
+     mem_buffer_alloc(&m_buffer, 12);
+
+     EXPECT_EQ(0, mem_buffer_set_size(&m_buffer, 10));
+     EXPECT_EQ((size_t)10, mem_buffer_size(&m_buffer));
+}
+
+TEST_F(BufferTest, set_size_small_multi_trunk) {
+    EXPECT_TRUE(append_trunk("aaa"));
+    EXPECT_TRUE(append_trunk("bbb"));
+    EXPECT_EQ((size_t)6, mem_buffer_size(&m_buffer));
+
+    EXPECT_EQ(0, mem_buffer_set_size(&m_buffer, 1));
+    EXPECT_EQ((size_t)1, mem_buffer_size(&m_buffer));
+
+    EXPECT_EQ((size_t)2, mem_buffer_trunk_count(&m_buffer));
+}
+
 TEST_F(BufferTest, alloc_empty_null) {
     m_buffer.m_default_allocrator = mem_allocrator_null();
     EXPECT_FALSE(mem_buffer_alloc(&m_buffer, 12));
@@ -130,7 +162,54 @@ TEST_F(BufferTest, strdup_basic) {
     EXPECT_EQ((size_t)4, mem_buffer_size(&m_buffer));
 }
 
-TEST_F(BufferTest, strndup_basic) {
-    EXPECT_STREQ("abc", mem_buffer_strndup(&m_buffer, "abcd", 3));
+TEST_F(BufferTest, strcat_to_empty) {
+    EXPECT_EQ(0, mem_buffer_strcat(&m_buffer, "abc"));
+    EXPECT_STREQ("abc", (char*)mem_buffer_make_continuous(&m_buffer, 0));
     EXPECT_EQ((size_t)4, mem_buffer_size(&m_buffer));
+}
+
+TEST_F(BufferTest, strcat_to_str) {
+    EXPECT_EQ(0, mem_buffer_strcat(&m_buffer, "abc"));
+    EXPECT_STREQ("abc", (char*)mem_buffer_make_continuous(&m_buffer, 0));
+
+    EXPECT_EQ(0, mem_buffer_strcat(&m_buffer, "def"));
+    EXPECT_STREQ("abcdef", (char*)mem_buffer_make_continuous(&m_buffer, 0));
+
+    EXPECT_EQ((size_t)7, mem_buffer_size(&m_buffer));
+}
+
+TEST_F(BufferTest, strcat_to_buf) {
+    EXPECT_EQ((size_t)3, append_string("abc"));
+    EXPECT_EQ((size_t)3, mem_buffer_size(&m_buffer));
+
+    EXPECT_EQ(-1, mem_buffer_strcat(&m_buffer, "def"));
+    EXPECT_EQ((size_t)3, mem_buffer_size(&m_buffer));
+}
+
+TEST_F(BufferTest, strcat_to_str_trunk_full) {
+    struct mem_buffer_trunk * trunk1 =
+        mem_buffer_append_trunk(&m_buffer, 7);
+
+    EXPECT_EQ((size_t)4, mem_trunk_append(&m_buffer, trunk1, "abc", 4));
+
+    EXPECT_EQ(0, mem_buffer_strcat(&m_buffer, "def"));
+    EXPECT_STREQ("abcdef", (char*)mem_buffer_make_continuous(&m_buffer, 0));
+
+    EXPECT_EQ((size_t)7, mem_buffer_size(&m_buffer));
+    EXPECT_EQ((size_t)1, mem_buffer_trunk_count(&m_buffer));
+}
+
+TEST_F(BufferTest, strcat_to_str_trunk_to_next) {
+    struct mem_buffer_trunk * trunk1 =
+        mem_buffer_append_trunk(&m_buffer, 6);
+
+    EXPECT_EQ((size_t)4, mem_trunk_append(&m_buffer, trunk1, "abc", 4));
+
+    EXPECT_EQ(0, mem_buffer_strcat(&m_buffer, "def"));
+
+    EXPECT_EQ((size_t)2, mem_buffer_trunk_count(&m_buffer));
+
+    EXPECT_STREQ("abcdef", (char*)mem_buffer_make_continuous(&m_buffer, 0));
+
+    EXPECT_EQ((size_t)7, mem_buffer_size(&m_buffer));
 }

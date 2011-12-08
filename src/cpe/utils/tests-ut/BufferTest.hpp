@@ -1,9 +1,9 @@
 #ifndef CPE_DR_TEST_WITH_INPUTMETALIBTEST_H
 #define CPE_DR_TEST_WITH_INPUTMETALIBTEST_H
-#include "gtest/gtest.h"
+#include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/utils/buffer.h"
 
-class BufferTest : public ::testing::Test {
+class BufferTest : public testenv::fixture<> {
 public:
     virtual void SetUp();
     virtual void TearDown();
