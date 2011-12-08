@@ -49,13 +49,16 @@ int dir_rm_recursion(const char * path, error_monitor_t em, mem_allocrator_t tal
 typedef enum dir_visit_next_op {
     dir_visit_next_go
     , dir_visit_next_ignore
-    , dir_visit_next_uplevel
     , dir_visit_next_exit
 } dir_visit_next_op_t;
 
 typedef struct dir_visitor {
+    /*ignore: ignore this dir, but leave will be still called*/
+    /*exit: exit direct*/
     dir_visit_next_op_t (*on_dir_enter)(const char * full, const char * base, void * ctx);
+    /*exit: exit direct*/
     dir_visit_next_op_t (*on_dir_leave)(const char * full, const char * base, void * ctx);
+    /*exit: exit direct*/
     dir_visit_next_op_t (*on_file)(const char * full, const char * base, void * ctx);
 } * dir_visitor_t;
 
