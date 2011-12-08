@@ -65,5 +65,16 @@ void with_file::t_write_to_file(const char * subname, const char * data) {
     EXPECT_LE(0, file_write_from_str( t_path_make(subname), data, &tem));
 }
 
+void with_file::t_dir_make(const char * subpath) {
+    CPE_DEF_ERROR_MONITOR(tem, cpe_error_log_to_consol, NULL);
+    EXPECT_EQ(
+        0,
+        dir_mk_recursion(
+            t_path_make(subpath),
+            DIR_DEFAULT_MODE,
+            &tem,
+            t_tmp_allocrator()));
+}
+
 }}
 
