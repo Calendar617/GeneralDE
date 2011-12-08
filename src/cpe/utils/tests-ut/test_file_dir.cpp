@@ -22,6 +22,19 @@ TEST_F(FileTest, dir_mk_recursion_one_level) {
     EXPECT_TRUE(dir_exist(t_path_make("a"), NULL));
 }
 
+TEST_F(FileTest, dir_mk_recursion_multi_level) {
+    EXPECT_EQ(
+        0,
+        dir_mk_recursion(
+            t_path_make("a/b/c"),
+            DIR_DEFAULT_MODE,
+            t_em(), NULL));
+
+    EXPECT_TRUE(dir_exist(t_path_make("a"), NULL));
+    EXPECT_TRUE(dir_exist(t_path_make("a/b"), NULL));
+    EXPECT_TRUE(dir_exist(t_path_make("a/b/c"), NULL));
+}
+
 TEST_F(FileTest, dir_rm_recursion_with_file) {
     dir_mk(t_path_make("a"), DIR_DEFAULT_MODE, t_em());
     t_write_to_file("a/a.txt", "abc");

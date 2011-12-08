@@ -1,9 +1,9 @@
 #ifndef CPE_CFG_TEST_TLTEST_H
 #define CPE_CFG_TEST_TLTEST_H
-#include "gtest/gtest.h"
+#include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/cfg/cfg.h"
 
-class CfgTest : public ::testing::Test {
+class CfgTest : public testenv::fixture<> {
 public:
     CfgTest();
 
