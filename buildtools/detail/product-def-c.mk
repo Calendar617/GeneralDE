@@ -33,7 +33,6 @@ endef
 
 # $(call compile-rule, binary-file, source-files, product-name)
 define compile-rule.c
-
 $1: $2
 	$$(call with_message)$$(call c-make-depend,$2,$1,$(subst .o,.d,$1),$3)
 	$$(call with_message,compiling $(subst $(CPDE_ROOT)/,,$2) --> $(subst $(CPDE_ROOT)/,,$1) ...)\
@@ -63,6 +62,7 @@ $(eval r.$1.product.c.ldpathes+=$(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib))
 endif
 
 $(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.c.sources)) \
+                     $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources))) \
                      $(CPDE_OUTPUT_ROOT)/$(r.$1.product) \
 )
 
