@@ -313,9 +313,6 @@ int inode_stat_by_fileno(int fno, struct stat * buf, int ignoreError, error_moni
         case ENAMETOOLONG:
             CPE_ERROR_EX(em, errno, "The length of the path argument exceeds {PATH_MAX} or a pathname component is longer than {NAME_MAX}.");
             break;
-        case ENOENT:
-            CPE_ERROR_EX(em, errno, "A component of path does not name an existing file or path is an empty string.");
-            break;
         case ENOTDIR:
             CPE_ERROR_EX(em, errno, "A component of the path prefix is not a directory.");
             break;

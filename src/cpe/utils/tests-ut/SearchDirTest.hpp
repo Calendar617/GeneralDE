@@ -25,5 +25,8 @@ public:
     ::std::ostringstream m_result;
 };
 
+#define CHECK_SEARCHDIR_RESULT() \
+    EXPECT_STREQ(m_expect.str().c_str(), m_result.str().c_str())
+
 #endif
 

@@ -1,11 +1,13 @@
 #include "BufferTest.hpp"
 
 void BufferTest::SetUp() {
-    mem_buffer_init(&m_buffer, 0);
+    Base::SetUp();
+    mem_buffer_init(&m_buffer, t_allocrator());
 }
 
 void BufferTest::TearDown() {
     mem_buffer_clear(&m_buffer);
+    Base::TearDown();
 }
 
 size_t BufferTest::append_string(const char * data) {
