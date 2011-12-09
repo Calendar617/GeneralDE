@@ -1,5 +1,5 @@
 product-support-types+=run
-product-def-all-items+=run.libraries run.cmd run.path run.arg
+product-def-all-items+=run.libraries run.cmd run.path run.args
 
 define product-def-rule-run
 

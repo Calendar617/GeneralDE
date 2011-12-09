@@ -52,10 +52,12 @@ endef
 # $(call product-def-rule-c-product,product-name,type)
 define product-def-rule-c-product
 
-$(eval r.$1.product:=$(if $(filter lib,$2),\
-                       $(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib)/lib$1.so,\
-                       $(if $(r.$1.buildfor),$(r.$1.buildfor)-bin,bin)/$1) \
-)
+$(eval r.$1.output:=$(if $(r.$1.output),$(r.$1.output),\
+                         $(if $(filter lib,$2),\
+                              $(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib),\
+                              $(if $(r.$1.buildfor),$(r.$1.buildfor)-bin,bin))))
+
+$(eval r.$1.product?=$(r.$1.output)/$(if $(filter lib,$2),lib$1.so,$1))
 
 ifeq ($(filter lib,$3),)
 $(eval r.$1.product.c.libraries+=$1)
