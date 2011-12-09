@@ -28,7 +28,7 @@ static int gd_app_parse_args(gd_app_context_t context, int argc, char * argv[]) 
 
 gd_app_context_t
 gd_app_context_create(
-    mem_allocrator_t alloc, size_t capacity, error_monitor_t em,
+    mem_allocrator_t alloc, size_t capacity,
     int argc, char * argv[])
 {
     gd_app_context_t context;
@@ -39,6 +39,9 @@ gd_app_context_create(
     if (context == NULL) return NULL;
 
     bzero(context, allocSize);
+
+    cpe_error_monitor_init(&context->m_em_print, cpe_error_log_to_consol, NULL);
+    context->m_em = &context->m_em_print;
 
     context->m_alloc = alloc;
     context->m_capacity = capacity;
@@ -102,4 +105,3 @@ void gd_app_context_free(gd_app_context_t context) {
 
     mem_free(context->m_alloc, context);
 }
-

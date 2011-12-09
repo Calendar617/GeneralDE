@@ -1,10 +1,16 @@
 #include <string.h>
 #include <stdlib.h>
+#include "cpe/utils/buffer.h"
+#include "cpe/cfg/cfg_manage.h"
 #include "gd/app/app_context.h"
 #include "app_internal_types.h"
 
 void gd_app_set_main(gd_app_context_t context, gd_app_main mf) {
     context->m_main = mf;
+}
+
+void gd_app_set_em(gd_app_context_t context, error_monitor_t em) {
+    context->m_em = em;
 }
 
 error_monitor_t gd_app_em(gd_app_context_t context) {
@@ -67,3 +73,31 @@ int gd_app_set_root(gd_app_context_t context, const char * path) {
 const char * gd_app_root(gd_app_context_t context) {
     return context->m_root;
 }
+
+int gd_app_cfg_reload(gd_app_context_t context) {
+    int rv;
+    struct mem_buffer tbuf;
+
+    mem_buffer_init(&tbuf, context->m_alloc);
+
+    mem_buffer_strcat(&tbuf, context->m_root);
+    mem_buffer_strcat(&tbuf, "/etc");
+
+    rv = cfg_read_dir(
+        context->m_cfg,
+        (char*)mem_buffer_make_continuous(&tbuf, 0),
+        cfg_merge_use_new,
+        context->m_em,
+        context->m_alloc);
+
+    if (rv == 0) {
+        CPE_INFO(context->m_em, "load config from %s success!", (char*)mem_buffer_make_continuous(&tbuf, 0));
+    }
+
+    mem_buffer_clear(&tbuf);
+
+    return rv;
+}
+
+gd_app_context_t g_app_context = NULL;
+

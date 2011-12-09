@@ -14,7 +14,10 @@ struct gd_app_context {
     char * m_argv[GD_APP_MAX_ARGV];
     mem_allocrator_t m_alloc;
     size_t m_capacity;
+
     error_monitor_t m_em;
+    struct error_monitor m_em_print;
+
     char * m_root;
     cfg_t m_cfg;
     gd_tl_manage_t m_tl_mgr;
