@@ -47,3 +47,8 @@ $(foreach part,$(subst /,$(space),$2),                          \
 $(foreach result-part,$($1.inbuild),$(eval $1:=/$(result-part)$($1)))
 endef
 
+# $(call path-list-join,path-list)
+define path-list-join
+$(if $1,$(word 1,$1):$(call path-list-join,$(wordlist 2,$(words $1), $1)),)
+endef
+
