@@ -7,6 +7,15 @@ product-def-not-null-items:=type
 
 product-base = $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST)))
 
+#$(call product-gen-depend-list,product-list)
+define product-gen-depend-list
+$(sort \
+    $(foreach p,$1,\
+        $(foreach dep,$(r.$p.depends),\
+	        $(dep) $(call product-gen-depend-list,$(dep)))))
+endef
+
+
 #$(call product-gen-depend-value-list,product-name,value-name)
 define product-gen-depend-value-list
 $(foreach dep,$(r.$1.depends),\
