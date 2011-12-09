@@ -7,6 +7,12 @@ product-def-not-null-items:=type
 
 product-base = $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST)))
 
+#$(call product-gen-depend-value-list,product-name,value-name)
+define product-gen-depend-value-list
+$(foreach dep,$(r.$1.depends),\
+	$(r.$(dep).$2) $(call product-gen-depend-value-list,$(dep),$2))
+endef
+
 # $(call product-def,product-name,input-sources)
 define product-def
   #verify must set variables
@@ -14,8 +20,9 @@ define product-def
     $(if $($1.$(cn)),,$(error $(cn) of $1 not defined)))
 
   #verify type support
-  $(if $(filter $($1.type),$(product-support-types)),,
-    $(error $1 use not support type $($1.type), supported types: $(product-support-types)))
+  $(foreach type,$($1.type), \
+      $(if $(filter $(type),$(product-support-types)),,
+        $(error $1 use not support type $(type), supported types: $(product-support-types))))
 
   #copy variables
   $(foreach cn,$(product-def-all-items),
@@ -29,19 +36,13 @@ define product-def
   .PHONY: $1 $1.clean
 
   ifneq ($(r.$1.depends),)
-  $1: $(r.$1.depends)
+  $1: $(foreach dep,$(r.$1.depends), $(dep) $$(r.$(dep).depends))
   endif
 
-  $(call product-def-rule-$($1.type),$1)
+  $(foreach type,$($1.type), \
+    $(call product-def-rule-$(type),$1))
 
   $1.clean:
 	$(call with_message,cleaning...)$(RM) $(r.$1.cleanup)
 
-  ifneq ($(r.$1.run),)
-  .PHONY: $1.run
-
-  $1.run: $1
-	$(call with_message,runing $1 ...)$(if $(r.$1.run.path),cd $(r.$1.run.path) &&,)$(r.$1.run) $(if $($1-run-args),$($1-run-args),$(r.$1.run.args))
-
-  endif
 endef
