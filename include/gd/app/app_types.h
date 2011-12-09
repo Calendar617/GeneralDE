@@ -7,6 +7,8 @@ extern "C" {
 
 typedef struct gd_app_context * gd_app_context_t;
 
+typedef int (*gd_app_main)(gd_app_context_t ctx);
+
 #ifdef __cplusplus
 }
 #endif

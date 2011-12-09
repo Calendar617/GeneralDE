@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-gd_dp_mgr_t gd_dp_mgr_create(mem_allocrator_t alloc, gd_tl_t timerTl);
+gd_dp_mgr_t gd_dp_mgr_create(mem_allocrator_t alloc, gd_tl_manage_t tlmgr);
 void gd_dp_mgr_free(gd_dp_mgr_t dp);
 
 void gd_dp_mgr_dispatch(gd_dp_mgr_t dp, void * data, size_t len);

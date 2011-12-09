@@ -1,6 +1,6 @@
-product:=gd_app_net
+product:=gd_app
 $(product).type:=lib
-$(product).depends:=cpe_utils
+$(product).depends:=cpe_utils cpe_cfg gd_tl gd_dp
 $(product).c.libraries:=
 $(product).c.flags.ld:=
 $(product).c.sources:=$(wildcard $(product-base)*.c)

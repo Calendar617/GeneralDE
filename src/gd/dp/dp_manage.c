@@ -2,7 +2,7 @@
 #include "gd/dp/dp_manage.h"
 #include "dp_internal_types.h"
 
-gd_dp_mgr_t gd_dp_mgr_create(mem_allocrator_t alloc, gd_tl_t timerTl) {
+gd_dp_mgr_t gd_dp_mgr_create(mem_allocrator_t alloc, gd_tl_manage_t tlmgr) {
     gd_dp_mgr_t dpm;
     size_t allocSize = sizeof(struct gd_dp_mgr);
 
@@ -10,7 +10,7 @@ gd_dp_mgr_t gd_dp_mgr_create(mem_allocrator_t alloc, gd_tl_t timerTl) {
     bzero(dpm, allocSize);
 
     dpm->m_alloc = alloc;
-    dpm->m_timerTl = timerTl;
+    //dpm->m_timerTl = timerTl;
 
     return dpm;
 }
