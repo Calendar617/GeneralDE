@@ -2,7 +2,7 @@ CPDE_OUTPUT_ROOT?=$(CPDE_ROOT)/build
 
 project_repository:=
 product-support-types:=
-product-def-all-items:=type buildfor depends  run run.path
+product-def-all-items:=type buildfor depends output
 product-def-not-null-items:=type
 
 product-base = $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST)))
@@ -35,7 +35,7 @@ define product-def
 
   #copy variables
   $(foreach cn,$(product-def-all-items),
-    $(eval r.$1.$(cn) := $($1.$(cn))))
+    $(eval r.$1.$(cn):=$($1.$(cn))))
 
   $(eval $(call build-regular-path,r.$1.base,$(product-base)))
 
