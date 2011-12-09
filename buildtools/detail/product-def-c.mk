@@ -28,7 +28,7 @@ c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
 
 # $(call c-make-depend,source-file,object-file,depend-file,product-name)
 define c-make-depend
-	$(GCC) -MM -MF $3 -MP -MT $2 $(CPPFLAGS) $(call c-generate-depend-cpp-flags,$4) $(TARGET_ARCH) $1
+	$(CCACHE) $(GCC) -MM -MF $3 -MP -MT $2 $(CPPFLAGS) $(call c-generate-depend-cpp-flags,$4) $(TARGET_ARCH) $1
 endef
 
 # $(call compile-rule, binary-file, source-files, product-name)
@@ -36,7 +36,7 @@ define compile-rule.c
 $1: $2
 	$$(call with_message)$$(call c-make-depend,$2,$1,$(subst .o,.d,$1),$3)
 	$$(call with_message,compiling $(subst $(CPDE_ROOT)/,,$2) --> $(subst $(CPDE_ROOT)/,,$1) ...)\
-          $$(COMPILE$(suffix $2)) $$(call c-generate-depend-cpp-flags,$3) -o $$@ $$<
+          $(CCACHE) $$(COMPILE$(suffix $2)) $$(call c-generate-depend-cpp-flags,$3) -o $$@ $$<
 
 endef
 
