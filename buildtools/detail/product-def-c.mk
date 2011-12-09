@@ -16,14 +16,15 @@ c-source-to-object = $(call c-source-dir-to-binary-dir,\
 						$(subst .c,.o,$(filter %.c,$1)))
 
 c-generate-depend-ld-flags=$(addprefix -L$(CPDE_OUTPUT_ROOT)/,\
-								 $(sort $(r.$1.c.ldpathes) $(foreach dep,$(r.$1.depends),$(r.$(dep).product.c.ldpathes)))) \
-                           $(addprefix -l,$(sort $(r.$1.c.libraries) $(foreach dep,$(r.$1.depends),$(r.$(dep).product.c.libraries)))) \
-                           $(foreach dep,$(r.$1.depends),$(r.$(dep).product.c.flags.ld)) \
+								 $(sort  $(r.$1.c.ldpathes) $(call product-gen-depend-value-list,$1,product.c.ldpathes))) \
+                           $(addprefix -l,$(sort $(r.$1.c.libraries) $(call product-gen-depend-value-list,$1,product.c.libraries))) \
+                           $(call product-gen-depend-value-list,$1,product.c.flags.ld) \
                            $(r.$1.c.flags.ld)
 
 c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
-								 $(sort $(r.$1.c.includes) $(foreach p,$1 $(r.$1.depends),$(r.$(p).product.c.includes)))) \
-                           $(addprefix -D,$(sort $(foreach p,$1 $(r.$1.depends),$(r.$p.product.c.defs)))) \
+								 $(sort $(r.$1.c.includes) $(r.$1.product.c.includes) \
+									$(call product-gen-depend-value-list,$1,product.c.includes))) \
+                           $(addprefix -D,$(sort $(call product-gen-depend-value-list,$1,product.c.defs))) \
                            $(r.$1.c.flags.cpp)
 
 # $(call c-make-depend,source-file,object-file,depend-file,product-name)
@@ -88,9 +89,8 @@ $(foreach f,$(r.$1.c.sources),$(call compile-rule$(suffix $f),$(call c-source-to
 $(eval r.$1.makefile.include := $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources))))
 
 ifeq ($(filter progn,$3),)
-ifeq ($(r.$1.run),)
-$(eval r.$1.run:=LD_LIBRARY_PATH=$(if $(r.$1.buildfor),$(CPDE_OUTPUT_ROOT)/$(r.$1.buildfor)-lib:,)$(CPDE_OUTPUT_ROOT)/lib:$$$$$$$$LD_LIBRARY_PATH $(CPDE_OUTPUT_ROOT)/$(r.$1.product))
-endif
+$(eval r.$1.run.libraries+=$(if $(r.$1.buildfor),$(CPDE_OUTPUT_ROOT)/$(r.$1.buildfor)-lib,) $(CPDE_OUTPUT_ROOT)/lib)
+$(eval r.$1.run.cmd:=$(CPDE_OUTPUT_ROOT)/$(r.$1.product))
 endif
 
 endef
