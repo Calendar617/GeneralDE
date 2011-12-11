@@ -22,9 +22,8 @@ dev-env?=$(OS_NAME)
 include $(CPED_BUILD_DETAIL_DIR)/dev-env-$(dev-env).mk
 
 include $(CPED_BUILD_DETAIL_DIR)/product-def.mk
-include $(CPED_BUILD_DETAIL_DIR)/product-def-c.mk
-include $(CPED_BUILD_DETAIL_DIR)/product-def-install.mk
-include $(CPED_BUILD_DETAIL_DIR)/product-def-virtual.mk
+include $(wildcard $(CPED_BUILD_DETAIL_DIR)/product-def-*.mk)
+include $(CPED_BUILD_DETAIL_DIR)/gtest-def.mk
 include $(CPED_BUILD_DETAIL_DIR)/gtags.mk
 
 endif
