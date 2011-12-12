@@ -4,7 +4,7 @@
 namespace utils { namespace testenv {
 
 void with_file::SetUp() {
-    char * name_buf = t_strdup("/tmp/gtest.XXXXXX");
+    char * name_buf = t_tmp_strdup("/tmp/gtest.XXXXXX");
     EXPECT_TRUE(name_buf);
     m_path_base = mkdtemp(name_buf);
 }

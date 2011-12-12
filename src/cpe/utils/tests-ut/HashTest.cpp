@@ -25,8 +25,9 @@ void HashTest::TearDown(void) {
     Base::TearDown();
 }
 
-uint32_t HashTest::hash_fun(const void *) {
-    return 0;
+uint32_t HashTest::hash_fun(const void * o) {
+    const char * str = ((TestObject *)o)->m_name;
+    return cpe_hash_str(str, strlen(str));
 }
 
 int HashTest::hash_cmp(const void * l, const void * r) {
@@ -41,6 +42,7 @@ HashTest::TestObject *
 HashTest::createTestObject(const char * name) {
     TestObject * p = (TestObject *)t_alloc(sizeof(struct TestObject));
     strncpy(p->m_name, name, 9);
+    cpe_hash_entry_init(&p->m_he);
     return p;
 }
 
@@ -48,6 +50,7 @@ HashTest::TestObject *
 HashTest::createTmpTestObject(const char * name) {
     TestObject * p = (TestObject *)t_tmp_alloc(sizeof(struct TestObject));
     strncpy(p->m_name, name, 9);
+    cpe_hash_entry_init(&p->m_he);
     return p;
 }
 
