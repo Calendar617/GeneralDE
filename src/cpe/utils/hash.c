@@ -114,6 +114,56 @@ void cpe_hash_table_set_destory_fun(
     hstable->m_destory_context = destory_context;
 }
 
+#define cpe_hash_check_need_resize(hstable, count) ((count) > (hstable)->m_bucket_capacity)
+
+int cpe_hash_table_check_resize(cpe_hash_table_t hstable, int32_t suggestCapacity) {
+    if (cpe_hash_check_need_resize(hstable, suggestCapacity)) {
+        return cpe_hash_table_resize(hstable, suggestCapacity);
+    }
+    else {
+        return 0;
+    }
+}
+
+int cpe_hash_table_resize(cpe_hash_table_t hstable, int32_t suggestCapacity) {
+    int32_t newCapacity;
+    int32_t newBucketsBufSize;
+    struct cpe_hash_bucket * newBuckets;
+    int i;
+
+    newCapacity = select_next_prime(suggestCapacity);
+    if (newCapacity < 0) return -1;
+
+    newBucketsBufSize = sizeof(struct cpe_hash_bucket) * newCapacity;
+    newBuckets = mem_alloc(hstable->m_alloc, newBucketsBufSize);
+    if (newBuckets == NULL) return -1;
+    bzero(newBuckets, newBucketsBufSize);
+
+    for(i = 0; i < hstable->m_bucket_capacity; ++i) {
+        struct cpe_hash_entry ** oldEntryPos = &(hstable->m_buckets + i)->m_entry;
+        while(*oldEntryPos) {
+            struct cpe_hash_entry * e;
+            struct cpe_hash_entry ** newEntryPos;
+
+            e = *oldEntryPos;
+            *oldEntryPos = e->m_next;
+
+            newEntryPos = &(newBuckets + (e->m_value % newCapacity))->m_entry;
+
+            e->m_next = *newEntryPos;
+            if (e->m_next) e->m_next->m_prev = &e->m_next;
+            e->m_prev = newEntryPos;
+            *newEntryPos = e;
+        }
+    }
+
+    mem_free(hstable->m_alloc, hstable->m_buckets);
+    hstable->m_buckets = newBuckets;
+    hstable->m_bucket_capacity = newCapacity;
+
+    return 0;
+}
+
 void cpe_hash_table_fini(cpe_hash_table_t hstable) {
     if (hstable == NULL) return;
 
@@ -201,10 +251,26 @@ int cpe_hash_table_insert_unique_noresize(cpe_hash_table_t hstable, void * obj) 
 }
 
 int cpe_hash_table_insert_unique(cpe_hash_table_t hstable, void * obj) {
+    if (hstable == NULL) return -1;
+
+    if (cpe_hash_check_need_resize(hstable, hstable->m_count + 1)) {
+        if (cpe_hash_table_resize(hstable, hstable->m_count + 1) != 0) {
+            return -1;
+        }
+    }
+
     return cpe_hash_table_insert_unique_noresize(hstable, obj);
 }
 
 int cpe_hash_table_insert(cpe_hash_table_t hstable, void * obj) {
+    if (hstable == NULL) return -1;
+
+    if (cpe_hash_check_need_resize(hstable, hstable->m_count + 1)) {
+        if (cpe_hash_table_resize(hstable, hstable->m_count + 1) != 0) {
+            return -1;
+        }
+    }
+
     return cpe_hash_table_insert_noresize(hstable, obj);
 }
 

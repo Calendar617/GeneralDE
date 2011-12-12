@@ -65,6 +65,9 @@ int cpe_hash_table_count(cpe_hash_table_t hstable);
 int cpe_hash_table_insert_unique(cpe_hash_table_t hstable, void * obj);
 int cpe_hash_table_insert(cpe_hash_table_t hstable, void * obj);
 
+int cpe_hash_table_resize(cpe_hash_table_t hstable, int32_t suggestCapacity);
+int cpe_hash_table_check_resize(cpe_hash_table_t hstable, int32_t suggestCapacity);
+
 void * cpe_hash_table_find(cpe_hash_table_t hstable, const void * obj);
 void * cpe_hash_table_find_next(cpe_hash_table_t hstable, const void * obj);
 int cpe_hash_table_remove_by_ins(cpe_hash_table_t hstable, void * obj);
