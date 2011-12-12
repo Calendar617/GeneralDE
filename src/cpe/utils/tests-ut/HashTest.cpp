@@ -25,8 +25,9 @@ void HashTest::TearDown(void) {
     Base::TearDown();
 }
 
-uint32_t HashTest::hash_fun(const void *) {
-    return 0;
+uint32_t HashTest::hash_fun(const void * o) {
+    const char * str = ((TestObject *)o)->m_name;
+    return cpe_hash_str(str, strlen(str));
 }
 
 int HashTest::hash_cmp(const void * l, const void * r) {

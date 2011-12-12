@@ -99,6 +99,10 @@ int cpe_hash_table_init(
     return 0;
 }
 
+int cpe_hash_table_count(cpe_hash_table_t hstable) {
+    return hstable->m_count;
+}
+
 void cpe_hash_table_set_destory_fun(
     cpe_hash_table_t hstable,
     cpe_hash_destory_t destory_fun,
@@ -114,15 +118,17 @@ void cpe_hash_table_fini(cpe_hash_table_t hstable) {
     if (hstable == NULL) return;
 
     if (hstable->m_destory_fun) {
-        //TODO: destory all object;
-        /* struct cpe_hash_entry * e = hstable->m_list; */
-        /* while(e) { */
-        /*     struct cpe_hash_entry * c = e; */
-        /*     e = e->m_next; */
-        /*     hstable->m_destory_fun( */
-        /*         cpe_hash_entry_2_obj(hstable, c), */
-        /*         hstable->m_destory_context); */
-        /* } */
+        int i;
+        for(i = 0; i < hstable->m_bucket_capacity; ++i) {
+            struct cpe_hash_entry * e = (hstable->m_buckets + i)->m_entry;
+            while(e) {
+                struct cpe_hash_entry * n = e->m_next;
+                hstable->m_destory_fun(
+                    cpe_hash_entry_2_obj(hstable, e),
+                    hstable->m_destory_context);
+                e = n;
+            }
+        }
     }
 
     if (hstable->m_buckets) {
@@ -144,6 +150,13 @@ int cpe_hash_table_insert_unique_noresize(cpe_hash_table_t hstable, void * obj) 
     bucket_insert = &(hstable->m_buckets + bucketPos)->m_entry;
 
     while(*bucket_insert) {
+        if (hstable->m_compare_fun(
+                cpe_hash_entry_2_obj(hstable, (*bucket_insert)),
+                obj))
+        {
+            return -1;
+        }
+
         bucket_insert = &(*bucket_insert)->m_next;
     }
 
@@ -181,12 +194,11 @@ int cpe_hash_table_remove_by_ins(cpe_hash_table_t hstable, void * obj) {
 void * cpe_hash_table_find(cpe_hash_table_t hstable, const void * obj) {
     int32_t bucketPos;
     int32_t hsvalue;
-    struct cpe_hash_entry * entry;
     struct cpe_hash_entry ** find_pos;
 
     hsvalue = hstable->m_hash_fun(obj); 
 
-    bucketPos = entry->m_value % hstable->m_bucket_capacity;
+    bucketPos = hsvalue % hstable->m_bucket_capacity;
 
     find_pos = &(hstable->m_buckets + bucketPos)->m_entry;
 
@@ -199,4 +211,37 @@ void * cpe_hash_table_find(cpe_hash_table_t hstable, const void * obj) {
     }
 
     return NULL;
+}
+
+static
+struct cpe_hash_entry *
+cpe_hash_search_next_bucket(cpe_hash_table_t hstable, int32_t startPos) {
+    for(; startPos < hstable->m_bucket_capacity; ++startPos) {
+        struct cpe_hash_entry * entry
+            = (hstable->m_buckets + startPos)->m_entry;
+        if (entry) return entry;
+    }
+
+    return NULL;
+}
+
+void cpe_hash_it_init(cpe_hash_it_t * it, cpe_hash_table_t hstable) {
+    it->m_hstable = hstable;
+    it->m_entry = cpe_hash_search_next_bucket(hstable, 0);
+}
+
+void * cpe_hash_it_next(cpe_hash_it_t * it) {
+    void * r;
+
+    if (it->m_entry == NULL) return NULL;
+    r = cpe_hash_entry_2_obj(it->m_hstable, it->m_entry);
+
+    it->m_entry = 
+        it->m_entry->m_next
+        ? it->m_entry->m_next
+        : cpe_hash_search_next_bucket(
+            it->m_hstable, 
+            it->m_entry->m_value % it->m_hstable->m_bucket_capacity);
+
+    return r;
 }

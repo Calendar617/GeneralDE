@@ -2,6 +2,7 @@
 
 void SearchDirTest::SetUp() {
     Base::SetUp();
+
     m_stack_pos = 0;
     m_expect_stack_pos = 0;
 }
