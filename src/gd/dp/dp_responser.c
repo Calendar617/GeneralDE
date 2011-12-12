@@ -25,15 +25,17 @@ gd_dp_rsp_t gd_dp_rsp_create(gd_dp_mgr_t dp, const char * name) {
     return r;
 }
 
-void gd_dp_rsp_free(gd_dp_rsp_t rsp) {
-    if (rsp == NULL) return;
-    cpe_hash_table_remove_by_ins(&rsp->m_dp->m_rsps, rsp);
-
+void gd_dp_rsp_free_i(gd_dp_rsp_t rsp) {
     while(rsp->m_bindings) {
         gd_dp_binding_free(rsp->m_bindings);
     }
 
     mem_free(rsp->m_dp->m_alloc, rsp);
+}
+
+void gd_dp_rsp_free(gd_dp_rsp_t rsp) {
+    if (rsp == NULL) return;
+    cpe_hash_table_remove_by_ins(&rsp->m_dp->m_rsps, rsp);
 }
 
 const char * gd_dp_rsp_name(gd_dp_rsp_t rsp) {

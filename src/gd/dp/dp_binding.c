@@ -20,16 +20,20 @@ int gd_dp_binding_add(struct gd_dp_binding * binding, gd_dp_rsp_t rsp) {
     return 0;
 }
 
-void gd_dp_binding_free(struct gd_dp_binding * binding) {
+void gd_dp_binding_free_i(struct gd_dp_binding * binding) {
     gd_dp_mgr_t dp = binding->m_rsp->m_dp;
 
     *binding->m_binding_pre = binding->m_binding_next;
     if (binding->m_binding_next) {
         binding->m_binding_next->m_binding_pre = binding->m_binding_pre;
     }
-    cpe_hash_table_remove_by_ins(&dp->m_cmd_2_rsps, binding);
 
     mem_free(dp->m_alloc, binding);
+}
+
+void gd_dp_binding_free(struct gd_dp_binding * binding) {
+    gd_dp_mgr_t dp = binding->m_rsp->m_dp;
+    cpe_hash_table_remove_by_ins(&dp->m_cmd_2_rsps, binding);
 }
 
 int32_t gd_dp_binding_hash(const struct gd_dp_binding * rsp) {
@@ -131,7 +135,7 @@ int gd_dp_mgr_bind_string(gd_dp_rsp_t rsp, const char * cmd, error_monitor_t em)
 
 int gd_dp_mgr_unbind_string(gd_dp_mgr_t dp, const char * cmd) {
     struct gd_dp_binding_string tmp;
-    tmp.m_head.m_kt = gd_dp_key_numeric;
+    tmp.m_head.m_kt = gd_dp_key_string;
     tmp.m_value = cmd;
     tmp.m_value_len = strlen(cmd);
 

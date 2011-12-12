@@ -11,7 +11,7 @@ void gd_dp_rsp_free(gd_dp_rsp_t rsp);
 
 const char * gd_dp_rsp_name(gd_dp_rsp_t rsp);
 
-enum gd_dp_rsp_ot {
+typedef enum gd_dp_rsp_ot {
     gd_dp_rsp_set_processor
 } gd_dp_rsp_op_t ;
 

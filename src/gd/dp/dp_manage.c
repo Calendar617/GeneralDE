@@ -23,7 +23,7 @@ gd_dp_mgr_t gd_dp_mgr_create(mem_allocrator_t alloc) {
 
     cpe_hash_table_set_destory_fun(
         &dpm->m_rsps,
-        (cpe_hash_destory_t)gd_dp_rsp_free,
+        (cpe_hash_destory_t)gd_dp_rsp_free_i,
         NULL);
 
     cpe_hash_table_init(
@@ -36,7 +36,7 @@ gd_dp_mgr_t gd_dp_mgr_create(mem_allocrator_t alloc) {
 
     cpe_hash_table_set_destory_fun(
         &dpm->m_cmd_2_rsps,
-        (cpe_hash_destory_t)gd_dp_binding_free,
+        (cpe_hash_destory_t)gd_dp_binding_free_i,
         NULL);
 
     return dpm;
@@ -51,7 +51,6 @@ void gd_dp_mgr_free(gd_dp_mgr_t dp) {
 
     mem_free(dp->m_alloc, dp);
 }
-
 
 gd_dp_rsp_t gd_dp_rsp_find_by_name(gd_dp_mgr_t dp, const char * name) {
     struct gd_dp_rsp rspBuf;

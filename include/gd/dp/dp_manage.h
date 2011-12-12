@@ -15,6 +15,8 @@ void gd_dp_mgr_free(gd_dp_mgr_t dp);
 /*bind command to rsp*/
 int gd_dp_mgr_bind_numeric(gd_dp_rsp_t rsp, int32_t cmd, error_monitor_t em);
 int gd_dp_mgr_unbind_numeric(gd_dp_mgr_t dp, int32_t cmd);
+int gd_dp_mgr_bind_string(gd_dp_rsp_t rsp, const char * cmd, error_monitor_t em);
+int gd_dp_mgr_unbind_string(gd_dp_mgr_t dp, const char * cmd);
 
 /*rsp find operations*/
 gd_dp_rsp_t gd_dp_rsp_find_by_name(gd_dp_mgr_t dp, const char * name);
