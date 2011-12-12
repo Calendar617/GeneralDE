@@ -3,6 +3,10 @@
 #include "cpe/pal/types.h"
 #include "cpe/dr/dr_ctypes_info.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct cfg * cfg_t;
 
 typedef enum cfg_policy {
@@ -37,6 +41,10 @@ typedef struct cfg_seq_it {
 #define CPE_CFG_TYPE_STRING      CPE_DR_TYPE_STRING
 #define CPE_CFG_TYPE_FLOAT       CPE_DR_TYPE_FLOAT
 #define CPE_CFG_TYPE_DOUBLE      CPE_DR_TYPE_DOUBLE
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
