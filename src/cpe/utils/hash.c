@@ -137,12 +137,43 @@ void cpe_hash_table_fini(cpe_hash_table_t hstable) {
     }
 }
 
+int cpe_hash_table_insert_noresize(cpe_hash_table_t hstable, void * obj) {
+    int32_t bucketPos;
+    struct cpe_hash_entry * entry;
+    struct cpe_hash_entry ** bucket_insert;
+
+    if (obj == NULL) return -1;
+
+    entry = cpe_hash_obj_2_entry(hstable, obj);
+
+    if (entry->m_prev != NULL) return -1;
+
+    entry->m_value = hstable->m_hash_fun(obj);
+    bucketPos = entry->m_value % hstable->m_bucket_capacity;
+
+    bucket_insert = &(hstable->m_buckets + bucketPos)->m_entry;
+
+    entry->m_prev = bucket_insert;
+    entry->m_next = *bucket_insert;
+    if (entry->m_next) {
+        entry->m_next->m_prev = &entry->m_next;
+    }
+    *bucket_insert = entry;
+
+    ++hstable->m_count;
+
+    return 0;
+}
+
 int cpe_hash_table_insert_unique_noresize(cpe_hash_table_t hstable, void * obj) {
     int32_t bucketPos;
     struct cpe_hash_entry * entry;
     struct cpe_hash_entry ** bucket_insert;
 
+    if (obj == NULL) return -1;
+
     entry = cpe_hash_obj_2_entry(hstable, obj);
+    if (entry->m_prev != NULL) return -1;
 
     entry->m_value = hstable->m_hash_fun(obj);
     bucketPos = entry->m_value % hstable->m_bucket_capacity;
@@ -173,12 +204,64 @@ int cpe_hash_table_insert_unique(cpe_hash_table_t hstable, void * obj) {
     return cpe_hash_table_insert_unique_noresize(hstable, obj);
 }
 
+int cpe_hash_table_insert(cpe_hash_table_t hstable, void * obj) {
+    return cpe_hash_table_insert_noresize(hstable, obj);
+}
+
+int cpe_hash_table_remove_by_key(cpe_hash_table_t hstable, const void * obj) {
+    void * existObj = cpe_hash_table_find(hstable, obj);
+    if (existObj) {
+        int r = cpe_hash_table_remove_by_ins(hstable, existObj);
+        return r == 0 ? 1 : r;
+    }
+    else {
+        return 0;
+    }
+}
+
+int cpe_hash_table_remove_all_by_key(cpe_hash_table_t hstable, const void * obj) {
+    void * existObj = cpe_hash_table_find(hstable, obj);
+    if (existObj) {
+        int r = 0;
+        struct cpe_hash_entry * e;
+
+        e = cpe_hash_obj_2_entry(hstable, existObj)->m_next;
+
+        if (cpe_hash_table_remove_by_ins(hstable, existObj) == 0) {
+            ++r;
+        }
+
+        while(e) {
+            struct cpe_hash_entry * n = e->m_next;
+            void * checkObj = cpe_hash_entry_2_obj(hstable, e);
+
+            if (hstable->m_compare_fun(checkObj, obj)) {
+                if (cpe_hash_table_remove_by_ins(hstable, checkObj) == 0) {
+                    ++r;
+                }
+            }
+
+            e = n;
+        }
+
+        return r;
+    }
+    else {
+        return 0;
+    }
+}
+
 int cpe_hash_table_remove_by_ins(cpe_hash_table_t hstable, void * obj) {
     struct cpe_hash_entry * entry;
 
+    if (obj == NULL) return -1;
+
     entry = cpe_hash_obj_2_entry(hstable, obj);
-    (*entry->m_prev)->m_next = entry->m_next;
+
+    if (entry->m_prev == NULL) return -1;
+
     if (entry->m_next) entry->m_next->m_prev = entry->m_prev;
+    (*entry->m_prev) = entry->m_next;
 
     entry->m_next = NULL;
     entry->m_prev = NULL;
@@ -188,6 +271,7 @@ int cpe_hash_table_remove_by_ins(cpe_hash_table_t hstable, void * obj) {
         hstable->m_destory_fun(obj, hstable->m_destory_context);
     }
 
+    --hstable->m_count;
     return 0;
 }
 
@@ -208,6 +292,23 @@ void * cpe_hash_table_find(cpe_hash_table_t hstable, const void * obj) {
             return checkObj;
         }
         find_pos = &(*find_pos)->m_next;
+    }
+
+    return NULL;
+}
+
+void * cpe_hash_table_find_next(cpe_hash_table_t hstable, const void * obj) {
+    struct cpe_hash_entry * entry;
+
+    if (hstable == NULL || obj == NULL) return NULL;
+
+    entry = cpe_hash_obj_2_entry(hstable, obj);
+
+    for(entry = entry->m_next; entry; entry = entry->m_next) {
+        void * checkObj = cpe_hash_entry_2_obj(hstable, entry);
+        if (hstable->m_compare_fun(checkObj, obj)) {
+            return checkObj;
+        }
     }
 
     return NULL;
@@ -241,7 +342,7 @@ void * cpe_hash_it_next(cpe_hash_it_t * it) {
         ? it->m_entry->m_next
         : cpe_hash_search_next_bucket(
             it->m_hstable, 
-            it->m_entry->m_value % it->m_hstable->m_bucket_capacity);
+            (it->m_entry->m_value % it->m_hstable->m_bucket_capacity) + 1);
 
     return r;
 }

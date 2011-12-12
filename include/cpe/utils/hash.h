@@ -43,6 +43,8 @@ typedef struct cpe_hash_it {
     struct cpe_hash_entry * m_entry;
 } cpe_hash_it_t;
 
+#define cpe_hash_entry_init(__entry) (__entry)->m_prev = NULL
+
 int cpe_hash_table_init(
     cpe_hash_table_t hstable,
     mem_allocrator_t alloc,
@@ -61,8 +63,13 @@ void cpe_hash_table_fini(cpe_hash_table_t hstable);
 int cpe_hash_table_count(cpe_hash_table_t hstable);
 
 int cpe_hash_table_insert_unique(cpe_hash_table_t hstable, void * obj);
+int cpe_hash_table_insert(cpe_hash_table_t hstable, void * obj);
+
 void * cpe_hash_table_find(cpe_hash_table_t hstable, const void * obj);
+void * cpe_hash_table_find_next(cpe_hash_table_t hstable, const void * obj);
 int cpe_hash_table_remove_by_ins(cpe_hash_table_t hstable, void * obj);
+int cpe_hash_table_remove_by_key(cpe_hash_table_t hstable, const void * obj);
+int cpe_hash_table_remove_all_by_key(cpe_hash_table_t hstable, const void * obj);
 
 /*iterator operation*/
 void cpe_hash_it_init(cpe_hash_it_t * it, cpe_hash_table_t hstable);

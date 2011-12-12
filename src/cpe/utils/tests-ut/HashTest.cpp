@@ -42,6 +42,7 @@ HashTest::TestObject *
 HashTest::createTestObject(const char * name) {
     TestObject * p = (TestObject *)t_alloc(sizeof(struct TestObject));
     strncpy(p->m_name, name, 9);
+    cpe_hash_entry_init(&p->m_he);
     return p;
 }
 
@@ -49,6 +50,7 @@ HashTest::TestObject *
 HashTest::createTmpTestObject(const char * name) {
     TestObject * p = (TestObject *)t_tmp_alloc(sizeof(struct TestObject));
     strncpy(p->m_name, name, 9);
+    cpe_hash_entry_init(&p->m_he);
     return p;
 }
 
