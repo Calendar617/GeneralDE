@@ -25,10 +25,11 @@ TEST_F(StructTest, add_seq) {
 TEST_F(StructTest, add_seq_seq_duplicate) {
     cfg_t seq = cfg_struct_add_seq(m_root, "a", cfg_replace);
     EXPECT_TRUE(seq);
+    cfg_seq_add_int8(seq, 2);
+    EXPECT_EQ(1, cfg_seq_count(seq));
 
     cfg_t newCfg = cfg_struct_add_seq(m_root, "a", cfg_replace);
-
-    EXPECT_TRUE(seq != newCfg);
+    EXPECT_EQ(0, cfg_seq_count(newCfg));
 }
 
 TEST_F(StructTest, add_not_from_struct) {
