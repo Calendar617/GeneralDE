@@ -72,13 +72,13 @@ public:
     typedef fixture Base;
 
     virtual void SetUp() {
-        fixture_gen<EnvListT>::SetUp();
         BaseT::SetUp();
+        fixture_gen<EnvListT>::SetUp();
     }
 
     virtual void TearDown() {
-        BaseT::TearDown();
         fixture_gen<EnvListT>::TearDown();
+        BaseT::TearDown();
     }
 
     using BaseT::t_allocrator;
