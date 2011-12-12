@@ -6,8 +6,10 @@
 extern "C" {
 #endif
 
-gd_dp_rsp_t gd_dp_rsp_create(gd_dp_mgr_t dp);
+gd_dp_rsp_t gd_dp_rsp_create(gd_dp_mgr_t dp, const char * name);
 void gd_dp_rsp_free(gd_dp_rsp_t rsp);
+
+const char * gd_dp_rsp_name(gd_dp_rsp_t rsp);
 
 enum gd_dp_rsp_ot {
     gd_dp_rsp_set_processor

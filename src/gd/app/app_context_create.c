@@ -71,7 +71,7 @@ gd_app_context_create(
         return NULL;
     }
 
-    context->m_dp_mgr = gd_dp_mgr_create(alloc, context->m_tl_mgr);
+    context->m_dp_mgr = gd_dp_mgr_create(alloc);
     if (context->m_dp_mgr == NULL) {
         gd_app_context_free(context);
         return NULL;
