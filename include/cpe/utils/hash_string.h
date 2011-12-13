@@ -16,6 +16,8 @@ size_t cpe_hs_binary_len(cpe_hash_string_t hs);
 uint32_t cpe_hs_value(cpe_hash_string_t hs);
 
 cpe_hash_string_t cpe_hs_create(mem_allocrator_t alloc, const char * data);
+void cpe_hs_copy(cpe_hash_string_t target, cpe_hash_string_t source);
+cpe_hash_string_t cpe_hs_copy_create(mem_allocrator_t alloc, cpe_hash_string_t source);
 
 #define cpe_hs_data(hs) (((const char *)(hs)) + 8)
  
