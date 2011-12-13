@@ -18,7 +18,7 @@ TEST_F(HashStringTest, buf_basic) {
         cpe_hs_value((cpe_hash_string_t)data));
 
     EXPECT_EQ(
-        (size_t)11,
+        (size_t)12,
         cpe_hs_binary_len((cpe_hash_string_t)data));
 }
 
@@ -34,7 +34,7 @@ TEST_F(HashStringTest, alloc_basic) {
         cpe_hs_value(data));
 
     EXPECT_EQ(
-        (size_t)11,
+        (size_t)12,
         cpe_hs_binary_len(data));
 
     mem_free(t_allocrator(), data);
