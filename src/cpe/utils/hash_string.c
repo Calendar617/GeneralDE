@@ -17,7 +17,7 @@ size_t cpe_hs_len(cpe_hash_string_t hs) {
 
 size_t cpe_hs_binary_len(cpe_hash_string_t hs) {
     cpe_hs_check_init(hs);
-    return *(b + 1) + 8;
+    return *(b + 1) + 8 + 1;
 }
 
 uint32_t cpe_hs_value(cpe_hash_string_t hs) {
@@ -37,4 +37,17 @@ cpe_hs_create(mem_allocrator_t alloc, const char * data) {
     *buf = cpe_hash_str(data, dataLen);
     *(buf + 1) = dataLen;
     return (cpe_hash_string_t)buf;
+}
+
+void cpe_hs_copy(cpe_hash_string_t target, cpe_hash_string_t source) {
+    memcpy(target, source, cpe_hs_binary_len(source));
+}
+
+cpe_hash_string_t 
+cpe_hs_copy_create(mem_allocrator_t alloc, cpe_hash_string_t source) {
+    cpe_hash_string_t r =
+        (cpe_hash_string_t)mem_alloc(alloc, cpe_hs_binary_len(source));
+    if (r == NULL) return NULL;
+    cpe_hs_copy(r, source);
+    return r;
 }
