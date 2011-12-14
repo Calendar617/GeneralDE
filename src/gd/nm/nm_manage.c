@@ -45,10 +45,32 @@ void gd_nm_mgr_free(gd_nm_mgr_t nmm) {
 }
 
 gd_nm_node_t
-gd_nm_node_find(gd_nm_mgr_t nmm, cpe_hash_string_t name) {
+gd_nm_mgr_find_node(gd_nm_mgr_t nmm, cpe_hash_string_t name) {
     struct gd_nm_node buf;
 
     buf.m_name = name;
 
     return (gd_nm_node_t)cpe_hash_table_find(&nmm->m_nodes, &buf);
+}
+
+gd_nm_node_t gd_nm_mgr_next_node(gd_nm_node_it_t it) {
+    struct gd_nm_node_in_mgr_it * nodeIt;
+
+    assert(it);
+    nodeIt = (struct gd_nm_node_in_mgr_it *)it;
+
+    return (gd_nm_node_t)cpe_hash_it_next(&nodeIt->m_hash_it);
+}
+
+int gd_nm_mgr_nodes(gd_nm_node_it_t it, gd_nm_mgr_t nmm) {
+    struct gd_nm_node_in_mgr_it * nodeIt;
+
+    assert(it);
+    if (nmm == NULL) return -1;
+
+    nodeIt = (struct gd_nm_node_in_mgr_it *)it;
+    nodeIt->m_next_fun = gd_nm_mgr_next_node;
+    cpe_hash_it_init(&nodeIt->m_hash_it, &nmm->m_nodes);
+
+    return 0;
 }

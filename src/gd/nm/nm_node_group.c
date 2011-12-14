@@ -28,6 +28,11 @@ gd_nm_group_create(gd_nm_mgr_t nmm, cpe_hash_string_t name, size_t capacity) {
         return NULL;
     }
 
+    cpe_hash_table_set_destory_fun(
+        &group->m_members,
+        (cpe_hash_destory_t)gd_nm_binding_free_from_group,
+        NULL);
+
     if (cpe_hash_table_insert_unique(&nmm->m_nodes, group) != 0) {
         gd_nm_group_free_from_mgr(group);
         return NULL;
@@ -50,4 +55,29 @@ int gd_nm_group_add_member(gd_nm_node_t grp, gd_nm_node_t sub) {
     }
 
     return (gd_nm_binding_create((struct gd_nm_group *)grp, sub) == NULL) ? -1 : 0;
+}
+
+gd_nm_node_t gd_nm_group_next_member(gd_nm_node_it_t it) {
+    struct gd_nm_node_in_group_it * nodeIt;
+    struct gd_nm_binding * binding;
+
+    assert(it);
+    nodeIt = (struct gd_nm_node_in_group_it *)it;
+
+    binding = (struct gd_nm_binding *)cpe_hash_it_next(&nodeIt->m_hash_it);
+    return binding ? binding->m_node : NULL;
+}
+
+int gd_nm_group_members(gd_nm_node_it_t it, gd_nm_node_t group) {
+    struct gd_nm_node_in_group_it * nodeIt;
+
+    assert(it);
+    if (group == NULL
+        || group->m_type != gd_nm_node_group) return -1;
+
+    nodeIt = (struct gd_nm_node_in_group_it *)it;
+    nodeIt->m_next_fun = gd_nm_group_next_member;
+    cpe_hash_it_init(&nodeIt->m_hash_it, &((struct gd_nm_group *)group)->m_members);
+
+    return 0;
 }

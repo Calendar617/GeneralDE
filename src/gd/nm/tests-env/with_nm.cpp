@@ -39,7 +39,7 @@ with_nm::t_nm_add_group(const char * name, size_t capacity) {
 }
 
 gd_nm_node_t with_nm::t_nm_find(const char * name) {
-    return gd_nm_node_find(t_nm(), cpe_hs_create(t_tmp_allocrator(), name));
+    return gd_nm_mgr_find_node(t_nm(), cpe_hs_create(t_tmp_allocrator(), name));
 }
 
 int with_nm::t_nm_bind(const char * groupName, const char * instanceName) {
@@ -59,10 +59,36 @@ with_nm::t_nm_it_dump(gd_nm_node_it_t it) {
 }
 
 ::std::string
-with_nm::t_nm_groups_of_node(const char * nodeName) {
+with_nm::t_nm_node_groups(const char * nodeName) {
     struct gd_nm_node_it it;
-    gd_nm_node_groups(&it, t_nm_find(nodeName));
-    return t_nm_it_dump(&it);
+    if (gd_nm_node_groups(&it, t_nm_find(nodeName)) == 0) {
+        return t_nm_it_dump(&it);
+    }
+    else {
+        return "init it error!";
+    }
+}
+
+::std::string
+with_nm::t_nm_group_members(const char * groupName) {
+    struct gd_nm_node_it it;
+    if (gd_nm_group_members(&it, t_nm_find(groupName)) == 0) {
+        return t_nm_it_dump(&it);
+    }
+    else {
+        return "init it error!";
+    }
+}
+
+::std::string
+with_nm::t_nm_nodes(void) {
+    struct gd_nm_node_it it;
+    if (gd_nm_mgr_nodes(&it, t_nm()) == 0) {
+        return t_nm_it_dump(&it);
+    }
+    else {
+        return "init it error!";
+    }
 }
 
 }}}

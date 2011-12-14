@@ -53,10 +53,23 @@ struct gd_nm_instance {
     GD_NM_NODE_HEAD();
 };
 
-struct gd_nm_node_gruops_it {
+struct gd_nm_node_groups_it {
     gd_nm_it_next_fun m_next_fun;
     struct gd_nm_binding * m_curent;
 };
+extern char check_node_groups_it_size[sizeof(struct gd_nm_node_it) - sizeof(struct gd_nm_node_groups_it)];
+
+struct gd_nm_node_in_mgr_it {
+    gd_nm_it_next_fun m_next_fun;
+    struct cpe_hash_it m_hash_it;
+};
+extern char check_node_in_mgr_it_size[sizeof(struct gd_nm_node_it) - sizeof(struct gd_nm_node_in_mgr_it)];
+
+struct gd_nm_node_in_group_it {
+    gd_nm_it_next_fun m_next_fun;
+    struct cpe_hash_it m_hash_it;
+};
+extern char check_node_in_group_it_size[sizeof(struct gd_nm_node_it) - sizeof(struct gd_nm_node_in_group_it)];
 
 #ifdef __cplusplus
 }

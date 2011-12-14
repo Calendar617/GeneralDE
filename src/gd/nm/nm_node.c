@@ -54,8 +54,11 @@ void gd_nm_node_free_from_mgr_base(gd_nm_node_t node) {
     assert(node);
 
     while(!TAILQ_EMPTY(&node->m_to_group_bindings)) {
-        gd_nm_binding_free(
-            TAILQ_FIRST(&node->m_to_group_bindings));
+        struct gd_nm_binding * binding = TAILQ_FIRST(&node->m_to_group_bindings);
+        
+        TAILQ_REMOVE(&node->m_to_group_bindings, binding, m_qh);
+
+        gd_nm_binding_free_from_node(binding);
     }
 
     mem_free(node->m_mgr->m_alloc, node->m_name);
@@ -94,11 +97,11 @@ gd_nm_node_type_t gd_nm_node_type(gd_nm_node_t node) {
 }
 
 gd_nm_node_t gd_nm_node_next_group(gd_nm_node_it_t it) {
-    struct gd_nm_node_gruops_it * groupIt;
+    struct gd_nm_node_groups_it * groupIt;
     gd_nm_node_t rv;
 
     assert(it);
-    groupIt = (struct gd_nm_node_gruops_it *)it;
+    groupIt = (struct gd_nm_node_groups_it *)it;
 
     if (groupIt->m_curent == NULL) return NULL;
 
@@ -107,13 +110,15 @@ gd_nm_node_t gd_nm_node_next_group(gd_nm_node_it_t it) {
     return rv;
 }
 
-void gd_nm_node_groups(gd_nm_node_it_t it, gd_nm_node_t node) {
-    struct gd_nm_node_gruops_it * groupIt;
+int gd_nm_node_groups(gd_nm_node_it_t it, gd_nm_node_t node) {
+    struct gd_nm_node_groups_it * groupIt;
 
     assert(it);
-    assert(node);
+    if (node == NULL) return -1;
 
-    groupIt = (struct gd_nm_node_gruops_it *)it;
+    groupIt = (struct gd_nm_node_groups_it *)it;
     groupIt->m_next_fun = gd_nm_node_next_group;
     groupIt->m_curent = TAILQ_FIRST(&node->m_to_group_bindings);
+
+    return 0;
 }

@@ -21,7 +21,9 @@ public:
     gd_nm_node_t t_nm_find(const char * name);
 
     ::std::string t_nm_it_dump(gd_nm_node_it_t it);
-    ::std::string t_nm_groups_of_node(const char * nodeName);
+    ::std::string t_nm_node_groups(const char * nodeName);
+    ::std::string t_nm_nodes(void);
+    ::std::string t_nm_group_members(const char * groupName);
 private:
     gd_nm_mgr_t m_nm;
 };

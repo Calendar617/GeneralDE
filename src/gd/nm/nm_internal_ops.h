@@ -32,7 +32,8 @@ void gd_nm_group_free_from_mgr(struct gd_nm_group * group);
 struct gd_nm_binding * gd_nm_binding_get(gd_nm_mgr_t nmm);
 void gd_nm_binding_put(gd_nm_mgr_t nmm, struct gd_nm_binding * binding);
 
-void gd_nm_binding_free(struct gd_nm_binding * binding);
+void gd_nm_binding_free_from_group(struct gd_nm_binding * binding);
+void gd_nm_binding_free_from_node(struct gd_nm_binding * binding);
 struct gd_nm_binding *
 gd_nm_binding_create(struct gd_nm_group * group, gd_nm_node_t node);
 
