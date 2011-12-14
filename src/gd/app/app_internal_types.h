@@ -10,6 +10,7 @@ extern "C" {
 #define GD_APP_MAX_ARGV 128
 
 struct gd_app_context {
+    gd_app_status_t m_state;
     int m_argc;
     char * m_argv[GD_APP_MAX_ARGV];
     mem_allocrator_t m_alloc;

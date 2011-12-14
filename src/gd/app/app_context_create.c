@@ -40,6 +40,8 @@ gd_app_context_create(
 
     bzero(context, allocSize);
 
+    context->m_state = gd_app_init;
+
     cpe_error_monitor_init(&context->m_em_print, cpe_error_log_to_consol, NULL);
     context->m_em = &context->m_em_print;
 

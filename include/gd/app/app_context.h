@@ -43,6 +43,9 @@ void * gd_app_user_data(gd_app_context_t context);
 
 int gd_app_run(gd_app_context_t context);
 
+void gd_app_set_state(gd_app_context_t context, gd_app_status_t state);
+gd_app_status_t gd_app_state(gd_app_context_t context);
+
 #ifdef __cplusplus
 }
 #endif
