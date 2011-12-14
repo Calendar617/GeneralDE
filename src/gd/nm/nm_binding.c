@@ -17,7 +17,7 @@ void gd_nm_binding_free(struct gd_nm_binding * binding) {
         m_qh);
 
     cpe_hash_table_remove_by_ins(
-        &binding->m_group->m_subs,
+        &binding->m_group->m_members,
         binding);
 
     gd_nm_binding_put(nmm, binding);
@@ -37,11 +37,14 @@ gd_nm_binding_create(struct gd_nm_group * group, gd_nm_node_t node) {
     binding->m_group = group;
     binding->m_node = node;
 
-    if (cpe_hash_table_insert_unique(&group->m_subs, binding) != 0) {
+    /*insert to group*/
+    cpe_hash_entry_init(&binding->m_hh_for_group);
+    if (cpe_hash_table_insert_unique(&group->m_members, binding) != 0) {
         gd_nm_binding_put(group->m_mgr, binding);
         return NULL;
     }
 
+    /*link to node*/
     TAILQ_INSERT_HEAD(&node->m_to_group_bindings, binding, m_qh);
 
     return binding;
@@ -72,7 +75,8 @@ uint32_t gd_nm_binding_node_name_hash(const struct gd_nm_binding * binding) {
     return cpe_hs_value(binding->m_node->m_name);
 }
 
-int gd_nm_binding_node_name_cmp(const struct gd_nm_binding * l, const struct gd_nm_binding * r) {
-    return cpe_hs_len(l->m_node->m_name) == cpe_hs_len(r->m_node->m_name)
-        && strcmp(cpe_hs_data(l->m_node->m_name), cpe_hs_data(r->m_node->m_name)) == 0;
+int gd_nm_binding_node_name_cmp(
+    const struct gd_nm_binding * l, const struct gd_nm_binding * r)
+{
+    return cpe_hs_cmp(l->m_node->m_name, r->m_node->m_name) == 0;
 }

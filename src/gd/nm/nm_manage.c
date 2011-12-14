@@ -45,62 +45,10 @@ void gd_nm_mgr_free(gd_nm_mgr_t nmm) {
 }
 
 gd_nm_node_t
-gd_nm_group_create(gd_nm_mgr_t nmm, cpe_hash_string_t name, size_t capacity) {
-    struct gd_nm_group * group;
+gd_nm_node_find(gd_nm_mgr_t nmm, cpe_hash_string_t name) {
+    struct gd_nm_node buf;
 
-    assert(nmm);
-    assert(name);
+    buf.m_name = name;
 
-    group = (struct gd_nm_group *)
-        gd_nm_node_alloc(
-            nmm, name,
-            gd_nm_node_group, sizeof(struct gd_nm_group),
-            capacity);
-    if (group == NULL) return NULL;
-
-    if (cpe_hash_table_init(
-            &group->m_subs,
-            nmm->m_alloc,
-            (cpe_hash_fun_t)gd_nm_binding_node_name_hash,
-            (cpe_hash_cmp_t)gd_nm_binding_node_name_cmp,
-            CPE_HASH_OBJ2ENTRY(gd_nm_binding, m_hh_for_group),
-            0) != 0)
-    {
-        gd_nm_node_free_from_mgr((gd_nm_node_t)group);
-        return NULL;
-    }
-
-    if (cpe_hash_table_insert_unique(&nmm->m_nodes, group) != 0) {
-        gd_nm_group_free_from_mgr(group);
-        return NULL;
-    }
-    
-    return (gd_nm_node_t)group;
-}
-
-gd_nm_node_t
-gd_nm_instance_create(gd_nm_mgr_t nmm, cpe_hash_string_t name, size_t capacity) {
-    struct gd_nm_instance * instance;
-
-    assert(nmm);
-    assert(name);
-
-    instance = (struct gd_nm_instance *)
-        gd_nm_node_alloc(
-            nmm, name,
-            gd_nm_node_instance, sizeof(struct gd_nm_instance),
-            capacity);
-    if (instance == NULL) return NULL;
-
-    if (cpe_hash_table_insert_unique(&nmm->m_nodes, instance) != 0) {
-        gd_nm_instance_free_from_mgr(instance);
-        return NULL;
-    }
-
-    return (gd_nm_node_t)instance;
-}
-
-void gd_nm_group_free_from_mgr(struct gd_nm_group * group) {
-    cpe_hash_table_fini(&group->m_subs);
-    gd_nm_node_free_from_mgr((gd_nm_node_t)group);
+    return (gd_nm_node_t)cpe_hash_table_find(&nmm->m_nodes, &buf);
 }

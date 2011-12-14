@@ -31,6 +31,7 @@ gd_nm_node_alloc(
     node->m_name = (cpe_hash_string_t)buf;
     node->m_data_capacity = capacity;
     TAILQ_INIT(&node->m_to_group_bindings);
+    cpe_hash_entry_init(&node->m_hh_for_mgr);
 
     return node;
 }
@@ -75,6 +76,44 @@ uint32_t gd_nm_node_hash(const gd_nm_node_t node) {
 }
 
 int gd_nm_node_cmp(const gd_nm_node_t l, const gd_nm_node_t r) {
-    return cpe_hs_len(l->m_name) == cpe_hs_len(r->m_name)
-        && strcmp(cpe_hs_data(l->m_name), cpe_hs_data(r->m_name));
+    return cpe_hs_value(l->m_name) == cpe_hs_value(r->m_name)
+        && strcmp(cpe_hs_data(l->m_name), cpe_hs_data(r->m_name)) == 0;
+}
+
+const char * gd_nm_node_name(gd_nm_node_t node) {
+    return cpe_hs_data(node->m_name);
+}
+
+cpe_hash_string_t
+gd_nm_node_hs_name(gd_nm_node_t node) {
+    return node->m_name;
+}
+
+gd_nm_node_type_t gd_nm_node_type(gd_nm_node_t node) {
+    return node->m_type;
+}
+
+gd_nm_node_t gd_nm_node_next_group(gd_nm_node_it_t it) {
+    struct gd_nm_node_gruops_it * groupIt;
+    gd_nm_node_t rv;
+
+    assert(it);
+    groupIt = (struct gd_nm_node_gruops_it *)it;
+
+    if (groupIt->m_curent == NULL) return NULL;
+
+    rv = (gd_nm_node_t)groupIt->m_curent->m_group;
+    groupIt->m_curent = TAILQ_NEXT(groupIt->m_curent, m_qh);
+    return rv;
+}
+
+void gd_nm_node_groups(gd_nm_node_it_t it, gd_nm_node_t node) {
+    struct gd_nm_node_gruops_it * groupIt;
+
+    assert(it);
+    assert(node);
+
+    groupIt = (struct gd_nm_node_gruops_it *)it;
+    groupIt->m_next_fun = gd_nm_node_next_group;
+    groupIt->m_curent = TAILQ_FIRST(&node->m_to_group_bindings);
 }

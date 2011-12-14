@@ -20,7 +20,12 @@ void cpe_hs_copy(cpe_hash_string_t target, cpe_hash_string_t source);
 cpe_hash_string_t cpe_hs_copy_create(mem_allocrator_t alloc, cpe_hash_string_t source);
 
 #define cpe_hs_data(hs) (((const char *)(hs)) + 8)
- 
+
+#define cpe_hs_cmp(__l, __r)                                    \
+    ( cpe_hs_value(__l) == cpe_hs_value(__r)                    \
+      ? strcmp(cpe_hs_data(__l), cpe_hs_data(__r))              \
+      : (((int)cpe_hs_value(__l)) - ((int)cpe_hs_value(__r))))
+
 #define CPE_HS_LEN_TO_BINARY_LEN(__len) ((__len) + 8)
 #define CPE_HS_BUF_MAKE(__str) {"\0\0\0\0\0\0\0\0" __str}
 

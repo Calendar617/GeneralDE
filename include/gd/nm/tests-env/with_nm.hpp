@@ -1,5 +1,6 @@
 #ifndef GD_NM_TESTENV_WITHDP_H
 #define GD_NM_TESTENV_WITHDP_H
+#include <string>
 #include "cpe/utils/tests-env/test-env.hpp"
 #include "../nm.h"
 
@@ -13,6 +14,14 @@ public:
     void TearDown();
 
     gd_nm_mgr_t t_nm();
+
+    gd_nm_node_t t_nm_add_instance(const char * name, size_t capacity);
+    gd_nm_node_t t_nm_add_group(const char * name, size_t capacity);
+    int t_nm_bind(const char * groupName, const char * instanceName);
+    gd_nm_node_t t_nm_find(const char * name);
+
+    ::std::string t_nm_it_dump(gd_nm_node_it_t it);
+    ::std::string t_nm_groups_of_node(const char * nodeName);
 private:
     gd_nm_mgr_t m_nm;
 };

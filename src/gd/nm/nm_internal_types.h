@@ -46,11 +46,16 @@ struct gd_nm_binding {
 
 struct gd_nm_group {
     GD_NM_NODE_HEAD();
-    struct cpe_hash_table m_subs;
+    struct cpe_hash_table m_members;
 };
 
 struct gd_nm_instance {
     GD_NM_NODE_HEAD();
+};
+
+struct gd_nm_node_gruops_it {
+    gd_nm_it_next_fun m_next_fun;
+    struct gd_nm_binding * m_curent;
 };
 
 #ifdef __cplusplus

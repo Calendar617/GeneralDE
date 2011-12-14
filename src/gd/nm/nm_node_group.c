@@ -1,0 +1,53 @@
+#include <assert.h>
+#include "gd/nm/nm_manage.h"
+#include "nm_internal_ops.h"
+
+gd_nm_node_t
+gd_nm_group_create(gd_nm_mgr_t nmm, cpe_hash_string_t name, size_t capacity) {
+    struct gd_nm_group * group;
+
+    assert(nmm);
+    assert(name);
+
+    group = (struct gd_nm_group *)
+        gd_nm_node_alloc(
+            nmm, name,
+            gd_nm_node_group, sizeof(struct gd_nm_group),
+            capacity);
+    if (group == NULL) return NULL;
+
+    if (cpe_hash_table_init(
+            &group->m_members,
+            nmm->m_alloc,
+            (cpe_hash_fun_t)gd_nm_binding_node_name_hash,
+            (cpe_hash_cmp_t)gd_nm_binding_node_name_cmp,
+            CPE_HASH_OBJ2ENTRY(gd_nm_binding, m_hh_for_group),
+            0) != 0)
+    {
+        gd_nm_node_free_from_mgr((gd_nm_node_t)group);
+        return NULL;
+    }
+
+    if (cpe_hash_table_insert_unique(&nmm->m_nodes, group) != 0) {
+        gd_nm_group_free_from_mgr(group);
+        return NULL;
+    }
+    
+    return (gd_nm_node_t)group;
+}
+
+void gd_nm_group_free_from_mgr(struct gd_nm_group * group) {
+    cpe_hash_table_fini(&group->m_members);
+    gd_nm_node_free_from_mgr_base((gd_nm_node_t)group);
+}
+
+int gd_nm_group_add_member(gd_nm_node_t grp, gd_nm_node_t sub) {
+    if(grp == NULL
+       || sub == NULL
+       || grp->m_type != gd_nm_node_group)
+    {
+        return -1;
+    }
+
+    return (gd_nm_binding_create((struct gd_nm_group *)grp, sub) == NULL) ? -1 : 0;
+}

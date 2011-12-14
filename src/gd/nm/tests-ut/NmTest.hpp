@@ -1,5 +1,6 @@
 #ifndef CPE_NM_TEST_NMTEST_H
 #define CPE_NM_TEST_NMTEST_H
+#include <string>
 #include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
 #include "gd/nm/tests-env/with_nm.hpp"
