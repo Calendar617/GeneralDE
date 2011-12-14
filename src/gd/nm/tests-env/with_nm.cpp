@@ -8,7 +8,7 @@ with_nm::with_nm()
 }
 
 void with_nm::SetUp() {
-    m_nm = gd_nm_mgr_create(t_allocrator(), 8);
+    m_nm = gd_nm_mgr_create(t_allocrator());
 }
 
 

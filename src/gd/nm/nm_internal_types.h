@@ -2,6 +2,8 @@
 #define GD_NM_INTERNAL_TYPES_H
 #include "cpe/pal/queue.h"
 #include "cpe/utils/hash.h"
+#include "cpe/utils/buffer.h"
+#include "cpe/utils/hash_string.h"
 #include "cpe/utils/memory.h"
 #include "gd/nm/nm_types.h"
 
@@ -11,13 +13,15 @@ extern "C" {
 
 struct gd_nm_group;
 struct gd_nm_binding;
+typedef TAILQ_HEAD(gd_nm_binding_list, gd_nm_binding) gd_nm_binding_list_t;
 
 struct gd_nm_mgr {
     mem_allocrator_t m_alloc;
-    size_t m_maxGroupCount;
-};
+    struct cpe_hash_table m_nodes;
 
-typedef TAILQ_HEAD(gd_nm_binding_list, gd_nm_binding) gd_nm_binding_list_t;
+    struct mem_buffer m_binding_buffer;
+    gd_nm_binding_list_t m_binding_free_list;
+};
 
 #define GD_NM_NODE_HEAD()                       \
     gd_nm_mgr_t m_mgr;                          \
@@ -25,8 +29,8 @@ typedef TAILQ_HEAD(gd_nm_binding_list, gd_nm_binding) gd_nm_binding_list_t;
     cpe_hash_string_t m_name;                   \
     size_t m_data_capacity;                     \
                                                 \
-    struct cpe_hash_entry m_hh_for_mgr;                     \
-    gd_nm_binding_list_t m_groups
+    struct cpe_hash_entry m_hh_for_mgr;         \
+    gd_nm_binding_list_t m_to_group_bindings
 
 struct gd_nm_node {
     GD_NM_NODE_HEAD();
@@ -37,7 +41,7 @@ struct gd_nm_binding {
     gd_nm_node_t m_node;
 
     struct cpe_hash_entry m_hh_for_group;
-    TAILQ_ENTRY(gd_nm_binding) m_qh_for_node;
+    TAILQ_ENTRY(gd_nm_binding) m_qh; /*for free list or node*/
 };
 
 struct gd_nm_group {
@@ -47,7 +51,6 @@ struct gd_nm_group {
 
 struct gd_nm_instance {
     GD_NM_NODE_HEAD();
-    struct gd_nm_node m_node;
 };
 
 #ifdef __cplusplus
