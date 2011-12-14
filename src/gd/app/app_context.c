@@ -33,6 +33,14 @@ gd_dp_mgr_t gd_app_dp_mgr(gd_app_context_t context) {
     return context->m_dp_mgr;
 }
 
+int gd_app_argc(gd_app_context_t context) {
+    return context->m_argc;
+}
+
+char ** gd_app_argv(gd_app_context_t context) {
+    return context->m_argv;
+}
+
 int gd_app_add_arg(gd_app_context_t context, char * arg) {
     if (context->m_argc + 1 < GD_APP_MAX_ARGV) {
         context->m_argv[context->m_argc++] = arg;
