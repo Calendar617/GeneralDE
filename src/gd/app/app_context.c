@@ -33,6 +33,10 @@ gd_dp_mgr_t gd_app_dp_mgr(gd_app_context_t context) {
     return context->m_dp_mgr;
 }
 
+gd_nm_mgr_t gd_app_nm_mgr(gd_app_context_t context) {
+    return context->m_nm_mgr;
+}
+
 int gd_app_argc(gd_app_context_t context) {
     return context->m_argc;
 }

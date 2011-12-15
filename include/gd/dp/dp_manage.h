@@ -1,6 +1,7 @@
 #ifndef GD_DP_MANAGE_H
 #define GD_DP_MANAGE_H
 #include "cpe/utils/memory.h"
+#include "cpe/utils/hash_string.h"
 #include "cpe/utils/error.h"
 #include "gd/tl/tl_types.h"
 #include "dp_types.h"
@@ -22,6 +23,9 @@ int gd_dp_mgr_unbind_string(gd_dp_mgr_t dp, const char * cmd);
 gd_dp_rsp_t gd_dp_rsp_find_by_name(gd_dp_mgr_t dp, const char * name);
 gd_dp_rsp_t gd_dp_rsp_find_by_numeric(gd_dp_mgr_t dp, int32_t cmd);
 gd_dp_rsp_t gd_dp_rsp_find_by_string(gd_dp_mgr_t dp, const char * cmd);
+
+int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monitor_t em);
+int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em);
 
 #ifdef __cplusplus
 }

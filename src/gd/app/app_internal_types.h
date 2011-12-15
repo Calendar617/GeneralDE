@@ -23,6 +23,7 @@ struct gd_app_context {
     cfg_t m_cfg;
     gd_tl_manage_t m_tl_mgr;
     gd_dp_mgr_t m_dp_mgr;
+    gd_nm_mgr_t m_nm_mgr;
     gd_app_main m_main;
 };
 

@@ -87,3 +87,11 @@ gd_dp_rsp_t gd_dp_rsp_find_by_string(gd_dp_mgr_t dp, const char * cmd) {
         ? r->m_rsp
         : NULL;
 }
+
+int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monitor_t em) {
+    return -1;
+}
+
+int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) {
+    return -1;
+}

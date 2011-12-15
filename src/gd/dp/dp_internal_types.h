@@ -1,6 +1,8 @@
 #ifndef GD_DP_IMPL_INTERNAL_TYPES_H
 #define GD_DP_IMPL_INTERNAL_TYPES_H
+#include "cpe/pal/queue.h"
 #include "cpe/utils/memory.h"
+#include "cpe/utils/hash_string.h"
 #include "cpe/utils/hash.h"
 #include "gd/dp/dp_types.h"
 
@@ -48,12 +50,19 @@ struct gd_dp_rsp {
     struct cpe_hash_entry m_hh;
 };
 
+typedef TAILQ_HEAD(gd_dp_rsp_list, gd_dp_req) gd_dp_rsp_list_t;
+
 struct gd_dp_req {
     gd_dp_mgr_t m_mgr;
     mem_allocrator_t m_talloc;
-
+    cpe_hash_string_t m_type;
+    gd_dp_req_t m_parent;
     void * m_data;
+    size_t m_data_capacity;
     size_t m_data_size;
+
+    gd_dp_rsp_list_t m_childs;
+    TAILQ_ENTRY(gd_dp_req) m_brother;
 };
 
 #ifdef __cplusplus
