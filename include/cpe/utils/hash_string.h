@@ -24,6 +24,9 @@ cpe_hash_string_t cpe_hs_copy_create(mem_allocrator_t alloc, cpe_hash_string_t s
 #define CPE_HS_LEN_TO_BINARY_LEN(__len) ((__len) + 8)
 #define CPE_HS_BUF_MAKE(__str) {"\0\0\0\0\0\0\0\0" __str}
 
+#define CPE_HS_DEF_VAR(__arg_name, __str)                               \
+    cpe_hash_string_buf __arg_name ## _buf = CPE_HS_BUF_MAKE(__str);   \
+    cpe_hash_string_t __arg_name = (cpe_hash_string_t)& __arg_name ## _buf
 
 #ifdef __cplusplus
 }
