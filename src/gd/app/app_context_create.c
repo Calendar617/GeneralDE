@@ -79,6 +79,8 @@ gd_app_context_create(
         return NULL;
     }
 
+    TAILQ_INIT(&context->m_runing_modules);
+
     return context;
 }
 

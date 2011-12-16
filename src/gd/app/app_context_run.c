@@ -1,8 +1,9 @@
+#include <assert.h>
 #include <strings.h>
 #include <unistd.h>
 #include "cpe/cfg/cfg_manage.h"
 #include "gd/app/app_context.h"
-#include "app_internal_types.h"
+#include "app_internal_ops.h"
 
 static int gd_app_chdir_to_root(gd_app_context_t context) {
     if (context->m_root) {
@@ -15,28 +16,43 @@ static int gd_app_chdir_to_root(gd_app_context_t context) {
     return 0;
 }
 
-static int gd_app_run_i(gd_app_context_t context) {
-    int rv;
-
-    if (gd_app_chdir_to_root(context) != 0) return -1;
-    if (gd_app_cfg_reload(context) != 0) return -1;
-
-    rv = context->m_main(context);
-
-    return -1;
-}
-
 int gd_app_run(gd_app_context_t context) {
     int rv;
 
-    if (context == NULL || context->m_main == NULL) return -1;
+    assert(context);
 
     if (g_app_context != NULL) {
         CPE_ERROR(context->m_em, "app already runing!");
+        return -1;
     }
 
     g_app_context = context;
-    rv = gd_app_run_i(context);
+
+    if (gd_app_chdir_to_root(context) != 0) {
+        g_app_context = NULL;
+        return -1;
+    }
+
+    if (gd_app_cfg_reload(context) != 0) {
+        g_app_context = NULL;
+        return -1;
+    }
+
+    if (gd_app_modules_load(context) != 0) {
+        g_app_context = NULL;
+        return -1;
+    }
+
+    if (context->m_main == NULL) {
+        CPE_ERROR(context->m_em, "no main function to runing!");
+        gd_app_modules_unload(context);
+        g_app_context = NULL;
+        return -1;
+    }
+
+    rv = context->m_main(context);
+
+    gd_app_modules_unload(context);
     g_app_context = NULL;
 
     return rv;

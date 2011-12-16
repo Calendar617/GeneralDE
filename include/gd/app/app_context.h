@@ -2,10 +2,6 @@
 #define GD_APP_CONTEXT_H
 #include "cpe/utils/memory.h"
 #include "cpe/utils/error.h"
-#include "cpe/cfg/cfg_types.h"
-#include "gd/dp/dp_types.h"
-#include "gd/nm/nm_types.h"
-#include "gd/tl/tl_types.h"
 #include "app_basic.h"
 
 #ifdef __cplusplus
