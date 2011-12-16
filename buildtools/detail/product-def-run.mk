@@ -5,7 +5,7 @@ define product-def-rule-run
 
 $(eval r.$1.run.full-cmd:= \
 		$$(if $$(r.$1.run.path),cd $$(r.$1.run.path) &&,) \
-		$$(if $$(r.$1.run.libraries),LD_LIBRARY_PATH=$$(call path-list-join,$$(r.$1.run.libraries))$$$$LD_LIBRARY_PATH ,) \
+		$$(if $$(r.$1.run.libraries),LD_LIBRARY_PATH=$$(call path-list-join,$$(r.$1.run.libraries))$$$$$$$$LD_LIBRARY_PATH ,) \
 		$$(r.$1.run.cmd) \
 		$$(r.$1.run.args))
 
