@@ -90,6 +90,8 @@ gd_app_module_create(
     memcpy(buf, moduleName, nameLen + 1);
     module = (struct gd_app_module *)(buf + nameLen + 1);
 
+    module->m_name = buf;
+
     TAILQ_INIT(&module->m_runing_modules);
 
     if (libName == NULL) {
