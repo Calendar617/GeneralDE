@@ -2,7 +2,7 @@ product:=log4c
 $(product).type:=lib
 $(product).product.c.includes:=3rdTools/log4c/include
 
-$(product).c.sources:= $(addprefix $(product-base), \
+$(product).c.sources:= $(addprefix $(product-base)/, \
                          rc.c \
                          init.c \
                          appender_type_stream.c \
@@ -22,7 +22,7 @@ $(product).c.sources:= $(addprefix $(product-base), \
                          appender_type_rollingfile.c \
                          rollingpolicy.c \
                          rollingpolicy_type_sizewin.c) \
-                    $(addprefix $(product-base)sd/, \
+                    $(addprefix $(product-base)/sd/, \
                          stack.c \
                          list.c \
                          malloc.c \
