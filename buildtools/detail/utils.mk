@@ -52,3 +52,12 @@ define path-list-join
 $(if $1,$(word 1,$1):$(call path-list-join,$(wordlist 2,$(words $1), $1)),)
 endef
 
+# $(call select-var,var-list)
+define select-var
+$(if $1\
+     , $(warning $(word 1,$1))\
+	   $(if $($(word 1, $1)) \
+          , $($(word 1, $1))\
+          , $(call select-var,$(wordlist 2,$(words $1), $1))) \
+     ,)
+endef
