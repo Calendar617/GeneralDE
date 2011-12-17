@@ -2,7 +2,7 @@ product:=curl
 $(product).type:=lib
 $(product).c.libraries:=
 
-$(product).c.sources := $(addprefix $(product-base), \
+$(product).c.sources := $(addprefix $(product-base)/, \
                      amigaos.c \
                      asyn-ares.c \
                      asyn-thread.c \
