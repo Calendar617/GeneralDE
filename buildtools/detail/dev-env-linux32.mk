@@ -1,3 +1,5 @@
+self-dev-env=linux32
+
 GCC?=$(shell which gcc)
 CC=$(GCC)
 
@@ -10,3 +12,5 @@ CXXFLAGS+=-ggdb
 endif
 
 LDFLAGS.share:=--shared -z defs
+
+$(self-dev-env).default-lib-type:=dynamic

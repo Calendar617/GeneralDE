@@ -1,3 +1,5 @@
+self-dev-env=mac
+
 GCC?=$(shell which gcc)
 CC=$(GCC)
 
@@ -12,3 +14,5 @@ endif
 LDFLAGS.share:=--shared
 
 dep.iconv?=system
+
+$(self-dev-env).default-lib-type:=dynamic
