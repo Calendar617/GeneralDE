@@ -2,7 +2,7 @@ product:=ev
 $(product).type:=lib
 $(product).c.libraries:=
 $(product).version:=4.0.4
-$(product).c.sources := $(addprefix $(product-base), \
+$(product).c.sources := $(addprefix $(product-base)/, \
                           ev.c \
                           event.c \
                        )
