@@ -1,3 +1,6 @@
+GCC?=$(shell which gcc)
+CC=$(GCC)
+
 CFLAGS+=-Wall
 CXXFLAGS+=-Wall
 
