@@ -1,6 +1,3 @@
-GCC?=$(shell which gcc)
-CC:=$(GCC)
-
 $(call assert-not-null,GCC)
 
 product-support-types+=lib progn
@@ -10,6 +7,7 @@ product-def-all-items+= c.libraries c.includes c.sources c.ldpathes c.flags.cpp 
 c-source-dir-to-binary-dir = $(addprefix $(CPDE_OUTPUT_ROOT)/obj,$(subst $(CPDE_ROOT),,$1))
 
 c-source-to-object = $(call c-source-dir-to-binary-dir,\
+						$(subst .mm,.o,$(filter %.mm,$1))\
 						$(subst .m,.o,$(filter %.m,$1))\
 						$(subst .cpp,.o,$(filter %.cpp,$1))\
 						$(subst .cc,.o,$(filter %.cc,$1))\
@@ -26,6 +24,10 @@ c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
 									$(call product-gen-depend-value-list,$1,product.c.includes))) \
                            $(addprefix -D,$(sort $(call product-gen-depend-value-list,$1,product.c.defs))) \
                            $(r.$1.c.flags.cpp)
+
+product-def-c-linker-c=$(LINK.c)
+product-def-c-linker-cpp=$(LINK.cc)
+product-def-c-linker-objc=$(LINK.m)
 
 # $(call c-make-depend,source-file,object-file,depend-file,product-name)
 define c-make-depend
@@ -49,6 +51,22 @@ define compile-rule.cpp
 $(call compile-rule.cc,$1,$2,$3)
 endef
 
+define compile-rule.mm
+$(call compile-rule.c,$1,$2,$3)
+endef
+
+define compile-rule.m
+$(call compile-rule.c,$1,$2,$3)
+endef
+
+define product-def-c-select-linker
+$(strip \
+    $(if $(filter .cc,$1),cpp \
+	    , $(if $(filter .cpp,$1),cpp \
+	        , $(if $(filter .mm,$1),objc \
+                , c))))
+endef
+
 # $(call product-def-rule-c-product,product-name,type)
 define product-def-rule-c-product
 
@@ -56,12 +74,13 @@ $(eval r.$1.output:=$(if $(r.$1.output),$(r.$1.output),\
                          $(if $(filter lib,$2),\
                               $(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib),\
                               $(if $(r.$1.buildfor),$(r.$1.buildfor)-bin,bin))))
-
-$(eval r.$1.product?=$(r.$1.output)/$(if $(filter lib,$2),lib$1.so,$1))
-
-ifeq ($(filter lib,$3),)
+ifeq ($(filter lib,$2),)
+$(eval r.$1.c.lib.type?=$($(dev-env).default-lib-type))
 $(eval r.$1.product.c.libraries+=$1)
 $(eval r.$1.product.c.ldpathes+=$(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib))
+$(eval r.$1.product?=$(r.$1.output)/lib$1.$(if $(filter static,$(r.$1.c.lib.type)),a,so))
+else
+$(eval r.$1.product?=$(r.$1.output)/$1)
 endif
 
 $(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.c.sources)) \
@@ -69,10 +88,7 @@ $(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.c.sources)) \
                      $(CPDE_OUTPUT_ROOT)/$(r.$1.product) \
 )
 
-$(eval r.$1.c.linker:=$(if $(r.$1.c.linker),$(r.$1.c.linker),\
-                           $(if $(filter %.cpp,$(r.$1.c.sources)),$$(LINK.cc),     \
-                                $$(LINK.c)))                                       \
-)
+$(eval r.$1.c.linker:=$(call product-def-c-select-linker, $(suffix $(r.$1.c.sources))))
 
 $(call assert-not-null,r.$1.c.sources)
 
@@ -81,16 +97,27 @@ auto-build-dirs += $(dir $(CPDE_OUTPUT_ROOT)/$(r.$1.product))
 
 $1: $(CPDE_OUTPUT_ROOT)/$(r.$1.product)
 
+ifeq ($2,progn)
 $(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
 	$$(call with_message,linking $(r.$1.product) ...) \
-		$$(r.$1.c.linker) $(if $(filter lib,$2),$(LDFLAGS.share)) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
-
+		$$(product-def-c-linker-$(r.$1.c.linker)) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
+else
+ifeq (dynamic,$(r.$1.c.lib.type))
+$(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
+	$$(call with_message,linking $(r.$1.product) ...) \
+		$$(product-def-c-linker-$(r.$1.c.linker)) $(LDFLAGS.share) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
+else
+$(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
+	$$(call with_message,linking $(r.$1.product) ...) \
+		$$(AR) $(ARFLAGS) $$@ $$^
+endif
+endif
 
 $(foreach f,$(r.$1.c.sources),$(call compile-rule$(suffix $f),$(call c-source-to-object,$f),$f,$1))
 
 $(eval r.$1.makefile.include := $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources))))
 
-ifeq ($(filter progn,$3),)
+ifeq ($(filter progn,$2),progn)
 $(eval r.$1.run.libraries+=$(if $(r.$1.buildfor),$(CPDE_OUTPUT_ROOT)/$(r.$1.buildfor)-lib,) $(CPDE_OUTPUT_ROOT)/lib)
 $(eval r.$1.run.cmd:=$(CPDE_OUTPUT_ROOT)/$(r.$1.product))
 endif
