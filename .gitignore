@@ -2,3 +2,5 @@ GPATH
 GRTAGS
 GTAGS
 /build
+.DS_Store
+xcuserdata

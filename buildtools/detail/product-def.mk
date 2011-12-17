@@ -5,7 +5,7 @@ product-support-types:=
 product-def-all-items:=type buildfor depends output
 product-def-not-null-items:=type
 
-product-base = $(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST)))
+product-base = $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
 
 #$(call product-gen-depend-list,product-list)
 define product-gen-depend-list
