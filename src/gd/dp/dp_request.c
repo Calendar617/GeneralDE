@@ -102,8 +102,8 @@ gd_dp_node_t gd_dp_req_from(gd_dp_req_t req) {
     return req->m_from;
 }
 
-void gd_dp_req_set_from(gd_dp_req_t req, gd_dp_node_t to) {
-    req->m_to = to;
+void gd_dp_req_set_from(gd_dp_req_t req, gd_dp_node_t from) {
+    req->m_from = from;
 }
 
 gd_dp_node_t gd_dp_req_to(gd_dp_req_t req) {

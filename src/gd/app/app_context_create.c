@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "cpe/cfg/cfg_manage.h"
 #include "gd/app/app_context.h"
+#include "gd/nm/nm_manage.h"
 #include "gd/dp/dp_manage.h"
 #include "gd/tl/tl_manage.h"
 #include "app_internal_types.h"
@@ -69,6 +70,12 @@ gd_app_context_create(
 
     context->m_tl_mgr = gd_tl_manage_create(alloc);
     if (context->m_tl_mgr == NULL) {
+        gd_app_context_free(context);
+        return NULL;
+    }
+
+    context->m_nm_mgr = gd_nm_mgr_create(alloc);
+    if (context->m_nm_mgr == NULL) {
         gd_app_context_free(context);
         return NULL;
     }

@@ -1,3 +1,5 @@
+#include <assert.h>
+#include <string.h>
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "gd/dp/dp_node.h"
@@ -15,6 +17,10 @@ gd_dp_node_create(
     gd_nm_node_t nmNode;
     char * buf;
 
+    assert(nmm);
+    assert(name);
+    assert(replay);
+
     replayLen = cpe_hs_len_to_binary_len(strlen(replay));
 
     nmNode = gd_nm_instance_create(
@@ -23,7 +29,7 @@ gd_dp_node_create(
     if (nmNode == NULL) return NULL;
 
     buf = gd_nm_node_data(nmNode);
-    cpe_hs_init(buf, replayLen, replay);
+    cpe_hs_init((cpe_hash_string_t)buf, replayLen, replay);
 
     r = (gd_dp_node_t)(buf + replayLen);
     r->m_nm_node = nmNode;

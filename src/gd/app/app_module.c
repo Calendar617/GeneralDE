@@ -223,7 +223,7 @@ int gd_app_modules_load(gd_app_context_t context) {
     cfg_t moduleCfg;
     struct cfg_seq_it cfgIt;
 
-    moduleListCfg = cfg_find_cfg(context->m_cfg, "app.modules");
+    moduleListCfg = cfg_find_cfg(context->m_cfg, "modules.load");
 
     if (moduleListCfg == NULL) {
         APP_CTX_INFO(context, "no modules need to load!");
