@@ -11,9 +11,12 @@ void gd_dp_rsp_free(gd_dp_rsp_t rsp);
 
 const char * gd_dp_rsp_name(gd_dp_rsp_t rsp);
 
-typedef enum gd_dp_rsp_ot {
-    gd_dp_rsp_set_processor
-} gd_dp_rsp_op_t ;
+typedef enum gd_dp_rsp_opt {
+    gd_dp_rsp_set_processor /*see gd_dp_rsp_process_fun_t*/
+    , gd_dp_rsp_set_context
+} gd_dp_rsp_opt_t ;
+
+int gd_dp_rsp_set_opt(gd_dp_rsp_t rsp, gd_dp_rsp_opt_t opt, ...);
 
 #ifdef __cplusplus
 }

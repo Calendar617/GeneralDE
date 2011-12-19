@@ -6,25 +6,26 @@
 gd_nm_node_t
 gd_nm_node_alloc(
     gd_nm_mgr_t nmm,
-    cpe_hash_string_t name,
+    const char * name,
     gd_nm_node_type_t type,
     size_t bodyLen,
     size_t capacity)
 {
     char * buf;
     gd_nm_node_t node;
+    size_t nameLen;
 
     assert(nmm);
     assert(name);
 
-    buf = mem_alloc(nmm->m_alloc, cpe_hs_binary_len(name) + bodyLen + capacity);
+    nameLen = strlen(name);
+
+    buf = mem_alloc(nmm->m_alloc, cpe_hs_len_to_binary_len(nameLen) + bodyLen + capacity);
     if (buf == NULL) return NULL;
 
-    cpe_hs_copy((cpe_hash_string_t)buf, name);
+    cpe_hs_init((cpe_hash_string_t)buf, cpe_hs_len_to_binary_len(nameLen), name);
 
-    node = (gd_nm_node_t)
-        (buf
-         + cpe_hs_binary_len(name));
+    node = (gd_nm_node_t)(buf + cpe_hs_len_to_binary_len(nameLen));
 
     node->m_mgr = nmm;
     node->m_type = type;
@@ -88,7 +89,7 @@ const char * gd_nm_node_name(gd_nm_node_t node) {
 }
 
 cpe_hash_string_t
-gd_nm_node_hs_name(gd_nm_node_t node) {
+gd_nm_node_name_hs(gd_nm_node_t node) {
     return node->m_name;
 }
 

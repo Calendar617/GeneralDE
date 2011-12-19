@@ -13,7 +13,7 @@ extern "C" {
 gd_nm_node_t
 gd_nm_node_alloc(
     gd_nm_mgr_t nmm,
-    cpe_hash_string_t name, gd_nm_node_type_t type,
+    const char * name, gd_nm_node_type_t type,
     size_t bodyLen, size_t capacity);
 
 void gd_nm_node_free_from_mgr_base(gd_nm_node_t node);

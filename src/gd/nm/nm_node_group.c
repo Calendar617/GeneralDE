@@ -3,7 +3,7 @@
 #include "nm_internal_ops.h"
 
 gd_nm_node_t
-gd_nm_group_create(gd_nm_mgr_t nmm, cpe_hash_string_t name, size_t capacity) {
+gd_nm_group_create(gd_nm_mgr_t nmm, const char * name, size_t capacity) {
     struct gd_nm_group * group;
 
     assert(nmm);

@@ -89,9 +89,37 @@ gd_dp_rsp_t gd_dp_rsp_find_by_string(gd_dp_mgr_t dp, const char * cmd) {
 }
 
 int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monitor_t em) {
-    return -1;
+    gd_dp_rsp_t rsp;
+    rsp = gd_dp_rsp_find_by_name(req->m_mgr, cpe_hs_data(cmd));
+    if (rsp == NULL) {
+        CPE_ERROR(em, "no responser to process %s\n", cpe_hs_data(cmd));
+        return -1;
+    }
+
+    if (rsp->m_processor == NULL) {
+        CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
+        return -1;
+    }
+
+    rsp->m_processor(req, rsp->m_context);
+
+    return 0;
 }
 
 int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) {
-    return -1;
+    gd_dp_rsp_t rsp;
+    rsp = gd_dp_rsp_find_by_numeric(req->m_mgr, cmd);
+    if (rsp == NULL) {
+        CPE_ERROR(em, "no responser to process %d\n", cmd);
+        return -1;
+    }
+
+    if (rsp->m_processor == NULL) {
+        CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
+        return -1;
+    }
+
+    rsp->m_processor(req, rsp->m_context);
+
+    return 0;
 }

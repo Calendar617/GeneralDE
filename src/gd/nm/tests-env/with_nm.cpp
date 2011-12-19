@@ -24,18 +24,12 @@ gd_nm_mgr_t with_nm::t_nm() {
 
 gd_nm_node_t
 with_nm::t_nm_add_instance(const char * name, size_t capacity) {
-    return gd_nm_instance_create(
-        t_nm(),
-        cpe_hs_create(t_tmp_allocrator(), name),
-        capacity);
+    return gd_nm_instance_create(t_nm(), name, capacity);
 }
 
 gd_nm_node_t
 with_nm::t_nm_add_group(const char * name, size_t capacity) {
-    return gd_nm_group_create(
-        t_nm(),
-        cpe_hs_create(t_tmp_allocrator(), name),
-        capacity);
+    return gd_nm_group_create(t_nm(), name, capacity);
 }
 
 gd_nm_node_t with_nm::t_nm_find(const char * name) {

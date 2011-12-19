@@ -4,6 +4,7 @@
 #include "cpe/utils/memory.h"
 #include "cpe/utils/hash_string.h"
 #include "cpe/utils/hash.h"
+#include "gd/nm/nm_types.h"
 #include "gd/dp/dp_types.h"
 
 #ifdef __cplusplus
@@ -46,6 +47,10 @@ struct gd_dp_rsp {
     gd_dp_mgr_t m_dp;
     const char * m_name;
     size_t m_name_len;
+
+    gd_dp_rsp_process_fun_t m_processor;
+    void * m_context;
+
     struct gd_dp_binding * m_bindings;
     struct cpe_hash_entry m_hh;
 };
@@ -57,12 +62,20 @@ struct gd_dp_req {
     mem_allocrator_t m_talloc;
     cpe_hash_string_t m_type;
     gd_dp_req_t m_parent;
+    gd_dp_node_t m_from;
+    gd_dp_node_t m_to;
     void * m_data;
     size_t m_data_capacity;
     size_t m_data_size;
 
     gd_dp_rsp_list_t m_childs;
     TAILQ_ENTRY(gd_dp_req) m_brother;
+};
+
+struct gd_dp_node {
+    gd_nm_node_t m_nm_node;
+    cpe_hash_string_t m_replay;
+    size_t m_capacity;
 };
 
 #ifdef __cplusplus
