@@ -7,7 +7,7 @@ gd_nm_node_t
 gd_nm_node_alloc(
     gd_nm_mgr_t nmm,
     const char * name,
-    gd_nm_node_type_t type,
+    gd_nm_node_category_t category,
     size_t bodyLen,
     size_t capacity)
 {
@@ -28,7 +28,7 @@ gd_nm_node_alloc(
     node = (gd_nm_node_t)(buf + cpe_hs_len_to_binary_len(nameLen));
 
     node->m_mgr = nmm;
-    node->m_type = type;
+    node->m_category = category;
     node->m_name = (cpe_hash_string_t)buf;
     node->m_data_capacity = capacity;
     TAILQ_INIT(&node->m_to_group_bindings);
@@ -43,7 +43,7 @@ void gd_nm_node_free(gd_nm_node_t node) {
 }
 
 void gd_nm_node_free_from_mgr(gd_nm_node_t node) {
-    if (node->m_type == gd_nm_node_group) {
+    if (node->m_category == gd_nm_node_group) {
         gd_nm_group_free_from_mgr((struct gd_nm_group *)node);
     }
     else {
@@ -70,7 +70,7 @@ size_t gd_nm_node_capacity(gd_nm_node_t node) {
 }
 
 void * gd_nm_node_data(gd_nm_node_t node) {
-    return node->m_type == gd_nm_node_group
+    return node->m_category == gd_nm_node_group
         ? (void*)(((struct gd_nm_group *)node) + 1)
         : (void*)(((struct gd_nm_instance *)node) + 1);
 }
@@ -93,8 +93,8 @@ gd_nm_node_name_hs(gd_nm_node_t node) {
     return node->m_name;
 }
 
-gd_nm_node_type_t gd_nm_node_type(gd_nm_node_t node) {
-    return node->m_type;
+gd_nm_node_category_t gd_nm_node_category(gd_nm_node_t node) {
+    return node->m_category;
 }
 
 gd_nm_node_t gd_nm_node_next_group(gd_nm_node_it_t it) {

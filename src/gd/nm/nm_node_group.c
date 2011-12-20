@@ -49,7 +49,7 @@ void gd_nm_group_free_from_mgr(struct gd_nm_group * group) {
 int gd_nm_group_add_member(gd_nm_node_t grp, gd_nm_node_t sub) {
     if(grp == NULL
        || sub == NULL
-       || grp->m_type != gd_nm_node_group)
+       || grp->m_category != gd_nm_node_group)
     {
         return -1;
     }
@@ -73,7 +73,7 @@ int gd_nm_group_members(gd_nm_node_it_t it, gd_nm_node_t group) {
 
     assert(it);
     if (group == NULL
-        || group->m_type != gd_nm_node_group) return -1;
+        || group->m_category != gd_nm_node_group) return -1;
 
     nodeIt = (struct gd_nm_node_in_group_it *)it;
     nodeIt->m_next_fun = gd_nm_group_next_member;

@@ -6,7 +6,7 @@ TEST_F(NmTest, group_basic) {
     EXPECT_TRUE(group);
 
     EXPECT_STREQ("abc", gd_nm_node_name(group));
-    EXPECT_EQ(gd_nm_node_group, gd_nm_node_type(group));
+    EXPECT_EQ(gd_nm_node_group, gd_nm_node_category(group));
     EXPECT_EQ((size_t)128, gd_nm_node_capacity(group));
 
     EXPECT_TRUE(group == t_nm_find("abc"));

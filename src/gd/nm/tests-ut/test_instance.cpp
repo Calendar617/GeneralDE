@@ -6,7 +6,7 @@ TEST_F(NmTest, instance_basic) {
     EXPECT_TRUE(instance);
 
     EXPECT_STREQ("abc", gd_nm_node_name(instance));
-    EXPECT_EQ(gd_nm_node_instance, gd_nm_node_type(instance));
+    EXPECT_EQ(gd_nm_node_instance, gd_nm_node_category(instance));
     EXPECT_EQ((size_t)128, gd_nm_node_capacity(instance));
 
     EXPECT_TRUE(instance == t_nm_find("abc"));

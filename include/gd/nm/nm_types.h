@@ -5,10 +5,10 @@
 extern "C" {
 #endif
 
-typedef enum gd_nm_node_type {
+typedef enum gd_nm_node_category {
     gd_nm_node_group,
     gd_nm_node_instance
-} gd_nm_node_type_t;
+} gd_nm_node_category_t;
 
 typedef struct gd_nm_mgr * gd_nm_mgr_t;
 typedef struct gd_nm_node * gd_nm_node_t;
