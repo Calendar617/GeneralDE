@@ -74,6 +74,18 @@ void gd_dp_req_free(gd_dp_req_t req) {
     mem_free(req->m_mgr->m_alloc, req);
 }
 
+gd_dp_req_t gd_dp_req_parent(gd_dp_req_t req) {
+    return req->m_parent;
+}
+
+gd_dp_req_t gd_dp_req_parent_find(gd_dp_req_t req, cpe_hash_string_t typeName) {
+    while(req && cpe_hs_cmp(req->m_type, typeName) != 0) {
+        req = req->m_parent;
+    }
+
+    return req;
+}
+
 cpe_hash_string_t gd_dp_req_type_hs(gd_dp_req_t req) {
     return req->m_type;
 }
@@ -144,3 +156,25 @@ int gd_dp_req_send(gd_dp_req_t req, error_monitor_t em) {
 
     return gd_dp_dispatch_by_string(req->m_to->m_replay, req, em);
 }
+
+int gd_dp_req_replay(gd_dp_req_t req, char * buf, size_t size, error_monitor_t em) {
+    gd_dp_req_t replayReq;
+    int rv;
+
+    if (req == NULL || buf == NULL) return -1;
+
+    replayReq = gd_dp_req_create_child(req, gd_dp_req_type_replay, buf, size);
+    if (replayReq == NULL) {
+        CPE_ERROR(em, "create replay requesnt fail!");
+        return -1;
+    }
+
+    gd_dp_req_set_to(replayReq, gd_dp_req_from(req));
+    gd_dp_req_set_from(replayReq, gd_dp_req_to(req));
+
+    rv = gd_dp_req_send(replayReq, em);
+    gd_dp_req_from(replayReq);
+    return rv;
+}
+
+CPE_HS_DEF_VAR(gd_dp_req_type_replay, "req.dp.replay");

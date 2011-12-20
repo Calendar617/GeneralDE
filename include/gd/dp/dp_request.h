@@ -23,11 +23,16 @@ gd_dp_req_create_child(
 
 void gd_dp_req_free(gd_dp_req_t req);
 
+gd_dp_req_t gd_dp_req_parent(gd_dp_req_t req);
+gd_dp_req_t gd_dp_req_parent_find(gd_dp_req_t req, cpe_hash_string_t typeName);
+
 gd_dp_node_t gd_dp_req_from(gd_dp_req_t req);
 void gd_dp_req_set_from(gd_dp_req_t req, gd_dp_node_t from);
 
 gd_dp_node_t gd_dp_req_to(gd_dp_req_t req);
 void gd_dp_req_set_to(gd_dp_req_t req, gd_dp_node_t to);
+
+int gd_dp_req_set_buf(void * buf, size_t capacity);
 
 cpe_hash_string_t gd_dp_req_type_hs(gd_dp_req_t req);
 const char * gd_dp_req_type(gd_dp_req_t req);
@@ -40,6 +45,9 @@ int gd_dp_req_set_size(gd_dp_req_t req, size_t size);
 mem_allocrator_t gd_dp_req_talloc(gd_dp_req_t req);
 
 int gd_dp_req_send(gd_dp_req_t req, error_monitor_t em);
+int gd_dp_req_replay(gd_dp_req_t req, char * buf, size_t size, error_monitor_t em);
+
+extern cpe_hash_string_t gd_dp_req_type_replay;
 
 #ifdef __cplusplus
 }

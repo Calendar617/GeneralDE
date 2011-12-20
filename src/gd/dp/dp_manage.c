@@ -101,9 +101,7 @@ int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monit
         return -1;
     }
 
-    rsp->m_processor(req, rsp->m_context);
-
-    return 0;
+    return rsp->m_processor(req, rsp->m_context, em);
 }
 
 int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) {
@@ -119,7 +117,5 @@ int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) 
         return -1;
     }
 
-    rsp->m_processor(req, rsp->m_context);
-
-    return 0;
+    return rsp->m_processor(req, rsp->m_context, em);
 }
