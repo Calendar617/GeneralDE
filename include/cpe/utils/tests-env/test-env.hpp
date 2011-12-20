@@ -22,6 +22,19 @@ struct env_gen<Loki::Typelist<Head, Tail> >
     }
 };
 
+template <class Head>
+struct env_gen<Loki::Typelist<Head, Loki::NullType> >
+    : public Head
+{
+    void SetUp() {
+        Head::SetUp();
+    }
+
+    void TearDown() {
+        Head::TearDown();
+    }
+};
+
 template <>
 struct env_gen<Loki::NullType> {
     void SetUp() {}
@@ -31,6 +44,8 @@ struct env_gen<Loki::NullType> {
 template<typename EnvListT = Loki::NullType>
 class env : public env_gen<EnvListT> {
 public:
+    typedef env_gen<EnvListT> Base;
+
     virtual ~env() {}
 
     template<typename T2>
