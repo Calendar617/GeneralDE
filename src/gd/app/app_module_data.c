@@ -22,7 +22,7 @@ gd_nm_node_t
 gd_app_runing_module_data_load(
     gd_app_context_t context,
     cpe_hash_string_t moduleName,
-    cfg_t cfg)
+    cfg_t moduleCfg)
 {
     gd_nm_mgr_t nmm;
     gd_nm_node_t rootGroup;
@@ -34,7 +34,7 @@ gd_app_runing_module_data_load(
     if (rootGroup == NULL) {
         rootGroup = gd_nm_group_create(nmm, cpe_hs_data(gd_app_module_root_group_name), 0);
         if (rootGroup == NULL) {
-            APP_CTX_ERROR(context, "create module data root group fail!");
+            APP_CTX_ERROR(context, "create module %s: data root group fail!", cpe_hs_data(moduleName));
             return NULL;
         }
         gd_nm_node_set_type(rootGroup, &g_module_root_group);
@@ -42,14 +42,19 @@ gd_app_runing_module_data_load(
 
     moduleGroup = gd_nm_group_create(gd_app_nm_mgr(context), cpe_hs_data(moduleName), 0);
     if (moduleGroup == NULL) {
-        APP_CTX_ERROR(context, "create module data group fail!");
-        if (gd_nm_group_member_count(rootGroup) == 0) {
-            gd_nm_node_free(rootGroup);
-        }
+        APP_CTX_ERROR(context, "create module %s: data group fail!", cpe_hs_data(moduleName));
+        gd_app_runing_module_data_free(context, moduleName);
         return NULL;
     }
 
     gd_nm_node_set_type(moduleGroup, &g_module_group);
+
+    if (gd_nm_group_add_member(rootGroup, moduleGroup) != 0) {
+        APP_CTX_ERROR(context, "create module %s: add to root group fail!", cpe_hs_data(moduleName));
+        gd_nm_node_free(moduleGroup);
+        gd_app_runing_module_data_free(context, moduleName);
+        return NULL;
+    }
 
     return moduleGroup;
 }
@@ -65,9 +70,9 @@ void gd_app_runing_module_data_free(gd_app_context_t context, cpe_hash_string_t 
     if (rootGroup == NULL) return;
 
     moduleGroup = gd_nm_group_find_member(rootGroup, moduleName);
-    if (moduleGroup == NULL) return;
-    
-    gd_nm_node_free(moduleGroup);
+    if (moduleGroup) {
+        gd_nm_node_free(moduleGroup);
+    }
 
     if (gd_nm_group_member_count(rootGroup) == 0) {
         gd_nm_node_free(rootGroup);

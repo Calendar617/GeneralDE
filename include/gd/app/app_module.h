@@ -10,6 +10,7 @@ extern "C" {
 const char * gd_app_module_name(gd_app_module_t module);
 cpe_hash_string_t gd_app_module_name_hs(gd_app_module_t module);
 gd_nm_node_t gd_app_module_data(gd_app_context_t context, gd_app_module_t module);
+gd_app_lib_t gd_app_module_lib(gd_app_module_t module);
 
 #ifdef __cplusplus
 }

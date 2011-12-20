@@ -155,6 +155,7 @@ static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
     const char * moduleName;
     struct gd_app_runing_module * runing_module;
     gd_nm_node_t moduleDataGroup;
+    cfg_t moduleCfg;
 
     assert(context);
 
@@ -178,10 +179,10 @@ static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
         return -1;
     }
 
-    moduleDataGroup = gd_app_runing_module_data_load(
-        context,
-        runing_module->m_module->m_name,
-        cfg);
+    moduleCfg = cfg_find_cfg(
+        cfg_find_cfg(gd_app_cfg(context), "modules"),
+        moduleName);
+    moduleDataGroup = gd_app_runing_module_data_load(context, module->m_name, moduleCfg);
     if (moduleDataGroup == NULL) {
         if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_free(module, context->m_em);
         mem_free(context->m_alloc, runing_module);
@@ -189,7 +190,7 @@ static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
     }
 
     if (module->m_app_init) {
-        if (module->m_app_init(context, module, cfg) != 0) {
+        if (module->m_app_init(context, module, moduleCfg) != 0) {
             APP_CTX_ERROR(context, "load module %s: app init fail!", moduleName);
             gd_app_runing_module_data_free(context, module->m_name);
             if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_free(module, context->m_em);
@@ -282,4 +283,8 @@ const char * gd_app_module_name(gd_app_module_t module) {
 
 cpe_hash_string_t gd_app_module_name_hs(gd_app_module_t module) {
     return module->m_name;
+}
+
+gd_app_lib_t gd_app_module_lib(gd_app_module_t module) {
+    return module->m_lib;
 }

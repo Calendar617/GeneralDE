@@ -4,5 +4,6 @@
 #include "app_context.h"
 #include "app_module.h"
 #include "app_log.h"
+#include "app_rsp.h"
 #endif
 
