@@ -18,6 +18,10 @@ gd_nm_node_t gd_nm_instance_create(gd_nm_mgr_t nmm, const char * name, size_t ca
 
 void gd_nm_node_free(gd_nm_node_t node);
 
+void gd_nm_node_set_type(gd_nm_node_t node, gd_nm_node_type_t type);
+
+void gd_nm_group_free_members(gd_nm_node_t node);
+
 #ifdef __cplusplus
 }
 #endif

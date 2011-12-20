@@ -39,6 +39,9 @@ gd_nm_node_alloc(
 
 void gd_nm_node_free(gd_nm_node_t node) {
     if (node == NULL) return;
+    if (node->m_type && node->m_type->destruct) {
+        node->m_type->destruct(node);
+    }
     cpe_hash_table_remove_by_ins(&node->m_mgr->m_nodes, node);
 }
 
@@ -88,6 +91,10 @@ const char * gd_nm_node_name(gd_nm_node_t node) {
     return cpe_hs_data(node->m_name);
 }
 
+void gd_nm_node_set_type(gd_nm_node_t node, gd_nm_node_type_t type) {
+    node->m_type = type;
+}
+
 cpe_hash_string_t
 gd_nm_node_name_hs(gd_nm_node_t node) {
     return node->m_name;
@@ -122,4 +129,8 @@ int gd_nm_node_groups(gd_nm_node_it_t it, gd_nm_node_t node) {
     groupIt->m_curent = TAILQ_FIRST(&node->m_to_group_bindings);
 
     return 0;
+}
+
+gd_nm_mgr_t gd_nm_node_mgr(gd_nm_node_t node) {
+    return node->m_mgr;
 }

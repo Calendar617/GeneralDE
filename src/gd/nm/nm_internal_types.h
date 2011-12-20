@@ -26,6 +26,7 @@ struct gd_nm_mgr {
 #define GD_NM_NODE_HEAD()                       \
     gd_nm_mgr_t m_mgr;                          \
     gd_nm_node_category_t m_category;           \
+    gd_nm_node_type_t m_type;                   \
     cpe_hash_string_t m_name;                   \
     size_t m_data_capacity;                     \
                                                 \

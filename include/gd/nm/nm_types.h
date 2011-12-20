@@ -12,6 +12,7 @@ typedef enum gd_nm_node_category {
 
 typedef struct gd_nm_mgr * gd_nm_mgr_t;
 typedef struct gd_nm_node * gd_nm_node_t;
+typedef struct gd_nm_node_type * gd_nm_node_type_t;
 typedef struct gd_nm_node_it * gd_nm_node_it_t;
 
 typedef gd_nm_node_t (*gd_nm_it_next_fun)(gd_nm_node_it_t it);
@@ -19,6 +20,11 @@ typedef gd_nm_node_t (*gd_nm_it_next_fun)(gd_nm_node_it_t it);
 struct gd_nm_node_it {
     gd_nm_it_next_fun m_next_fun;
     char m_reserve[32];
+};
+
+struct gd_nm_node_type {
+    const char * name;
+    void (*destruct)(gd_nm_node_t node);
 };
 
 #ifdef __cplusplus
