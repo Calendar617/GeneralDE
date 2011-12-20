@@ -33,7 +33,7 @@ typedef struct cpe_hash_table {
 
     /*bulckets*/
     struct cpe_hash_bucket * m_buckets;
-    int32_t m_bucket_capacity;
+    uint32_t m_bucket_capacity;
 
     int32_t m_count;
 } * cpe_hash_table_t;
