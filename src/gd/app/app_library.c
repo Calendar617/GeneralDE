@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+#include <stdio.h>
 #include <dlfcn.h>
 #include <assert.h>
 #include <string.h>
@@ -10,15 +12,23 @@ struct gd_app_lib {
     TAILQ_ENTRY(gd_app_lib) m_next;
 };
 
+static void * gd_app_default_lib_handler = NULL;
+
 static
 gd_app_lib_list_t g_app_libs = TAILQ_HEAD_INITIALIZER(g_app_libs);
+
+void gd_set_default_library(void * handler) {
+    gd_app_default_lib_handler = handler;
+}
 
 static
 struct gd_app_lib *
 gd_app_lib_create(const char * libName, error_monitor_t em) {
-    size_t nameLen = strlen(libName);
+    size_t nameLen;
     struct gd_app_lib * lib = NULL;
     char * buf;
+
+    nameLen = strlen(libName);
 
     buf = mem_alloc(NULL, nameLen + 1 + sizeof(struct gd_app_lib));
     if (buf == NULL) {
@@ -111,6 +121,21 @@ void gd_app_lib_close_for_module(
     }
 }
 
-void * gd_app_lib_sym(struct gd_app_lib * lib, const char * symName) {
-    return lib ? dlsym(lib->m_handler, symName) : dlsym(NULL, symName);
+void * gd_app_lib_sym(struct gd_app_lib * lib, const char * symName, error_monitor_t em) {
+    void * sym;
+
+    dlerror();
+
+    sym = lib
+        ? dlsym(lib->m_handler, symName)
+        : dlsym(gd_app_default_lib_handler, symName);
+
+    if (sym == NULL) {
+        const char * e = dlerror();
+        if (e) {
+            CPE_ERROR(em, "find symbol %s error: %s\n", symName, e);
+        }
+    }
+
+    return sym;
 }

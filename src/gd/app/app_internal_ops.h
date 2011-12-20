@@ -14,7 +14,7 @@ gd_app_lib_open_for_module(
 void gd_app_lib_close_for_module(
     struct gd_app_lib * lib, struct gd_app_module * module, error_monitor_t em);
 
-void * gd_app_lib_sym(struct gd_app_lib * lib, const char * symName);
+void * gd_app_lib_sym(struct gd_app_lib * lib, const char * symName, error_monitor_t em);
 
 /*module operations*/
 int gd_app_modules_load(gd_app_context_t context);

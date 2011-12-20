@@ -37,16 +37,16 @@ int gd_app_module_load_fun(
     memcpy(nameBuf, moduleName, nameLen + 1);
 
     strcpy(nameBuf + nameLen, "_global_init");
-    module->m_global_init = gd_app_lib_sym(module->m_lib, nameBuf);
+    module->m_global_init = gd_app_lib_sym(module->m_lib, nameBuf, em);
 
     strcpy(nameBuf + nameLen, "_global_fini");
-    module->m_global_fini = gd_app_lib_sym(module->m_lib, nameBuf);
+    module->m_global_fini = gd_app_lib_sym(module->m_lib, nameBuf, em);
 
     strcpy(nameBuf + nameLen, "_app_init");
-    module->m_app_init = gd_app_lib_sym(module->m_lib, nameBuf);
+    module->m_app_init = gd_app_lib_sym(module->m_lib, nameBuf, em);
 
     strcpy(nameBuf + nameLen, "_app_fini");
-    module->m_app_fini = gd_app_lib_sym(module->m_lib, nameBuf);
+    module->m_app_fini = gd_app_lib_sym(module->m_lib, nameBuf, em);
 
     mem_free(NULL, nameBuf);
 
@@ -150,25 +150,22 @@ gd_app_module_find(const char * moduleName) {
     return NULL;
 }
 
-static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
+static
+struct gd_app_runing_module * 
+gd_app_runing_module_create_i(
+    gd_app_context_t context,
+    const char * moduleName,
+    const char * libName,
+    cfg_t moduleCfg)
+{
     struct gd_app_module * module;
-    const char * moduleName;
     struct gd_app_runing_module * runing_module;
     gd_nm_node_t moduleDataGroup;
-    cfg_t moduleCfg;
-
-    assert(context);
-
-    moduleName = cfg_get_string(cfg, "name", NULL);
-    if (moduleName == NULL) {
-        APP_CTX_ERROR(context, "load module: no name!");
-        return -1;
-    }
 
     module = gd_app_module_find(moduleName);
     if (module == NULL) {
-        module = gd_app_module_create(moduleName, cfg_get_string(cfg, "library", NULL), context->m_em);
-        if (module == NULL) return -1;
+        module = gd_app_module_create(moduleName, libName, context->m_em);
+        if (module == NULL) return NULL;
     }
 
     runing_module = (struct gd_app_runing_module *)
@@ -176,17 +173,14 @@ static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
     if (runing_module == NULL) {
         APP_CTX_ERROR(context, "load module: alloc runing module fail!");
         if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_free(module, context->m_em);
-        return -1;
+        return NULL;
     }
 
-    moduleCfg = cfg_find_cfg(
-        cfg_find_cfg(gd_app_cfg(context), "modules"),
-        moduleName);
     moduleDataGroup = gd_app_runing_module_data_load(context, module->m_name, moduleCfg);
     if (moduleDataGroup == NULL) {
         if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_free(module, context->m_em);
         mem_free(context->m_alloc, runing_module);
-        return -1;
+        return NULL;
     }
 
     if (module->m_app_init) {
@@ -195,7 +189,7 @@ static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
             gd_app_runing_module_data_free(context, module->m_name);
             if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_free(module, context->m_em);
             mem_free(context->m_alloc, runing_module);
-            return -1;
+            return NULL;
         }
     }
 
@@ -205,7 +199,30 @@ static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
     TAILQ_INSERT_TAIL(&context->m_runing_modules, runing_module, m_qh_for_app);
     TAILQ_INSERT_TAIL(&module->m_runing_modules, runing_module, m_qh_for_runing);
     
-    return 0;
+    return runing_module;
+}
+
+static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
+    assert(context);
+
+    const char * moduleName;
+
+    moduleName = cfg_get_string(cfg, "name", NULL);
+    if (moduleName == NULL) {
+        APP_CTX_ERROR(context, "load module: no name!");
+        return -1;
+    }
+
+    return gd_app_runing_module_create_i(
+        context,
+        moduleName,
+        cfg_get_string(cfg, "library", NULL),
+        cfg_find_cfg(
+            cfg_find_cfg(gd_app_cfg(context), "modules"),
+            moduleName)
+        ) == NULL
+        ? -1
+        : 0;
 }
 
 static void gd_app_runing_module_free(
@@ -287,4 +304,14 @@ cpe_hash_string_t gd_app_module_name_hs(gd_app_module_t module) {
 
 gd_app_lib_t gd_app_module_lib(gd_app_module_t module) {
     return module->m_lib;
+}
+
+gd_app_module_t
+gd_app_install_module(gd_app_context_t context, const char * name, const char * libName, cfg_t moduleCfg) {
+    struct gd_app_runing_module * runingModule;
+
+    runingModule = 
+        gd_app_runing_module_create_i(context, name, libName, moduleCfg);
+
+    return runingModule == NULL ? NULL : runingModule->m_module;
 }

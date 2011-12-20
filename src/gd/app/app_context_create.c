@@ -99,6 +99,11 @@ void gd_app_context_free(gd_app_context_t context) {
         context->m_dp_mgr = NULL;
     }
 
+    if (context->m_nm_mgr) {
+        gd_nm_mgr_free(context->m_nm_mgr);
+        context->m_nm_mgr = NULL;
+    }
+
     if (context->m_tl_mgr) {
         gd_tl_manage_free(context->m_tl_mgr);
         context->m_tl_mgr = NULL;

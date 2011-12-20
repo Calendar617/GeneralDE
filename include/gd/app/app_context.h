@@ -48,6 +48,8 @@ gd_app_status_t gd_app_state(gd_app_context_t context);
 /*the main*/
 int gd_app_run(gd_app_context_t context);
 
+void gd_set_default_library(void * handler);
+
 #ifdef __cplusplus
 }
 #endif
