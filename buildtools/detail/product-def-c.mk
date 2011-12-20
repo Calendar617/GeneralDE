@@ -67,6 +67,18 @@ $(strip \
                 , c))))
 endef
 
+define product-def-rule-c-product-for-lib
+r.$1.c.lib.type=$(if $(r.$1.c.lib.type),$(r.$1.c.lib.type),$($(dev-env).default-lib-type))
+r.$1.product.c.libraries+=$1
+r.$1.product.c.ldpathes+=$(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib)
+r.$1.product:=$(if $(r.$1.product),$(r.$1.product),\
+                   $(r.$1.output)/lib$1.$(if $(filter static,$(r.$1.c.lib.type)),a,so))
+endef
+
+define product-def-rule-c-product-for-progn
+r.$1.product:=$(if $(r.$1.product),$(r.$1.product),$(r.$1.output)/$1)
+endef
+
 # $(call product-def-rule-c-product,product-name,type)
 define product-def-rule-c-product
 
@@ -74,14 +86,10 @@ $(eval r.$1.output:=$(if $(r.$1.output),$(r.$1.output),\
                          $(if $(filter lib,$2),\
                               $(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib),\
                               $(if $(r.$1.buildfor),$(r.$1.buildfor)-bin,bin))))
-ifeq ($(filter lib,$2),)
-$(eval r.$1.c.lib.type?=$($(dev-env).default-lib-type))
-$(eval r.$1.product.c.libraries+=$1)
-$(eval r.$1.product.c.ldpathes+=$(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib))
-$(eval r.$1.product?=$(r.$1.output)/lib$1.$(if $(filter static,$(r.$1.c.lib.type)),a,so))
-else
-$(eval r.$1.product?=$(r.$1.output)/$1)
-endif
+
+$(eval $(if $(filter lib,$2), $(call product-def-rule-c-product-for-lib,$1,$2) \
+	      , $(if $(filter progn,$2),$(call product-def-rule-c-product-for-progn,$1,$2)\
+                 , $(warning unknown c-product-type of $1: $2)))) \
 
 $(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.c.sources)) \
                      $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources))) \
