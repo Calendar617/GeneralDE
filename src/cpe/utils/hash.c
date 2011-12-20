@@ -342,15 +342,15 @@ int cpe_hash_table_remove_by_ins(cpe_hash_table_t hstable, void * obj) {
 }
 
 void * cpe_hash_table_find(cpe_hash_table_t hstable, const void * obj) {
-    int32_t bucketPos;
-    int32_t hsvalue;
+    uint32_t bucketPos;
+    uint32_t hsvalue;
     struct cpe_hash_entry ** find_pos;
 
     hsvalue = hstable->m_hash_fun(obj); 
 
     bucketPos = hsvalue % hstable->m_bucket_capacity;
 
-    find_pos = &(hstable->m_buckets + bucketPos)->m_entry;
+    find_pos = &((hstable->m_buckets + bucketPos)->m_entry);
 
     while(*find_pos) {
         void * checkObj = cpe_hash_entry_2_obj(hstable, *find_pos);
