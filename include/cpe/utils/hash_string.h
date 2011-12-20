@@ -1,5 +1,6 @@
 #ifndef CPE_UTILS_HASHSTRING_H
 #define CPE_UTILS_HASHSTRING_H
+#include <string.h>
 #include "cpe/pal/types.h"
 #include "memory.h"
 
