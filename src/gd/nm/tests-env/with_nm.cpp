@@ -85,5 +85,13 @@ with_nm::t_nm_nodes(void) {
     }
 }
 
+gd_nm_node_t
+with_nm::t_nm_group_find(const char * groupName, const char * name) {
+    gd_nm_node_t group = t_nm_find(groupName);
+    if (group == NULL) return NULL;
+
+    return gd_nm_group_find_member(group, cpe_hs_create(t_tmp_allocrator(), name));
+}
+
 }}}
 

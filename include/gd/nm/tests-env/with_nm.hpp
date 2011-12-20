@@ -24,6 +24,7 @@ public:
     ::std::string t_nm_node_groups(const char * nodeName);
     ::std::string t_nm_nodes(void);
     ::std::string t_nm_group_members(const char * groupName);
+    gd_nm_node_t t_nm_group_find(const char * groupName, const char * name);
 private:
     gd_nm_mgr_t m_nm;
 };

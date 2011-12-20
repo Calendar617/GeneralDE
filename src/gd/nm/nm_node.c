@@ -18,19 +18,21 @@ gd_nm_node_alloc(
     assert(nmm);
     assert(name);
 
-    nameLen = strlen(name);
+    nameLen = cpe_hs_len_to_binary_len(strlen(name));
 
-    buf = mem_alloc(nmm->m_alloc, cpe_hs_len_to_binary_len(nameLen) + bodyLen + capacity);
+    buf = mem_alloc(nmm->m_alloc, nameLen + bodyLen + capacity);
     if (buf == NULL) return NULL;
 
-    cpe_hs_init((cpe_hash_string_t)buf, cpe_hs_len_to_binary_len(nameLen), name);
+    cpe_hs_init((cpe_hash_string_t)buf, nameLen, name);
 
-    node = (gd_nm_node_t)(buf + cpe_hs_len_to_binary_len(nameLen));
+    node = (gd_nm_node_t)(buf + nameLen);
 
     node->m_mgr = nmm;
     node->m_category = category;
     node->m_name = (cpe_hash_string_t)buf;
     node->m_data_capacity = capacity;
+    node->m_type = NULL;
+
     TAILQ_INIT(&node->m_to_group_bindings);
     cpe_hash_entry_init(&node->m_hh_for_mgr);
 

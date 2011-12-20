@@ -107,7 +107,7 @@ void gd_nm_group_free_members(gd_nm_node_t node) {
 
 int gd_nm_group_member_count(gd_nm_node_t group) {
     if (group->m_category != gd_nm_node_group) {
-        return 0;
+        return -1;
     }
     else {
         return cpe_hash_table_count(&((struct gd_nm_group *)group)->m_members);
@@ -116,16 +116,18 @@ int gd_nm_group_member_count(gd_nm_node_t group) {
 
 gd_nm_node_t gd_nm_group_find_member(gd_nm_node_t group, cpe_hash_string_t name) {
     struct gd_nm_binding * binding;
-    struct gd_nm_node buf;
+    struct gd_nm_node buf_node;
+    struct gd_nm_binding buf_binding;
 
     if (group->m_category != gd_nm_node_group) {
         return NULL;
     }
 
-    buf.m_name = name;
+    buf_binding.m_node = &buf_node;
+    buf_node.m_name = name;
 
     binding = (struct gd_nm_binding *)
-        cpe_hash_table_find(&((struct gd_nm_group *)group)->m_members, &buf);
+        cpe_hash_table_find(&((struct gd_nm_group *)group)->m_members, &buf_binding);
 
     return binding == NULL ? NULL : binding->m_node;
 }
