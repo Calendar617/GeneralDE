@@ -2,6 +2,8 @@
 #include <string.h>
 #include "cpe/cfg/cfg_read.h"
 #include "gd/app/app_log.h"
+#include "gd/app/app_context.h"
+#include "gd/app/app_module.h"
 #include "app_internal_ops.h"
 
 struct gd_app_runing_module {
@@ -77,20 +79,20 @@ gd_app_module_create(
     const char * libName,
     error_monitor_t em)
 {
-    size_t nameLen = strlen(moduleName);
+    size_t nameLen = cpe_hs_len_to_binary_len(strlen(moduleName));
     struct gd_app_module * module = NULL;
     char * buf;
 
-    buf = mem_alloc(NULL, nameLen + 1 + sizeof(struct gd_app_module));
+    buf = mem_alloc(NULL, nameLen + sizeof(struct gd_app_module));
     if (buf == NULL) {
         CPE_ERROR(em, "create module %s: alloc buf fail!", moduleName);
         return NULL;
     }
     
-    memcpy(buf, moduleName, nameLen + 1);
-    module = (struct gd_app_module *)(buf + nameLen + 1);
+    cpe_hs_init((cpe_hash_string_t)buf, nameLen, moduleName);
+    module = (struct gd_app_module *)(buf + nameLen);
 
-    module->m_name = buf;
+    module->m_name = (cpe_hash_string_t)buf;
 
     TAILQ_INIT(&module->m_runing_modules);
 
@@ -131,7 +133,7 @@ static
 void gd_app_module_free(struct gd_app_module * module, error_monitor_t em) {
     TAILQ_REMOVE(&g_app_modules, module, m_next);
     if (module->m_lib) gd_app_lib_close_for_module(module->m_lib, module, em);
-    CPE_INFO(em, "destory module %s: success!", module->m_name);
+    CPE_INFO(em, "destory module %s: success!", cpe_hs_data(module->m_name));
     mem_free(NULL, module->m_name);
 }
 
@@ -140,7 +142,7 @@ gd_app_module_find(const char * moduleName) {
     struct gd_app_module * module;
 
     TAILQ_FOREACH(module, &g_app_modules, m_next) {
-        if (strcmp(module->m_name, moduleName) == 0) {
+        if (strcmp(cpe_hs_data(module->m_name), moduleName) == 0) {
             return module;
         }
     }
@@ -152,7 +154,8 @@ static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
     struct gd_app_module * module;
     const char * moduleName;
     struct gd_app_runing_module * runing_module;
-    
+    gd_nm_node_t moduleDataGroup;
+
     assert(context);
 
     moduleName = cfg_get_string(cfg, "name", NULL);
@@ -175,9 +178,20 @@ static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
         return -1;
     }
 
+    moduleDataGroup = gd_app_runing_module_data_load(
+        context,
+        runing_module->m_module->m_name,
+        cfg);
+    if (moduleDataGroup == NULL) {
+        if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_free(module, context->m_em);
+        mem_free(context->m_alloc, runing_module);
+        return -1;
+    }
+
     if (module->m_app_init) {
-        if (module->m_app_init(context, cfg) != 0) {
+        if (module->m_app_init(context, module, cfg) != 0) {
             APP_CTX_ERROR(context, "load module %s: app init fail!", moduleName);
+            gd_app_runing_module_data_free(context, module->m_name);
             if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_free(module, context->m_em);
             mem_free(context->m_alloc, runing_module);
             return -1;
@@ -204,11 +218,13 @@ static void gd_app_runing_module_free(
     module = runing_module->m_module;
 
     if (module->m_app_fini) {
-        module->m_app_fini(context);
+        module->m_app_fini(context, module);
     }
 
     TAILQ_REMOVE(&context->m_runing_modules, runing_module, m_qh_for_app);
     TAILQ_REMOVE(&module->m_runing_modules, runing_module, m_qh_for_runing);
+
+    gd_app_runing_module_data_free(context, module->m_name);
 
     mem_free(runing_module->m_alloc, runing_module);
 
@@ -258,4 +274,12 @@ void gd_app_modules_unload(gd_app_context_t context) {
             TAILQ_LAST(&context->m_runing_modules, gd_app_runing_module_list),
             context);
     }
+}
+
+const char * gd_app_module_name(gd_app_module_t module) {
+    return cpe_hs_data(module->m_name);
+}
+
+cpe_hash_string_t gd_app_module_name_hs(gd_app_module_t module) {
+    return module->m_name;
 }

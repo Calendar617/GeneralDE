@@ -3,6 +3,7 @@
 #include "cpe/pal/queue.h"
 #include "cpe/utils/memory.h"
 #include "cpe/utils/error.h"
+#include "cpe/utils/hash_string.h"
 #include "gd/app/app_types.h"
 
 #ifdef __cplusplus
@@ -41,7 +42,7 @@ struct gd_app_context {
 };
 
 struct gd_app_module {
-    char * m_name;
+    cpe_hash_string_t m_name;
     struct gd_app_lib * m_lib;
     gd_app_module_global_init m_global_init;
     gd_app_module_global_fini m_global_fini;
@@ -53,6 +54,8 @@ struct gd_app_module {
 
     gd_app_runing_module_list_t m_runing_modules;
 };
+
+extern cpe_hash_string_t gd_app_module_root_group_name;
 
 #ifdef __cplusplus
 }

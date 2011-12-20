@@ -20,6 +20,17 @@ void * gd_app_lib_sym(struct gd_app_lib * lib, const char * symName);
 int gd_app_modules_load(gd_app_context_t context);
 void gd_app_modules_unload(gd_app_context_t context);
 
+/*module data operations*/
+gd_nm_node_t
+gd_app_runing_module_data_load(
+    gd_app_context_t context,
+    cpe_hash_string_t moduleName,
+    cfg_t cfg);
+
+void gd_app_runing_module_data_free(
+    gd_app_context_t context,
+    cpe_hash_string_t moduleName);
+
 #ifdef __cplusplus
 }
 #endif

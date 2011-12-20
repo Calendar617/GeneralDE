@@ -16,13 +16,15 @@ typedef enum gd_app_status {
 } gd_app_status_t;
 
 typedef struct gd_app_context * gd_app_context_t;
+typedef struct gd_app_lib * gd_app_lib_t;
+typedef struct gd_app_module * gd_app_module_t;
 
 typedef int (*gd_app_main)(gd_app_context_t ctx);
 
 typedef int (*gd_app_module_global_init)(void);
 typedef void (*gd_app_module_global_fini)(void);
-typedef int (*gd_app_module_app_init)(gd_app_context_t context, cfg_t cfg);
-typedef void (*gd_app_module_app_fini)(gd_app_context_t context);
+typedef int (*gd_app_module_app_init)(gd_app_context_t context, gd_app_module_t module, cfg_t cfg);
+typedef void (*gd_app_module_app_fini)(gd_app_context_t context, gd_app_module_t module);
 
 #ifdef __cplusplus
 }
