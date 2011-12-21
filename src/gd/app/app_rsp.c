@@ -108,7 +108,7 @@ int gd_app_rsp_bind(
             return -1;
         }
 
-        if (gd_dp_mgr_bind_string(rsp, cmd, gd_app_em(ctx->m_context)) != 0) {
+        if (gd_dp_rsp_bind_string(rsp, cmd, gd_app_em(ctx->m_context)) != 0) {
             APP_CTX_ERROR(
                 ctx->m_context, "%s reading rsp: bind to str cmd %s fail!",
                 gd_app_module_name(ctx->m_module), cmd);
@@ -134,7 +134,7 @@ int gd_app_rsp_bind(
             return -1;
         }
 
-        if (gd_dp_mgr_bind_numeric(rsp, cmd, gd_app_em(ctx->m_context)) != 0) {
+        if (gd_dp_rsp_bind_numeric(rsp, cmd, gd_app_em(ctx->m_context)) != 0) {
             APP_CTX_ERROR(
                 ctx->m_context, "%s reading rsp: bind to numeric cmd %d fail!",
                 gd_app_module_name(ctx->m_module), cmd);

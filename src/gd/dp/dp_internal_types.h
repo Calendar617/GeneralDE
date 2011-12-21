@@ -28,8 +28,12 @@ struct gd_dp_binding {
     gd_dp_key_type_t m_kt;
 
     /*make a list to rsp*/
-    struct gd_dp_binding * m_binding_next;
-    struct gd_dp_binding ** m_binding_pre;
+    struct gd_dp_binding * m_rep_binding_next;
+    struct gd_dp_binding ** m_rep_binding_pre;
+
+    /*make a list to cmd*/
+    struct gd_dp_binding * m_cmd_binding_next;
+    struct gd_dp_binding ** m_cmd_binding_pre;
 };
 
 struct gd_dp_binding_numeric {

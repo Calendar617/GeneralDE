@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 #include <strings.h>
 #include "gd/dp/dp_manage.h"
@@ -61,61 +62,105 @@ gd_dp_rsp_t gd_dp_rsp_find_by_name(gd_dp_mgr_t dp, const char * name) {
     return (gd_dp_rsp_t)cpe_hash_table_find(&dp->m_rsps, &rspBuf);
 }
 
-gd_dp_rsp_t gd_dp_rsp_find_by_numeric(gd_dp_mgr_t dp, int32_t cmd) {
+static gd_dp_rsp_t gd_dp_rsp_binding_cmd_next(gd_dp_rsp_it_t it) {
     struct gd_dp_binding * r;
+    
+    if (it->m_context == NULL) return NULL;
+
+    r = (struct gd_dp_binding *)it->m_context;
+    it->m_context = r->m_cmd_binding_next;
+
+    return r->m_rsp;
+}
+
+void gd_dp_rsp_find_by_numeric(gd_dp_rsp_it_t it, gd_dp_mgr_t dp, int32_t cmd) {
+    assert(it);
+    assert(dp);
+
     struct gd_dp_binding_numeric buf;
     buf.m_head.m_kt = gd_dp_key_numeric;
     buf.m_value = cmd;
 
-    r = (struct gd_dp_binding *)cpe_hash_table_find(&dp->m_cmd_2_rsps, &buf);
-
-    return r
-        ? r->m_rsp
-        : NULL;
+    it->m_context = (struct gd_dp_binding *)cpe_hash_table_find(&dp->m_cmd_2_rsps, &buf);
+    it->m_next_fun = gd_dp_rsp_binding_cmd_next;
 }
 
-gd_dp_rsp_t gd_dp_rsp_find_by_string(gd_dp_mgr_t dp, const char * cmd) {
-    struct gd_dp_binding * r;
+void gd_dp_rsp_find_by_string(gd_dp_rsp_it_t it, gd_dp_mgr_t dp, const char * cmd) {
     struct gd_dp_binding_string buf;
     buf.m_head.m_kt = gd_dp_key_string;
     buf.m_value = cmd;
     buf.m_value_len = strlen(cmd);
 
-    r = (struct gd_dp_binding *)cpe_hash_table_find(&dp->m_cmd_2_rsps, &buf);
+    it->m_context = (struct gd_dp_binding *)cpe_hash_table_find(&dp->m_cmd_2_rsps, &buf);
+    it->m_next_fun = gd_dp_rsp_binding_cmd_next;
+}
 
-    return r
-        ? r->m_rsp
-        : NULL;
+gd_dp_rsp_t gd_dp_rsp_find_first_by_numeric(gd_dp_mgr_t dp, int32_t cmd) {
+    struct gd_dp_rsp_it it;
+    gd_dp_rsp_find_by_numeric(&it, dp, cmd);
+    return gd_dp_rsp_next(&it);
+}
+
+gd_dp_rsp_t gd_dp_rsp_find_first_by_string(gd_dp_mgr_t dp, const char * cmd) {
+    struct gd_dp_rsp_it it;
+    gd_dp_rsp_find_by_string(&it, dp, cmd);
+    return gd_dp_rsp_next(&it);
 }
 
 int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monitor_t em) {
     gd_dp_rsp_t rsp;
-    rsp = gd_dp_rsp_find_by_string(req->m_mgr, cpe_hs_data(cmd));
-    if (rsp == NULL) {
+    struct gd_dp_rsp_it rspIt;
+    int rv;
+    int count;
+
+    gd_dp_rsp_find_by_string(&rspIt, req->m_mgr, cpe_hs_data(cmd));
+
+    while((rsp = gd_dp_rsp_next(&rspIt))) {
+        if (rsp->m_processor == NULL) {
+            CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
+            rv = -1;
+            continue;
+        }
+
+        if (rsp->m_processor(req, rsp->m_context, em) != 0) {
+            rv = -1;
+            continue;
+        }
+    }
+
+    if (count == 0) {
         CPE_ERROR(em, "no responser to process %s\n", cpe_hs_data(cmd));
         return -1;
     }
 
-    if (rsp->m_processor == NULL) {
-        CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
-        return -1;
-    }
-
-    return rsp->m_processor(req, rsp->m_context, em);
+    return rv;
 }
 
 int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) {
     gd_dp_rsp_t rsp;
-    rsp = gd_dp_rsp_find_by_numeric(req->m_mgr, cmd);
-    if (rsp == NULL) {
-        CPE_ERROR(em, "no responser to process %d\n", cmd);
+    struct gd_dp_rsp_it rspIt;
+    int rv;
+    int count;
+
+    gd_dp_rsp_find_by_numeric(&rspIt, req->m_mgr, cmd);
+
+    while((rsp = gd_dp_rsp_next(&rspIt))) {
+        if (rsp->m_processor == NULL) {
+            CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
+            rv = -1;
+            continue;
+        }
+
+        if (rsp->m_processor(req, rsp->m_context, em) != 0) {
+            rv = -1;
+            continue;
+        }
+    }
+
+    if (count == 0) {
+        CPE_ERROR(em, "no responser to process %s\n", cpe_hs_data(cmd));
         return -1;
     }
 
-    if (rsp->m_processor == NULL) {
-        CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
-        return -1;
-    }
-
-    return rsp->m_processor(req, rsp->m_context, em);
+    return rv;
 }
