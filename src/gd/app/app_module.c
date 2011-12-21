@@ -331,3 +331,19 @@ gd_app_find_module(
 
     return NULL;
 }
+
+int gd_app_uninstall_module(
+    gd_app_context_t context,
+    const char * name)
+{
+    struct gd_app_runing_module * runint_module;
+
+    TAILQ_FOREACH(runint_module, &context->m_runing_modules, m_qh_for_app) {
+        if (strcmp(name, gd_app_module_name(runint_module->m_module)) == 0) {
+            gd_app_runing_module_free(runint_module, context);
+            return 0;
+        }
+    }
+
+    return -1;
+}

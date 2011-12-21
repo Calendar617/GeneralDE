@@ -15,6 +15,8 @@ gd_dp_rsp_t gd_dp_rsp_create(gd_dp_mgr_t dp, const char * name) {
     r->m_name = (char*)(r + 1);
     r->m_name_len = nameLen;
     r->m_bindings = NULL;
+    r->m_processor = NULL;
+    r->m_context = NULL;
     cpe_hash_entry_init(&r->m_hh);
     memcpy((char*)r->m_name, name, nameLen + 1);
 
@@ -68,6 +70,10 @@ int gd_dp_rsp_set_opt(gd_dp_rsp_t rsp, gd_dp_rsp_opt_t opt, ...) {
 
     return rv;
     
+}
+
+gd_dp_rsp_process_fun_t gd_dp_rsp_processor(gd_dp_rsp_t rsp) {
+    return rsp->m_processor;
 }
 
 int32_t gd_dp_rsp_hash(const gd_dp_rsp_t rsp) {

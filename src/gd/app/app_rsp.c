@@ -1,30 +1,302 @@
 #include <assert.h>
 #include <string.h>
+#include "cpe/pal/queue.h"
+#include "cpe/utils/buffer.h"
 #include "cpe/cfg/cfg_read.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
+#include "gd/dp/dp_manage.h"
+#include "gd/dp/dp_responser.h"
 #include "gd/app/app.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_rsp.h"
 #include "app_internal_ops.h"
 
-static struct gd_nm_node_type g_module_rsp_group = {
-    "app_module_rsp",
-    gd_nm_group_free_members
+struct gd_app_rsp_create_ctx {
+    gd_app_context_t m_context;
+    gd_app_module_t m_module;
+    gd_dp_mgr_t m_dpm;
+    struct gd_app_rsp_mgr * m_rspMgr;
+    struct mem_buffer m_buffer;
 };
 
-static int gd_app_rsp_create(
-    gd_app_context_t context,
-    gd_app_module_t module,
-    gd_dp_mgr_t dpm,
-    gd_nm_node_t rspNode,
-    cfg_t cfgNode)
-{
-    const char * rspName;
+struct gd_app_rsp_proxy {
+    SIMPLEQ_ENTRY(gd_app_rsp_proxy) m_next;
+};
 
+struct gd_app_rsp_mgr {
+    gd_app_context_t m_context;
+    SIMPLEQ_HEAD(gd_app_rsp_proxy_list, gd_app_rsp_proxy) m_rsps;
+    struct mem_buffer m_buffer;
+};
+
+static int gd_app_rsp_mgr_add_rsp(struct gd_app_rsp_mgr * rspMgr, const char * rspName) {
+    size_t rspNameLen = strlen(rspName);
+    struct gd_app_rsp_proxy * proxy;
+
+    proxy = (struct gd_app_rsp_proxy * )
+        mem_buffer_alloc(&rspMgr->m_buffer, sizeof(struct gd_app_rsp_proxy) + rspNameLen + 1);
+    if (proxy == NULL) return -1;
+
+    memcpy(proxy + 1, rspName, rspNameLen + 1);
+    SIMPLEQ_INSERT_TAIL(&rspMgr->m_rsps, proxy, m_next);
+    return 0;
+}
+
+static void gd_app_rsp_mgr_init(gd_nm_node_t node, gd_app_context_t context) {
+    struct gd_app_rsp_mgr * rspMgr =
+        (struct gd_app_rsp_mgr *)gd_nm_node_data(node);
+
+    rspMgr->m_context = context;
+    SIMPLEQ_INIT(&rspMgr->m_rsps);
+    mem_buffer_init(&rspMgr->m_buffer, gd_app_alloc(context));
+}
+
+static void gd_app_rsp_mgr_free(gd_nm_node_t node) {
+    struct gd_app_rsp_proxy * rspProxy;
+    gd_dp_mgr_t dpm;
+
+    struct gd_app_rsp_mgr * rspMgr =
+        (struct gd_app_rsp_mgr *)gd_nm_node_data(node);
+
+    dpm = gd_app_dp_mgr(rspMgr->m_context);
+
+    SIMPLEQ_FOREACH(rspProxy, &rspMgr->m_rsps, m_next) {
+        gd_dp_rsp_t rsp =
+            gd_dp_rsp_find_by_name(dpm, (char *)(rspProxy + 1));
+        if (rsp) {
+            gd_dp_rsp_free(rsp);
+        }
+    }
+
+    mem_buffer_clear(&rspMgr->m_buffer);
+}
+
+static struct gd_nm_node_type g_module_rsp_mgr = {
+    "app_module_rsp_mgr",
+    gd_app_rsp_mgr_free
+};
+
+static
+int gd_app_rsp_bind(
+    struct gd_app_rsp_create_ctx * ctx,
+    gd_dp_rsp_t rsp,
+    cfg_t responsToCfg)
+{
+    assert(responsToCfg);
+
+    int rv = 0;
+
+    switch(cfg_type(responsToCfg)) {
+    case CPE_CFG_TYPE_SEQUENCE: {
+        struct cfg_seq_it cfgIt;
+        cfg_t subResponsToCfg;
+        cfg_seq_it_init(&cfgIt, responsToCfg);
+        while((subResponsToCfg = cfg_seq_it_next(&cfgIt))) {
+            if (gd_app_rsp_bind(ctx, rsp, subResponsToCfg) != 0) {
+                rv = -1;
+            }
+        }
+        break;
+    }
+    case CPE_CFG_TYPE_STRING: {
+        const char * cmd = cfg_as_string(responsToCfg, NULL);
+        if (cmd == NULL) {
+            APP_CTX_ERROR(
+                ctx->m_context, "%s reading rsp: not support bind to str cmd NULL!",
+                gd_app_module_name(ctx->m_module));
+            return -1;
+        }
+
+        if (gd_dp_mgr_bind_string(rsp, cmd, gd_app_em(ctx->m_context)) != 0) {
+            APP_CTX_ERROR(
+                ctx->m_context, "%s reading rsp: bind to str cmd %s fail!",
+                gd_app_module_name(ctx->m_module), cmd);
+            return -1;
+        }
+
+        break;
+    }
+    case CPE_CFG_TYPE_INT8:
+    case CPE_CFG_TYPE_UINT8:
+    case CPE_CFG_TYPE_INT16:
+    case CPE_CFG_TYPE_UINT16:
+    case CPE_CFG_TYPE_INT32:
+    case CPE_CFG_TYPE_UINT32:
+    case CPE_CFG_TYPE_INT64:
+    case CPE_CFG_TYPE_UINT64:
+    {
+        int32_t cmd = cfg_as_int32(responsToCfg, -1);
+        if (cmd == -1) {
+            APP_CTX_ERROR(
+                ctx->m_context, "%s reading rsp: not support bind to numeric cmd %d!",
+                gd_app_module_name(ctx->m_module), cmd);
+            return -1;
+        }
+
+        if (gd_dp_mgr_bind_numeric(rsp, cmd, gd_app_em(ctx->m_context)) != 0) {
+            APP_CTX_ERROR(
+                ctx->m_context, "%s reading rsp: bind to numeric cmd %d fail!",
+                gd_app_module_name(ctx->m_module), cmd);
+            return -1;
+        }
+
+        break;
+    }
+    default:
+        APP_CTX_ERROR(
+            ctx->m_context, "%s reading rsp: not support bind to type %d!",
+            gd_app_module_name(ctx->m_module), cfg_type(responsToCfg));
+        return -1;
+    }
+
+    return rv;
+}
+
+static
+int gd_app_rsp_init(
+    struct gd_app_rsp_create_ctx * ctx,
+    gd_dp_rsp_t rsp,
+    cfg_t cfg)
+{
+    gd_app_rsp_init_fun_t init;
+    gd_dp_rsp_process_fun_t processor;
+    const char * processorSymName;
+    const char * initSymName;
+
+    processorSymName = cfg_get_string(cfg, "processor", NULL);
+    initSymName = cfg_get_string(cfg, "init", NULL);
+
+    if (processorSymName && initSymName) {
+        APP_CTX_ERROR(
+            ctx->m_context,
+            "%s reading rsp %s: can`t config processor and init, please select one!",
+            gd_app_module_name(ctx->m_module), gd_dp_rsp_name(rsp));
+        return -1;
+    }
+
+    if (initSymName) {
+        init = (gd_app_rsp_init_fun_t)gd_app_lib_sym(gd_app_module_lib(ctx->m_module), initSymName, NULL);
+        if (init == NULL) {
+            APP_CTX_ERROR(
+                ctx->m_context,
+                "%s reading rsp %s: can`t find init function %s!",
+                gd_app_module_name(ctx->m_module), gd_dp_rsp_name(rsp), initSymName);
+            return -1;
+        }
+
+        int rv = init(rsp, ctx->m_context, ctx->m_module, cfg);
+        if (rv == 0) {
+            if(gd_dp_rsp_processor(rsp) == NULL) {
+                rv = -1;
+            }
+        }
+        return rv;
+    }
+
+    if (processorSymName) {
+        processor = (gd_dp_rsp_process_fun_t)gd_app_lib_sym(gd_app_module_lib(ctx->m_module), processorSymName, NULL);
+        if (processor == NULL) {
+            APP_CTX_ERROR(
+                ctx->m_context,
+                "%s reading rsp %s: can`t find processor function %s!",
+                gd_app_module_name(ctx->m_module), gd_dp_rsp_name(rsp), processorSymName);
+            return -1;
+        }
+
+        gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_processor, processor);
+        gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_context, ctx->m_context);
+        return 0;
+    }
+
+    assert(processorSymName == NULL && initSymName == NULL);
+
+    mem_buffer_set_size(&ctx->m_buffer, 0);
+    mem_buffer_strcat(&ctx->m_buffer, "rsp_");
+    mem_buffer_strcat(&ctx->m_buffer, gd_dp_rsp_name(rsp));
+    mem_buffer_strcat(&ctx->m_buffer, "_init");
+
+    init = (gd_app_rsp_init_fun_t)gd_app_lib_sym(
+        gd_app_module_lib(ctx->m_module),
+        (char*)mem_buffer_make_continuous(&ctx->m_buffer, 0),
+        NULL);
+    if (init) {
+        int rv = init(rsp, ctx->m_context, ctx->m_module, cfg);
+        if (rv == 0) {
+            if(gd_dp_rsp_processor(rsp) == 0) {
+                rv = -1;
+            }
+        }
+        return rv;
+    }
+
+    /*remove _init post fix*/
+    mem_buffer_set_size(&ctx->m_buffer, mem_buffer_size(&ctx->m_buffer) - 6);
+    mem_buffer_append_char(&ctx->m_buffer, 0);
+    processorSymName = (char*)mem_buffer_make_continuous(&ctx->m_buffer, 0);
+
+    processor = (gd_dp_rsp_process_fun_t)
+        gd_app_lib_sym(gd_app_module_lib(ctx->m_module), processorSymName, NULL);
+    if (processor) {
+        gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_processor, processor);
+        gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_context, ctx->m_context);
+        return 0;
+    }
+
+    APP_CTX_ERROR(
+        ctx->m_context,
+        "%s reading rsp %s: no default init or processor function found!",
+        gd_app_module_name(ctx->m_module), gd_dp_rsp_name(rsp));
+
+    return -1;
+}
+
+static int gd_app_rsp_create(struct gd_app_rsp_create_ctx * ctx, cfg_t cfgNode) {
+    const char * rspName;
+    gd_dp_rsp_t rsp;
+    cfg_t responsToCfg;
+ 
     rspName = cfg_get_string(cfgNode, "name", NULL);
     if (rspName == NULL) {
-        APP_CTX_ERROR(context, "%s reading rsp: no module node!", gd_app_module_name(module));
+        APP_CTX_ERROR(
+            ctx->m_context,
+            "%s reading rsp: no module node!", gd_app_module_name(ctx->m_module));
+        return -1;
+    }
+
+    rsp = gd_dp_rsp_create(ctx->m_dpm, rspName);
+    if (rsp == NULL) {
+        APP_CTX_ERROR(
+            ctx->m_context,
+            "%s reading rsp: create rsp fail!", gd_app_module_name(ctx->m_module));
+        return -1;
+    }
+
+    if (gd_app_rsp_init(ctx, rsp, cfgNode) != 0) {
+        gd_dp_rsp_free(rsp);
+        return -1;
+    }
+
+    responsToCfg = cfg_find_cfg(cfgNode, "respons-to");
+    if (responsToCfg == NULL) {
+        APP_CTX_ERROR(
+            ctx->m_context,
+            "%s reading rsp: no respons cfg!", gd_app_module_name(ctx->m_module));
+        gd_dp_rsp_free(rsp);
+        return -1;
+    }
+
+    if (gd_app_rsp_bind(ctx, rsp, responsToCfg) != 0) {
+        gd_dp_rsp_free(rsp);
+        return -1;
+    }
+
+    if (gd_app_rsp_mgr_add_rsp(ctx->m_rspMgr, rspName) != 0) {
+        APP_CTX_ERROR(
+            ctx->m_context,
+            "%s reading rsp: add to rsp mgr fail, no memory!", gd_app_module_name(ctx->m_module));
+        gd_dp_rsp_free(rsp);
+        return -1;
     }
 
     return 0;
@@ -41,13 +313,13 @@ gd_app_rsp_create_group_node(gd_app_context_t context, gd_app_module_t module) {
         return NULL;
     }
 
-    rspNode = gd_nm_group_create(gd_app_nm_mgr(context), "rsps", 0);
+    rspNode = gd_nm_instance_create(gd_app_nm_mgr(context), "rsps", sizeof(struct gd_app_rsp_mgr));
     if (rspNode == NULL) {
         APP_CTX_ERROR(context, "%s reading rsp: create rsps node fail!", gd_app_module_name(module));
         return NULL;
     }
-
-    gd_nm_node_set_type(rspNode, &g_module_rsp_group);
+    gd_app_rsp_mgr_init(rspNode, context);
+    gd_nm_node_set_type(rspNode, &g_module_rsp_mgr);
 
     if (gd_nm_group_add_member(moduleNode, rspNode) != 0) {
         APP_CTX_ERROR(context, "create module %s: rsp node to module fail!", gd_app_module_name(module));
@@ -63,15 +335,18 @@ int gd_app_rsp_load(
     gd_app_module_t module,
     cfg_t moduleCfg)
 {
+    struct gd_app_rsp_create_ctx ctx;
     int rv;
     cfg_t rsps;
     cfg_t rspCfg;
-    gd_nm_node_t rspNode;
     struct cfg_seq_it cfgIt;
-    gd_dp_mgr_t dpm;
+    gd_nm_node_t rspNode;
 
     assert(context);
     assert(module);
+
+    ctx.m_context = context;
+    ctx.m_module = module;
 
     rsps = cfg_find_cfg(moduleCfg, "rsps");
     if (rsps == NULL) return 0;
@@ -87,18 +362,24 @@ int gd_app_rsp_load(
     rspNode = gd_app_rsp_create_group_node(context, module);
     if (rspNode == NULL) return -1;
 
-    dpm = gd_app_dp_mgr(context);
+    ctx.m_rspMgr = (struct gd_app_rsp_mgr*)(gd_nm_node_data(rspNode));
 
+    ctx.m_dpm = gd_app_dp_mgr(context);
+
+    mem_buffer_init(&ctx.m_buffer, gd_app_alloc(context));
     rv = 0;
     cfg_seq_it_init(&cfgIt, rsps);
-    while(rv == 0
-          && (rspCfg = cfg_seq_it_next(&cfgIt)))
-    {
-        if (gd_app_rsp_create(context, module, dpm, rspNode, rspCfg) != 0) {
+    while((rspCfg = cfg_seq_it_next(&cfgIt))) {
+        if (gd_app_rsp_create(&ctx, rspCfg) != 0) {
             rv = -1;
         }
     }
+    mem_buffer_clear(&ctx.m_buffer);
 
-    return 0;
+    if (rv != 0) {
+        gd_nm_node_free(rspNode);
+    }
+
+    return rv;
 }
 

@@ -24,6 +24,10 @@ gd_app_find_module(
     gd_app_context_t context,
     const char * name);
 
+int gd_app_uninstall_module(
+    gd_app_context_t context,
+    const char * name);
+
 #ifdef __cplusplus
 }
 #endif

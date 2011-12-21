@@ -4,6 +4,7 @@ TEST_F(DpTest, rsp_create_basic) {
     gd_dp_rsp_t rsp = gd_dp_rsp_create(t_dp(), "rsp1");
     ASSERT_TRUE(rsp);
     EXPECT_STREQ("rsp1", gd_dp_rsp_name(rsp));
+    EXPECT_TRUE(NULL == gd_dp_rsp_processor(rsp));
 }
 
 TEST_F(DpTest, rsp_create_duplicate) {
