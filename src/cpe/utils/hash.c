@@ -331,13 +331,13 @@ int cpe_hash_table_remove_by_ins(cpe_hash_table_t hstable, void * obj) {
 
     entry->m_next = NULL;
     entry->m_prev = NULL;
+    --hstable->m_count;
 
     /*destory object*/
     if (hstable->m_destory_fun) {
         hstable->m_destory_fun(obj, hstable->m_destory_context);
     }
 
-    --hstable->m_count;
     return 0;
 }
 
