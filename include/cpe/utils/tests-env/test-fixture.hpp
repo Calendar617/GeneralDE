@@ -60,6 +60,19 @@ struct fixture_gen<Loki::Typelist<Head, Tail> >
     }
 };
 
+template <class Head>
+struct fixture_gen<Loki::Typelist<Head, Loki::NullType> >
+    : public Head
+{
+    void SetUp() {
+        Head::SetUp();
+    }
+
+    void TearDown() {
+        Head::TearDown();
+    }
+};
+
 template <>
 struct fixture_gen<Loki::NullType> {
     void SetUp() {}
