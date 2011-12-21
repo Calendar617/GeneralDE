@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-int gd_app_load_rsps(gd_app_context_t context, gd_app_module_t module, cfg_t moduleCfg);
+int gd_app_rsp_load(gd_app_context_t context, gd_app_module_t module, cfg_t moduleCfg);
 
 #ifdef __cplusplus
 }

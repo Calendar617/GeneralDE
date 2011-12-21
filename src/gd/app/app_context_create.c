@@ -6,7 +6,7 @@
 #include "gd/nm/nm_manage.h"
 #include "gd/dp/dp_manage.h"
 #include "gd/tl/tl_manage.h"
-#include "app_internal_types.h"
+#include "app_internal_ops.h"
 
 static int gd_app_parse_args(gd_app_context_t context, int argc, char * argv[]) {
     int i;
@@ -93,6 +93,8 @@ gd_app_context_create(
 
 void gd_app_context_free(gd_app_context_t context) {
     if (context == NULL) return;
+
+    gd_app_modules_unload(context);
 
     if (context->m_dp_mgr) {
         gd_dp_mgr_free(context->m_dp_mgr);

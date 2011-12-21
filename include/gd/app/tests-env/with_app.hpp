@@ -27,6 +27,19 @@ public:
         const char * name,
         const char * cfg);
 
+    int t_app_install_rsps(
+        gd_app_module_t module,
+        const char * cfg);
+
+    int t_app_install_rsps(
+        const char * moduleName,
+        const char * cfg);
+
+    gd_dp_mgr_t t_dp(void);
+    gd_nm_mgr_t t_nm(void);
+
+    gd_app_module_t t_app_find_module(const char * moduleName);
+
 private:
     gd_app_context_t m_app;
 };

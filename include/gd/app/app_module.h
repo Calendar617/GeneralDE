@@ -19,6 +19,11 @@ gd_app_install_module(
     const char * libName,
     cfg_t moduleCfg);
 
+gd_app_module_t
+gd_app_find_module(
+    gd_app_context_t context,
+    const char * name);
+
 #ifdef __cplusplus
 }
 #endif

@@ -61,7 +61,9 @@ with_app::t_app_install_module(
         struct read_stream_mem stream =
             CPE_READ_STREAM_MEM_INITIALIZER(strCfg, strlen(strCfg));
 
-        EXPECT_EQ(0, cfg_read(cfg, (read_stream_t)&stream, cfg_replace, NULL));
+        CPE_DEF_ERROR_MONITOR(em, cpe_error_log_to_consol, NULL);
+
+        EXPECT_EQ(0, cfg_read(cfg, (read_stream_t)&stream, cfg_replace, &em));
     }
 
     gd_app_module_t m =gd_app_install_module(t_app(), name, libName, cfg);
@@ -79,6 +81,54 @@ with_app::t_app_install_module(
     const char * cfg)
 {
     return t_app_install_module(name, NULL, cfg);
+}
+
+int with_app::t_app_install_rsps(
+    gd_app_module_t module,
+    const char * strCfg)
+{
+    cfg_t cfg = NULL;
+    if (strCfg) {
+        cfg = cfg_create(t_tmp_allocrator());
+        EXPECT_TRUE(cfg) << "create cfg for install module fail!";
+
+        struct read_stream_mem stream =
+            CPE_READ_STREAM_MEM_INITIALIZER(strCfg, strlen(strCfg));
+
+        CPE_DEF_ERROR_MONITOR(em, cpe_error_log_to_consol, NULL);
+
+        EXPECT_EQ(0, cfg_read(cfg, (read_stream_t)&stream, cfg_replace, &em));
+    }
+
+    int rv = gd_app_rsp_load(t_app(), module, cfg);
+
+    if (cfg) {
+        cfg_free(cfg);
+    }
+
+    return rv;
+}
+
+int with_app::t_app_install_rsps(
+    const char * moduleName,
+    const char * cfg)
+{
+    return t_app_install_rsps(
+        t_app_find_module(moduleName),
+        cfg);
+}
+
+gd_app_module_t
+with_app::t_app_find_module(const char * moduleName) {
+    return gd_app_find_module(t_app(), moduleName);
+}
+
+gd_dp_mgr_t with_app::t_dp(void) {
+    return gd_app_dp_mgr(t_app());
+}
+
+gd_nm_mgr_t with_app::t_nm(void) {
+    return gd_app_nm_mgr(t_app());
 }
 
 }}}

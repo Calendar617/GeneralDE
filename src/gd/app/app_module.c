@@ -315,3 +315,19 @@ gd_app_install_module(gd_app_context_t context, const char * name, const char * 
 
     return runingModule == NULL ? NULL : runingModule->m_module;
 }
+
+gd_app_module_t
+gd_app_find_module(
+    gd_app_context_t context,
+    const char * name)
+{
+    struct gd_app_runing_module * runint_module;
+
+    TAILQ_FOREACH(runint_module, &context->m_runing_modules, m_qh_for_app) {
+        if (strcmp(name, gd_app_module_name(runint_module->m_module)) == 0) {
+            return runint_module->m_module;
+        }
+    }
+
+    return NULL;
+}

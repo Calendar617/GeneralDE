@@ -12,6 +12,9 @@ typedef LOKI_TYPELIST_2(
 
 class AppTest : public testenv::fixture<AppTestBase> {
 public:
+    virtual void SetUp(void);
+
+    gd_app_module_t installTestModule(void);
 };
 
 #endif
