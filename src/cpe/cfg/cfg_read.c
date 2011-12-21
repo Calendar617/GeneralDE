@@ -74,13 +74,17 @@ CPE_CFG_GEN_READ_TYPE(uint32);
 CPE_CFG_GEN_READ_TYPE(int64);
 CPE_CFG_GEN_READ_TYPE(uint64);
 
+const char * cfg_as_string(cfg_t cfg, const char * dft) {
+    return cfg->m_type == CPE_DR_TYPE_STRING
+        ? (const char *)cfg_data(cfg)
+        : dft;
+}
+
 const char * cfg_get_string(cfg_t cfg, const char * path, const char * dft) {
     cfg_t at = cfg_find_cfg(cfg, path);
     if (at == NULL) return dft;
 
-    return at->m_type == CPE_DR_TYPE_STRING
-        ? (const char *)cfg_data(at)
-        : dft;
+    return cfg_as_string(at, dft);
 }
 
 static cfg_t cfg_do_find_cfg_from_struct(cfg_t cfg, const char * path, const char * end) {
