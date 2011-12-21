@@ -330,6 +330,48 @@ gd_app_rsp_create_group_node(gd_app_context_t context, gd_app_module_t module) {
     return rspNode;
 }
 
+int gd_app_rsp_load_i(
+    struct gd_app_rsp_create_ctx  * ctx,
+    cfg_t rspsCfg)
+{
+    if (rspsCfg == NULL) return 0;
+
+    if (cfg_type(rspsCfg) == CPE_CFG_TYPE_STRUCT) {
+        cfg_t subRspsCfg;
+        struct cfg_struct_it cfgIt;
+        int rv = 0;
+        cfg_struct_it_init(&cfgIt, rspsCfg);
+        while((subRspsCfg = cfg_struct_it_next(&cfgIt))) {
+            if (gd_app_rsp_load_i(ctx, subRspsCfg) != 0) {
+                printf("aaa\n");
+                rv = -1;
+            }
+        }
+
+        return rv;
+    }
+    else if (cfg_type(rspsCfg) == CPE_CFG_TYPE_SEQUENCE) {
+        cfg_t rspCfg;
+        struct cfg_seq_it cfgIt;
+        int rv = 0;
+        cfg_seq_it_init(&cfgIt, rspsCfg);
+        while((rspCfg = cfg_seq_it_next(&cfgIt))) {
+            if (gd_app_rsp_create(ctx, rspCfg) != 0) {
+                rv = -1;
+            }
+        }
+
+        return rv;
+    }
+    else {
+        APP_CTX_ERROR(
+            ctx->m_context,
+            "%s reading rsp: config node type error!",
+            gd_app_module_name(ctx->m_module));
+        return -1;
+    }
+}
+
 int gd_app_rsp_load(
     gd_app_context_t context,
     gd_app_module_t module,
@@ -337,43 +379,22 @@ int gd_app_rsp_load(
 {
     struct gd_app_rsp_create_ctx ctx;
     int rv;
-    cfg_t rsps;
-    cfg_t rspCfg;
-    struct cfg_seq_it cfgIt;
     gd_nm_node_t rspNode;
 
     assert(context);
     assert(module);
 
-    ctx.m_context = context;
-    ctx.m_module = module;
-
-    rsps = cfg_find_cfg(moduleCfg, "rsps");
-    if (rsps == NULL) return 0;
-
-    if (cfg_type(rsps) != CPE_CFG_TYPE_SEQUENCE) {
-        APP_CTX_ERROR(
-            context,
-            "%s reading rsp: config node type error!",
-            gd_app_module_name(module));
-        return -1;
-    }
-
     rspNode = gd_app_rsp_create_group_node(context, module);
     if (rspNode == NULL) return -1;
 
+    ctx.m_context = context;
+    ctx.m_module = module;
     ctx.m_rspMgr = (struct gd_app_rsp_mgr*)(gd_nm_node_data(rspNode));
-
     ctx.m_dpm = gd_app_dp_mgr(context);
-
     mem_buffer_init(&ctx.m_buffer, gd_app_alloc(context));
-    rv = 0;
-    cfg_seq_it_init(&cfgIt, rsps);
-    while((rspCfg = cfg_seq_it_next(&cfgIt))) {
-        if (gd_app_rsp_create(&ctx, rspCfg) != 0) {
-            rv = -1;
-        }
-    }
+
+    rv = gd_app_rsp_load_i(&ctx, cfg_find_cfg(moduleCfg, "rsps"));
+
     mem_buffer_clear(&ctx.m_buffer);
 
     if (rv != 0) {

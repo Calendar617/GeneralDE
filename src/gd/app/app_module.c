@@ -37,16 +37,16 @@ int gd_app_module_load_fun(
     memcpy(nameBuf, moduleName, nameLen + 1);
 
     strcpy(nameBuf + nameLen, "_global_init");
-    module->m_global_init = gd_app_lib_sym(module->m_lib, nameBuf, em);
+    module->m_global_init = gd_app_lib_sym(module->m_lib, nameBuf, NULL);
 
     strcpy(nameBuf + nameLen, "_global_fini");
-    module->m_global_fini = gd_app_lib_sym(module->m_lib, nameBuf, em);
+    module->m_global_fini = gd_app_lib_sym(module->m_lib, nameBuf, NULL);
 
     strcpy(nameBuf + nameLen, "_app_init");
-    module->m_app_init = gd_app_lib_sym(module->m_lib, nameBuf, em);
+    module->m_app_init = gd_app_lib_sym(module->m_lib, nameBuf, NULL);
 
     strcpy(nameBuf + nameLen, "_app_fini");
-    module->m_app_fini = gd_app_lib_sym(module->m_lib, nameBuf, em);
+    module->m_app_fini = gd_app_lib_sym(module->m_lib, nameBuf, NULL);
 
     mem_free(NULL, nameBuf);
 

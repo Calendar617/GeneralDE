@@ -265,3 +265,19 @@ TEST_F(RspTest, rsp_auto_free) {
     ASSERT_TRUE(NULL == t_app_find_module("test_module"));
     ASSERT_TRUE(NULL == gd_dp_rsp_find_by_name(t_dp(), "rsp1"));
 }
+
+TEST_F(RspTest, rsp_load_from_multi_level) {
+    EXPECT_EQ(
+        0,
+        t_app_install_rsps(
+            "test_module",
+            "rsps:\n"
+            "    rsp-group-level-1:\n"
+            "        rsp-group-level-2:\n"
+            "            - name: rsp1\n"
+            "              respons-to: []\n"
+            "              processor: rsp_processor_1\n"
+            ));
+
+    ASSERT_TRUE(NULL != gd_dp_rsp_find_by_name(t_dp(), "rsp1"));
+}
