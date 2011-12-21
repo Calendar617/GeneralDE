@@ -133,7 +133,7 @@ TEST_F(RspTest, rsp_load_no_name) {
             "    processor: rsp_processor_1\n"
             ));
 
-    EXPECT_TRUE(NULL == gd_dp_rsp_find_by_numeric(t_dp(), 1));
+    EXPECT_TRUE(NULL == gd_dp_rsp_find_first_by_numeric(t_dp(), 1));
 }
 
 TEST_F(RspTest, rsp_load_no_processor) {
@@ -147,7 +147,7 @@ TEST_F(RspTest, rsp_load_no_processor) {
             "    processor: rsp_processor_not_exist\n"
             ));
 
-    EXPECT_TRUE(NULL == gd_dp_rsp_find_by_numeric(t_dp(), 1));
+    EXPECT_TRUE(NULL == gd_dp_rsp_find_first_by_numeric(t_dp(), 1));
 }
 
 TEST_F(RspTest, rsp_load_single_binding) {
@@ -164,7 +164,7 @@ TEST_F(RspTest, rsp_load_single_binding) {
     gd_dp_rsp_t rsp1 = gd_dp_rsp_find_by_name(t_dp(), "rsp1");
     ASSERT_TRUE(rsp1);
 
-    EXPECT_TRUE(rsp1 == gd_dp_rsp_find_by_numeric(t_dp(), 1));
+    EXPECT_TRUE(rsp1 == gd_dp_rsp_find_first_by_numeric(t_dp(), 1));
 }
 
 TEST_F(RspTest, rsp_load_multi_binding) {
@@ -181,8 +181,8 @@ TEST_F(RspTest, rsp_load_multi_binding) {
     gd_dp_rsp_t rsp1 = gd_dp_rsp_find_by_name(t_dp(), "rsp1");
     ASSERT_TRUE(rsp1);
 
-    EXPECT_TRUE(rsp1 == gd_dp_rsp_find_by_numeric(t_dp(), 1));
-    EXPECT_TRUE(rsp1 == gd_dp_rsp_find_by_string(t_dp(), "ack"));
+    EXPECT_TRUE(rsp1 == gd_dp_rsp_find_first_by_numeric(t_dp(), 1));
+    EXPECT_TRUE(rsp1 == gd_dp_rsp_find_first_by_string(t_dp(), "ack"));
 }
 
 TEST_F(RspTest, rsp_load_no_binding) {
