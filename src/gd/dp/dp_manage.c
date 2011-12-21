@@ -113,9 +113,13 @@ int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monit
     int rv;
     int count;
 
+    count = 0;
+
     gd_dp_rsp_find_by_string(&rspIt, req->m_mgr, cpe_hs_data(cmd));
 
     while((rsp = gd_dp_rsp_next(&rspIt))) {
+        ++count;
+
         if (rsp->m_processor == NULL) {
             CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
             rv = -1;
@@ -142,9 +146,13 @@ int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) 
     int rv;
     int count;
 
+    count = 0;
+
     gd_dp_rsp_find_by_numeric(&rspIt, req->m_mgr, cmd);
 
     while((rsp = gd_dp_rsp_next(&rspIt))) {
+        ++count;
+
         if (rsp->m_processor == NULL) {
             CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
             rv = -1;
@@ -163,4 +171,21 @@ int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) 
     }
 
     return rv;
+}
+
+int gd_dp_dispatch_by_name(const char * name, gd_dp_req_t req, error_monitor_t em) {
+    gd_dp_rsp_t rsp;
+    rsp = gd_dp_rsp_find_by_name(req->m_mgr, name);
+
+    if (rsp == 0) {
+        CPE_ERROR(em, "no responser name %s\n", name);
+        return -1;
+    }
+    
+    if (rsp->m_processor == NULL) {
+        CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
+        return -1;
+    }
+
+    return rsp->m_processor(req, rsp->m_context, em);
 }

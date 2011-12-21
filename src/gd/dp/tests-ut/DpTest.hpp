@@ -1,5 +1,5 @@
-#ifndef CPE_DR_TEST_HASHTEST_H
-#define CPE_DR_TEST_HASHTEST_H
+#ifndef GD_DP_TEST_DPTEST_H
+#define GD_DP_TEST_DPTEST_H
 #include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
 #include "gd/dp/tests-env/with_dp.hpp"

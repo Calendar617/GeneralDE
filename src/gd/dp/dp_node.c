@@ -48,7 +48,9 @@ void * gd_dp_node_data(gd_dp_node_t node) {
 }
 
 size_t gd_dp_node_capacity(gd_dp_node_t node) {
-    return gd_nm_node_capacity(node->m_nm_node) - sizeof(struct gd_dp_node);
+    return gd_nm_node_capacity(node->m_nm_node)
+        - sizeof(struct gd_dp_node)
+        - cpe_hs_binary_len(node->m_replay);
 }
 
 const char * gd_dp_node_name(gd_dp_node_t node) {
@@ -57,4 +59,12 @@ const char * gd_dp_node_name(gd_dp_node_t node) {
 
 cpe_hash_string_t gd_dp_node_name_hs(gd_dp_node_t node) {
     return gd_nm_node_name_hs(node->m_nm_node);
+}
+
+const char * gd_dp_node_replay(gd_dp_node_t node) {
+    return cpe_hs_data(node->m_replay);
+}
+
+cpe_hash_string_t gd_dp_node_replay_hs(gd_dp_node_t node) {
+    return node->m_replay;
 }

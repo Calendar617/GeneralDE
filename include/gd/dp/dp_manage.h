@@ -32,6 +32,7 @@ void gd_dp_rsp_find_by_string(gd_dp_rsp_it_t it, gd_dp_mgr_t dp, const char * cm
 
 int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monitor_t em);
 int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em);
+int gd_dp_dispatch_by_name(const char * name, gd_dp_req_t req, error_monitor_t em);
 
 /*iterator operations*/
 #define gd_dp_rsp_next(it) (it)->m_next_fun((it))

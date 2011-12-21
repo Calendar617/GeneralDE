@@ -7,12 +7,15 @@ void gd_dp_req_init(
     gd_dp_req_t req,
     gd_dp_mgr_t mgr, gd_dp_req_t parent,
     cpe_hash_string_t type,
+    gd_dp_node_t from, gd_dp_node_t to,
     void * data, size_t capacity)
 {
     req->m_mgr = mgr;
     req->m_talloc = parent ? parent->m_talloc : mgr->m_alloc;
     req->m_type = type;
     req->m_parent = parent;
+    req->m_from = from;
+    req->m_to = to;
     req->m_data = data;
     req->m_data_capacity = capacity;
     req->m_data_size = 0;
@@ -34,7 +37,7 @@ gd_dp_req_create(
         mem_alloc(mgr->m_alloc, sizeof(struct gd_dp_req ) + capacity);
     if (req == NULL) return NULL;
 
-    gd_dp_req_init(req, mgr, NULL, type, (void*)(req + 1), capacity);
+    gd_dp_req_init(req, mgr, NULL, type, NULL, NULL, (void*)(req + 1), capacity);
 
     return req;
 }
@@ -53,7 +56,7 @@ gd_dp_req_create_child(
     req = (gd_dp_req_t)
         mem_alloc(parent->m_mgr->m_alloc, sizeof(struct gd_dp_req ));
 
-    gd_dp_req_init(req, parent->m_mgr, parent, type, data, capacity);
+    gd_dp_req_init(req, parent->m_mgr, parent, type, parent->m_from, parent->m_to, data, capacity);
 
     TAILQ_INSERT_TAIL(&parent->m_childs, req, m_brother);
 
@@ -86,6 +89,32 @@ gd_dp_req_t gd_dp_req_parent_find(gd_dp_req_t req, cpe_hash_string_t typeName) {
     return req;
 }
 
+gd_dp_req_t gd_dp_req_child_find(gd_dp_req_t req, cpe_hash_string_t typeName) {
+    return NULL;
+}
+
+gd_dp_req_t gd_dp_req_brother_find(gd_dp_req_t req, cpe_hash_string_t typeName) {
+    gd_dp_req_t parent = req->m_parent;
+    gd_dp_req_t self = req;
+
+    while(parent) {
+        gd_dp_req_t brother;
+
+        TAILQ_FOREACH(brother, &parent->m_childs, m_brother) {
+            if (brother == self) continue;
+
+            if (cpe_hs_cmp(brother->m_type, typeName) == 0) {
+                return brother;
+            }
+        }
+
+        self = parent;
+        parent = parent->m_parent;
+    }
+
+    return NULL;
+}
+
 cpe_hash_string_t gd_dp_req_type_hs(gd_dp_req_t req) {
     return req->m_type;
 }
@@ -107,10 +136,6 @@ size_t gd_dp_req_size(gd_dp_req_t req) {
 }
 
 gd_dp_node_t gd_dp_req_from(gd_dp_req_t req) {
-    while(req->m_from == NULL && req->m_parent) {
-        req = req->m_parent;
-    }
-
     return req->m_from;
 }
 
@@ -119,10 +144,6 @@ void gd_dp_req_set_from(gd_dp_req_t req, gd_dp_node_t from) {
 }
 
 gd_dp_node_t gd_dp_req_to(gd_dp_req_t req) {
-    while(req->m_to == NULL && req->m_parent) {
-        req = req->m_parent;
-    }
-
     return req->m_to;
 }
 
@@ -157,7 +178,7 @@ int gd_dp_req_send(gd_dp_req_t req, error_monitor_t em) {
     return gd_dp_dispatch_by_string(req->m_to->m_replay, req, em);
 }
 
-int gd_dp_req_replay(gd_dp_req_t req, char * buf, size_t size, error_monitor_t em) {
+int gd_dp_req_replay(gd_dp_req_t req, void * buf, size_t size, error_monitor_t em) {
     gd_dp_req_t replayReq;
     int rv;
 
@@ -171,9 +192,10 @@ int gd_dp_req_replay(gd_dp_req_t req, char * buf, size_t size, error_monitor_t e
 
     gd_dp_req_set_to(replayReq, gd_dp_req_from(req));
     gd_dp_req_set_from(replayReq, gd_dp_req_to(req));
+    gd_dp_req_set_size(replayReq, size);
 
     rv = gd_dp_req_send(replayReq, em);
-    gd_dp_req_from(replayReq);
+    gd_dp_req_free(replayReq);
     return rv;
 }
 

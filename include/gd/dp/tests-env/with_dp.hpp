@@ -13,6 +13,8 @@ public:
     void TearDown();
 
     gd_dp_mgr_t t_dp();
+    gd_dp_req_t t_dp_req_create(const char * type, size_t capacity);
+    gd_dp_req_t t_dp_req_create_child(gd_dp_req_t req, const char * type, void * buf, size_t capacity);
 private:
     gd_dp_mgr_t m_dp;
 };

@@ -1,5 +1,6 @@
 #ifndef GD_DP_NODE_H
 #define GD_DP_NODE_H
+#include "cpe/utils/hash_string.h"
 #include "gd/nm/nm_types.h"
 #include "dp_types.h"
 
