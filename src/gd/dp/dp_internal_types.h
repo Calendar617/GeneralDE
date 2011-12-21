@@ -48,6 +48,7 @@ struct gd_dp_rsp {
     const char * m_name;
     size_t m_name_len;
 
+    gd_dp_rsp_type_t m_type;
     gd_dp_rsp_process_fun_t m_processor;
     void * m_context;
 

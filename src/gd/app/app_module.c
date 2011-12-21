@@ -271,9 +271,7 @@ int gd_app_modules_load(gd_app_context_t context) {
 
     rv = 0;
     cfg_seq_it_init(&cfgIt, moduleListCfg);
-    while(rv == 0
-          && (moduleCfg = cfg_find_cfg(cfg_seq_it_next(&cfgIt), "module")))
-    {
+    while(rv == 0 && (moduleCfg = cfg_seq_it_next(&cfgIt))) {
         if (gd_app_runing_module_create(context, moduleCfg) != 0) {
             rv = -1;
         }

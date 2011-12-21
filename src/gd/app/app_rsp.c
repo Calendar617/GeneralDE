@@ -268,7 +268,7 @@ static int gd_app_rsp_create(struct gd_app_rsp_create_ctx * ctx, cfg_t cfgNode) 
     if (rsp == NULL) {
         APP_CTX_ERROR(
             ctx->m_context,
-            "%s reading rsp: create rsp fail!", gd_app_module_name(ctx->m_module));
+            "%s reading rsp %s: create rsp fail!", gd_app_module_name(ctx->m_module), rspName);
         return -1;
     }
 
@@ -281,7 +281,7 @@ static int gd_app_rsp_create(struct gd_app_rsp_create_ctx * ctx, cfg_t cfgNode) 
     if (responsToCfg == NULL) {
         APP_CTX_ERROR(
             ctx->m_context,
-            "%s reading rsp: no respons cfg!", gd_app_module_name(ctx->m_module));
+            "%s reading rsp %s: no respons-to cfg!", gd_app_module_name(ctx->m_module), rspName);
         gd_dp_rsp_free(rsp);
         return -1;
     }
@@ -294,7 +294,8 @@ static int gd_app_rsp_create(struct gd_app_rsp_create_ctx * ctx, cfg_t cfgNode) 
     if (gd_app_rsp_mgr_add_rsp(ctx->m_rspMgr, rspName) != 0) {
         APP_CTX_ERROR(
             ctx->m_context,
-            "%s reading rsp: add to rsp mgr fail, no memory!", gd_app_module_name(ctx->m_module));
+            "%s reading rsp %s: add to rsp mgr fail, no memory!",
+            gd_app_module_name(ctx->m_module), rspName);
         gd_dp_rsp_free(rsp);
         return -1;
     }
@@ -343,7 +344,6 @@ int gd_app_rsp_load_i(
         cfg_struct_it_init(&cfgIt, rspsCfg);
         while((subRspsCfg = cfg_struct_it_next(&cfgIt))) {
             if (gd_app_rsp_load_i(ctx, subRspsCfg) != 0) {
-                printf("aaa\n");
                 rv = -1;
             }
         }

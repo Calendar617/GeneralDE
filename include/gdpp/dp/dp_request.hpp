@@ -11,6 +11,7 @@ public:
     size_t size(void) { return gd_dp_req_size((gd_dp_req_t)this); }
     mem_allocrator_t talloc(void) { return gd_dp_req_talloc((gd_dp_req_t)this); }
 
+    static Request * _cast(gd_dp_req_t req) { return (Request *)req; }
 private:
     Request();
     ~Request();

@@ -16,6 +16,7 @@ gd_dp_rsp_t gd_dp_rsp_create(gd_dp_mgr_t dp, const char * name) {
     r->m_name_len = nameLen;
     r->m_bindings = NULL;
     r->m_processor = NULL;
+    r->m_type = NULL;
     r->m_context = NULL;
     cpe_hash_entry_init(&r->m_hh);
     memcpy((char*)r->m_name, name, nameLen + 1);
@@ -31,6 +32,10 @@ gd_dp_rsp_t gd_dp_rsp_create(gd_dp_mgr_t dp, const char * name) {
 void gd_dp_rsp_free_i(gd_dp_rsp_t rsp) {
     while(rsp->m_bindings) {
         gd_dp_binding_free(rsp->m_bindings);
+    }
+
+    if (rsp->m_type && rsp->m_type->destruct) {
+        rsp->m_type->destruct(rsp);
     }
 
     mem_free(rsp->m_dp->m_alloc, rsp);
@@ -56,6 +61,11 @@ int gd_dp_rsp_set_opt(gd_dp_rsp_t rsp, gd_dp_rsp_opt_t opt, ...) {
         rv = 0;
         break;
     }
+    case gd_dp_rsp_set_type: {
+        rsp->m_type = va_arg(ap, gd_dp_rsp_type_t);
+        rv = 0;
+        break;
+    }
     case gd_dp_rsp_set_context: {
         rsp->m_context = va_arg(ap, void*);
         rv = 0;
@@ -74,6 +84,14 @@ int gd_dp_rsp_set_opt(gd_dp_rsp_t rsp, gd_dp_rsp_opt_t opt, ...) {
 
 gd_dp_rsp_process_fun_t gd_dp_rsp_processor(gd_dp_rsp_t rsp) {
     return rsp->m_processor;
+}
+
+gd_dp_rsp_type_t gd_dp_rsp_type(gd_dp_rsp_t rsp) {
+    return rsp->m_type;
+}
+
+void * gd_dp_rsp_context(gd_dp_rsp_t rsp) {
+    return rsp->m_context;
 }
 
 int32_t gd_dp_rsp_hash(const gd_dp_rsp_t rsp) {
