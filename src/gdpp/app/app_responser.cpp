@@ -1,4 +1,6 @@
 #include <cassert>
+#include <stdexcept>
+#include <typeinfo>
 #include "gdpp/dp/dp_request.hpp"
 #include "gdpp/app/app_responser.hpp"
 
@@ -9,11 +11,23 @@ Responser::~Responser() {
 
 int Responser::_process(gd_dp_req_t req, void * ctx, error_monitor_t em) {
     assert(ctx);
-    return ((Responser *)ctx)->process(*Dp::Request::_cast(req), em);
+    try {
+        return ((Responser *)ctx)->process(*Dp::Request::_cast(req), em);
+    }
+    catch(::std::exception const & e) {
+        CPE_ERROR(
+            em,
+            "process request: catch exception(%s): %s",
+            typeid(e).name(), e.what());
+    }
+    catch(...) {
+        CPE_ERROR(em, "process request: catch unknown error!");
+    }
+    return -1;
 }
 
 static void destoryResponser(gd_dp_rsp_t rsp) {
-    delete ((Responser *)gd_dp_rsp_context(rsp));
+    ((Responser *)gd_dp_rsp_context(rsp))->~Responser();
 }
 
 struct gd_dp_rsp_type g_AppResponserType = {

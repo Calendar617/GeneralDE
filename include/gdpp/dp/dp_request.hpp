@@ -19,9 +19,32 @@ public:
         return gd_dp_req_replay((gd_dp_req_t)this, buf, size, NULL);
     }
 
+    Request & parent(cpe_hash_string_t type);
+
+    Request * findParent(cpe_hash_string_t type) { 
+        return (Request*)gd_dp_req_parent_find((gd_dp_req_t)this, type);
+    }
+
+    Request & brother(cpe_hash_string_t type);
+
+    Request * findBrother(cpe_hash_string_t type) { 
+        return (Request*)gd_dp_req_brother_find((gd_dp_req_t)this, type);
+    }
+
+    Request & child(cpe_hash_string_t type);
+
+    Request * findChild(cpe_hash_string_t type) { 
+        return (Request*)gd_dp_req_child_find((gd_dp_req_t)this, type);
+    }
+
     static Request * _cast(gd_dp_req_t req) { return (Request *)req; }
 
+    template<typename T>
+    T & as(void) { checkSize(sizeof(T)); return *((T*)gd_dp_req_data((gd_dp_req_t)this)); }
+
 private:
+    void checkSize(size_t size);
+
     Request();
     ~Request();
 };
