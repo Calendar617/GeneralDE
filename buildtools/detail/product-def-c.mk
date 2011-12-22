@@ -25,9 +25,11 @@ c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
                            $(addprefix -D,$(sort $(call product-gen-depend-value-list,$1,product.c.defs))) \
                            $(r.$1.c.flags.cpp)
 
+COMPILE.mm=$(COMPILE.cc)
 product-def-c-linker-c=$(LINK.c)
 product-def-c-linker-cpp=$(LINK.cc)
-product-def-c-linker-objc=$(LINK.m)
+product-def-c-linker-obj-c=$(LINK.c)
+product-def-c-linker-obj-cpp=$(LINK.cc)
 
 # $(call c-make-depend,source-file,object-file,depend-file,product-name)
 define c-make-depend
@@ -52,7 +54,7 @@ $(call compile-rule.cc,$1,$2,$3)
 endef
 
 define compile-rule.mm
-$(call compile-rule.c,$1,$2,$3)
+$(call compile-rule.cc,$1,$2,$3)
 endef
 
 define compile-rule.m
@@ -63,8 +65,9 @@ define product-def-c-select-linker
 $(strip \
     $(if $(filter .cc,$1),cpp \
 	    , $(if $(filter .cpp,$1),cpp \
-	        , $(if $(filter .mm,$1),objc \
-                , c))))
+	        , $(if $(filter .mm,$1),obj-cpp \
+	            , $(if $(filter .m,$1),obj-c \
+                    , c)))))
 endef
 
 define product-def-rule-c-product-for-lib
