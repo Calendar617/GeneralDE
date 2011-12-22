@@ -79,8 +79,7 @@ struct gd_dp_req {
 
 struct gd_dp_node {
     gd_nm_node_t m_nm_node;
-    cpe_hash_string_t m_replay;
-    size_t m_capacity;
+    gd_dp_node_type_t m_type;
 };
 
 #ifdef __cplusplus

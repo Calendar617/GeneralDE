@@ -5,36 +5,43 @@
 #include "gd/dp/dp_node.h"
 #include "dp_internal_types.h"
 
+static void gd_dp_node_destory(gd_nm_node_t node) {
+    gd_dp_node_t r = (gd_dp_node_t)gd_nm_node_data(node);
+
+    if (r->m_type && r->m_type->destruct) {
+        r->m_type->destruct(r);
+    }
+}
+
+static struct gd_nm_node_type g_dp_node_type = {
+    "dp_node"
+    , gd_dp_node_destory
+};
+
 gd_dp_node_t
 gd_dp_node_create(
     gd_nm_mgr_t nmm,
     const char * name,
-    const char * replay,
+    gd_dp_node_type_t type,
     size_t capacity)
 {
-    size_t replayLen;
     gd_dp_node_t r;
     gd_nm_node_t nmNode;
-    char * buf;
 
     assert(nmm);
     assert(name);
-    assert(replay);
-
-    replayLen = cpe_hs_len_to_binary_len(strlen(replay));
+    assert(type);
 
     nmNode = gd_nm_instance_create(
         nmm, name,
-        replayLen + sizeof(struct gd_dp_node) + capacity);
+        sizeof(struct gd_dp_node) + capacity);
     if (nmNode == NULL) return NULL;
 
-    buf = gd_nm_node_data(nmNode);
-    cpe_hs_init((cpe_hash_string_t)buf, replayLen, replay);
+    gd_nm_node_set_type(nmNode, &g_dp_node_type);
 
-    r = (gd_dp_node_t)(buf + replayLen);
+    r = (gd_dp_node_t)gd_nm_node_data(nmNode);
     r->m_nm_node = nmNode;
-    r->m_replay = (cpe_hash_string_t)buf;
-
+    r->m_type = type;
     return r;
 }
 
@@ -48,9 +55,7 @@ void * gd_dp_node_data(gd_dp_node_t node) {
 }
 
 size_t gd_dp_node_capacity(gd_dp_node_t node) {
-    return gd_nm_node_capacity(node->m_nm_node)
-        - sizeof(struct gd_dp_node)
-        - cpe_hs_binary_len(node->m_replay);
+    return gd_nm_node_capacity(node->m_nm_node) - sizeof(struct gd_dp_node);
 }
 
 const char * gd_dp_node_name(gd_dp_node_t node) {
@@ -61,10 +66,6 @@ cpe_hash_string_t gd_dp_node_name_hs(gd_dp_node_t node) {
     return gd_nm_node_name_hs(node->m_nm_node);
 }
 
-const char * gd_dp_node_replay(gd_dp_node_t node) {
-    return cpe_hs_data(node->m_replay);
-}
-
-cpe_hash_string_t gd_dp_node_replay_hs(gd_dp_node_t node) {
-    return node->m_replay;
+gd_dp_node_type_t gd_dp_node_type(gd_dp_node_t node) {
+    return node->m_type;
 }

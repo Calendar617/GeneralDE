@@ -170,12 +170,17 @@ int gd_dp_req_send(gd_dp_req_t req, error_monitor_t em) {
         return -1;
     }
 
-    if (req->m_to->m_replay == NULL) {
+    if (req->m_to->m_type == NULL) {
+        CPE_ERROR(em, "requesnt send to %s have type!", gd_dp_node_name(req->m_to));
+        return -1;
+    }
+
+    if (req->m_to->m_type->send == NULL) {
         CPE_ERROR(em, "requesnt send to %s have replay!", gd_dp_node_name(req->m_to));
         return -1;
     }
 
-    return gd_dp_dispatch_by_string(req->m_to->m_replay, req, em);
+    return req->m_to->m_type->send(req->m_to, req, em);
 }
 
 int gd_dp_req_replay(gd_dp_req_t req, void * buf, size_t size, error_monitor_t em) {
@@ -183,6 +188,15 @@ int gd_dp_req_replay(gd_dp_req_t req, void * buf, size_t size, error_monitor_t e
     int rv;
 
     if (req == NULL || buf == NULL) return -1;
+
+    if (req->m_from == NULL) {
+        CPE_ERROR(em, "req have no from field, can`t replay!");
+        return -1;
+    }
+
+    if (req->m_from->m_type && req->m_from->m_type->replay) {
+        return req->m_from->m_type->replay(req->m_from, req, buf, size, em);
+    }
 
     replayReq = gd_dp_req_create_child(req, gd_dp_req_type_replay, buf, size);
     if (replayReq == NULL) {

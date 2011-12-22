@@ -166,7 +166,7 @@ int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) 
     }
 
     if (count == 0) {
-        CPE_ERROR(em, "no responser to process %s\n", cpe_hs_data(cmd));
+        CPE_ERROR(em, "no responser to process %d", cmd);
         return -1;
     }
 

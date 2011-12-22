@@ -12,15 +12,13 @@ gd_dp_node_t
 gd_dp_node_create(
     gd_nm_mgr_t nmm,
     const char * name,
-    const char * replayRsp,
+    gd_dp_node_type_t type,
     size_t capacity);
 
 void gd_dp_node_free(gd_dp_node_t node);
 const char * gd_dp_node_name(gd_dp_node_t node);
 cpe_hash_string_t gd_dp_node_name_hs(gd_dp_node_t node);
-
-const char * gd_dp_node_replay(gd_dp_node_t node);
-cpe_hash_string_t gd_dp_node_replay_hs(gd_dp_node_t node);
+gd_dp_node_type_t gd_dp_node_type(gd_dp_node_t node);
 
 void * gd_dp_node_data(gd_dp_node_t node);
 size_t gd_dp_node_capacity(gd_dp_node_t node);
