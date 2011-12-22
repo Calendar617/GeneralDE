@@ -71,7 +71,7 @@ $(strip \
 endef
 
 define product-def-rule-c-product-for-lib
-r.$1.c.lib.type=$(if $(r.$1.c.lib.type),$(r.$1.c.lib.type),$($(dev-env).default-lib-type))
+$(eval r.$1.c.lib.type=$(if $(r.$1.c.lib.type),$(r.$1.c.lib.type),$($(dev-env).default-lib-type)))
 r.$1.product.c.libraries+=$1
 r.$1.product.c.ldpathes+=$(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib)
 r.$1.product:=$(if $(r.$1.product),$(r.$1.product),\
@@ -81,6 +81,10 @@ endef
 define product-def-rule-c-product-for-progn
 r.$1.product:=$(if $(r.$1.product),$(r.$1.product),$(r.$1.output)/$1)
 endef
+
+product-def-rule-c-link-cmd-progn=$$(product-def-c-linker-$(r.$1.c.linker)) $2 -o $3 $$(call c-generate-depend-ld-flags,$1)
+product-def-rule-c-link-cmd-lib-share=$$(product-def-c-linker-$(r.$1.c.linker)) $2 -o $3 $$(call c-generate-depend-ld-flags,$1)
+product-def-rule-c-link-cmd-lib-static=$$(AR) $$(ARFLAGS) $3 $2
 
 # $(call product-def-rule-c-product,product-name,type)
 define product-def-rule-c-product
@@ -108,21 +112,9 @@ auto-build-dirs += $(dir $(CPDE_OUTPUT_ROOT)/$(r.$1.product))
 
 $1: $(CPDE_OUTPUT_ROOT)/$(r.$1.product)
 
-ifeq ($2,progn)
 $(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
 	$$(call with_message,linking $(r.$1.product) ...) \
-		$$(product-def-c-linker-$(r.$1.c.linker)) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
-else
-ifeq (dynamic,$(r.$1.c.lib.type))
-$(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
-	$$(call with_message,linking $(r.$1.product) ...) \
-		$$(product-def-c-linker-$(r.$1.c.linker)) $(LDFLAGS.share) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
-else
-$(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
-	$$(call with_message,linking $(r.$1.product) ...) \
-		$$(AR) $(ARFLAGS) $$@ $$^
-endif
-endif
+        $(call product-def-rule-c-link-cmd-$(if $(filter progn,$2),progn,lib-$(r.$1.c.lib.type)),$1, $$^, $$@)
 
 $(foreach f,$(r.$1.c.sources),$(call compile-rule$(suffix $f),$(call c-source-to-object,$f),$f,$1))
 
