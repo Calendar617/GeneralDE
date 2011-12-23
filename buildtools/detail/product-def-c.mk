@@ -83,7 +83,7 @@ r.$1.product:=$(if $(r.$1.product),$(r.$1.product),$(r.$1.output)/$1)
 endef
 
 product-def-rule-c-link-cmd-progn=$$(product-def-c-linker-$(r.$1.c.linker)) $2 -o $3 $$(call c-generate-depend-ld-flags,$1)
-product-def-rule-c-link-cmd-lib-share=$$(product-def-c-linker-$(r.$1.c.linker)) $2 -o $3 $$(call c-generate-depend-ld-flags,$1)
+product-def-rule-c-link-cmd-lib-dynamic=$$(product-def-c-linker-$(r.$1.c.linker)) $(LDFLAGS.share) $2 -o $3 $$(call c-generate-depend-ld-flags,$1)
 product-def-rule-c-link-cmd-lib-static=$$(AR) $$(ARFLAGS) $3 $2
 
 # $(call product-def-rule-c-product,product-name,type)
