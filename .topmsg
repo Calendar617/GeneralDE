@@ -1,0 +1,6 @@
+From: lokiwang <wangjian1009@gmail.com>
+Subject: [PATCH] t/3rdTools/log4c
+
+trace log4c in dev env
+
+Signed-off-by: lokiwang <wangjian1009@gmail.com>
