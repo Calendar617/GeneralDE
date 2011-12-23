@@ -1,7 +1,7 @@
 #ifndef GDPP_DP_REQUEST_H
 #define GDPP_DP_REQUEST_H
 #include "gd/dp/dp_request.h"
-#include "dp_system.hpp"
+#include "System.hpp"
 
 namespace Gd { namespace Dp {
 

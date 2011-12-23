@@ -1,8 +1,7 @@
 #ifndef GDPP_APP_RESPONSER_H
 #define GDPP_APP_RESPONSER_H
 #include "gd/dp/dp_responser.h"
-#include "gdpp/dp/dp_system.hpp"
-#include "app_system.hpp"
+#include "System.hpp"
 
 namespace Gd { namespace App {
 

@@ -1,7 +1,8 @@
-#ifndef GD_TLPP_TIMER_H
-#define GD_TLPP_TIMER_H
+#ifndef GDPP_TL_TIMER_H
+#define GDPP_TL_TIMER_H
+#include "System.hpp"
 
-namespace Tlpp {
+namespace Gd { namespace Tl {
 
 class Timer {
 public:
@@ -9,7 +10,7 @@ public:
     virtual ~Timer() throw();
 };
 
-}
+}}
 
 #endif
 

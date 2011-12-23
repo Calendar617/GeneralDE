@@ -1,6 +1,6 @@
 #include <sstream>
 #include <stdexcept>
-#include "gdpp/dp/dp_request.hpp"
+#include "gdpp/dp/Request.hpp"
 
 namespace Gd { namespace Dp {
 
