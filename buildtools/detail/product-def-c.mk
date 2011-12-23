@@ -25,9 +25,11 @@ c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
                            $(addprefix -D,$(sort $(call product-gen-depend-value-list,$1,product.c.defs))) \
                            $(r.$1.c.flags.cpp)
 
+COMPILE.mm=$(COMPILE.cc)
 product-def-c-linker-c=$(LINK.c)
 product-def-c-linker-cpp=$(LINK.cc)
-product-def-c-linker-objc=$(LINK.m)
+product-def-c-linker-obj-c=$(LINK.c)
+product-def-c-linker-obj-cpp=$(LINK.cc)
 
 # $(call c-make-depend,source-file,object-file,depend-file,product-name)
 define c-make-depend
@@ -52,7 +54,7 @@ $(call compile-rule.cc,$1,$2,$3)
 endef
 
 define compile-rule.mm
-$(call compile-rule.c,$1,$2,$3)
+$(call compile-rule.cc,$1,$2,$3)
 endef
 
 define compile-rule.m
@@ -63,12 +65,13 @@ define product-def-c-select-linker
 $(strip \
     $(if $(filter .cc,$1),cpp \
 	    , $(if $(filter .cpp,$1),cpp \
-	        , $(if $(filter .mm,$1),objc \
-                , c))))
+	        , $(if $(filter .mm,$1),obj-cpp \
+	            , $(if $(filter .m,$1),obj-c \
+                    , c)))))
 endef
 
 define product-def-rule-c-product-for-lib
-r.$1.c.lib.type=$(if $(r.$1.c.lib.type),$(r.$1.c.lib.type),$($(dev-env).default-lib-type))
+$(eval r.$1.c.lib.type=$(if $(r.$1.c.lib.type),$(r.$1.c.lib.type),$($(dev-env).default-lib-type)))
 r.$1.product.c.libraries+=$1
 r.$1.product.c.ldpathes+=$(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib)
 r.$1.product:=$(if $(r.$1.product),$(r.$1.product),\
@@ -78,6 +81,10 @@ endef
 define product-def-rule-c-product-for-progn
 r.$1.product:=$(if $(r.$1.product),$(r.$1.product),$(r.$1.output)/$1)
 endef
+
+product-def-rule-c-link-cmd-progn=$$(product-def-c-linker-$(r.$1.c.linker)) $2 -o $3 $$(call c-generate-depend-ld-flags,$1)
+product-def-rule-c-link-cmd-lib-share=$$(product-def-c-linker-$(r.$1.c.linker)) $2 -o $3 $$(call c-generate-depend-ld-flags,$1)
+product-def-rule-c-link-cmd-lib-static=$$(AR) $$(ARFLAGS) $3 $2
 
 # $(call product-def-rule-c-product,product-name,type)
 define product-def-rule-c-product
@@ -91,7 +98,7 @@ $(eval $(if $(filter lib,$2), $(call product-def-rule-c-product-for-lib,$1,$2) \
 	      , $(if $(filter progn,$2),$(call product-def-rule-c-product-for-progn,$1,$2)\
                  , $(warning unknown c-product-type of $1: $2)))) \
 
-$(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.c.sources)) \
+$(eval r.$1.cleanup+=$(call c-source-to-object,$(r.$1.c.sources)) \
                      $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources))) \
                      $(CPDE_OUTPUT_ROOT)/$(r.$1.product) \
 )
@@ -105,21 +112,9 @@ auto-build-dirs += $(dir $(CPDE_OUTPUT_ROOT)/$(r.$1.product))
 
 $1: $(CPDE_OUTPUT_ROOT)/$(r.$1.product)
 
-ifeq ($2,progn)
 $(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
 	$$(call with_message,linking $(r.$1.product) ...) \
-		$$(product-def-c-linker-$(r.$1.c.linker)) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
-else
-ifeq (dynamic,$(r.$1.c.lib.type))
-$(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
-	$$(call with_message,linking $(r.$1.product) ...) \
-		$$(product-def-c-linker-$(r.$1.c.linker)) $(LDFLAGS.share) $$^ -o $$@ $$(call c-generate-depend-ld-flags,$1)
-else
-$(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources))
-	$$(call with_message,linking $(r.$1.product) ...) \
-		$$(AR) $(ARFLAGS) $$@ $$^
-endif
-endif
+        $(call product-def-rule-c-link-cmd-$(if $(filter progn,$2),progn,lib-$(r.$1.c.lib.type)),$1, $$^, $$@)
 
 $(foreach f,$(r.$1.c.sources),$(call compile-rule$(suffix $f),$(call c-source-to-object,$f),$f,$1))
 
