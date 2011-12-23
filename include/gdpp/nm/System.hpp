@@ -5,6 +5,7 @@
 namespace Gd { namespace Nm {
 
 class Object;
+class Group;
 class Manager;
 
 }}
