@@ -26,4 +26,9 @@ Object & Manager::object(cpe_hash_string_t name) {
     return *r;
 }
 
+void Manager::removeObject(cpe_hash_string_t name) {
+    gd_nm_node_free(
+        gd_nm_mgr_find_node(*this, name));
+}
+
 }}

@@ -27,6 +27,8 @@ public:
     Object const & object(cpe_hash_string_t name) const;
     Object & object(cpe_hash_string_t name);
 
+    void removeObject(cpe_hash_string_t name);
+
 private:
     ~Manager();
     Manager();

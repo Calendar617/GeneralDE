@@ -7,9 +7,11 @@ namespace Gd { namespace App {
 
 class Application {
 public:
-    int argc(void) const { return gd_app_argc((gd_app_context_t)this); }
+    int argc(void) const { return gd_app_argc(*this); }
 
-    Nm::Manager & nmManager(void) { return *((Nm::Manager *)(void*)gd_app_nm_mgr((gd_app_context_t)this)); }
+    Nm::Manager & nmManager(void) { return *((Nm::Manager *)gd_app_nm_mgr(*this)); }
+
+    operator gd_app_context_t () const { return (gd_app_context_t)(void*)this; }
 
 private:
     Application();

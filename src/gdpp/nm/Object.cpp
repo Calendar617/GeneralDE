@@ -29,6 +29,7 @@ Object::~Object() {
 }
 
 void * Object::operator new (size_t size, gd_nm_mgr_t nmm, const char * name) {
+    printf("name=%s, size=%d, nmm=%p\n", name, size, nmm);
     gd_nm_node_t node = gd_nm_instance_create(nmm, name, size);
     if (node == NULL) {
         throw ::std::bad_alloc();
