@@ -98,7 +98,7 @@ $(eval $(if $(filter lib,$2), $(call product-def-rule-c-product-for-lib,$1,$2) \
 	      , $(if $(filter progn,$2),$(call product-def-rule-c-product-for-progn,$1,$2)\
                  , $(warning unknown c-product-type of $1: $2)))) \
 
-$(eval r.$1.cleanup:=$(call c-source-to-object,$(r.$1.c.sources)) \
+$(eval r.$1.cleanup+=$(call c-source-to-object,$(r.$1.c.sources)) \
                      $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources))) \
                      $(CPDE_OUTPUT_ROOT)/$(r.$1.product) \
 )
