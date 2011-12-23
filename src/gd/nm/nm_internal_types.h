@@ -46,8 +46,8 @@ struct gd_nm_binding {
 };
 
 struct gd_nm_group {
-    GD_NM_NODE_HEAD();
     struct cpe_hash_table m_members;
+    GD_NM_NODE_HEAD();
 };
 
 struct gd_nm_instance {
@@ -71,6 +71,12 @@ struct gd_nm_node_in_group_it {
     struct cpe_hash_it m_hash_it;
 };
 extern char check_node_in_group_it_size[sizeof(struct gd_nm_node_it) - sizeof(struct gd_nm_node_in_group_it)];
+
+#define gd_nm_group_from_node(n) ((struct gd_nm_group*)(((char*)(n)) - ((sizeof(struct gd_nm_group) - sizeof(struct gd_nm_node)))))
+#define gd_nm_node_from_group(n) ((gd_nm_node_t)(((char*)(n)) + ((sizeof(struct gd_nm_group) - sizeof(struct gd_nm_node)))))
+
+#define gd_nm_instance_from_node(n) ((struct gd_nm_instance*)(((char*)(n)) - ((sizeof(struct gd_nm_instance) - sizeof(struct gd_nm_node)))))
+#define gd_nm_node_from_instance(n) ((gd_nm_node_t)(((char*)(n)) + ((sizeof(struct gd_nm_instance) - sizeof(struct gd_nm_node)))))
 
 #ifdef __cplusplus
 }

@@ -10,11 +10,11 @@ gd_nm_instance_create(gd_nm_mgr_t nmm, const char *  name, size_t capacity) {
     assert(nmm);
     assert(name);
 
-    instance = (struct gd_nm_instance *)
+    instance = gd_nm_instance_from_node(
         gd_nm_node_alloc(
             nmm, name,
             gd_nm_node_instance, sizeof(struct gd_nm_instance),
-            capacity);
+            capacity));
     if (instance == NULL) return NULL;
 
     if (cpe_hash_table_insert_unique(&nmm->m_nodes, instance) != 0) {
@@ -22,5 +22,5 @@ gd_nm_instance_create(gd_nm_mgr_t nmm, const char *  name, size_t capacity) {
         return NULL;
     }
 
-    return (gd_nm_node_t)instance;
+    return gd_nm_node_from_instance(instance);
 }

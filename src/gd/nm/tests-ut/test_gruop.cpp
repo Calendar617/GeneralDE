@@ -103,3 +103,9 @@ TEST_F(NmTest, group_member_count_not_group) {
     EXPECT_EQ(-1, gd_nm_group_member_count(i1));
 }
 
+TEST_F(NmTest, group_data_to_node) {
+    gd_nm_node_t g1 = t_nm_add_group("g1", 128);
+    EXPECT_TRUE(g1);
+
+    EXPECT_TRUE(g1 == gd_nm_node_from_data(gd_nm_node_data(g1)));
+}

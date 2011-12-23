@@ -4,17 +4,19 @@
 
 gd_nm_node_t
 gd_nm_group_create(gd_nm_mgr_t nmm, const char * name, size_t capacity) {
+    gd_nm_node_t node;
     struct gd_nm_group * group;
 
     assert(nmm);
     assert(name);
 
-    group = (struct gd_nm_group *)
-        gd_nm_node_alloc(
-            nmm, name,
-            gd_nm_node_group, sizeof(struct gd_nm_group),
-            capacity);
-    if (group == NULL) return NULL;
+    node = gd_nm_node_alloc(
+        nmm, name,
+        gd_nm_node_group, sizeof(struct gd_nm_group),
+        capacity);
+    if (node == NULL) return NULL;
+
+    group = gd_nm_group_from_node(node);
 
     if (cpe_hash_table_init(
             &group->m_members,
@@ -24,7 +26,7 @@ gd_nm_group_create(gd_nm_mgr_t nmm, const char * name, size_t capacity) {
             CPE_HASH_OBJ2ENTRY(gd_nm_binding, m_hh_for_group),
             0) != 0)
     {
-        gd_nm_node_free_from_mgr((gd_nm_node_t)group);
+        gd_nm_node_free_from_mgr(node);
         return NULL;
     }
 
@@ -33,17 +35,17 @@ gd_nm_group_create(gd_nm_mgr_t nmm, const char * name, size_t capacity) {
         (cpe_hash_destory_t)gd_nm_binding_free_from_group,
         NULL);
 
-    if (cpe_hash_table_insert_unique(&nmm->m_nodes, group) != 0) {
+    if (cpe_hash_table_insert_unique(&nmm->m_nodes, node) != 0) {
         gd_nm_group_free_from_mgr(group);
         return NULL;
     }
     
-    return (gd_nm_node_t)group;
+    return node;
 }
 
 void gd_nm_group_free_from_mgr(struct gd_nm_group * group) {
     cpe_hash_table_fini(&group->m_members);
-    gd_nm_node_free_from_mgr_base((gd_nm_node_t)group);
+    gd_nm_node_free_from_mgr_base(gd_nm_node_from_group(group));
 }
 
 int gd_nm_group_add_member(gd_nm_node_t grp, gd_nm_node_t sub) {
@@ -54,7 +56,7 @@ int gd_nm_group_add_member(gd_nm_node_t grp, gd_nm_node_t sub) {
         return -1;
     }
 
-    return (gd_nm_binding_create((struct gd_nm_group *)grp, sub) == NULL) ? -1 : 0;
+    return (gd_nm_binding_create(gd_nm_group_from_node(grp), sub) == NULL) ? -1 : 0;
 }
 
 gd_nm_node_t gd_nm_group_next_member(gd_nm_node_it_t it) {
@@ -68,16 +70,16 @@ gd_nm_node_t gd_nm_group_next_member(gd_nm_node_it_t it) {
     return binding ? binding->m_node : NULL;
 }
 
-int gd_nm_group_members(gd_nm_node_it_t it, gd_nm_node_t group) {
+int gd_nm_group_members(gd_nm_node_it_t it, gd_nm_node_t node) {
     struct gd_nm_node_in_group_it * nodeIt;
 
     assert(it);
-    if (group == NULL
-        || group->m_category != gd_nm_node_group) return -1;
+    if (node == NULL
+        || node->m_category != gd_nm_node_group) return -1;
 
     nodeIt = (struct gd_nm_node_in_group_it *)it;
     nodeIt->m_next_fun = gd_nm_group_next_member;
-    cpe_hash_it_init(&nodeIt->m_hash_it, &((struct gd_nm_group *)group)->m_members);
+    cpe_hash_it_init(&nodeIt->m_hash_it, &(gd_nm_group_from_node(node))->m_members);
 
     return 0;
 }
@@ -90,7 +92,7 @@ void gd_nm_group_free_members(gd_nm_node_t node) {
     assert(node->m_category == gd_nm_node_group);
     if (node->m_category != gd_nm_node_group) return;
 
-    cpe_hash_it_init(&it, &((struct gd_nm_group *)node)->m_members);
+    cpe_hash_it_init(&it, &(gd_nm_group_from_node(node))->m_members);
 
     binding = (struct gd_nm_binding *)cpe_hash_it_next(&it);
     preNode = binding ? binding->m_node : NULL;
@@ -105,21 +107,21 @@ void gd_nm_group_free_members(gd_nm_node_t node) {
     }
 }
 
-int gd_nm_group_member_count(gd_nm_node_t group) {
-    if (group->m_category != gd_nm_node_group) {
+int gd_nm_group_member_count(gd_nm_node_t node) {
+    if (node->m_category != gd_nm_node_group) {
         return -1;
     }
     else {
-        return cpe_hash_table_count(&((struct gd_nm_group *)group)->m_members);
+        return cpe_hash_table_count(&(gd_nm_group_from_node(node))->m_members);
     }
 }
 
-gd_nm_node_t gd_nm_group_find_member(gd_nm_node_t group, cpe_hash_string_t name) {
+gd_nm_node_t gd_nm_group_find_member(gd_nm_node_t node, cpe_hash_string_t name) {
     struct gd_nm_binding * binding;
     struct gd_nm_node buf_node;
     struct gd_nm_binding buf_binding;
 
-    if (group->m_category != gd_nm_node_group) {
+    if (node->m_category != gd_nm_node_group) {
         return NULL;
     }
 
@@ -127,7 +129,7 @@ gd_nm_node_t gd_nm_group_find_member(gd_nm_node_t group, cpe_hash_string_t name)
     buf_node.m_name = name;
 
     binding = (struct gd_nm_binding *)
-        cpe_hash_table_find(&((struct gd_nm_group *)group)->m_members, &buf_binding);
+        cpe_hash_table_find(&(gd_nm_group_from_node(node))->m_members, &buf_binding);
 
     return binding == NULL ? NULL : binding->m_node;
 }

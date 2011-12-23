@@ -1,5 +1,6 @@
 #ifndef GD_NM_NODE_H
 #define GD_NM_NODE_H
+#include "cpe/utils/hash_string.h"
 #include "cpe/utils/memory.h"
 #include "nm_types.h"
 
@@ -25,6 +26,8 @@ int gd_nm_node_groups(gd_nm_node_it_t it, gd_nm_node_t node);
 int gd_nm_group_members(gd_nm_node_it_t it, gd_nm_node_t group);
 int gd_nm_group_member_count(gd_nm_node_t group);
 gd_nm_node_t gd_nm_group_find_member(gd_nm_node_t group, cpe_hash_string_t name);
+
+gd_nm_node_t gd_nm_node_from_data(void * data);
 
 /*iterator operations*/
 #define gd_nm_node_next(it) (it)->m_next_fun((it))

@@ -1,5 +1,6 @@
 #ifndef GD_DP_TEST_NODETEST_H
 #define GD_DP_TEST_NODETEST_H
+#include "cpe/utils/tests-env/test-fixture.hpp"
 #include "gd/dp/dp_node.h"
 #include "gd/nm/tests-env/with_nm.hpp"
 #include "DpTest.hpp"

@@ -55,3 +55,9 @@ TEST_F(NmTest, instance_it_empty) {
     EXPECT_STREQ("", t_nm_node_groups("i1").c_str());
 }
 
+TEST_F(NmTest, instance_data_to_node) {
+    gd_nm_node_t instance = t_nm_add_instance("abc", 128);
+    EXPECT_TRUE(instance);
+
+    EXPECT_TRUE(instance == gd_nm_node_from_data(gd_nm_node_data(instance)));
+}
