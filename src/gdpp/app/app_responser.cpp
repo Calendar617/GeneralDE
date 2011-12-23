@@ -1,8 +1,8 @@
 #include <cassert>
 #include <stdexcept>
 #include <typeinfo>
-#include "gdpp/dp/dp_request.hpp"
-#include "gdpp/app/app_responser.hpp"
+#include "gdpp/dp/Request.hpp"
+#include "gdpp/app/Responser.hpp"
 
 namespace Gd { namespace App {
 
