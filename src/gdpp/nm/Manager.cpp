@@ -71,9 +71,15 @@ Object & Manager::object(cpe_hash_string_t name) {
     return *r;
 }
 
-void Manager::removeObject(cpe_hash_string_t name) {
-    gd_nm_node_free(
-        gd_nm_mgr_find_node(*this, name));
+bool Manager::removeObject(cpe_hash_string_t name) {
+    gd_nm_node_t node = gd_nm_mgr_find_node(*this, name);
+    if (node) {
+        gd_nm_node_free(node);
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 Object const * Manager::findObjectNc(const char * name) const {

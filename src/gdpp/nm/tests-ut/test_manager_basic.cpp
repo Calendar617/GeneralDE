@@ -121,3 +121,21 @@ TEST_F(ManagerTest, objectNc_const_basic) {
 TEST_F(ManagerTest, objectNc_const_not_exist) {
     ASSERT_THROW(mgr_const().objectNc("not-exist-object"), ::std::exception);
 }
+
+TEST_F(ManagerTest, removeObject_basic) {
+    new(t_nm(), "object1") TestObject(*this, 1);
+
+    CPE_HS_DEF_VAR(name1, "object1");
+
+    EXPECT_EQ(
+        true,
+        mgr().removeObject(name1));
+}
+
+TEST_F(ManagerTest, removeObject_not_exist) {
+    CPE_HS_DEF_VAR(name1, "not-exist-object");
+
+    EXPECT_EQ(
+        false,
+        mgr().removeObject(name1));
+}

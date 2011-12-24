@@ -23,7 +23,7 @@ public:
     Object const & objectNc(const char * name) const;
     Object & objectNc(const char * name);
 
-    void removeObject(cpe_hash_string_t name);
+    bool removeObject(cpe_hash_string_t name);
 
 private:
     ~Manager();
