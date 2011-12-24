@@ -73,14 +73,15 @@ struct fixture_gen<Loki::Typelist<Head, Loki::NullType> >
     }
 };
 
-template <>
-struct fixture_gen<Loki::NullType> {
-    void SetUp() {}
-    void TearDown() {}
-};
+template<
+    typename EnvListT = Loki::NullType
+    , typename BaseT = Test
+    , bool isNull = Loki::IsSameType<EnvListT, Loki::NullType>::value
+>
+class fixture;
 
-template<typename EnvListT = Loki::NullType, typename BaseT = Test>
-class fixture : public BaseT, public fixture_gen<EnvListT> {
+template<typename EnvListT, typename BaseT>
+class fixture<EnvListT, BaseT, false> : public BaseT, public fixture_gen<EnvListT> {
 public:
     typedef fixture Base;
 
@@ -91,6 +92,24 @@ public:
 
     virtual void TearDown() {
         fixture_gen<EnvListT>::TearDown();
+        BaseT::TearDown();
+    }
+
+    using BaseT::t_allocrator;
+    using BaseT::t_alloc;
+    using BaseT::t_strdup;
+};
+
+template<typename EnvListT, typename BaseT>
+class fixture<EnvListT, BaseT, true> : public BaseT {
+public:
+    typedef fixture Base;
+
+    virtual void SetUp() {
+        BaseT::SetUp();
+    }
+
+    virtual void TearDown() {
         BaseT::TearDown();
     }
 
