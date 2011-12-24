@@ -1,11 +1,12 @@
 #ifndef GDPP_DP_REQUEST_H
 #define GDPP_DP_REQUEST_H
+#include "cpepp/utils/ClassCategory.hpp"
 #include "gd/dp/dp_request.h"
 #include "System.hpp"
 
 namespace Gd { namespace Dp {
 
-class Request {
+class Request : public Cpe::Utils::SimulateObject {
 public:
     void * data(void) { return gd_dp_req_data((gd_dp_req_t)this); }
     size_t size(void) { return gd_dp_req_size((gd_dp_req_t)this); }
@@ -44,9 +45,6 @@ public:
 
 private:
     void checkSize(size_t size);
-
-    Request();
-    ~Request();
 };
 
 }}

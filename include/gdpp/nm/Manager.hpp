@@ -1,12 +1,13 @@
 #ifndef GDPP_NM_MANAGE_H
 #define GDPP_NM_MANAGE_H
+#include "cpepp/utils/ClassCategory.hpp"
 #include "gd/nm/nm_manage.h"
 #include "System.hpp"
 #include "ObjectIterator.hpp"
 
 namespace Gd { namespace Nm {
 
-class Manager {
+class Manager : public Cpe::Utils::SimulateObject {
 public:
     operator gd_nm_mgr_t (void) const { return (gd_nm_mgr_t)(this); }
 
@@ -24,10 +25,6 @@ public:
     Object & objectNc(const char * name);
 
     bool removeObject(cpe_hash_string_t name);
-
-private:
-    ~Manager();
-    Manager();
 };
 
 }}

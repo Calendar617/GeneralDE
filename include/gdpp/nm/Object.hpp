@@ -1,12 +1,13 @@
 #ifndef GDPP_NM_OBJECT_H
 #define GDPP_NM_OBJECT_H
+#include "cpepp/utils/ClassCategory.hpp"
 #include "gd/nm/nm_read.h"
 #include "System.hpp"
 #include "ObjectIterator.hpp"
 
 namespace Gd { namespace Nm {
 
-class Object {
+class Object : public Cpe::Utils::Noncopyable {
 public:
     Object();
     virtual ~Object() = 0;
