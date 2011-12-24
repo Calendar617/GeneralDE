@@ -10,17 +10,8 @@ class Manager {
 public:
     operator gd_nm_mgr_t (void) const { return (gd_nm_mgr_t)(this); }
 
-    ObjectIterator objects(void) {
-        ObjectIterator it;
-        gd_nm_mgr_nodes(&it.m_it, *this);
-        return it;
-    }
-
-    ConstObjectIterator objects(void) const {
-        ConstObjectIterator it;
-        gd_nm_mgr_nodes(&it.m_it, *this);
-        return it;
-    }
+    ObjectIterator objects(void);
+    ConstObjectIterator objects(void) const;
 
     Object const * findObject(cpe_hash_string_t name) const;
     Object * findObject(cpe_hash_string_t name);

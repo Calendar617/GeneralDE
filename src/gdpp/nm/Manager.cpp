@@ -8,6 +8,24 @@ namespace Gd { namespace Nm {
 
 extern struct gd_nm_node_type g_object_type;
 
+ObjectIterator Manager::objects(void) {
+    ObjectIterator it;
+    if (gd_nm_mgr_nodes(&it._it, *this) != 0) {
+        throw ::std::runtime_error("get named objects of Manager fail!");
+    }
+    it._next = it.next_i();
+    return it;
+}
+
+ConstObjectIterator Manager::objects(void) const {
+    ConstObjectIterator it;
+    if (gd_nm_mgr_nodes(&it._it, *this) != 0) {
+        throw ::std::runtime_error("get named objects of Manager fail!");
+    }
+    it._next = it.next_i();
+    return it;
+}
+
 Object const *
 Manager::findObject(cpe_hash_string_t name) const {
     gd_nm_node_t node = gd_nm_mgr_find_node(*this, name);

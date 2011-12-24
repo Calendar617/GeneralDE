@@ -50,4 +50,47 @@ void Object::operator delete (void *p) {
     gd_nm_node_free(gd_nm_node_from_data(p));
 }
 
+Object * Object::_cast(gd_nm_node_t node) {
+    if (node == NULL || gd_nm_node_type(node) != &g_object_type) {
+        return NULL;
+    }
+    else {
+        return (Object*)gd_nm_node_data(node);
+    }
+}
+
+ObjectIterator
+Object::groups(void) {
+    ObjectIterator it;
+    if (gd_nm_node_groups(&it._it, *this) != 0) {
+        ::std::ostringstream os;
+        os << "get groups of named object " << name() << " fail!";
+        throw ::std::runtime_error(os.str());
+    }
+    it._next = it.next_i();
+    return it;
+}
+
+ConstObjectIterator
+Object::groups(void) const {
+    ConstObjectIterator it;
+    if (gd_nm_node_groups(&it._it, *this) != 0) {
+        ::std::ostringstream os;
+        os << "get groups of named object " << name() << " fail!";
+        throw ::std::runtime_error(os.str());
+    }
+    it._next = it.next_i();
+    return it;
+}
+
+Object const *
+ConstObjectIterator::next_i(void) {
+    return Object::_cast(gd_nm_node_next(&_it));
+}
+
+Object *
+ObjectIterator::next_i(void) {
+    return Object::_cast(gd_nm_node_next(&_it));
+}
+
 }}

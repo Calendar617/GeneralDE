@@ -58,14 +58,56 @@ TEST_F(GroupTest, addMember_basic) {
     ASSERT_TRUE(g1);
 
     TestObject * i1 = new(t_nm(), "o1") TestObject(*this, 1);
-    ASSERT_TRUE(g1);
+    ASSERT_TRUE(i1);
+    TestObject * i2 = new(t_nm(), "o2") TestObject(*this, 1);
+    ASSERT_TRUE(i2);
 
     g1->addMember(*i1);
+    g1->addMember(*i2);
 
-    EXPECT_EQ(1, g1->memberCount());
+    EXPECT_EQ(2, g1->memberCount());
 
     Gd::Nm::ObjectIterator it = g1->members();
+    EXPECT_TRUE(i2 == it.next());
     EXPECT_TRUE(i1 == it.next());
+    EXPECT_TRUE(NULL == it.next());
+}
+
+TEST_F(GroupTest, groups_basic) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+    ASSERT_TRUE(g1);
+
+    TestGroup * g2 = new(t_nm(), "g2") TestGroup(*this, 1);
+    ASSERT_TRUE(g2);
+
+    TestObject * i1 = new(t_nm(), "o1") TestObject(*this, 1);
+    ASSERT_TRUE(i1);
+
+    g1->addMember(*i1);
+    g2->addMember(*i1);
+
+    Gd::Nm::ObjectIterator it = i1->groups();
+    EXPECT_TRUE(g2 == it.next());
+    EXPECT_TRUE(g1 == it.next());
+    EXPECT_TRUE(NULL == it.next());
+}
+
+TEST_F(GroupTest, const_groups_basic) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+    ASSERT_TRUE(g1);
+
+    TestGroup * g2 = new(t_nm(), "g2") TestGroup(*this, 1);
+    ASSERT_TRUE(g2);
+
+    TestObject * i1 = new(t_nm(), "o1") TestObject(*this, 1);
+    ASSERT_TRUE(i1);
+
+    g1->addMember(*i1);
+    g2->addMember(*i1);
+
+    Gd::Nm::ConstObjectIterator it = const_cast<TestObject const *>(i1)->groups();
+    EXPECT_TRUE(g2 == it.next());
+    EXPECT_TRUE(g1 == it.next());
     EXPECT_TRUE(NULL == it.next());
 }
 

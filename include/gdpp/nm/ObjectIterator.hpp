@@ -7,17 +7,27 @@ namespace Gd { namespace Nm {
 
 class ObjectIterator {
 public:
-    ObjectIterator() {}
-    ObjectIterator(const ObjectIterator & o) : m_it(o.m_it) {}
-    ObjectIterator(gd_nm_node_it it) : m_it(it) {}
+    ObjectIterator() : _next(NULL) {}
+    ObjectIterator(gd_nm_node_it it) : _next(NULL), _it(it) { _next = next_i(); }
 
-    Object const * next(void) { 
-        gd_nm_node_t node = gd_nm_node_next(&m_it);
-        return (Object*)(node == NULL ? NULL : gd_nm_node_data(node));
+    ObjectIterator & operator=(gd_nm_node_it it) {
+        _it = it;
+        _next = next_i();
+        return *this;
+    }
+
+    Object * next(void) { 
+        if (_next == NULL) return NULL;
+        Object * r = _next;
+        _next = next_i();
+        return r;
     }
 
 private:
-    struct gd_nm_node_it m_it;
+    Object * next_i(void);
+
+    Object * _next;
+    struct gd_nm_node_it _it;
 
 friend class Manager;
 friend class Object;
@@ -28,17 +38,34 @@ friend class ConstObjectIterator;
 class ConstObjectIterator {
 public:
     ConstObjectIterator() {}
-    ConstObjectIterator(ConstObjectIterator const & o) : m_it(o.m_it) {}
-    ConstObjectIterator(ObjectIterator const & o) : m_it(o.m_it) {}
-    ConstObjectIterator(gd_nm_node_it it) : m_it(it) {}
+    ConstObjectIterator(ObjectIterator const & o) : _next(o._next), _it(o._it) {}
+    ConstObjectIterator(gd_nm_node_it it) : _next(NULL), _it(it) { _next = next_i(); }
+
+    ConstObjectIterator & operator=(ObjectIterator const & o) {
+        _next = o._next;
+        _it = o._it;
+        return *this;
+    }
+
+    ConstObjectIterator & operator=(gd_nm_node_it it) {
+        _it = it;
+        _next = next_i();
+        return *this;
+    }
+
 
     Object const * next(void) {
-        gd_nm_node_t node = gd_nm_node_next(&m_it);
-        return (Object*)(node == NULL ? NULL : gd_nm_node_data(node));
+        if (_next == NULL) return NULL;
+        Object const * r = _next;
+        _next = next_i();
+        return r;
     }
 
 private:
-    struct gd_nm_node_it m_it;
+    Object const * next_i(void);
+
+    Object const * _next;
+    struct gd_nm_node_it _it;
 
 friend class Manager;
 friend class Object;

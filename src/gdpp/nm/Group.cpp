@@ -61,21 +61,23 @@ void Group::addMember(Object & object) {
 
 ObjectIterator Group::members(void) {
     ObjectIterator it;
-    if (gd_nm_group_members(&it.m_it, *this) != 0) {
+    if (gd_nm_group_members(&it._it, *this) != 0) {
         ::std::ostringstream os;
         os << "get members fail! named group(?) " << name() << " is not group?";
         throw ::std::runtime_error(os.str());
     }
+    it._next = it.next_i();
     return it;
 }
 
 ConstObjectIterator Group::members(void) const {
     ConstObjectIterator it;
-    if (gd_nm_group_members(&it.m_it, *this) != 0) {
+    if (gd_nm_group_members(&it._it, *this) != 0) {
         ::std::ostringstream os;
         os << "get members fail! named group(?) " << name() << " is not group?";
         throw ::std::runtime_error(os.str());
     }
+    it._next = it.next_i();
     return it;
 }
 

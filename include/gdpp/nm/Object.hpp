@@ -20,21 +20,16 @@ public:
     Manager & manager(void) { return *((Manager *)gd_nm_node_mgr(*this)); }
     Manager const & manager(void) const { return *((Manager *)gd_nm_node_mgr(*this)); }
 
-    ObjectIterator groups(void) {
-        ObjectIterator it;
-        gd_nm_node_groups(&it.m_it, *this);
-        return it;
-    }
-
-    ConstObjectIterator groups(void) const {
-        ConstObjectIterator it;
-        gd_nm_node_groups(&it.m_it, *this);
-        return it;
-    }
+    ObjectIterator groups(void);
+    ConstObjectIterator groups(void) const;
 
     void * operator new (size_t size, gd_nm_mgr_t nmm, const char * name);
 
     void operator delete(void *p);
+
+    static Object * _cast(gd_nm_node_t node);
+    static Object * _cast_throw(gd_nm_node_t node);
+
 private:
     void * operator new (size_t size);
 };

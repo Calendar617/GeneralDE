@@ -60,3 +60,12 @@ TEST_F(ObjectTest, groups_empty) {
     Gd::Nm::ObjectIterator it = o->groups();
     EXPECT_TRUE(NULL == it.next());
 }
+
+TEST_F(ObjectTest, const_groups_empty) {
+    TestObject const * o = new(t_nm(), "object1") TestObject(*this, 1);
+    ASSERT_TRUE(o);
+
+    Gd::Nm::ConstObjectIterator it = o->groups();
+    EXPECT_TRUE(NULL == it.next());
+}
+
