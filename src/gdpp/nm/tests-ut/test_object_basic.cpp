@@ -1,5 +1,8 @@
 #include <stdexcept>
-#include "ObjectTest.hpp"
+#include "NmTest.hpp"
+
+class ObjectTest : public NmTest {
+};
 
 TEST_F(ObjectTest, create_basic) {
     TestObject * o = new(t_nm(), "object1") TestObject(*this, 1);

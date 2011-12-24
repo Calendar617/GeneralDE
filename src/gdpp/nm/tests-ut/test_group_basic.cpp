@@ -1,5 +1,8 @@
 #include <stdexcept>
-#include "GroupTest.hpp"
+#include "NmTest.hpp"
+
+class GroupTest : public NmTest {
+};
 
 TEST_F(GroupTest, create_basic) {
     TestGroup * o = new(t_nm(), "object1") TestGroup(*this, 1);

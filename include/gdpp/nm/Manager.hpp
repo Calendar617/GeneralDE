@@ -18,6 +18,11 @@ public:
     Object const & object(cpe_hash_string_t name) const;
     Object & object(cpe_hash_string_t name);
 
+    Object const * findObjectNc(const char * name) const;
+    Object * findObjectNc(const char * name);
+    Object const & objectNc(const char * name) const;
+    Object & objectNc(const char * name);
+
     void removeObject(cpe_hash_string_t name);
 
 private:
