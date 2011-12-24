@@ -45,6 +45,18 @@ void gd_nm_mgr_free(gd_nm_mgr_t nmm) {
 }
 
 gd_nm_node_t
+gd_nm_mgr_find_node_nc(gd_nm_mgr_t nmm, const char * name) {
+    struct gd_nm_node buf;
+    size_t nameLen = cpe_hs_len_to_binary_len(strlen(name));
+    char nameBuf[nameLen];
+    buf.m_name = (cpe_hash_string_t)nameBuf;
+
+    cpe_hs_init(buf.m_name, nameLen, name);
+
+    return (gd_nm_node_t)cpe_hash_table_find(&nmm->m_nodes, &buf);
+}
+
+gd_nm_node_t
 gd_nm_mgr_find_node(gd_nm_mgr_t nmm, cpe_hash_string_t name) {
     struct gd_nm_node buf;
 

@@ -1,4 +1,5 @@
 #include <cassert>
+#include <sstream>
 #include <stdexcept>
 #include "gd/nm/nm_manage.h"
 #include "gdpp/nm/Object.hpp"
@@ -15,24 +16,30 @@ static void object_destruct(gd_nm_node_t node) {
     }
 }
 
-static struct gd_nm_node_type g_object_type = {
+struct gd_nm_node_type g_object_type = {
     "Gd::Nm::Object",
     object_destruct
 };
 
 Object::Object() {
-    gd_nm_node_set_type(_to_node(), &g_object_type);
+    gd_nm_node_set_type(*this, &g_object_type);
 }
 
 Object::~Object() {
-    gd_nm_node_set_type(_to_node(), NULL);
+    gd_nm_node_set_type(*this, NULL);
 }
 
 void * Object::operator new (size_t size, gd_nm_mgr_t nmm, const char * name) {
-    printf("name=%s, size=%d, nmm=%p\n", name, size, nmm);
     gd_nm_node_t node = gd_nm_instance_create(nmm, name, size);
     if (node == NULL) {
-        throw ::std::bad_alloc();
+        if (gd_nm_mgr_find_node_nc(nmm, name)) {
+            ::std::ostringstream os;
+            os << "named object " << name << " already exist!";
+            throw ::std::runtime_error(os.str());
+        }
+        else {
+            throw ::std::bad_alloc();
+        }
     }
 
     return gd_nm_node_data(node);

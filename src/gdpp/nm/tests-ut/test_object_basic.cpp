@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "ObjectTest.hpp"
 
 TEST_F(ObjectTest, create_basic) {
@@ -5,6 +6,16 @@ TEST_F(ObjectTest, create_basic) {
     ASSERT_TRUE(o);
 
     EXPECT_STREQ("object1", o->name());
+    EXPECT_EQ(gd_nm_node_instance, o->category());
+}
+
+TEST_F(ObjectTest, create_duplicate) {
+    TestObject * o1 = new(t_nm(), "object1") TestObject(*this, 1);
+    ASSERT_TRUE(o1);
+
+    EXPECT_THROW(
+        new(t_nm(), "object1") TestObject(*this, 1)
+        , ::std::runtime_error);
 }
 
 class ExceptionCreateObject : public ObjectTest::TestObject {

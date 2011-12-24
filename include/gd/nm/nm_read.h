@@ -10,6 +10,7 @@ extern "C" {
 
 /*mgr operations*/
 gd_nm_node_t gd_nm_mgr_find_node(gd_nm_mgr_t nmm, cpe_hash_string_t name);
+gd_nm_node_t gd_nm_mgr_find_node_nc(gd_nm_mgr_t nmm, const char * name);
 int gd_nm_mgr_nodes(gd_nm_node_it_t it, gd_nm_mgr_t nmm);
 
 /*node operations*/

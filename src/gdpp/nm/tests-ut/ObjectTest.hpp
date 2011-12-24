@@ -1,5 +1,5 @@
-#ifndef GDPP_NM_TEST_REQTEST_H
-#define GDPP_NM_TEST_REQTEST_H
+#ifndef GDPP_NM_TEST_OBJECTTEST_H
+#define GDPP_NM_TEST_OBJECTTEST_H
 #include "gd/nm/tests-env/with_nm.hpp"
 #include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"

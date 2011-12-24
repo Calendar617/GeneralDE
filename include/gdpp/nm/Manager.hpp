@@ -16,14 +16,14 @@ public:
         return it;
     }
 
-    Object const * findObject(cpe_hash_string_t name) const {
-        return (Object *)gd_nm_mgr_find_node(*this, name);
+    ConstObjectIterator objects(void) const {
+        ConstObjectIterator it;
+        gd_nm_mgr_nodes(&it.m_it, *this);
+        return it;
     }
 
-    Object * findObject(cpe_hash_string_t name) {
-        return (Object *)gd_nm_mgr_find_node(*this, name);
-    }
-
+    Object const * findObject(cpe_hash_string_t name) const;
+    Object * findObject(cpe_hash_string_t name);
     Object const & object(cpe_hash_string_t name) const;
     Object & object(cpe_hash_string_t name);
 

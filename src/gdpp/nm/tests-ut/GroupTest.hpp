@@ -1,13 +1,11 @@
-#ifndef GDPP_NM_TEST_REQTEST_H
-#define GDPP_NM_TEST_REQTEST_H
-#include "gd/nm/tests-env/with_nm.hpp"
-#include "cpe/utils/tests-env/test-fixture.hpp"
-#include "cpe/utils/tests-env/with_em.hpp"
+#ifndef GDPP_NM_TEST_GROUPTEST_H
+#define GDPP_NM_TEST_GROUPTEST_H
 #include "gdpp/nm/Group.hpp"
+#include "ObjectTest.hpp"
 
-typedef LOKI_TYPELIST_1(gd::nm::testenv::with_nm) GroupTestBase;
+typedef Loki::NullType GroupTestBase;
 
-class GroupTest : public testenv::fixture<GroupTestBase> {
+class GroupTest : public testenv::fixture<GroupTestBase, ObjectTest> {
 public:
     GroupTest();
 
@@ -23,8 +21,6 @@ public:
         GroupTest & _t;
         int _value;
     };
-
-    int _destoryCount;
 };
 
 #endif

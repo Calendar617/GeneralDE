@@ -33,7 +33,7 @@ with_nm::t_nm_add_group(const char * name, size_t capacity) {
 }
 
 gd_nm_node_t with_nm::t_nm_find(const char * name) {
-    return gd_nm_mgr_find_node(t_nm(), cpe_hs_create(t_tmp_allocrator(), name));
+    return gd_nm_mgr_find_node_nc(t_nm(), name);
 }
 
 int with_nm::t_nm_bind(const char * groupName, const char * instanceName) {

@@ -95,6 +95,10 @@ void gd_nm_node_set_type(gd_nm_node_t node, gd_nm_node_type_t type) {
     node->m_type = type;
 }
 
+gd_nm_node_type_t gd_nm_node_type(gd_nm_node_t node) {
+    return node->m_type;
+}
+
 cpe_hash_string_t
 gd_nm_node_name_hs(gd_nm_node_t node) {
     return node->m_name;

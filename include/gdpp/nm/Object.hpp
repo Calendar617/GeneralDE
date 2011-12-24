@@ -11,13 +11,14 @@ public:
     Object();
     virtual ~Object() = 0;
 
-    const char * name(void) const { return gd_nm_node_name(_to_node()); }
-    cpe_hash_string_t name_hs(void) const { return gd_nm_node_name_hs(_to_node()); }
+    const char * name(void) const { return gd_nm_node_name(*this); }
+    cpe_hash_string_t name_hs(void) const { return gd_nm_node_name_hs(*this); }
+    gd_nm_node_category_t category(void) { return gd_nm_node_category(*this); }
 
-    operator gd_nm_node_t () { return gd_nm_node_from_data((void*)this); }
+    operator gd_nm_node_t () const { return gd_nm_node_from_data((void*)this); }
 
-    Manager & manager(void) { return *((Manager *)_mgr()); }
-    Manager const & manager(void) const { return *((Manager *)_mgr()); }
+    Manager & manager(void) { return *((Manager *)gd_nm_node_mgr(*this)); }
+    Manager const & manager(void) const { return *((Manager *)gd_nm_node_mgr(*this)); }
 
     ObjectIterator groups(void) {
         ObjectIterator it;
@@ -25,8 +26,11 @@ public:
         return it;
     }
 
-    gd_nm_mgr_t _mgr(void) const { return gd_nm_node_mgr(_to_node()); }
-    gd_nm_node_t _to_node(void) const { return gd_nm_node_from_data((void*)this); }
+    ConstObjectIterator groups(void) const {
+        ConstObjectIterator it;
+        gd_nm_node_groups(&it.m_it, *this);
+        return it;
+    }
 
     void * operator new (size_t size, gd_nm_mgr_t nmm, const char * name);
 

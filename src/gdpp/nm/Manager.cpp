@@ -6,6 +6,32 @@
 
 namespace Gd { namespace Nm {
 
+extern struct gd_nm_node_type g_object_type;
+
+Object const *
+Manager::findObject(cpe_hash_string_t name) const {
+    gd_nm_node_t node = gd_nm_mgr_find_node(*this, name);
+    if (node == NULL
+        || gd_nm_node_type(node) != &g_object_type)
+    {
+        return NULL;
+    }
+
+    return (Object*)node;
+}
+
+Object *
+Manager::findObject(cpe_hash_string_t name) {
+    gd_nm_node_t node = gd_nm_mgr_find_node(*this, name);
+    if (node == NULL
+        || gd_nm_node_type(node) != &g_object_type)
+    {
+        return NULL;
+    }
+
+    return (Object*)node;
+}
+
 Object const & Manager::object(cpe_hash_string_t name) const {
     Object const * r = findObject(name);
     if (r == NULL) {

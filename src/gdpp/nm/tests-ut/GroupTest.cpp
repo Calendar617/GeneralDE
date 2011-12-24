@@ -1,4 +1,4 @@
 #include "GroupTest.hpp"
 
-GroupTest::GroupTest() : _destoryCount(0) {
+GroupTest::GroupTest() {
 }
