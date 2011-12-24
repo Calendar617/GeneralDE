@@ -22,13 +22,13 @@ size_t gd_nm_node_capacity(gd_nm_node_t node);
 void * gd_nm_node_data(gd_nm_node_t node);
 
 int gd_nm_node_groups(gd_nm_node_it_t it, gd_nm_node_t node);
+gd_nm_node_t gd_nm_node_from_data(void * data);
 
 /*gruop operations*/
 int gd_nm_group_members(gd_nm_node_it_t it, gd_nm_node_t group);
 int gd_nm_group_member_count(gd_nm_node_t group);
 gd_nm_node_t gd_nm_group_find_member(gd_nm_node_t group, cpe_hash_string_t name);
-
-gd_nm_node_t gd_nm_node_from_data(void * data);
+gd_nm_node_t gd_nm_group_find_member_nc(gd_nm_node_t group, const char * name);
 
 /*iterator operations*/
 #define gd_nm_node_next(it) (it)->m_next_fun((it))

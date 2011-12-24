@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "gd/nm/nm_manage.h"
+#include "gd/nm/nm_read.h"
 #include "nm_internal_ops.h"
 
 gd_nm_node_t
@@ -114,6 +115,13 @@ int gd_nm_group_member_count(gd_nm_node_t node) {
     else {
         return cpe_hash_table_count(&(gd_nm_group_from_node(node))->m_members);
     }
+}
+
+gd_nm_node_t gd_nm_group_find_member_nc(gd_nm_node_t node, const char * name) {
+    size_t nameLen = cpe_hs_len_to_binary_len(strlen(name));
+    char buf[nameLen];
+    cpe_hs_init((cpe_hash_string_t)buf, nameLen, name);
+    return gd_nm_group_find_member(node, (cpe_hash_string_t)buf);
 }
 
 gd_nm_node_t gd_nm_group_find_member(gd_nm_node_t node, cpe_hash_string_t name) {

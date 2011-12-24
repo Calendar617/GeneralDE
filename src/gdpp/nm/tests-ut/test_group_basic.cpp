@@ -114,3 +114,77 @@ TEST_F(GroupTest, const_groups_basic) {
     EXPECT_TRUE(NULL == it.next());
 }
 
+TEST_F(GroupTest, destoryMembers_basic) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+    TestObject * i1 = new(t_nm(), "o1") TestObject(*this, 1);
+    g1->addMember(*i1);
+
+    g1->destoryMembers();
+
+    ASSERT_TRUE(NULL == g1->findMemberNc("o1"));
+}
+
+TEST_F(GroupTest, findMember_basic) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+    TestObject * i1 = new(t_nm(), "o1") TestObject(*this, 1);
+    g1->addMember(*i1);
+
+    CPE_HS_DEF_VAR(name1, "o1");
+
+    ASSERT_TRUE(i1 == g1->findMember(name1));
+}
+
+TEST_F(GroupTest, findMember_not_exist) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+
+    CPE_HS_DEF_VAR(name1, "not-exist");
+
+    ASSERT_TRUE(NULL == g1->findMember(name1));
+}
+
+TEST_F(GroupTest, member_basic) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+    TestObject * i1 = new(t_nm(), "o1") TestObject(*this, 1);
+    g1->addMember(*i1);
+
+    CPE_HS_DEF_VAR(name1, "o1");
+
+    ASSERT_TRUE(i1 == &g1->member(name1));
+}
+
+TEST_F(GroupTest, member_not_exist) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+
+    CPE_HS_DEF_VAR(name1, "not-exist");
+
+    ASSERT_THROW(g1->member(name1), ::std::exception);
+}
+
+TEST_F(GroupTest, findMemberNc_basic) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+    TestObject * i1 = new(t_nm(), "o1") TestObject(*this, 1);
+    g1->addMember(*i1);
+
+    ASSERT_TRUE(i1 == g1->findMemberNc("o1"));
+}
+
+TEST_F(GroupTest, findMemberNc_not_exist) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+
+    ASSERT_TRUE(NULL == g1->findMemberNc("not-exist"));
+}
+
+TEST_F(GroupTest, memberNc_basic) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+    TestObject * i1 = new(t_nm(), "o1") TestObject(*this, 1);
+    g1->addMember(*i1);
+
+    ASSERT_TRUE(i1 == &g1->memberNc("o1"));
+}
+
+TEST_F(GroupTest, memberNc_not_exist) {
+    TestGroup * g1 = new(t_nm(), "g1") TestGroup(*this, 1);
+
+    ASSERT_THROW(g1->memberNc("not-exist"), ::std::exception);
+}
+

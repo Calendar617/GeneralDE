@@ -25,28 +25,6 @@ void * Group::operator new (size_t size, gd_nm_mgr_t nmm, const char * name) {
     return gd_nm_node_data(node);
 }
 
-Object const & Group::member(cpe_hash_string_t name) const {
-    Object const * r = findMember(name);
-    if (r == NULL) {
-        ::std::ostringstream os;
-        os << "named object " << cpe_hs_data(name)
-           << " not exist in group " << this->name() << "!";
-        throw ::std::runtime_error(os.str());
-    }
-    return *r;
-}
-
-Object & Group::member(cpe_hash_string_t name) {
-    Object * r = findMember(name);
-    if (r == NULL) {
-        ::std::ostringstream os;
-        os << "named object " << cpe_hs_data(name)
-           << " not exist in group " << this->name() << "!";
-        throw ::std::runtime_error(os.str());
-    }
-    return *r;
-}
-
 void Group::destoryMembers(void) {
     gd_nm_group_free_members(*this);
 }
@@ -79,6 +57,70 @@ ConstObjectIterator Group::members(void) const {
     }
     it._next = it.next_i();
     return it;
+}
+
+Object *
+Group::findMember(cpe_hash_string_t name) {
+    return Object::_cast(gd_nm_group_find_member(*this, name));
+}
+
+Object const *
+Group::findMember(cpe_hash_string_t name) const {
+    return Object::_cast(gd_nm_group_find_member(*this, name));
+}
+
+Object const & Group::member(cpe_hash_string_t name) const {
+    Object const * r = findMember(name);
+    if (r == NULL) {
+        ::std::ostringstream os;
+        os << "named object " << cpe_hs_data(name)
+           << " not exist in group " << this->name() << "!";
+        throw ::std::runtime_error(os.str());
+    }
+    return *r;
+}
+
+Object & Group::member(cpe_hash_string_t name) {
+    Object * r = findMember(name);
+    if (r == NULL) {
+        ::std::ostringstream os;
+        os << "named object " << cpe_hs_data(name)
+           << " not exist in group " << this->name() << "!";
+        throw ::std::runtime_error(os.str());
+    }
+    return *r;
+}
+
+Object *
+Group::findMemberNc(const char * name) {
+    return Object::_cast(gd_nm_group_find_member_nc(*this, name));
+}
+
+Object const *
+Group::findMemberNc(const char * name) const {
+    return Object::_cast(gd_nm_group_find_member_nc(*this, name));
+}
+
+Object const & Group::memberNc(const char * name) const {
+    Object const * r = findMemberNc(name);
+    if (r == NULL) {
+        ::std::ostringstream os;
+        os << "named object " << name
+           << " not exist in group " << this->name() << "!";
+        throw ::std::runtime_error(os.str());
+    }
+    return *r;
+}
+
+Object & Group::memberNc(const char * name) {
+    Object * r = findMemberNc(name);
+    if (r == NULL) {
+        ::std::ostringstream os;
+        os << "named object " << name
+           << " not exist in group " << this->name() << "!";
+        throw ::std::runtime_error(os.str());
+    }
+    return *r;
 }
 
 }}

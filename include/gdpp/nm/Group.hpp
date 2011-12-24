@@ -15,16 +15,15 @@ public:
     void destoryMembers(void);
     void addMember(Object & object);
 
-    Object * findMember(cpe_hash_string_t name) {
-        return (Object *)gd_nm_group_find_member(*this, name);
-    }
-
-    Object const * findMember(cpe_hash_string_t name) const {
-        return (Object *)gd_nm_group_find_member(*this, name);
-    }
-
+    Object * findMember(cpe_hash_string_t name);
+    Object const * findMember(cpe_hash_string_t name) const;
     Object const & member(cpe_hash_string_t name) const;
     Object & member(cpe_hash_string_t name);
+
+    Object * findMemberNc(const char * name);
+    Object const * findMemberNc(const char * name) const;
+    Object const & memberNc(const char * name) const;
+    Object & memberNc(const char * name);
 
     void * operator new (size_t size, gd_nm_mgr_t nmm, const char * name);
     void * operator new (size_t size, Manager & nmm, const char * name);
