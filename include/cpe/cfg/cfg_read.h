@@ -26,6 +26,15 @@ int64_t cfg_as_int64(cfg_t cfg, int64_t dft);
 uint64_t cfg_as_uint64(cfg_t cfg, uint64_t dft);
 const char * cfg_as_string(cfg_t cfg, const char * dft);
 
+int cfg_try_as_int8(cfg_t cfg, int8_t * data);
+int cfg_try_as_uint8(cfg_t cfg, uint8_t * data);
+int cfg_try_as_int16(cfg_t cfg, int16_t * data);
+int cfg_try_as_uint16(cfg_t cfg, uint16_t * data);
+int cfg_try_as_int32(cfg_t cfg, int32_t * data);
+int cfg_try_as_uint32(cfg_t cfg, uint32_t * data);
+int cfg_try_as_int64(cfg_t cfg, int64_t * data);
+int cfg_try_as_uint64(cfg_t cfg, uint64_t * data);
+
 /*get data by path operation*/
 int8_t cfg_get_int8(cfg_t cfg, const char * path, int8_t dft);
 uint8_t cfg_get_uint8(cfg_t cfg, const char * path, uint8_t dft);
