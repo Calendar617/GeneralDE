@@ -57,6 +57,18 @@ mem_buffer_append_trunk_after(
     return trunk;
 }
 
+struct mem_buffer_trunk *
+mem_buffer_trunk_first(mem_buffer_t buffer) {
+    return TAILQ_FIRST(&buffer->m_trunks);
+}
+
+struct mem_buffer_trunk *
+mem_buffer_trunk_next(struct mem_buffer_trunk * trunk) {
+    return trunk
+        ? TAILQ_NEXT(trunk, m_next)
+        : NULL;
+}
+
 ssize_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer) {
     size_t readedSize = 0;
     struct mem_buffer_trunk * trunk;

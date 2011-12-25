@@ -33,6 +33,9 @@ void mem_trunk_free(mem_buffer_t buffer, struct mem_buffer_trunk * trunk);
 size_t mem_buffer_trunk_count(mem_buffer_t buffer);
 struct mem_buffer_trunk * mem_buffer_trunk_at(mem_buffer_t buffer, size_t pos);
 
+struct mem_buffer_trunk * mem_buffer_trunk_first(mem_buffer_t buffer);
+struct mem_buffer_trunk * mem_buffer_trunk_next(struct mem_buffer_trunk * trunk);
+
 void * mem_trunk_data(struct mem_buffer_trunk * trunk);
 size_t mem_trunk_capacity(struct mem_buffer_trunk * trunk);
 size_t mem_trunk_size(struct mem_buffer_trunk * trunk);
