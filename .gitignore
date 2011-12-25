@@ -4,3 +4,4 @@ GTAGS
 /build
 .DS_Store
 xcuserdata
+/buildtools/build
