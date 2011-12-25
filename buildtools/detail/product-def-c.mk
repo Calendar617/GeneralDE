@@ -2,6 +2,7 @@ $(call assert-not-null,GCC)
 
 product-support-types+=lib progn
 product-def-all-items+= c.libraries c.includes c.sources c.ldpathes c.flags.cpp c.flags.ld c.linker    \
+                        c.flags.lan c.flags.lan.c c.flags.lan.cc c.flags.lan.m c.flags.lan.mm \
                         product.c.includes product.c.libraries product.c.flags.ld product.c.ldpathes product.c.defs
 
 c-source-dir-to-binary-dir = $(addprefix $(CPDE_OUTPUT_ROOT)/obj,$(subst $(CPDE_ROOT),,$1))
@@ -25,7 +26,6 @@ c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
                            $(addprefix -D,$(sort $(call product-gen-depend-value-list,$1,product.c.defs))) \
                            $(r.$1.c.flags.cpp)
 
-COMPILE.mm=$(COMPILE.cc)
 product-def-c-linker-c=$(LINK.c)
 product-def-c-linker-cpp=$(LINK.cc)
 product-def-c-linker-obj-c=$(LINK.c)
@@ -36,29 +36,20 @@ define c-make-depend
 	$(CCACHE) $(GCC) -MM -MF $3 -MP -MT $2 $(CPPFLAGS) $(call c-generate-depend-cpp-flags,$4) $(TARGET_ARCH) $1
 endef
 
+product-def-rule-c-compile-cmd.c=$(CC) $(CFLAGS) $(r.$1.c.flags.lan.all) $(r.$1.c.flags.lan.c) $(CPPFLAGS) $(TARGET_ARCH) -c
+product-def-rule-c-compile-cmd.cc=$(CXX) $(CXXFLAGS) $(r.$1.c.flags.lan.all) $(r.$1.c.flags.lan.cc) $(CPPFLAGS) $(TARGET_ARCH) -c 
+product-def-rule-c-compile-cmd.mm=$(CXX) $(MMFLAGS) $(r.$1.c.flags.lan.all) $(r.$1.c.flags.lan.mm) $(CPPFLAGS) $(TARGET_ARCH) -c 
+product-def-rule-c-compile-cmd.m=$(CC) $(MFLAGS) $(r.$1.c.flags.lan.all) $(r.$1.c.flags.lan.m) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+
+product-def-rule-c-compile-cmd.cpp=$(call product-def-rule-c-compile-cmd.cc,$1)
+
 # $(call compile-rule, binary-file, source-files, product-name)
-define compile-rule.c
+define product-def-rule-c-compile-rule
 $1: $2
 	$$(call with_message)$$(call c-make-depend,$2,$1,$(subst .o,.d,$1),$3)
 	$$(call with_message,compiling $(subst $(CPDE_ROOT)/,,$2) --> $(subst $(CPDE_ROOT)/,,$1) ...)\
-          $(CCACHE) $$(COMPILE$(suffix $2)) $$(call c-generate-depend-cpp-flags,$3) -o $$@ $$<
+          $(CCACHE) $$(call product-def-rule-c-compile-cmd$(suffix $2),$3) $$(call c-generate-depend-cpp-flags,$3) -o $$@ $$<
 
-endef
-
-define compile-rule.cc
-$(call compile-rule.c,$1,$2,$3)
-endef
-
-define compile-rule.cpp
-$(call compile-rule.cc,$1,$2,$3)
-endef
-
-define compile-rule.mm
-$(call compile-rule.cc,$1,$2,$3)
-endef
-
-define compile-rule.m
-$(call compile-rule.c,$1,$2,$3)
 endef
 
 define product-def-c-select-linker
@@ -116,7 +107,7 @@ $(CPDE_OUTPUT_ROOT)/$(r.$1.product): $(call c-source-to-object,$(r.$1.c.sources)
 	$$(call with_message,linking $(r.$1.product) ...) \
         $(call product-def-rule-c-link-cmd-$(if $(filter progn,$2),progn,lib-$(r.$1.c.lib.type)),$1, $$^, $$@)
 
-$(foreach f,$(r.$1.c.sources),$(call compile-rule$(suffix $f),$(call c-source-to-object,$f),$f,$1))
+$(foreach f,$(r.$1.c.sources),$(call product-def-rule-c-compile-rule,$(call c-source-to-object,$f),$f,$1))
 
 $(eval r.$1.makefile.include := $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources))))
 

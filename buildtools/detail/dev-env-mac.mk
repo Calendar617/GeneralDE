@@ -5,6 +5,8 @@ CC=$(GCC)
 
 CFLAGS+=-Wall
 CXXFLAGS+=-Wall
+MFLAGS+=-Wall -x objective-c -fobjc-abi-version=2 -fobjc-legacy-dispatch
+MMFLAGS+=-Wall -x objective-c++ -fobjc-abi-version=2 -fobjc-legacy-dispatch
 
 ifneq ($(DEBUG),0)
 CFLAGS+=-ggdb
