@@ -54,6 +54,11 @@ __type ## _t cfg_as_  ## __type(cfg_t at, __type ## _t dft) {    \
         ? rv                                                     \
         : dft;                                                   \
 }                                                                \
+int cfg_try_as_  ## __type(cfg_t at, __type ## _t * data) {      \
+    if (at == NULL || !cfg_is_value(at) ) return -1;             \
+    return dr_ctype_try_read_ ## __type(                         \
+        data, cfg_data(at), at->m_type, NULL);                   \
+}                                                                \
 __type ## _t cfg_get_  ## __type(                                \
     cfg_t cfg, const char * path, __type ## _t dft) {            \
     __type ## _t rv;                                             \
