@@ -3,6 +3,8 @@ self-dev-env:=iphone
 
 CFLAGS+=-Wall
 CXXFLAGS+=-Wall
+MFLAGS+=-Wall -pipe -x objective-c
+MMFLAGS+=-Wall -pipe -x objective-c++
 
 ifneq ($(DEBUG),0)
 CFLAGS+=-ggdb
@@ -30,15 +32,25 @@ iPhoneSimulator.TARGET_ARCH ?= -arch i386
 iPhoneSimulator.CPPFLAGS ?= -D__IPHONE_OS_VERSION_MIN_REQUIRED=$(iphone-os-version-min)
 
 iPhoneSimulator.CFLAGS ?= \
-                   -pipe\
                    -std=c99 \
-                   -Os \
                    -fexceptions \
-                   -fvisibility=hidden \
                    -mmacosx-version-min=10.6 \
                    -gdwarf-2 \
 
-iPhoneSimulator.CFLAGS.m ?= \
+iPhoneSimulator.CXXFLAGS ?= \
+                   -fexceptions \
+                   -mmacosx-version-min=10.6 \
+                   -gdwarf-2 \
+
+iPhoneSimulator.MFLAGS ?= \
+                   $(iPhoneSimulator.CFLAGS) \
+                   -fmessage-length=0 \
+                   -fpascal-strings \
+                   -fasm-blocks \
+                   -fobjc-abi-version=2 \
+                   -fobjc-legacy-dispatch \
+
+iPhoneSimulator.MMFLAGS ?= \
                    -fmessage-length=0 \
                    -fpascal-strings \
                    -fasm-blocks \
@@ -66,7 +78,9 @@ SDK_PREFIX:=$(PLATFORM_PREFIX)/Developer/SDKs/$(PLATFORM_NAME)$(PLATFORM_VERSION
 
 $(call assert-not-null,$(PLATFORM_NAME).compiler)
 $(call assert-not-null,$(PLATFORM_NAME).CFLAGS)
-$(call assert-not-null,$(PLATFORM_NAME).CFLAGS.m)
+$(call assert-not-null,$(PLATFORM_NAME).CXXFLAGS)
+$(call assert-not-null,$(PLATFORM_NAME).MFLAGS)
+$(call assert-not-null,$(PLATFORM_NAME).MMFLAGS)
 $(call assert-not-null,$(PLATFORM_NAME).LDFLAGS)
 $(call assert-not-null,$(PLATFORM_NAME).TARGET_ARCH)
 
@@ -91,9 +105,10 @@ CPPFLAGS+= -isysroot $(SDK_PREFIX) \
            $(INCLUDES) \
            $($(PLATFORM_NAME).CPPFLAGS)
 
-CFLAGS += $($(PLATFORM_NAME).CFLAGS) \
-
-CFLAGS.m += $($(PLATFORM_NAME).CFLAGS.m)
+CFLAGS += $($(PLATFORM_NAME).CFLAGS)
+CXXFLAGS += $($(PLATFORM_NAME).CXXFLAGS)
+MFLAGS += $($(PLATFORM_NAME).MFLAGS)
+MMFLAGS += $($(PLATFORM_NAME).MMFLAGS)
 
 TARGET_ARCH += $($(PLATFORM_NAME).TARGET_ARCH)
 
