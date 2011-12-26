@@ -20,6 +20,7 @@ cpe_hash_string_t cpe_hs_create(mem_allocrator_t alloc, const char * data);
 void cpe_hs_copy(cpe_hash_string_t target, cpe_hash_string_t source);
 void cpe_hs_init(cpe_hash_string_t target, size_t capacity, const char * source);
 cpe_hash_string_t cpe_hs_copy_create(mem_allocrator_t alloc, cpe_hash_string_t source);
+void cpe_hs_strcat(cpe_hash_string_t target, size_t capacity, const char * data);
 
 #define cpe_hs_data(hs) (((const char *)(hs)) + 8)
 
