@@ -8,6 +8,8 @@
 #include "app_internal_ops.h"
 
 
+static char g_module_name_prefix[] = "module::";
+
 static struct gd_nm_node_type g_module_root_group = {
     "app_module_root",
     gd_nm_group_free_members
@@ -27,7 +29,6 @@ gd_app_runing_module_data_load(
     gd_nm_mgr_t nmm;
     gd_nm_node_t rootGroup;
     gd_nm_node_t moduleGroup;
-
     nmm = gd_app_nm_mgr(context);
 
     rootGroup = gd_nm_mgr_find_node(nmm, gd_app_module_root_group_name);
@@ -40,9 +41,14 @@ gd_app_runing_module_data_load(
         gd_nm_node_set_type(rootGroup, &g_module_root_group);
     }
 
-    moduleGroup = gd_nm_group_create(gd_app_nm_mgr(context), cpe_hs_data(moduleName), 0);
+    size_t nameLen = cpe_hs_len(moduleName);
+    char groupNameBuf[(sizeof(g_module_name_prefix) - 1) + (nameLen + 1)];
+    memcpy(groupNameBuf, g_module_name_prefix, sizeof(g_module_name_prefix) - 1);
+    memcpy(groupNameBuf + sizeof(g_module_name_prefix) - 1, cpe_hs_data(moduleName), nameLen + 1);
+
+    moduleGroup = gd_nm_group_create(gd_app_nm_mgr(context), groupNameBuf, 0);
     if (moduleGroup == NULL) {
-        APP_CTX_ERROR(context, "create module %s: data group fail!", cpe_hs_data(moduleName));
+        APP_CTX_ERROR(context, "create module %s: data group fail!", groupNameBuf);
         gd_app_runing_module_data_free(context, moduleName);
         return NULL;
     }
@@ -50,7 +56,7 @@ gd_app_runing_module_data_load(
     gd_nm_node_set_type(moduleGroup, &g_module_group);
 
     if (gd_nm_group_add_member(rootGroup, moduleGroup) != 0) {
-        APP_CTX_ERROR(context, "create module %s: add to root group fail!", cpe_hs_data(moduleName));
+        APP_CTX_ERROR(context, "create module %s: add to root group fail!", groupNameBuf);
         gd_nm_node_free(moduleGroup);
         gd_app_runing_module_data_free(context, moduleName);
         return NULL;
@@ -69,7 +75,12 @@ void gd_app_runing_module_data_free(gd_app_context_t context, cpe_hash_string_t 
     rootGroup = gd_nm_mgr_find_node(nmm, gd_app_module_root_group_name);
     if (rootGroup == NULL) return;
 
-    moduleGroup = gd_nm_group_find_member(rootGroup, moduleName);
+    size_t bufCapacity = cpe_hs_len_to_binary_len((sizeof(g_module_name_prefix) - 1) + cpe_hs_len(moduleName)) ;
+    char groupNameBuf[bufCapacity];
+    cpe_hs_init((cpe_hash_string_t)groupNameBuf, bufCapacity, g_module_name_prefix);
+    cpe_hs_strcat((cpe_hash_string_t)groupNameBuf, bufCapacity, cpe_hs_data(moduleName));
+
+    moduleGroup = gd_nm_group_find_member(rootGroup, (cpe_hash_string_t)groupNameBuf);
     if (moduleGroup) {
         gd_nm_node_free(moduleGroup);
     }
@@ -86,10 +97,15 @@ gd_app_module_data(gd_app_context_t context, struct gd_app_module * module) {
 
     nmm = gd_app_nm_mgr(context);
 
+    size_t bufCapacity = cpe_hs_len_to_binary_len((sizeof(g_module_name_prefix) - 1) + cpe_hs_len(module->m_name)) ;
+    char groupNameBuf[bufCapacity];
+    cpe_hs_init((cpe_hash_string_t)groupNameBuf, bufCapacity, g_module_name_prefix);
+    cpe_hs_strcat((cpe_hash_string_t)groupNameBuf, bufCapacity, cpe_hs_data(module->m_name));
+
     rootGroup = gd_nm_mgr_find_node(nmm, gd_app_module_root_group_name);
 
     return rootGroup ?
-        gd_nm_group_find_member(rootGroup, module->m_name)
+        gd_nm_group_find_member(rootGroup, (cpe_hash_string_t)groupNameBuf)
         : NULL;
 }
 
