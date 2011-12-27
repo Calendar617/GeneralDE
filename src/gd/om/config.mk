@@ -1,4 +1,4 @@
-product:=gd_pg
+product:=gd_om
 $(product).type:=lib
 $(product).depends:=cpe_utils
 $(product).c.libraries:=
