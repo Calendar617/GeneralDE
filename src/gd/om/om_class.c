@@ -1,5 +1,7 @@
 #include <assert.h>
+#include "cpe/utils/bitarry.h"
 #include "om_class.h"
+#include "om_page.h"
 
 uint32_t gd_om_class_hash_fun(struct gd_om_class * class) {
     return cpe_hs_value(class->m_name);
@@ -65,4 +67,28 @@ gd_om_class_find(struct gd_om_class_mgr * classMgr, cpe_hash_string_t className)
     key.m_name = className;
 
     return (struct gd_om_class *)cpe_hash_table_find(&classMgr->m_classNameIdx, &key);
+}
+
+int gd_om_class_add_new_page(struct gd_om_class * class, void * page, error_monitor_t em) {
+    struct gd_om_page_head * head;
+    cpe_ba_t alloc_arry;
+    char * data_buf;
+
+    head = (struct gd_om_page_head *)page;
+    alloc_arry = (cpe_ba_t)(head + 1);
+    data_buf = (char *)page + class->m_object_buf_begin_in_page;
+
+    if (class->m_page_array_size >= class->m_page_array_capacity) {
+        size_t new_page_array_capacity = class->m_page_array_capacity + 1024;
+        void * new_page_array = mem_alloc(class->m_alloc, sizeof(void *) * new_page_array_capacity);
+        if (new_page_array == NULL) {
+            //CPE_ERROR_SET_LINE
+        }
+    }
+
+    return 0;
+}
+
+int gd_om_class_add_old_page(struct gd_om_class * class, void * page, error_monitor_t em) {
+    return 0;
 }

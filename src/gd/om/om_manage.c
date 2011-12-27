@@ -1,6 +1,6 @@
 #include <assert.h>
 #include "gd/om/om_manage.h"
-#include "om_manage_type.h"
+#include "om_manage_internal.h"
 
 gd_om_mgr_t
 gd_om_mgr_create(mem_allocrator_t alloc) {

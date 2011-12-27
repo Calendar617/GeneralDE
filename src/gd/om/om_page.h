@@ -8,24 +8,16 @@
 extern "C" {
 #endif
 
-struct gd_om_buf {
-};
-
 #pragma pack(push, 1)
-struct gd_om_alloc_info {
-    uint8_t m_pageType;
-    uint8_t m_state;
-};
 
-struct gd_om_info {
-    char m_page_type_name[GD_OM_MAX_TYPENAME_LEN];
-    size_t m_entry_size;
+struct gd_om_page_head {
+    int16_t m_magic;
+    gd_om_class_id_t m_classId;
+    int8_t m_reserve;
+    int16_t m_page_idx;
 };
 
 #pragma pack(pop)
-
-struct gd_om_mgr_control_page {
-};
 
 #ifdef __cplusplus
 }
