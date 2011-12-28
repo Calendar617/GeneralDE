@@ -2,8 +2,8 @@
 #define GD_OM_CLASS_H
 #include "cpe/utils/hash.h"
 #include "cpe/utils/error.h"
+#include "cpe/utils/range_allocrator.h"
 #include "gd/om/om_types.h"
-#include "om_oid_alloc.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,6 +15,7 @@ struct gd_om_class {
     char m_name_buf[cpe_hs_len_to_binary_len(GD_OM_MAX_TYPENAME_LEN)];
     cpe_hash_string_t m_name;
     struct cpe_hash_entry m_hh;
+    struct cpe_range_allocrator m_range_alloc;
     mem_allocrator_t m_alloc;
     size_t m_object_size;
 
@@ -44,6 +45,13 @@ gd_om_class_find(struct gd_om_class_mgr * classMgr, cpe_hash_string_t className)
 
 int gd_om_class_add_new_page(struct gd_om_class * class, void * page, error_monitor_t em);
 int gd_om_class_add_old_page(struct gd_om_class * class, void * page, error_monitor_t em);
+
+int32_t gd_om_class_alloc_object(struct gd_om_class * class);
+void gd_om_class_free_object(struct gd_om_class * class, int32_t value, error_monitor_t em);
+void * gd_om_class_get_object(struct gd_om_class * class, int32_t value, error_monitor_t em);
+
+#define gd_om_class_ba_of_page(page) (cpe_ba_t)(((char*)(page)) + sizeof(struct gd_om_page_head))
+
 
 #ifdef __cplusplus
 }

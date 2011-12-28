@@ -9,9 +9,20 @@ gd_om_oid_t gd_om_obj_alloc(
     cpe_hash_string_t className,
     error_monitor_t em);
 
-void gd_om_obj_free(gd_om_mgr_t omm, gd_om_oid_t);
+void gd_om_obj_free(
+    gd_om_mgr_t omm,
+    gd_om_oid_t oid,
+    error_monitor_t em);
 
-void * gd_om_obj_get(gd_om_mgr_t omm, gd_om_oid_t oid);
-cpe_hash_string_t gd_om_obj_type(gd_om_mgr_t omm, gd_om_oid_t oid);
+void * gd_om_obj_get(
+    gd_om_mgr_t omm, 
+    gd_om_oid_t oid,
+    error_monitor_t em);
+
+cpe_hash_string_t
+gd_om_obj_type(
+    gd_om_mgr_t omm,
+    gd_om_oid_t oid,
+    error_monitor_t em);
 
 #endif

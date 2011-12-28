@@ -9,6 +9,7 @@ gd_om_oid_t gd_om_obj_alloc(
     error_monitor_t em)
 {
     struct gd_om_class * class;
+    int32_t baseOid;
 
     assert(omm);
     assert(className);
@@ -20,12 +21,84 @@ gd_om_oid_t gd_om_obj_alloc(
             "class %s not exist!", cpe_hs_data(className));
         return GD_OM_INVALID_OID; 
     }
-    
-    return GD_OM_INVALID_OID;
+
+    baseOid = gd_om_class_alloc_object(class);
+    if (baseOid < 0) {
+        //TODO: alloc new page!
+        return GD_OM_INVALID_OID;
+    }
+
+    if (baseOid > 0xFFFFFF) {
+        CPE_ERROR_EX(
+            em, gd_om_no_memory,
+            "object of class %s count overflow!", cpe_hs_data(className));
+        gd_om_class_free_object(class, baseOid, NULL);
+        return GD_OM_INVALID_OID; 
+    }
+
+    return (((uint32_t)class->m_id) << 24) | ((uint32_t)baseOid);
 }
 
-void gd_om_obj_free(gd_om_mgr_t omm, gd_om_oid_t oid) {
+void gd_om_obj_free(
+    gd_om_mgr_t omm,
+    gd_om_oid_t oid,
+    error_monitor_t em)
+{
+    gd_om_class_id_t classId;
+    struct gd_om_class * class;
+
     assert(omm);
 
-    if (oid == GD_OM_INVALID_OID) return;
+    classId = ((uint32_t)oid) >> 24;
+    class = gd_om_class_get(&omm->m_classMgr, classId);
+
+    if (class == NULL) {
+        CPE_ERROR_EX(em, gd_om_error_no_class, "class id=%d not exist!", classId);
+        return;
+    }
+
+    gd_om_class_free_object(class, oid & 0xFFFFFF, em);
+}
+
+void * gd_om_obj_get(
+    gd_om_mgr_t omm, 
+    gd_om_oid_t oid,
+    error_monitor_t em)
+{
+    gd_om_class_id_t classId;
+    struct gd_om_class * class;
+
+    assert(omm);
+
+    classId = ((uint32_t)oid) >> 24;
+    class = gd_om_class_get(&omm->m_classMgr, classId);
+
+    if (class == NULL) {
+        CPE_ERROR_EX(em, gd_om_error_no_class, "class id=%d not exist!", classId);
+        return NULL;
+    }
+
+    return gd_om_class_get_object(class, oid & 0xFFFFFF, em);
+}
+
+cpe_hash_string_t
+gd_om_obj_type(
+    gd_om_mgr_t omm,
+    gd_om_oid_t oid,
+    error_monitor_t em)
+{
+    gd_om_class_id_t classId;
+    struct gd_om_class * class;
+
+    assert(omm);
+
+    classId = ((uint32_t)oid) >> 24;
+    class = gd_om_class_get(&omm->m_classMgr, classId);
+
+    if (class == NULL) {
+        CPE_ERROR_EX(em, gd_om_error_no_class, "class id=%d not exist!", classId);
+        return NULL;
+    }
+
+    return class->m_name;
 }
