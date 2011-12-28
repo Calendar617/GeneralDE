@@ -3,6 +3,7 @@
 #include "cpe/utils/hash.h"
 #include "cpe/utils/error.h"
 #include "gd/om/om_types.h"
+#include "om_oid_alloc.h"
 
 #ifdef __cplusplus
 extern "C" {
