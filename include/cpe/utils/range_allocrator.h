@@ -22,6 +22,7 @@ typedef struct cpe_range_allocrator {
 
 int cpe_range_allocrator_init(cpe_range_allocrator_t ra, mem_allocrator_t alloc);
 void cpe_range_allocrator_fini(cpe_range_allocrator_t ra);
+void cpe_range_allocrator_clear(cpe_range_allocrator_t ra);
 void cpe_range_allocrator_dump(write_stream_t stream, cpe_range_allocrator_t ra);
 
 int32_t cpe_range_alloc_one(cpe_range_allocrator_t ra);
