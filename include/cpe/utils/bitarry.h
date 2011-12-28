@@ -19,6 +19,8 @@ void cpe_ba_copy(cpe_ba_t target, cpe_ba_t source, size_t bit_capacity);
 size_t cpe_ba_count(cpe_ba_t ba, size_t bit_capacity);
 void cpe_ba_set_all(cpe_ba_t ba, size_t bit_capacity, cpe_ba_value_t value);
 
+cpe_ba_t cpe_ba_create_from_string(mem_allocrator_t alloc, const char * str);
+void cpe_ba_set_from_string(cpe_ba_t ba, size_t bit_capacity, const char * str);
 char * cpe_ba_to_str(char * dest, cpe_ba_t ba, size_t bit_capacity);
 char * cpe_ba_to_str_create(mem_allocrator_t alloc, cpe_ba_t ba, size_t bit_capacity);
 

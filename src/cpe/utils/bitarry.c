@@ -11,6 +11,32 @@ cpe_ba_create(mem_allocrator_t alloc, size_t bit_capacity) {
     return (cpe_ba_t)mem_alloc(alloc, s);
 }
 
+cpe_ba_t cpe_ba_create_from_string(mem_allocrator_t alloc, const char * str) {
+    cpe_ba_t  r;
+    size_t bit_capacity = strlen(str);
+
+    r = cpe_ba_create(alloc, bit_capacity);
+    if (r == NULL) return NULL;
+
+    cpe_ba_set_from_string(r, bit_capacity, str);
+
+    return r;
+}
+
+void cpe_ba_set_from_string(cpe_ba_t ba, size_t bit_capacity, const char * str) {
+    int i;
+    size_t len = strlen(str);
+    if (len > bit_capacity) len = bit_capacity;
+
+    cpe_ba_set_all(ba, bit_capacity, cpe_ba_false);
+
+    for(i = 0; i < bit_capacity; ++i) {
+        if (str[i] != '0') {
+            cpe_ba_set(ba, i, cpe_ba_true);
+        }
+    }
+}
+
 void cpe_ba_copy(cpe_ba_t target, cpe_ba_t source, size_t bit_capacity) {
     size_t s = cpe_ba_bytes_from_bits(bit_capacity);
 
