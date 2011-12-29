@@ -3,7 +3,7 @@
 #include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
 #include "gd/om/om_error.h"
-#include "../om_class.h"
+#include "../om_class_i.h"
 
 typedef LOKI_TYPELIST_1(
     utils::testenv::with_em) ClassTestBase;

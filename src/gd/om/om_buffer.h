@@ -22,8 +22,8 @@ int gd_om_buffer_mgr_init(
     struct gd_om_buffer_mgr * pgm,
     gd_om_backend_t backend,
     void * backend_ctx,
-    size_t m_page_size,
-    size_t m_buf_size,
+    size_t page_size,
+    size_t buf_size,
     mem_allocrator_t alloc);
 
 void gd_om_buffer_mgr_fini(struct gd_om_buffer_mgr * pgm);

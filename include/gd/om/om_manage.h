@@ -1,7 +1,12 @@
 #ifndef GD_OM_MANAGE_H
 #define GD_OM_MANAGE_H
 #include "cpe/utils/memory.h"
+#include "cpe/utils/error.h"
 #include "om_types.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 gd_om_mgr_t
 gd_om_mgr_create(
@@ -18,6 +23,26 @@ typedef enum gd_om_mgr_opt {
 } gd_om_mgr_opt_t;
 
 int gd_om_mgr_set_opt(gd_om_mgr_opt_t opt, ...);
+
+gd_om_class_id_t
+gd_om_mgr_add_class(
+    gd_om_mgr_t omm,
+    const char * className,
+    size_t object_size,
+    size_t align,
+    error_monitor_t em);
+
+int gd_om_mgr_add_class_with_id(
+    gd_om_mgr_t omm,
+    gd_om_class_id_t classId,
+    const char * className,
+    size_t object_size,
+    size_t align,
+    error_monitor_t em);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

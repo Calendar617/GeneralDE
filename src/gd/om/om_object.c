@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "gd/om/om_object.h"
 #include "gd/om/om_error.h"
-#include "om_manage_internal.h"
+#include "om_manage_i.h"
 
 gd_om_oid_t gd_om_obj_alloc(
     gd_om_mgr_t omm,
@@ -98,24 +98,16 @@ void * gd_om_obj_get(
     return gd_om_class_get_object(class, oid & 0xFFFFFF, em);
 }
 
-cpe_hash_string_t
-gd_om_obj_type(
+gd_om_class_t
+gd_om_obj_class(
     gd_om_mgr_t omm,
     gd_om_oid_t oid,
     error_monitor_t em)
 {
     gd_om_class_id_t classId;
-    struct gd_om_class * class;
 
     assert(omm);
 
     classId = ((uint32_t)oid) >> 24;
-    class = gd_om_class_get(&omm->m_classMgr, classId);
-
-    if (class == NULL) {
-        CPE_ERROR_EX(em, gd_om_error_no_class, "class id=%d not exist!", classId);
-        return NULL;
-    }
-
-    return class->m_name;
+    return gd_om_class_get(&omm->m_classMgr, classId);
 }

@@ -2,7 +2,7 @@
 #include "cpe/utils/bitarry.h"
 #include "cpe/utils/range_bitarry.h"
 #include "gd/om/om_error.h"
-#include "om_class.h"
+#include "om_class_i.h"
 #include "om_page_head.h"
 
 uint32_t gd_om_class_hash_fun(struct gd_om_class * class) {
@@ -71,7 +71,7 @@ void gd_om_class_mgr_fini(struct gd_om_class_mgr * classMgr) {
 }
 
 gd_om_class_id_t
-gd_om_calss_add(
+gd_om_class_add(
     struct gd_om_class_mgr * classMgr,
     const char * className,
     size_t object_size,
@@ -80,6 +80,43 @@ gd_om_calss_add(
     error_monitor_t em)
 {
     int i;
+
+    assert(classMgr);
+    assert(className);
+
+    for(i = 1; i < (int)GD_OM_CLASS_BUF_LEN; ++i) {
+        if (classMgr->m_classes[i].m_id == GD_OM_INVALID_CLASSID) {
+            break;
+        }
+    }
+
+    if (i >= GD_OM_CLASS_BUF_LEN) {
+        CPE_ERROR_EX(em, gd_om_class_overflow, "too many class!");
+        return GD_OM_INVALID_CLASSID;
+    }
+
+    return 
+        gd_om_class_add_with_id(
+            classMgr,
+            (gd_om_class_id_t)i,
+            className,
+            object_size,
+            page_size,
+            align,
+            em) == 0
+        ? (gd_om_class_id_t)i
+        : GD_OM_INVALID_CLASSID;
+}
+
+int gd_om_class_add_with_id(
+    struct gd_om_class_mgr * classMgr,
+    gd_om_class_id_t classId,
+    const char * className,
+    size_t object_size,
+    size_t page_size,
+    size_t align,
+    error_monitor_t em)
+{
     struct gd_om_class * class;
 
     assert(classMgr);
@@ -87,31 +124,30 @@ gd_om_calss_add(
 
     if (align != 1 && align != 2 && align != 4 && align != 8) {
         CPE_ERROR_EX(em, gd_om_error_invalid_align, "invalid align %d!", align);
-        return GD_OM_INVALID_CLASSID;
+        return -1;
     }
 
     if (object_size % align) {
         object_size = ((object_size / align) + 1) * align;
     }
 
-    class = NULL;
-    for(i = 1; i < GD_OM_CLASS_BUF_LEN; ++i) {
-        if (classMgr->m_classes[i].m_id == GD_OM_INVALID_CLASSID) {
-            class = &classMgr->m_classes[i];
-            break;
-        }
+    if (classId <= 0) {
+        CPE_ERROR_EX(em, gd_om_class_overflow, "invalid class id!");
+        return -1;
     }
 
-    if (class == NULL) {
-        CPE_ERROR_EX(em, gd_om_class_overflow, "too many class!");
-        return GD_OM_INVALID_CLASSID;
+    if (((int)classId - 1) >= (int)GD_OM_CLASS_BUF_LEN - 1) {
+        CPE_ERROR_EX(em, gd_om_class_overflow, "class id overflow!");
+        return -1;
     }
+
+    class = &classMgr->m_classes[classId];
 
     if (page_size > 0x1FFFFFFF) {
         CPE_ERROR_EX(
             em, gd_om_page_size_too_big,
             "page size(%d) is bigger then %d!", page_size, 0x1FFFFFFF);
-        return GD_OM_INVALID_CLASSID;
+        return -1;
     }
 
     assert(class->m_name); /*set in init, point to m_name_buf*/
@@ -126,7 +162,7 @@ gd_om_calss_add(
             em, gd_om_page_size_too_small,
             "page size(%d) is too small, only can contain %d object(s)!",
             page_size, class->m_object_per_page);
-        return GD_OM_INVALID_CLASSID;
+        return -1;
     }
 
     class->m_alloc_buf_capacity = cpe_ba_bytes_from_bits(class->m_object_per_page);
@@ -145,12 +181,12 @@ gd_om_calss_add(
         CPE_ERROR_EX(
             em, gd_om_class_name_duplicate,
             "class %s name duplicate!", className);
-        return GD_OM_INVALID_CLASSID;
+        return -1;
     }
 
     /*last operation, set id*/
-    class->m_id = i;
-    return i;
+    class->m_id = classId;
+    return 0;
 }
 
 struct gd_om_class *
@@ -354,4 +390,20 @@ void * gd_om_class_get_object(struct gd_om_class * class, int32_t oid, error_mon
     }
 
     return (void*)(page + class->m_object_buf_begin_in_page + (class->m_object_size * posInPage));
+}
+
+gd_om_class_id_t om_class_id(gd_om_class_t cls) {
+    return cls->m_id;
+}
+
+const char * gd_om_class_name(gd_om_class_t cls) {
+    return cpe_hs_data(cls->m_name);
+}
+
+cpe_hash_string_t gd_om_class_name_hs(gd_om_class_t cls) {
+    return cls->m_name;
+}
+
+size_t gd_om_class_obj_size(gd_om_class_t cls) {
+    return cls->m_object_size;
 }

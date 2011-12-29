@@ -1,7 +1,7 @@
 #ifndef GD_OM_MAMAGE_H
 #define GD_OM_MAMAGE_H
 #include "gd/om/om_types.h"
-#include "om_class.h"
+#include "om_class_i.h"
 #include "om_buffer.h"
 
 #ifdef __cplusplus
@@ -10,8 +10,6 @@ extern "C" {
 
 struct gd_om_mgr {
     mem_allocrator_t m_alloc;
-    size_t m_pageSize;
-    size_t m_pagePerFrame;
     struct gd_om_class_mgr m_classMgr;
     struct gd_om_buffer_mgr m_bufMgr;
 };

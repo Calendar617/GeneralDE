@@ -3,6 +3,7 @@
 #include "cpe/utils/hash.h"
 #include "cpe/utils/error.h"
 #include "cpe/utils/range.h"
+#include "gd/om/om_class.h"
 #include "gd/om/om_types.h"
 
 #ifdef __cplusplus
@@ -41,8 +42,17 @@ int gd_om_class_mgr_init(struct gd_om_class_mgr * classMgr, mem_allocrator_t all
 void gd_om_class_mgr_fini(struct gd_om_class_mgr * classMgr);
 
 gd_om_class_id_t
-gd_om_calss_add(
+gd_om_class_add(
     struct gd_om_class_mgr * classMgr,
+    const char * className,
+    size_t object_size,
+    size_t page_size,
+    size_t align,
+    error_monitor_t em);
+
+int gd_om_class_add_with_id(
+    struct gd_om_class_mgr * classMgr,
+    gd_om_class_id_t classId,
     const char * className,
     size_t object_size,
     size_t page_size,

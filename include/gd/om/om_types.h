@@ -3,6 +3,10 @@
 #include "cpe/pal/types.h"
 #include "cpe/utils/hash_string.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define GD_OM_MAX_TYPENAME_LEN 32
 #define GD_OM_MAX_TYPE_COUNT 255 /*typeid 0 is invalid!*/
 
@@ -14,6 +18,7 @@ typedef uint8_t gd_om_class_id_t;
 typedef uint32_t gd_om_oid_t;
 
 typedef struct gd_om_backend * gd_om_backend_t;
+typedef struct gd_om_class * gd_om_class_t;
 typedef struct gd_om_mgr * gd_om_mgr_t;
 typedef struct gd_om_type * gd_om_type_t;
 
@@ -23,5 +28,9 @@ struct gd_om_backend {
     gd_om_buffer_id_t (*buf_alloc)(size_t size, void * context);
     void * (*buf_get)(gd_om_buffer_id_t id, void * context);
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
