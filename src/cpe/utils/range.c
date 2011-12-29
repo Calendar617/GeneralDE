@@ -224,18 +224,22 @@ int cpe_range_put_range(cpe_range_mgr_t ra, int start, int end) {
     return 0;
 }
 
-cpe_range_t
+struct cpe_range
 cpe_range_find(cpe_range_mgr_t ra, int value) {
+    struct cpe_range invalid;
+
     int pos = cpe_range_find_next_pos(ra, value);
     if (pos < ra->m_range_count && ra->m_ranges[pos].m_start == value) {
-        return &ra->m_ranges[pos];
+        return ra->m_ranges[pos];
     }
 
     if (pos > 0 && ra->m_ranges[pos - 1].m_end > value) {
-        return &ra->m_ranges[pos - 1];
+        return ra->m_ranges[pos - 1];
     }
 
-    return NULL;
+    invalid.m_start = -1;
+    invalid.m_end = -1;
+    return invalid;
 }
 
 int cpe_range_mgr_reserve_for_put(cpe_range_mgr_t ra, int put_count) {
@@ -268,4 +272,38 @@ int cpe_range_mgr_reserve_for_put(cpe_range_mgr_t ra, int put_count) {
     }
 
     return 0;
+}
+
+int cpe_range_is_valid(struct cpe_range r) {
+    return r.m_start >= 0 && r.m_end >= r.m_start
+        ? 1
+        : 0;
+}
+
+int cpe_range_size(struct cpe_range r) {
+    return cpe_range_is_valid(r)
+        ? (r.m_end - r.m_start)
+        : -1;
+}
+
+void cpe_range_mgr_ranges(cpe_range_it_t it, cpe_range_mgr_t ra) {
+    assert(it);
+    assert(ra);
+
+    it->m_mgr = ra;
+    it->m_pos = 0;
+}
+
+struct cpe_range cpe_range_it_next(cpe_range_it_t it) {
+    assert(it);
+    struct cpe_range invalid = { -1, -1 };
+
+    if (it->m_mgr == NULL || it->m_mgr->m_ranges == NULL) return invalid;
+
+    if (it->m_pos < it->m_mgr->m_range_count) {
+        return it->m_mgr->m_ranges[it->m_pos++];
+    }
+    else {
+        return invalid;
+    }
 }
