@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "cpe/utils/range_allocrator.h"
+#include "cpe/utils/range.h"
 
-int cpe_range_allocrator_init(cpe_range_allocrator_t ra, mem_allocrator_t alloc) {
+int cpe_range_mgr_init(cpe_range_mgr_t ra, mem_allocrator_t alloc) {
     if (ra == NULL) return 0;
 
     ra->m_alloc = alloc;
@@ -14,7 +14,7 @@ int cpe_range_allocrator_init(cpe_range_allocrator_t ra, mem_allocrator_t alloc)
     return 0;
 }
 
-void cpe_range_allocrator_fini(cpe_range_allocrator_t ra) {
+void cpe_range_mgr_fini(cpe_range_mgr_t ra) {
     assert(ra);
 
     if (ra->m_ranges) {
@@ -27,12 +27,12 @@ void cpe_range_allocrator_fini(cpe_range_allocrator_t ra) {
     ra->m_alloc = NULL;
 }
 
-void cpe_range_allocrator_clear(cpe_range_allocrator_t ra) {
+void cpe_range_mgr_clear(cpe_range_mgr_t ra) {
     assert(ra);
     ra->m_range_capacity = 0;
 }
 
-void cpe_range_allocrator_dump(write_stream_t stream, cpe_range_allocrator_t ra) {
+void cpe_range_mgr_dump(write_stream_t stream, cpe_range_mgr_t ra) {
     int i;
     for(i = 0; i < ra->m_range_count; ++i) {
         if (i > 0) stream_putc(stream, ',');
@@ -44,21 +44,21 @@ void cpe_range_allocrator_dump(write_stream_t stream, cpe_range_allocrator_t ra)
     }
 }
 
-int32_t cpe_range_alloc_one(cpe_range_allocrator_t ra) {
+int32_t cpe_range_get_one(cpe_range_mgr_t ra) {
     struct cpe_range r;
 
     assert(ra);
 
-    r = cpe_range_alloc_range(ra, 1);
+    r = cpe_range_get_range(ra, 1);
 
     return r.m_start;
 }
 
-int cpe_range_free_one(cpe_range_allocrator_t ra, int32_t value) {
-    return cpe_range_free_range(ra, value, value + 1);
+int cpe_range_put_one(cpe_range_mgr_t ra, int32_t value) {
+    return cpe_range_put_range(ra, value, value + 1);
 }
 
-struct cpe_range cpe_range_alloc_range(cpe_range_allocrator_t ra, size_t capacity) {
+struct cpe_range cpe_range_get_range(cpe_range_mgr_t ra, size_t capacity) {
     struct cpe_range r;
 
     assert(ra);
@@ -88,7 +88,7 @@ struct cpe_range cpe_range_alloc_range(cpe_range_allocrator_t ra, size_t capacit
     return r;
 }
 
-static int cpe_range_reserve_range_buf(cpe_range_allocrator_t ra) {
+static int cpe_range_reserve_range_buf(cpe_range_mgr_t ra) {
     size_t newCapacity;
     struct cpe_range * newBuf;
 
@@ -110,7 +110,7 @@ static int cpe_range_reserve_range_buf(cpe_range_allocrator_t ra) {
     return 0;
 }
 
-static void cpe_range_merge_neighbers(cpe_range_allocrator_t ra, int32_t beginPos) {
+static void cpe_range_merge_neighbers(cpe_range_mgr_t ra, int32_t beginPos) {
     int32_t keepPos;
     int32_t removeCount;
     int32_t checkPos;
@@ -154,7 +154,7 @@ static void cpe_range_merge_neighbers(cpe_range_allocrator_t ra, int32_t beginPo
     }
 }
 
-static int32_t cpe_range_find_insert_pos(cpe_range_allocrator_t ra, int32_t start) {
+static int32_t cpe_range_find_insert_pos(cpe_range_mgr_t ra, int32_t start) {
     struct cpe_range * curRange;
     int32_t beginPos, endPos, curPos;
 
@@ -180,7 +180,7 @@ static int32_t cpe_range_find_insert_pos(cpe_range_allocrator_t ra, int32_t star
         : ra->m_range_count;
 }
 
-int cpe_range_free_range(cpe_range_allocrator_t ra, int32_t start, int32_t end) {
+int cpe_range_put_range(cpe_range_mgr_t ra, int32_t start, int32_t end) {
     if (start < 0 || end <= 0 || end < start) return -1;
     if (end == start) return 0;
 

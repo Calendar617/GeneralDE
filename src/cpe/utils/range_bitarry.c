@@ -2,7 +2,7 @@
 #include "cpe/utils/range_bitarry.h"
 
 int cpe_range_free_from_bitarray(
-    cpe_range_allocrator_t ra,
+    cpe_range_mgr_t ra,
     cpe_ba_t ba,
     int32_t baStartPos,
     size_t ba_capacity)
@@ -25,7 +25,7 @@ int cpe_range_free_from_bitarray(
                 ++end;
             }
             else {
-                if (cpe_range_free_range(ra, start, end) != 0) return -1;
+                if (cpe_range_put_range(ra, start, end) != 0) return -1;
 
                 start = baStartPos;
                 end = baStartPos + 1;
@@ -34,7 +34,7 @@ int cpe_range_free_from_bitarray(
     }
 
     if (!(end < 0)) {
-        if (cpe_range_free_range(ra, start, end) != 0) return -1;
+        if (cpe_range_put_range(ra, start, end) != 0) return -1;
     }
 
     return 0;
