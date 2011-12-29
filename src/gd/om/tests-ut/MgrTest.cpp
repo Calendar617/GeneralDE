@@ -16,8 +16,17 @@ void MgrTest::SetUp() {
 }
 
 void MgrTest::TearDown() {
-    gd_om_mgr_free(m_omm);
-    m_omm = NULL;
+    if (m_omm) {
+        struct gd_om_buffer_it it;
+        gd_om_mgr_buffers(&it, m_omm);
+
+        while(void * p = gd_om_next_buffer(&it)) {
+            mem_free(t_allocrator(), p);
+        }
+
+        gd_om_mgr_free(m_omm);
+        m_omm = NULL;
+    }
 
     Base::TearDown();
 }

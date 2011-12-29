@@ -23,7 +23,7 @@ typedef struct gd_om_class * gd_om_class_t;
 typedef struct gd_om_mgr * gd_om_mgr_t;
 typedef struct gd_om_type * gd_om_type_t;
 
-typedef int gd_om_buffer_id_t;
+typedef int_ptr_t gd_om_buffer_id_t;
 
 struct gd_om_backend {
     gd_om_buffer_id_t (*buf_alloc)(size_t size, void * context);

@@ -123,7 +123,7 @@ int gd_om_class_add_with_id(
     assert(className);
 
     if (align != 1 && align != 2 && align != 4 && align != 8) {
-        CPE_ERROR_EX(em, gd_om_error_invalid_align, "invalid align %d!", align);
+        CPE_ERROR_EX(em, gd_om_error_invalid_align, "invalid align %zd!", align);
         return -1;
     }
 
@@ -146,7 +146,7 @@ int gd_om_class_add_with_id(
     if (page_size > 0x1FFFFFFF) {
         CPE_ERROR_EX(
             em, gd_om_page_size_too_big,
-            "page size(%d) is bigger then %d!", page_size, 0x1FFFFFFF);
+            "page size(%zd) is bigger then %d!", page_size, 0x1FFFFFFF);
         return -1;
     }
 
@@ -160,7 +160,7 @@ int gd_om_class_add_with_id(
     if (class->m_object_per_page < 10) {
         CPE_ERROR_EX(
             em, gd_om_page_size_too_small,
-            "page size(%d) is too small, only can contain %d object(s)!",
+            "page size(%zd) is too small, only can contain %zd object(s)!",
             page_size, class->m_object_per_page);
         return -1;
     }

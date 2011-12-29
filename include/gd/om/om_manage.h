@@ -54,5 +54,3 @@ gd_om_buffer_id_t gd_om_next_buffer_id(struct gd_om_buffer_id_it * it);
 #endif
 
 #endif
-
-

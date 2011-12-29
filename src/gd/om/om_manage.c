@@ -127,7 +127,7 @@ void * gd_om_next_buffer(struct gd_om_buffer_it * it) {
         return NULL;
     }
 
-    assert(cpe_range_size(it->m_curent) % it->m_buf_size);
+    assert((cpe_range_size(it->m_curent) % it->m_buf_size) == 0);
 
     r = (void*)it->m_curent.m_start;
     it->m_curent.m_start += it->m_buf_size;
