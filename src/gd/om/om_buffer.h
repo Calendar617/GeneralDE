@@ -16,6 +16,7 @@ struct gd_om_buffer_mgr {
     size_t m_buf_size;
     struct cpe_range_mgr m_free_pages;
     struct cpe_range_mgr m_buffers;
+    struct cpe_range_mgr m_buffer_ids;
 };
 
 int gd_om_buffer_mgr_init(

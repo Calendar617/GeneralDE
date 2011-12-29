@@ -98,3 +98,69 @@ gd_om_mgr_find_class(gd_om_mgr_t omm, cpe_hash_string_t className) {
     assert(omm);
     return gd_om_class_find(&omm->m_classMgr, className);
 }
+
+size_t gd_om_mgr_page_size(gd_om_mgr_t omm) {
+    assert(omm);
+    return omm->m_bufMgr.m_page_size;
+}
+
+size_t gd_om_mgr_buf_size(gd_om_mgr_t omm) {
+    assert(omm);
+    return omm->m_bufMgr.m_buf_size;
+}
+
+void gd_om_mgr_buffers(struct gd_om_buffer_it * it, gd_om_mgr_t omm) {
+    assert(it);
+    assert(omm);
+
+    it->m_buf_size = omm->m_bufMgr.m_buf_size;
+    cpe_range_mgr_ranges(&it->m_range_it, &omm->m_bufMgr.m_buffers);
+    it->m_curent = cpe_range_it_next(&it->m_range_it);
+}
+
+void * gd_om_next_buffer(struct gd_om_buffer_it * it) {
+    void * r;
+
+    assert(it);
+
+    if (cpe_range_size(it->m_curent) <= 0) {
+        return NULL;
+    }
+
+    assert(cpe_range_size(it->m_curent) % it->m_buf_size);
+
+    r = (void*)it->m_curent.m_start;
+    it->m_curent.m_start += it->m_buf_size;
+
+    if (cpe_range_size(it->m_curent) <= 0) {
+        it->m_curent = cpe_range_it_next(&it->m_range_it);
+    }
+
+    return r;
+}
+
+void gd_om_mgr_buffer_ids(struct gd_om_buffer_id_it * it, gd_om_mgr_t omm) {
+    assert(it);
+    assert(omm);
+
+    cpe_range_mgr_ranges(&it->m_range_it, &omm->m_bufMgr.m_buffer_ids);
+    it->m_curent = cpe_range_it_next(&it->m_range_it);
+}
+
+gd_om_buffer_id_t
+gd_om_next_buffer_id(struct gd_om_buffer_id_it * it) {
+    gd_om_buffer_id_t r;
+    assert(it);
+
+    if (cpe_range_size(it->m_curent) <= 0) {
+        return GD_OM_INVALID_BUFFER_ID;
+    }
+
+    r = it->m_curent.m_start++;
+
+    if (cpe_range_size(it->m_curent) <= 0) {
+        it->m_curent = cpe_range_it_next(&it->m_range_it);
+    }
+
+    return r;
+}

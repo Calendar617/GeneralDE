@@ -40,6 +40,15 @@ int gd_om_mgr_add_class_with_id(
     size_t align,
     error_monitor_t em);
 
+size_t gd_om_mgr_page_size(gd_om_mgr_t omm);
+size_t gd_om_mgr_buf_size(gd_om_mgr_t omm);
+
+void gd_om_mgr_buffers(struct gd_om_buffer_it * it, gd_om_mgr_t omm);
+void * gd_om_next_buffer(struct gd_om_buffer_it * it);
+
+void gd_om_mgr_buffer_ids(struct gd_om_buffer_id_it * it, gd_om_mgr_t omm);
+gd_om_buffer_id_t gd_om_next_buffer_id(struct gd_om_buffer_id_it * it);
+
 #ifdef __cplusplus
 }
 #endif

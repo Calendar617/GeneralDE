@@ -18,10 +18,18 @@ int gd_om_buffer_mgr_init(
     pgm->m_page_size = page_size;
     pgm->m_buf_size = buf_size;
 
-    if (cpe_range_mgr_init(&pgm->m_free_pages, alloc) != 0) return -1;
+    if (cpe_range_mgr_init(&pgm->m_free_pages, alloc) != 0) {
+        return -1;
+    }
 
     if (cpe_range_mgr_init(&pgm->m_buffers, alloc) != 0) {
         cpe_range_mgr_fini(&pgm->m_free_pages);
+        return -1;
+    }
+
+    if (cpe_range_mgr_init(&pgm->m_buffer_ids, alloc) != 0) {
+        cpe_range_mgr_fini(&pgm->m_free_pages);
+        cpe_range_mgr_fini(&pgm->m_buffers);
         return -1;
     }
 
@@ -31,7 +39,9 @@ int gd_om_buffer_mgr_init(
 void gd_om_buffer_mgr_fini(struct gd_om_buffer_mgr * pgm) {
     assert(pgm);
 
+    cpe_range_mgr_fini(&pgm->m_buffer_ids);
     cpe_range_mgr_fini(&pgm->m_buffers);
+    cpe_range_mgr_fini(&pgm->m_free_pages);
 }
 
 static int gd_om_buffer_mgr_add_new_buffer(
@@ -45,6 +55,21 @@ static int gd_om_buffer_mgr_add_new_buffer(
 
     if (pgm->m_backend->buf_alloc == NULL) {
         CPE_ERROR_EX(em, gd_om_no_memory, "backend not support alloc new buf!");
+        return -1;
+    }
+
+    if (cpe_range_mgr_reserve_for_put(&pgm->m_buffers, 1) != 0) {
+        CPE_ERROR_EX(em, gd_om_no_memory, "reserve for buffers fail!");
+        return -1;
+    }
+
+    if (cpe_range_mgr_reserve_for_put(&pgm->m_free_pages, 1) != 0) {
+        CPE_ERROR_EX(em, gd_om_no_memory, "reserve for free pages fail!");
+        return -1;
+    }
+
+    if (cpe_range_mgr_reserve_for_put(&pgm->m_buffer_ids, 1) != 0) {
+        CPE_ERROR_EX(em, gd_om_no_memory, "reserve for buffer ids fail!");
         return -1;
     }
 
@@ -65,15 +90,9 @@ static int gd_om_buffer_mgr_add_new_buffer(
         new_buf = (void *)new_buf_id;
     }
 
-    if (cpe_range_put_range(&pgm->m_buffers, (int)new_buf, ((int)new_buf) + pgm->m_buf_size) != 0) {
-        CPE_ERROR_EX(em, gd_om_no_memory, "add new buffer to buffer list fail!");
-        return -1;
-    }
-
-    if (cpe_range_put_range(&pgm->m_free_pages, (int)new_buf, ((int)new_buf) + pgm->m_buf_size) != 0) {
-        CPE_ERROR_EX(em, gd_om_no_memory, "add new buffer to buffer list fail!");
-        return -1;
-    }
+    cpe_range_put_range(&pgm->m_buffers, (int)new_buf, ((int)new_buf) + pgm->m_buf_size);
+    cpe_range_put_range(&pgm->m_free_pages, (int)new_buf, ((int)new_buf) + pgm->m_buf_size);
+    cpe_range_put_one(&pgm->m_buffer_ids, new_buf_id);
 
     return 0;
 }
@@ -92,6 +111,7 @@ void * gd_om_page_get(struct gd_om_buffer_mgr * pgm, error_monitor_t em) {
             if (gd_om_buffer_mgr_add_new_buffer(pgm, em) != 0) {
                 return NULL;
             }
+            continue;
         }
 
         if (cpe_range_size(pageRange) < pgm->m_page_size) {
