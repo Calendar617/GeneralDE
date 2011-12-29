@@ -226,8 +226,6 @@ int cpe_range_put_range(cpe_range_mgr_t ra, int start, int end) {
 
 struct cpe_range
 cpe_range_find(cpe_range_mgr_t ra, int value) {
-    struct cpe_range invalid;
-
     int pos = cpe_range_find_next_pos(ra, value);
     if (pos < ra->m_range_count && ra->m_ranges[pos].m_start == value) {
         return ra->m_ranges[pos];
@@ -237,9 +235,7 @@ cpe_range_find(cpe_range_mgr_t ra, int value) {
         return ra->m_ranges[pos - 1];
     }
 
-    invalid.m_start = -1;
-    invalid.m_end = -1;
-    return invalid;
+    return cpe_range_invalid;
 }
 
 int cpe_range_mgr_reserve_for_put(cpe_range_mgr_t ra, int put_count) {
@@ -296,14 +292,14 @@ void cpe_range_mgr_ranges(cpe_range_it_t it, cpe_range_mgr_t ra) {
 
 struct cpe_range cpe_range_it_next(cpe_range_it_t it) {
     assert(it);
-    struct cpe_range invalid = { -1, -1 };
-
-    if (it->m_mgr == NULL || it->m_mgr->m_ranges == NULL) return invalid;
+    if (it->m_mgr == NULL || it->m_mgr->m_ranges == NULL) return cpe_range_invalid;
 
     if (it->m_pos < it->m_mgr->m_range_count) {
         return it->m_mgr->m_ranges[it->m_pos++];
     }
     else {
-        return invalid;
+        return cpe_range_invalid;
     }
 }
+
+struct cpe_range cpe_range_invalid = { -1, -1 };
