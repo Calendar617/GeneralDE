@@ -319,73 +319,148 @@ TEST_F(RangeMgrTest, find_range_first_before) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
 
-    EXPECT_TRUE(NULL == cpe_range_find(&m_ra, 9));
+    struct cpe_range range = cpe_range_find(&m_ra, 9);
+    EXPECT_TRUE(!cpe_range_is_valid(range));
 }
 
 TEST_F(RangeMgrTest, find_range_first_begin) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
 
-    cpe_range_t range = cpe_range_find(&m_ra, 10);
-    ASSERT_TRUE(range);
-    EXPECT_EQ(10, range->m_start);
+    struct cpe_range range = cpe_range_find(&m_ra, 10);
+    EXPECT_EQ(10, range.m_start);
 }
 
 TEST_F(RangeMgrTest, find_range_first_middle) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
 
-    cpe_range_t range = cpe_range_find(&m_ra, 11);
-    ASSERT_TRUE(range);
-    EXPECT_EQ(10, range->m_start);
+    struct cpe_range range = cpe_range_find(&m_ra, 11);
+    EXPECT_EQ(10, range.m_start);
 }
 
 TEST_F(RangeMgrTest, find_range_first_last) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
 
-    cpe_range_t range = cpe_range_find(&m_ra, 12);
-    ASSERT_TRUE(NULL == range);
+    struct cpe_range range = cpe_range_find(&m_ra, 12);
+    ASSERT_TRUE(!cpe_range_is_valid(range));
 }
 
 TEST_F(RangeMgrTest, find_range_middle) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
 
-    cpe_range_t range = cpe_range_find(&m_ra, 13);
-    ASSERT_TRUE(NULL == range);
+    struct cpe_range range = cpe_range_find(&m_ra, 13);
+    ASSERT_TRUE(!cpe_range_is_valid(range));
 }
 
 TEST_F(RangeMgrTest, find_range_last_begin) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
 
-    cpe_range_t range = cpe_range_find(&m_ra, 18);
-    ASSERT_TRUE(range);
-    EXPECT_EQ(18, range->m_start);
+    struct cpe_range range = cpe_range_find(&m_ra, 18);
+    EXPECT_EQ(18, range.m_start);
 }
 
 TEST_F(RangeMgrTest, find_range_last_middle) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
 
-    cpe_range_t range = cpe_range_find(&m_ra, 19);
-    ASSERT_TRUE(range);
-    EXPECT_EQ(18, range->m_start);
+    struct cpe_range range = cpe_range_find(&m_ra, 19);
+    EXPECT_EQ(18, range.m_start);
 }
 
 TEST_F(RangeMgrTest, find_range_last_end) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
 
-    cpe_range_t range = cpe_range_find(&m_ra, 20);
-    ASSERT_TRUE(NULL == range);
+    struct cpe_range range = cpe_range_find(&m_ra, 20);
+    ASSERT_TRUE(!cpe_range_is_valid(range));
 }
 
 TEST_F(RangeMgrTest, find_range_last_pass_end) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
 
-    cpe_range_t range = cpe_range_find(&m_ra, 21);
-    ASSERT_TRUE(NULL == range);
+    struct cpe_range range = cpe_range_find(&m_ra, 21);
+    ASSERT_TRUE(!cpe_range_is_valid(range));
 }
+
+TEST_F(RangeMgrTest, ranges_empty) {
+    struct cpe_range_it it;
+    cpe_range_mgr_ranges(&it, &m_ra);
+
+    struct cpe_range range = cpe_range_it_next(&it);
+    EXPECT_TRUE(!cpe_range_is_valid(range));
+}
+
+TEST_F(RangeMgrTest, ranges_basic) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    struct cpe_range_it it;
+    cpe_range_mgr_ranges(&it, &m_ra);
+
+    struct cpe_range range = cpe_range_it_next(&it);
+    EXPECT_EQ(10, range.m_start);
+    EXPECT_EQ(12, range.m_end);
+
+    range = cpe_range_it_next(&it);
+    EXPECT_EQ(18, range.m_start);
+    EXPECT_EQ(20, range.m_end);
+
+    range = cpe_range_it_next(&it);
+    EXPECT_TRUE(!cpe_range_is_valid(range));
+}
+
+TEST_F(RangeMgrTest, is_valid_basic) {
+    struct cpe_range r = {1, 2};
+    EXPECT_TRUE(cpe_range_is_valid(r));
+}
+
+TEST_F(RangeMgrTest, is_valid_empty) {
+    struct cpe_range r = {1, 1};
+    EXPECT_TRUE(cpe_range_is_valid(r));
+}
+
+TEST_F(RangeMgrTest, is_valid_start_negative) {
+    struct cpe_range r = {-1, 1};
+    EXPECT_FALSE(cpe_range_is_valid(r));
+}
+
+TEST_F(RangeMgrTest, is_valid_end_negative) {
+    struct cpe_range r = {1, -1};
+    EXPECT_FALSE(cpe_range_is_valid(r));
+}
+
+TEST_F(RangeMgrTest, is_valid_lenght_error) {
+    struct cpe_range r = {2, 1};
+    EXPECT_FALSE(cpe_range_is_valid(r));
+}
+
+TEST_F(RangeMgrTest, size_basic) {
+    struct cpe_range r = {1, 2};
+    EXPECT_EQ(1, cpe_range_size(r));
+}
+
+TEST_F(RangeMgrTest, size_empty) {
+    struct cpe_range r = {1, 1};
+    EXPECT_EQ(0, cpe_range_size(r));
+}
+
+TEST_F(RangeMgrTest, size_start_negative) {
+    struct cpe_range r = {-1, 1};
+    EXPECT_EQ(-1, cpe_range_size(r));
+}
+
+TEST_F(RangeMgrTest, size_end_negative) {
+    struct cpe_range r = {1, -1};
+    EXPECT_EQ(-1, cpe_range_size(r));
+}
+
+TEST_F(RangeMgrTest, size_lenght_error) {
+    struct cpe_range r = {2, 1};
+    EXPECT_EQ(-1, cpe_range_size(r));
+}
+
