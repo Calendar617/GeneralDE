@@ -45,6 +45,8 @@ struct cpe_range cpe_range_find(cpe_range_mgr_t ra, int value);
 void cpe_range_mgr_ranges(cpe_range_it_t it, cpe_range_mgr_t ra);
 struct cpe_range cpe_range_it_next(cpe_range_it_t it);
 
+extern struct cpe_range cpe_range_invalid;
+
 #ifdef __cplusplus
 }
 #endif
