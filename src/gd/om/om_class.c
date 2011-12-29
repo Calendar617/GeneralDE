@@ -224,7 +224,7 @@ void gd_om_class_free_object(struct gd_om_class * class, int32_t oid, error_moni
 
     if(pagePos < 0 || pagePos >= class->m_page_array_size) {
         CPE_ERROR_EX(
-            em, gd_om_error_invalid_oid, "class %s: page pos %d overflow, page count is %d!", 
+            em, gd_om_error_invalid_oid, "class %s: page pos %d overflow, page count is %zu!", 
             cpe_hs_data(class->m_name), pagePos, class->m_page_array_size);
         return;
     }
@@ -249,7 +249,7 @@ void * gd_om_class_get_object(struct gd_om_class * class, int32_t oid, error_mon
 
     if(pagePos < 0 || pagePos >= class->m_page_array_size) {
         CPE_ERROR_EX(
-            em, gd_om_error_invalid_oid, "class %s: page pos %d overflow, page count is %d!", 
+            em, gd_om_error_invalid_oid, "class %s: page pos %d overflow, page count is %zu!", 
             cpe_hs_data(class->m_name), pagePos, class->m_page_array_size);
         return NULL;
     }

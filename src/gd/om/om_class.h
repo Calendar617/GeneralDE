@@ -43,12 +43,12 @@ gd_om_class_get(struct gd_om_class_mgr * classMgr, gd_om_class_id_t classId);
 struct gd_om_class *
 gd_om_class_find(struct gd_om_class_mgr * classMgr, cpe_hash_string_t className);
 
-int gd_om_class_add_new_page(struct gd_om_class * class, void * page, error_monitor_t em);
-int gd_om_class_add_old_page(struct gd_om_class * class, void * page, error_monitor_t em);
+int gd_om_class_add_new_page(struct gd_om_class *cls, void * page, error_monitor_t em);
+int gd_om_class_add_old_page(struct gd_om_class *cls, void * page, error_monitor_t em);
 
-int32_t gd_om_class_alloc_object(struct gd_om_class * class);
-void gd_om_class_free_object(struct gd_om_class * class, int32_t value, error_monitor_t em);
-void * gd_om_class_get_object(struct gd_om_class * class, int32_t value, error_monitor_t em);
+int32_t gd_om_class_alloc_object(struct gd_om_class *cls);
+void gd_om_class_free_object(struct gd_om_class *cls, int32_t value, error_monitor_t em);
+void * gd_om_class_get_object(struct gd_om_class *cls, int32_t value, error_monitor_t em);
 
 #define gd_om_class_ba_of_page(page) (cpe_ba_t)(((char*)(page)) + sizeof(struct gd_om_page_head))
 
