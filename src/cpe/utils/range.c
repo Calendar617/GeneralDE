@@ -54,11 +54,12 @@ int cpe_range_get_one(cpe_range_mgr_t ra) {
     return r.m_start;
 }
 
-int cpe_range_put_one(cpe_range_mgr_t ra, int value) {
+int cpe_range_put_one(cpe_range_mgr_t ra, int_ptr_t value) {
     return cpe_range_put_range(ra, value, value + 1);
 }
 
-struct cpe_range cpe_range_get_range(cpe_range_mgr_t ra, size_t capacity) {
+struct cpe_range
+cpe_range_get_range(cpe_range_mgr_t ra, size_t capacity) {
     struct cpe_range r;
 
     assert(ra);
@@ -132,7 +133,7 @@ static void cpe_range_merge_neighbers(cpe_range_mgr_t ra, int beginPos) {
     }
 }
 
-static int cpe_range_find_next_pos(cpe_range_mgr_t ra, int start) {
+static int cpe_range_find_next_pos(cpe_range_mgr_t ra, int_ptr_t start) {
     struct cpe_range * curRange;
     int beginPos, endPos, curPos;
 
@@ -158,7 +159,7 @@ static int cpe_range_find_next_pos(cpe_range_mgr_t ra, int start) {
         : ra->m_range_count;
 }
 
-int cpe_range_put_range(cpe_range_mgr_t ra, int start, int end) {
+int cpe_range_put_range(cpe_range_mgr_t ra, int_ptr_t start, int_ptr_t end) {
     if (start < 0 || end <= 0 || end < start) return -1;
     if (end == start) return 0;
 
@@ -225,7 +226,7 @@ int cpe_range_put_range(cpe_range_mgr_t ra, int start, int end) {
 }
 
 struct cpe_range
-cpe_range_find(cpe_range_mgr_t ra, int value) {
+cpe_range_find(cpe_range_mgr_t ra, int_ptr_t value) {
     int pos = cpe_range_find_next_pos(ra, value);
     if (pos < ra->m_range_count && ra->m_ranges[pos].m_start == value) {
         return ra->m_ranges[pos];
