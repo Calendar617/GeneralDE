@@ -24,8 +24,25 @@ gd_om_oid_t gd_om_obj_alloc(
 
     baseOid = gd_om_class_alloc_object(class);
     if (baseOid < 0) {
-        //TODO: alloc new page!
-        return GD_OM_INVALID_OID;
+        void * newPage = gd_om_page_get(&omm->m_bufMgr, em);
+        if (newPage == NULL) {
+            CPE_ERROR_EX(
+                em, gd_om_no_memory,
+                "object of class %s alloc new page fail!", cpe_hs_data(className));
+            return GD_OM_INVALID_OID;
+        }
+
+        if (gd_om_class_add_new_page(class, newPage, em) != 0) {
+            return GD_OM_INVALID_OID;
+        }
+
+        baseOid = gd_om_class_alloc_object(class);
+        if (baseOid < 0) {
+            CPE_ERROR_EX(
+                em, gd_om_no_memory,
+                "object of class %s alloc oid fail!", cpe_hs_data(className));
+            return GD_OM_INVALID_OID;
+        }
     }
 
     if (baseOid > 0xFFFFFF) {

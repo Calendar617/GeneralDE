@@ -1,7 +1,5 @@
-#ifndef GD_OM_PAGE_TYPES_H
-#define GD_OM_PAGE_TYPES_H
-#include "cpe/pal/queue.h"
-#include "cpe/utils/memory.h"
+#ifndef GD_OM_PAGEHEAD_H
+#define GD_OM_PAGEHEAD_H
 #include "gd/om/om_types.h"
 
 #ifdef __cplusplus

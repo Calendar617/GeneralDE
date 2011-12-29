@@ -8,11 +8,20 @@
 
 #define GD_OM_INVALID_CLASSID ((gd_om_class_id_t)0)
 #define GD_OM_INVALID_OID ((gd_om_oid_t)0)
+#define GD_OM_INVALID_BUFFER_ID ((gd_om_oid_t)0)
 
 typedef uint8_t gd_om_class_id_t;
 typedef uint32_t gd_om_oid_t;
 
+typedef struct gd_om_backend * gd_om_backend_t;
 typedef struct gd_om_mgr * gd_om_mgr_t;
 typedef struct gd_om_type * gd_om_type_t;
+
+typedef int gd_om_buffer_id_t;
+
+struct gd_om_backend {
+    gd_om_buffer_id_t (*buf_alloc)(size_t size, void * context);
+    void * (*buf_get)(gd_om_buffer_id_t id, void * context);
+};
 
 #endif
