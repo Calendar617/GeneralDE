@@ -314,3 +314,78 @@ TEST_F(RangeMgrTest, put_range_to_middle_connect_both) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 12, 18));
     EXPECT_STREQ("[10~20)", dump());
 }
+
+TEST_F(RangeMgrTest, find_range_first_before) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    EXPECT_TRUE(NULL == cpe_range_find(&m_ra, 9));
+}
+
+TEST_F(RangeMgrTest, find_range_first_begin) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    cpe_range_t range = cpe_range_find(&m_ra, 10);
+    ASSERT_TRUE(range);
+    EXPECT_EQ(10, range->m_start);
+}
+
+TEST_F(RangeMgrTest, find_range_first_middle) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    cpe_range_t range = cpe_range_find(&m_ra, 11);
+    ASSERT_TRUE(range);
+    EXPECT_EQ(10, range->m_start);
+}
+
+TEST_F(RangeMgrTest, find_range_first_last) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    cpe_range_t range = cpe_range_find(&m_ra, 12);
+    ASSERT_TRUE(NULL == range);
+}
+
+TEST_F(RangeMgrTest, find_range_middle) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    cpe_range_t range = cpe_range_find(&m_ra, 13);
+    ASSERT_TRUE(NULL == range);
+}
+
+TEST_F(RangeMgrTest, find_range_last_begin) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    cpe_range_t range = cpe_range_find(&m_ra, 18);
+    ASSERT_TRUE(range);
+    EXPECT_EQ(18, range->m_start);
+}
+
+TEST_F(RangeMgrTest, find_range_last_middle) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    cpe_range_t range = cpe_range_find(&m_ra, 19);
+    ASSERT_TRUE(range);
+    EXPECT_EQ(18, range->m_start);
+}
+
+TEST_F(RangeMgrTest, find_range_last_end) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    cpe_range_t range = cpe_range_find(&m_ra, 20);
+    ASSERT_TRUE(NULL == range);
+}
+
+TEST_F(RangeMgrTest, find_range_last_pass_end) {
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
+    EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));
+
+    cpe_range_t range = cpe_range_find(&m_ra, 21);
+    ASSERT_TRUE(NULL == range);
+}
