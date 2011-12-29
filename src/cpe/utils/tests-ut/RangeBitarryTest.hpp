@@ -1,9 +1,9 @@
 #ifndef CPE_DR_TEST_RANGEBITARRY_H
 #define CPE_DR_TEST_RANGEBITARRY_H
 #include "cpe/utils/range_bitarry.h"
-#include "RangeAllocratorTest.hpp"
+#include "RangeMgrTest.hpp"
 
-class RangeBitarryTest : public testenv::fixture<Loki::NullType, RangeAllocratorTest> {
+class RangeBitarryTest : public testenv::fixture<Loki::NullType, RangeMgrTest> {
 public:
     virtual void SetUp();
     virtual void TearDown();

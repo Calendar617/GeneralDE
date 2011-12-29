@@ -15,6 +15,8 @@ public:
     error_list_t t_elist();
     void t_em_set_print();
 
+    int t_em_have_errno(int e);
+
 private:
     error_list_t m_el;
     struct error_monitor m_em;

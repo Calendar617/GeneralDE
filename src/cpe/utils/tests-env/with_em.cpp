@@ -25,5 +25,9 @@ void with_em::t_em_set_print() {
     cpe_error_monitor_add_node(&m_em, &m_printer);
 }
 
+int with_em::t_em_have_errno(int e) {
+    return cpe_error_list_have_errno(m_el, e);
+}
+
 }}
 
