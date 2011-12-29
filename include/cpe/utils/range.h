@@ -9,8 +9,8 @@ extern "C" {
 #endif
 
 struct cpe_range {
-    int m_start;
-    int m_end;
+    int_ptr_t m_start;
+    int_ptr_t m_end;
 };
 
 typedef struct cpe_range_mgr {
@@ -35,12 +35,12 @@ int cpe_range_is_valid(struct cpe_range r);
 int cpe_range_size(struct cpe_range r);
 
 int cpe_range_get_one(cpe_range_mgr_t ra);
-int cpe_range_put_one(cpe_range_mgr_t ra, int value);
+int cpe_range_put_one(cpe_range_mgr_t ra, int_ptr_t value);
 
 struct cpe_range cpe_range_get_range(cpe_range_mgr_t ra, size_t require_count);
-int cpe_range_put_range(cpe_range_mgr_t ra, int start, int end);
+int cpe_range_put_range(cpe_range_mgr_t ra, int_ptr_t start, int_ptr_t end);
 
-struct cpe_range cpe_range_find(cpe_range_mgr_t ra, int value);
+struct cpe_range cpe_range_find(cpe_range_mgr_t ra, int_ptr_t value);
 
 void cpe_range_mgr_ranges(cpe_range_it_t it, cpe_range_mgr_t ra);
 struct cpe_range cpe_range_it_next(cpe_range_it_t it);

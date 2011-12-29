@@ -354,5 +354,13 @@ typedef unsigned long long ulonglong;
 
 #endif /* WIN32 */
 
+#if (__WORDSIZE == 64)
+typedef int64_t int_ptr_t;
+#define INTPTR_PREFIX "lld" 
+#else
+typedef int32_t int_ptr_t;
+#define INTPTR_PREFIX "d" 
+#endif
+
 #endif /* TTYPES_H */
 
