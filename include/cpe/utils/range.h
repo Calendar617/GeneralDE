@@ -24,6 +24,7 @@ int cpe_range_mgr_init(cpe_range_mgr_t ra, mem_allocrator_t alloc);
 void cpe_range_mgr_fini(cpe_range_mgr_t ra);
 void cpe_range_mgr_clear(cpe_range_mgr_t ra);
 void cpe_range_mgr_dump(write_stream_t stream, cpe_range_mgr_t ra);
+int cpe_range_mgr_reserve_for_put(cpe_range_mgr_t ra, int put_count);
 
 int cpe_range_get_one(cpe_range_mgr_t ra);
 int cpe_range_put_one(cpe_range_mgr_t ra, int value);

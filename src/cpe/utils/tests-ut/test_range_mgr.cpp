@@ -315,7 +315,6 @@ TEST_F(RangeMgrTest, put_range_to_middle_connect_both) {
     EXPECT_STREQ("[10~20)", dump());
 }
 
-
 TEST_F(RangeMgrTest, find_range_first_before) {
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 10, 12));
     EXPECT_EQ(0, cpe_range_put_range(&m_ra, 18, 20));

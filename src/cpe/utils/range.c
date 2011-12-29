@@ -88,28 +88,6 @@ struct cpe_range cpe_range_get_range(cpe_range_mgr_t ra, size_t capacity) {
     return r;
 }
 
-static int cpe_range_reserve_range_buf(cpe_range_mgr_t ra) {
-    size_t newCapacity;
-    struct cpe_range * newBuf;
-
-    if (ra->m_range_count + 1 < ra->m_range_capacity) return 0;
-
-    newCapacity = ra->m_range_capacity + 256;
-    newBuf = mem_alloc(ra->m_alloc, sizeof(struct cpe_range) * newCapacity);
-    if (newBuf == NULL) return -1;
-
-    if (ra->m_range_count > 0) {
-        memcpy(newBuf, ra->m_ranges, sizeof(struct cpe_range) * ra->m_range_count);
-    }
-
-    if (ra->m_ranges) mem_free(ra->m_alloc, ra->m_ranges);
-
-    ra->m_ranges = newBuf;
-    ra->m_range_capacity = newCapacity;
-
-    return 0;
-}
-
 static void cpe_range_merge_neighbers(cpe_range_mgr_t ra, int beginPos) {
     int keepPos;
     int removeCount;
@@ -187,7 +165,7 @@ int cpe_range_put_range(cpe_range_mgr_t ra, int start, int end) {
     assert(ra);
 
     if (ra->m_range_count == 0) {
-        if (cpe_range_reserve_range_buf(ra) != 0) return -1;
+        if (cpe_range_mgr_reserve_for_put(ra, 1) != 0) return -1;
         assert(ra->m_ranges);
         ra->m_ranges[0].m_start = start;
         ra->m_ranges[0].m_end = end;
@@ -216,7 +194,7 @@ int cpe_range_put_range(cpe_range_mgr_t ra, int start, int end) {
                 cpe_range_merge_neighbers(ra, insertPos - 1);
             }
             else {
-                if (cpe_range_reserve_range_buf(ra) != 0) return -1;
+                if (cpe_range_mgr_reserve_for_put(ra, 1) != 0) return -1;
 
                 memmove(
                     ra->m_ranges + insertPos + 1,
@@ -234,7 +212,7 @@ int cpe_range_put_range(cpe_range_mgr_t ra, int start, int end) {
                 ra->m_ranges[ra->m_range_count - 1].m_end = end;
             }
             else {
-                if (cpe_range_reserve_range_buf(ra) != 0) return -1;
+                if (cpe_range_mgr_reserve_for_put(ra, 1) != 0) return -1;
                 assert(ra->m_ranges);
                 ra->m_ranges[ra->m_range_count].m_start = start;
                 ra->m_ranges[ra->m_range_count].m_end = end;
@@ -258,4 +236,36 @@ cpe_range_find(cpe_range_mgr_t ra, int value) {
     }
 
     return NULL;
+}
+
+int cpe_range_mgr_reserve_for_put(cpe_range_mgr_t ra, int put_count) {
+    size_t newCapacity;
+    size_t requireCount;
+    struct cpe_range * newBuf;
+
+    requireCount = ra->m_range_count + put_count;
+    newCapacity = ra->m_range_capacity;
+
+    while(requireCount >= newCapacity) {
+        newCapacity =
+            newCapacity == 0
+            ? 256
+            : newCapacity << 1;
+    }
+
+    if (newCapacity != ra->m_range_capacity) {
+        newBuf = mem_alloc(ra->m_alloc, sizeof(struct cpe_range) * newCapacity);
+        if (newBuf == NULL) return -1;
+
+        if (ra->m_range_count > 0) {
+            memcpy(newBuf, ra->m_ranges, sizeof(struct cpe_range) * ra->m_range_count);
+        }
+
+        if (ra->m_ranges) mem_free(ra->m_alloc, ra->m_ranges);
+
+        ra->m_ranges = newBuf;
+        ra->m_range_capacity = newCapacity;
+    }
+
+    return 0;
 }
