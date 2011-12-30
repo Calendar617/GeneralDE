@@ -8,7 +8,7 @@ namespace Cpe { namespace Utils {
 class CString : public SimulateObject {
 public:
     operator const char * (void) const { return (const char *)this; }
-    operator const * (void) { return (char *)this; }
+    operator char * (void) { return (char *)this; }
     bool isValid(void) const { return this != NULL; }
 
     bool operator==(CString const & o) const { return strcmp(*this, o) == 0; }
@@ -18,6 +18,13 @@ public:
     bool operator>(CString const & o) const { return strcmp(*this, o) > 0; }
     bool operator>=(CString const & o) const { return strcmp(*this, o) >= 0; }
 
+    static CString const & _cast(const char * d) { 
+        return * reinterpret_cast<CString const *>(d);
+    }
+
+    static CString & _cast(char * d) { 
+        return * reinterpret_cast<CString *>(d);
+    }
 };
 
 }}
