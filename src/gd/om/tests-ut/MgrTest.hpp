@@ -4,6 +4,7 @@
 #include "cpe/utils/tests-env/with_em.hpp"
 #include "gd/om/om_error.h"
 #include "gd/om/om_manage.h"
+#include "gd/om/om_class.h"
 #include "gd/om/om_object.h"
 
 typedef LOKI_TYPELIST_1(

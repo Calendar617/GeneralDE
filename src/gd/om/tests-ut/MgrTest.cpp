@@ -3,7 +3,6 @@
 MgrTest::MgrTest() : m_omm(NULL) {
 }
 
-
 void MgrTest::SetUp() {
     Base::SetUp();
 
