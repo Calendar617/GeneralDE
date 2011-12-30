@@ -26,7 +26,13 @@ TEST_F(SearchDirTest, file_ignore) {
 }
 
 TEST_F(SearchDirTest, file_exit) {
-    expectFile("b.txt", dir_visit_next_exit);
+    EXPECT_CALL(
+        m_visitCheck
+        , on_file(
+            ::testing::AnyOf(
+                ::testing::StrEq("a.txt"),
+                ::testing::StrEq("b.txt"))))
+        .WillOnce(::testing::Return(dir_visit_next_exit));
 
     t_write_to_file("a.txt", "");
     t_write_to_file("b.txt", "");
