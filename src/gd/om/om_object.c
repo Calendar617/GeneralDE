@@ -17,7 +17,7 @@ gd_om_oid_t gd_om_obj_alloc(
     class = gd_om_class_find(&omm->m_classMgr, className);
     if (class == NULL) {
         CPE_ERROR_EX(
-            em, gd_om_error_no_class,
+            em, gd_om_class_not_exist,
             "class %s not exist!", cpe_hs_data(className));
         return GD_OM_INVALID_OID; 
     }
@@ -70,7 +70,7 @@ void gd_om_obj_free(
     class = gd_om_class_get(&omm->m_classMgr, classId);
 
     if (class == NULL) {
-        CPE_ERROR_EX(em, gd_om_error_no_class, "class id=%d not exist!", classId);
+        CPE_ERROR_EX(em, gd_om_class_not_exist, "class id=%d not exist!", classId);
         return;
     }
 
@@ -91,7 +91,9 @@ void * gd_om_obj_get(
     class = gd_om_class_get(&omm->m_classMgr, classId);
 
     if (class == NULL) {
-        CPE_ERROR_EX(em, gd_om_error_no_class, "class id=%d not exist!", classId);
+        CPE_ERROR_EX(
+            em, gd_om_class_not_exist,
+            "class id=%d not exist!", classId);
         return NULL;
     }
 

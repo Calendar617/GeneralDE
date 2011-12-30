@@ -21,7 +21,7 @@ TEST_F(MgrTest, object_alloc_no_class) {
 
     EXPECT_EQ(GD_OM_INVALID_OID, obj_alloc(className));
 
-    EXPECT_TRUE(t_em_have_errno(gd_om_error_no_class));
+    EXPECT_TRUE(t_em_have_errno(gd_om_class_not_exist));
 }
 
 TEST_F(MgrTest, object_size) {

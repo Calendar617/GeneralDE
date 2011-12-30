@@ -16,11 +16,35 @@ TEST_F(ClassTest, create_first_basic) {
     EXPECT_EQ((size_t)12, cls->m_object_buf_begin_in_page);
 }
 
+TEST_F(ClassTest, create_name_max) {
+    char max_name[GD_OM_MAX_TYPENAME_LEN + 1];
+    memset(max_name, 'a', GD_OM_MAX_TYPENAME_LEN);
+    max_name[GD_OM_MAX_TYPENAME_LEN] = 0;
+
+    gd_om_class_id_t classId = addClass(max_name, 11, 256, 4);
+    EXPECT_EQ(1, classId);
+
+    struct gd_om_class * cls = gd_om_class_get(&m_classMgr, classId);
+    ASSERT_TRUE(cls);
+
+    EXPECT_STREQ(max_name, cpe_hs_data(cls->m_name));
+}
+
+TEST_F(ClassTest, create_name_too_long) {
+    char max_name[GD_OM_MAX_TYPENAME_LEN + 2];
+    memset(max_name, 'a', GD_OM_MAX_TYPENAME_LEN + 1);
+    max_name[GD_OM_MAX_TYPENAME_LEN + 1] = 0;
+
+    EXPECT_EQ(GD_OM_INVALID_CLASSID, addClass(max_name, 11, 256, 4));
+
+    EXPECT_TRUE(t_em_have_errno(gd_om_class_name_too_long));
+}
+
 TEST_F(ClassTest, create_align_invalid) {
     EXPECT_EQ(GD_OM_INVALID_CLASSID, addClass("class1", 11, 256, 3));
     EXPECT_TRUE(NULL == gd_om_class_get(&m_classMgr, 1));
 
-    ASSERT_TRUE(t_em_have_errno(gd_om_error_invalid_align));
+    ASSERT_TRUE(t_em_have_errno(gd_om_invalid_align));
 }
 
 TEST_F(ClassTest, create_page_too_small) {

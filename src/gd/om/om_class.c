@@ -123,7 +123,7 @@ int gd_om_class_add_with_id(
     assert(className);
 
     if (align != 1 && align != 2 && align != 4 && align != 8) {
-        CPE_ERROR_EX(em, gd_om_error_invalid_align, "invalid align %zd!", align);
+        CPE_ERROR_EX(em, gd_om_invalid_align, "invalid align %zd!", align);
         return -1;
     }
 
@@ -138,6 +138,11 @@ int gd_om_class_add_with_id(
 
     if (((int)classId - 1) >= (int)GD_OM_CLASS_BUF_LEN - 1) {
         CPE_ERROR_EX(em, gd_om_class_overflow, "class id overflow!");
+        return -1;
+    }
+
+    if (strlen(className) > GD_OM_MAX_TYPENAME_LEN) {
+        CPE_ERROR_EX(em, gd_om_class_name_too_long, "class name too long!");
         return -1;
     }
 
@@ -348,7 +353,7 @@ void gd_om_class_free_object(struct gd_om_class * class, int32_t oid, error_moni
 
     if(pagePos < 0 || pagePos >= class->m_page_array_size) {
         CPE_ERROR_EX(
-            em, gd_om_error_invalid_oid, "class %s: page pos %d overflow, page count is %zu!", 
+            em, gd_om_invalid_oid, "class %s: page pos %d overflow, page count is %zu!", 
             cpe_hs_data(class->m_name), pagePos, class->m_page_array_size);
         return;
     }
@@ -373,7 +378,7 @@ void * gd_om_class_get_object(struct gd_om_class * class, int32_t oid, error_mon
 
     if(pagePos < 0 || pagePos >= class->m_page_array_size) {
         CPE_ERROR_EX(
-            em, gd_om_error_invalid_oid, "class %s: page pos %d overflow, page count is %zu!", 
+            em, gd_om_invalid_oid, "class %s: page pos %d overflow, page count is %zu!", 
             cpe_hs_data(class->m_name), pagePos, class->m_page_array_size);
         return NULL;
     }
@@ -384,7 +389,7 @@ void * gd_om_class_get_object(struct gd_om_class * class, int32_t oid, error_mon
     alloc_arry = gd_om_class_ba_of_page(page);
     if (cpe_ba_get(alloc_arry, posInPage) != cpe_ba_true) {
         CPE_ERROR_EX(
-            em, gd_om_error_invalid_oid, "class %s: oid %d not alloced!", 
+            em, gd_om_invalid_oid, "class %s: oid %d not alloced!", 
             cpe_hs_data(class->m_name), oid);
         return NULL;
     }

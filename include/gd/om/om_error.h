@@ -5,12 +5,13 @@
 enum gd_om_error {
     gd_om_success = 0
     , gd_om_no_memory
-    , gd_om_error_no_class
-    , gd_om_error_invalid_oid
-    , gd_om_error_invalid_align
+    , gd_om_invalid_oid
+    , gd_om_invalid_align
     , gd_om_page_head_error
     , gd_om_page_size_too_big
     , gd_om_page_size_too_small
+    , gd_om_class_not_exist
+    , gd_om_class_name_too_long
     , gd_om_class_overflow
     , gd_om_class_name_duplicate
 };
