@@ -82,7 +82,7 @@ static int gd_om_buffer_mgr_add_new_buffer(
     if (pgm->m_backend->buf_get) {
         new_buf = pgm->m_backend->buf_get(new_buf_id, pgm->m_backend_ctx);
         if (new_buf == NULL) {
-            CPE_ERROR_EX(em, gd_om_no_memory, "backend get buf %" INTPTR_PREFIX " fail!", new_buf_id);
+            CPE_ERROR_EX(em, gd_om_no_memory, "backend get buf %" PTRINT_PREFIX " fail!", new_buf_id);
             return -1;
         }
     }
@@ -90,8 +90,8 @@ static int gd_om_buffer_mgr_add_new_buffer(
         new_buf = (void *)new_buf_id;
     }
 
-    cpe_range_put_range(&pgm->m_buffers, (int_ptr_t)new_buf, ((int_ptr_t)new_buf) + pgm->m_buf_size);
-    cpe_range_put_range(&pgm->m_free_pages, (int_ptr_t)new_buf, ((int_ptr_t)new_buf) + pgm->m_buf_size);
+    cpe_range_put_range(&pgm->m_buffers, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
+    cpe_range_put_range(&pgm->m_free_pages, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
     cpe_range_put_one(&pgm->m_buffer_ids, new_buf_id);
 
     return 0;
