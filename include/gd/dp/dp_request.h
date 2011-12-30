@@ -47,9 +47,9 @@ int gd_dp_req_set_size(gd_dp_req_t req, size_t size);
 mem_allocrator_t gd_dp_req_talloc(gd_dp_req_t req);
 
 int gd_dp_req_send(gd_dp_req_t req, error_monitor_t em);
-int gd_dp_req_replay(gd_dp_req_t req, void * buf, size_t size, error_monitor_t em);
+int gd_dp_req_reply(gd_dp_req_t req, void * buf, size_t size, error_monitor_t em);
 
-extern cpe_hash_string_t gd_dp_req_type_replay;
+extern cpe_hash_string_t gd_dp_req_type_reply;
 
 #ifdef __cplusplus
 }

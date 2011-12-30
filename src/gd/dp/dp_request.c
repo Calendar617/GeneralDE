@@ -176,41 +176,41 @@ int gd_dp_req_send(gd_dp_req_t req, error_monitor_t em) {
     }
 
     if (req->m_to->m_type->send == NULL) {
-        CPE_ERROR(em, "requesnt send to %s have replay!", gd_dp_node_name(req->m_to));
+        CPE_ERROR(em, "requesnt send to %s have reply!", gd_dp_node_name(req->m_to));
         return -1;
     }
 
     return req->m_to->m_type->send(req->m_to, req, em);
 }
 
-int gd_dp_req_replay(gd_dp_req_t req, void * buf, size_t size, error_monitor_t em) {
-    gd_dp_req_t replayReq;
+int gd_dp_req_reply(gd_dp_req_t req, void * buf, size_t size, error_monitor_t em) {
+    gd_dp_req_t replyReq;
     int rv;
 
     if (req == NULL || buf == NULL) return -1;
 
     if (req->m_from == NULL) {
-        CPE_ERROR(em, "req have no from field, can`t replay!");
+        CPE_ERROR(em, "req have no from field, can`t reply!");
         return -1;
     }
 
-    if (req->m_from->m_type && req->m_from->m_type->replay) {
-        return req->m_from->m_type->replay(req->m_from, req, buf, size, em);
+    if (req->m_from->m_type && req->m_from->m_type->reply) {
+        return req->m_from->m_type->reply(req->m_from, req, buf, size, em);
     }
 
-    replayReq = gd_dp_req_create_child(req, gd_dp_req_type_replay, buf, size);
-    if (replayReq == NULL) {
-        CPE_ERROR(em, "create replay requesnt fail!");
+    replyReq = gd_dp_req_create_child(req, gd_dp_req_type_reply, buf, size);
+    if (replyReq == NULL) {
+        CPE_ERROR(em, "create reply requesnt fail!");
         return -1;
     }
 
-    gd_dp_req_set_to(replayReq, gd_dp_req_from(req));
-    gd_dp_req_set_from(replayReq, gd_dp_req_to(req));
-    gd_dp_req_set_size(replayReq, size);
+    gd_dp_req_set_to(replyReq, gd_dp_req_from(req));
+    gd_dp_req_set_from(replyReq, gd_dp_req_to(req));
+    gd_dp_req_set_size(replyReq, size);
 
-    rv = gd_dp_req_send(replayReq, em);
-    gd_dp_req_free(replayReq);
+    rv = gd_dp_req_send(replyReq, em);
+    gd_dp_req_free(replyReq);
     return rv;
 }
 
-CPE_HS_DEF_VAR(gd_dp_req_type_replay, "req.dp.replay");
+CPE_HS_DEF_VAR(gd_dp_req_type_reply, "req.dp.reply");

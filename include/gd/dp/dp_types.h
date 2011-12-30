@@ -17,13 +17,13 @@ typedef struct gd_dp_mgr * gd_dp_mgr_t;
 typedef struct gd_dp_rsp_type * gd_dp_rsp_type_t;
 
 typedef int (*gd_dp_node_send_fun_t)(gd_dp_node_t node, gd_dp_req_t req, error_monitor_t em);
-typedef int (*gd_dp_node_replay_fun_t)(gd_dp_node_t node, gd_dp_req_t req, char * buf, size_t size, error_monitor_t em);
+typedef int (*gd_dp_node_reply_fun_t)(gd_dp_node_t node, gd_dp_req_t req, char * buf, size_t size, error_monitor_t em);
 
 struct gd_dp_node_type {
     const char * name;
     void (*destruct)(gd_dp_node_t node);
     gd_dp_node_send_fun_t send;
-    gd_dp_node_replay_fun_t replay;
+    gd_dp_node_reply_fun_t reply;
 };
 
 typedef int (*gd_dp_rsp_process_fun_t)(gd_dp_req_t req, void * ctx, error_monitor_t em);
