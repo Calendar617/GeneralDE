@@ -12,12 +12,12 @@ public:
     size_t size(void) { return gd_dp_req_size((gd_dp_req_t)this); }
     mem_allocrator_t talloc(void) { return gd_dp_req_talloc((gd_dp_req_t)this); }
 
-    int replay(void * buf, size_t size, error_monitor_t em) { 
-        return gd_dp_req_replay((gd_dp_req_t)this, buf, size, em);
+    int reply(void * buf, size_t size, error_monitor_t em) { 
+        return gd_dp_req_reply((gd_dp_req_t)this, buf, size, em);
     }
 
-    int replay(void * buf, size_t size) { 
-        return gd_dp_req_replay((gd_dp_req_t)this, buf, size, NULL);
+    int reply(void * buf, size_t size) { 
+        return gd_dp_req_reply((gd_dp_req_t)this, buf, size, NULL);
     }
 
     Request & parent(cpe_hash_string_t type);
