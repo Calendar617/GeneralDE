@@ -1,6 +1,6 @@
 From: lokiwang <wangjian1009@gmail.com>
-Subject: [PATCH] t/support/dr2
+Subject: [PATCH] t/support/game
 
-develop tg
+game develop support component
 
 Signed-off-by: lokiwang <wangjian1009@gmail.com>
