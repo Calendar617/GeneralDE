@@ -32,6 +32,10 @@ void cpe_range_mgr_clear(cpe_range_mgr_t ra) {
     ra->m_range_capacity = 0;
 }
 
+int cpe_range_mgr_is_empty(cpe_range_mgr_t ra) {
+    return ra->m_range_capacity == 0 ? 1 : 0;
+}
+
 void cpe_range_mgr_dump(write_stream_t stream, cpe_range_mgr_t ra) {
     int i;
     for(i = 0; i < ra->m_range_count; ++i) {
