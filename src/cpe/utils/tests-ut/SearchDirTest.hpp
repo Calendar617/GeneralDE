@@ -1,5 +1,6 @@
 #ifndef CPE_DR_TEST_SEARCHDIRTEST_H
 #define CPE_DR_TEST_SEARCHDIRTEST_H
+#include "gmock/gmock.h"
 #include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/utils/tests-env/with_file.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
@@ -10,23 +11,26 @@ typedef LOKI_TYPELIST_2(
 
 class SearchDirTest : public testenv::fixture<SearchDirTestBase> {
 public:
-    virtual void SetUp();
+    class VisitCheckMock {
+    public:
+        MOCK_METHOD1(on_file, dir_visit_next_op_t(const char *));
+        MOCK_METHOD1(on_enter_dir, dir_visit_next_op_t(const char *));
+        MOCK_METHOD1(on_leave_dir, dir_visit_next_op_t(const char *));
+    };
 
-    void do_search(int maxLevel);
+    virtual void SetUp();
+    virtual void TearDown();
+
     void expectFile(const char * file, dir_visit_next_op_t r);
     void expectEnter(const char * file, dir_visit_next_op_t r);
     void expectLeave(const char * file, dir_visit_next_op_t r);
 
-    dir_visit_next_op_t m_expect_stack[128]; 
-    int m_expect_stack_pos;
-    int m_stack_pos;
+    void do_search(int maxLevel);
 
-    ::std::ostringstream m_expect;
-    ::std::ostringstream m_result;
+    VisitCheckMock m_visitCheck;
 };
 
 #define CHECK_SEARCHDIR_RESULT() \
-    EXPECT_STREQ(m_expect.str().c_str(), m_result.str().c_str())
+    ::testing::Mock::VerifyAndClear(&m_visitCheck);
 
 #endif
-
