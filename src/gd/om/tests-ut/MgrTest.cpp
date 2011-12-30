@@ -6,23 +6,14 @@ MgrTest::MgrTest() : m_omm(NULL) {
 void MgrTest::SetUp() {
     Base::SetUp();
 
-    m_backend.buf_alloc = buf_alloc;
-    m_backend.buf_get = NULL;
-
-    m_omm = gd_om_mgr_create(t_allocrator(), 256, 1024, &m_backend, this);
-
+    m_omm = gd_om_mgr_create(t_allocrator(), 256, 1024);
     ASSERT_TRUE(m_omm);
+
+    gd_om_mgr_set_backend_memory(m_omm, t_allocrator());
 }
 
 void MgrTest::TearDown() {
     if (m_omm) {
-        struct gd_om_buffer_it it;
-        gd_om_mgr_buffers(&it, m_omm);
-
-        while(void * p = gd_om_next_buffer(&it)) {
-            mem_free(t_allocrator(), p);
-        }
-
         gd_om_mgr_free(m_omm);
         m_omm = NULL;
     }

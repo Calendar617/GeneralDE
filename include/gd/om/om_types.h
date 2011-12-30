@@ -25,11 +25,6 @@ typedef struct gd_om_type * gd_om_type_t;
 
 typedef ptr_int_t gd_om_buffer_id_t;
 
-struct gd_om_backend {
-    gd_om_buffer_id_t (*buf_alloc)(size_t size, void * context);
-    void * (*buf_get)(gd_om_buffer_id_t id, void * context);
-};
-
 struct gd_om_buffer_it {
     size_t m_buf_size;
     struct cpe_range_it m_range_it;
@@ -39,6 +34,12 @@ struct gd_om_buffer_it {
 struct gd_om_buffer_id_it {
     struct cpe_range_it m_range_it;
     struct cpe_range m_curent;
+};
+
+struct gd_om_backend {
+    gd_om_buffer_id_t (*buf_alloc)(size_t size, void * context);
+    void * (*buf_get)(gd_om_buffer_id_t id, void * context);
+    void (*clear)(struct gd_om_buffer_id_it * buf_ids, void * context);
 };
 
 #ifdef __cplusplus

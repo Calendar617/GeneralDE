@@ -23,7 +23,6 @@ public:
     static gd_om_buffer_id_t buf_alloc(size_t size, void * context);
 
     gd_om_mgr_t m_omm;
-    struct gd_om_backend m_backend;
 };
 
 #endif

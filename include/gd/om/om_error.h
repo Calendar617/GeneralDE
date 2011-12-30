@@ -5,6 +5,8 @@
 enum gd_om_error {
     gd_om_success = 0
     , gd_om_no_memory
+    , gd_om_no_buffer
+    , gd_om_buffer_get_fail
     , gd_om_invalid_oid
     , gd_om_invalid_align
     , gd_om_page_head_error

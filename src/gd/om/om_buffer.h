@@ -21,11 +21,14 @@ struct gd_om_buffer_mgr {
 
 int gd_om_buffer_mgr_init(
     struct gd_om_buffer_mgr * pgm,
-    gd_om_backend_t backend,
-    void * backend_ctx,
     size_t page_size,
     size_t buf_size,
     mem_allocrator_t alloc);
+
+int gd_om_buffer_mgr_set_backend(
+    struct gd_om_buffer_mgr * pgm,
+    gd_om_backend_t backend,
+    void * backend_ctx);
 
 void gd_om_buffer_mgr_fini(struct gd_om_buffer_mgr * pgm);
 

@@ -6,9 +6,7 @@ gd_om_mgr_t
 gd_om_mgr_create(
     mem_allocrator_t alloc,
     size_t page_size,
-    size_t buffer_size,
-    gd_om_backend_t backend,
-    void * backend_ctx)
+    size_t buffer_size)
 {
     gd_om_mgr_t omm = mem_alloc(alloc, sizeof(struct gd_om_mgr));
     if (omm == NULL) return NULL;
@@ -17,7 +15,7 @@ gd_om_mgr_create(
 
     if (
         gd_om_buffer_mgr_init(
-            &omm->m_bufMgr, backend, backend_ctx, page_size, buffer_size, alloc)
+            &omm->m_bufMgr, page_size, buffer_size, alloc)
         != 0)
     {
         mem_free(alloc, omm);
@@ -42,8 +40,10 @@ void gd_om_mgr_free(gd_om_mgr_t omm) {
     mem_free(omm->m_alloc, omm);
 }
 
-int gd_om_mgr_set_opt(gd_om_mgr_opt_t opt, ...) {
-    return 0;
+int gd_om_mgr_set_backend(gd_om_mgr_t mgr, gd_om_backend_t backend, void * backend_ctx) {
+    assert(mgr);
+    return gd_om_buffer_mgr_set_backend(&mgr->m_bufMgr, backend, backend_ctx);
+    
 }
 
 gd_om_class_id_t
