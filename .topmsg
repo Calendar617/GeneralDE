@@ -1,6 +1,6 @@
 From: lokiwang <wangjian1009@gmail.com>
-Subject: [PATCH] t/3rdTools/gtest
+Subject: [PATCH] t/3rdTools/gmock
 
-trace gtest in develop env
+trace gmock in develop env
 
 Signed-off-by: lokiwang <wangjian1009@gmail.com>
