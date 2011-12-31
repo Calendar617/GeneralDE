@@ -30,6 +30,11 @@ int gd_om_buffer_mgr_set_backend(
     gd_om_backend_t backend,
     void * backend_ctx);
 
+int gd_om_buffer_mgr_add_buffer(
+    struct gd_om_buffer_mgr * pgm,
+    gd_om_buffer_id_t bufId,
+    error_monitor_t em);
+    
 void gd_om_buffer_mgr_fini(struct gd_om_buffer_mgr * pgm);
 
 void * gd_om_page_get(struct gd_om_buffer_mgr * pgm, error_monitor_t em);

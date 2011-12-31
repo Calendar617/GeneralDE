@@ -62,23 +62,7 @@ int gd_om_buffer_mgr_set_backend(
     return 0;
 }
 
-static int gd_om_buffer_mgr_add_new_buffer(
-    struct gd_om_buffer_mgr * pgm,
-    error_monitor_t em)
-{
-    gd_om_buffer_id_t new_buf_id;
-    void * new_buf;
-
-    if (pgm->m_backend == NULL) {
-        CPE_ERROR_EX(em, gd_om_no_buffer, "no backend to alloc new buf!");
-        return -1;
-    }
-
-    if (pgm->m_backend->buf_alloc == NULL) {
-        CPE_ERROR_EX(em, gd_om_no_buffer, "backend not support alloc new buf!");
-        return -1;
-    }
-
+static int gd_om_buffer_mgr_reserve_for_new_buffer(struct gd_om_buffer_mgr * pgm, error_monitor_t em) {
     if (cpe_range_mgr_reserve_for_put(&pgm->m_buffers, 1) != 0) {
         CPE_ERROR_EX(em, gd_om_no_memory, "reserve for buffers fail!");
         return -1;
@@ -94,28 +78,69 @@ static int gd_om_buffer_mgr_add_new_buffer(
         return -1;
     }
 
+    return 0;
+}
+
+static int
+gd_om_buffer_mgr_add_buffer_i(
+    struct gd_om_buffer_mgr * pgm,
+    gd_om_buffer_id_t buf_id,
+    error_monitor_t em)
+{
+    void * new_buf;
+
+    if (pgm->m_backend && pgm->m_backend->buf_get) {
+        new_buf = pgm->m_backend->buf_get(buf_id, pgm->m_backend_ctx);
+        if (new_buf == NULL) {
+            CPE_ERROR_EX(em, gd_om_buffer_get_fail, "backend get buf %" PTRINT_PREFIX " fail!", buf_id);
+            return -1;
+        }
+    }
+    else {
+        new_buf = (void *)buf_id;
+    }
+
+    cpe_range_put_range(&pgm->m_buffers, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
+    cpe_range_put_range(&pgm->m_free_pages, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
+    cpe_range_put_one(&pgm->m_buffer_ids, buf_id);
+
+    return 0;
+}
+
+static int gd_om_buffer_mgr_add_new_buffer(
+    struct gd_om_buffer_mgr * pgm,
+    error_monitor_t em)
+{
+    gd_om_buffer_id_t new_buf_id;
+
+    if (pgm->m_backend == NULL) {
+        CPE_ERROR_EX(em, gd_om_no_buffer, "no backend to alloc new buf!");
+        return -1;
+    }
+
+    if (pgm->m_backend->buf_alloc == NULL) {
+        CPE_ERROR_EX(em, gd_om_no_buffer, "backend not support alloc new buf!");
+        return -1;
+    }
+
+    if (gd_om_buffer_mgr_reserve_for_new_buffer(pgm, em) != 0) return -1;
+
     new_buf_id = pgm->m_backend->buf_alloc(pgm->m_buf_size, pgm->m_backend_ctx);
     if (new_buf_id == GD_OM_INVALID_BUFFER_ID) {
         CPE_ERROR_EX(em, gd_om_no_buffer, "backend alloc new buf fail!");
         return -1;
     }
 
-    if (pgm->m_backend->buf_get) {
-        new_buf = pgm->m_backend->buf_get(new_buf_id, pgm->m_backend_ctx);
-        if (new_buf == NULL) {
-            CPE_ERROR_EX(em, gd_om_buffer_get_fail, "backend get buf %" PTRINT_PREFIX " fail!", new_buf_id);
-            return -1;
-        }
-    }
-    else {
-        new_buf = (void *)new_buf_id;
-    }
+    return gd_om_buffer_mgr_add_buffer_i(pgm, new_buf_id, em);
+}
 
-    cpe_range_put_range(&pgm->m_buffers, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
-    cpe_range_put_range(&pgm->m_free_pages, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
-    cpe_range_put_one(&pgm->m_buffer_ids, new_buf_id);
-
-    return 0;
+int gd_om_buffer_mgr_add_buffer(
+    struct gd_om_buffer_mgr * pgm,
+    gd_om_buffer_id_t bufId,
+    error_monitor_t em)
+{
+    if (gd_om_buffer_mgr_reserve_for_new_buffer(pgm, em) != 0) return -1;
+    return gd_om_buffer_mgr_add_buffer_i(pgm, bufId, em);
 }
 
 void * gd_om_page_get(struct gd_om_buffer_mgr * pgm, error_monitor_t em) {
