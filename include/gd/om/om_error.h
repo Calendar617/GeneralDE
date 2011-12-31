@@ -9,6 +9,7 @@ enum gd_om_error {
     , gd_om_buffer_get_fail
     , gd_om_invalid_oid
     , gd_om_invalid_align
+    , gd_om_invalid_address
     , gd_om_page_head_error
     , gd_om_page_size_too_big
     , gd_om_page_size_too_small

@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "gd/om/om_error.h"
 #include "om_buffer.h"
+#include "om_page_head.h"
 
 int gd_om_buffer_mgr_init(
     struct gd_om_buffer_mgr * pgm,
@@ -9,6 +10,9 @@ int gd_om_buffer_mgr_init(
     mem_allocrator_t alloc)
 {
     assert(pgm);
+
+    if (page_size < sizeof(struct gd_om_data_page_head)) return -1;
+    if (buf_size < page_size) return -1;
 
     pgm->m_backend = NULL;
     pgm->m_backend_ctx = NULL;
@@ -177,4 +181,27 @@ void * gd_om_page_get(struct gd_om_buffer_mgr * pgm, error_monitor_t em) {
     else {
         return NULL;
     }
+}
+
+void * gd_om_buffer_mgr_find_page(
+    struct gd_om_buffer_mgr * pgm,
+    void * address)
+{
+    struct cpe_range r;
+    char * buffer;
+    char * page;
+
+    r = cpe_range_find(&pgm->m_buffers, (ptr_int_t)address);
+    if (!cpe_range_is_valid(r)) return NULL;
+
+    buffer = (char*)r.m_start;
+
+    while((buffer + pgm->m_buf_size) <= (char*)address) {
+        buffer += pgm->m_buf_size;
+    }
+
+    page = buffer +
+        ((((char*)address - buffer) / pgm->m_page_size) * pgm->m_page_size);
+    if ((page + pgm->m_page_size) > buffer + pgm->m_buf_size) return NULL;
+    return page;
 }

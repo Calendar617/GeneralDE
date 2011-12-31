@@ -59,3 +59,16 @@ TEST_F(MgrTest, object_free) {
 
     EXPECT_EQ(oid, obj_alloc(className));
 }
+
+TEST_F(MgrTest, object_from_addr_basic) {
+    CPE_HS_DEF_VAR(className, "class1");
+    addClass("class1", 20);
+
+    gd_om_oid_t oid = obj_alloc(className);
+    EXPECT_TRUE(oid != GD_OM_INVALID_OID);
+
+    void * objData = gd_om_obj_get(m_omm, oid, t_em());
+    ASSERT_TRUE(objData);
+
+    EXPECT_EQ(oid, gd_om_obj_id_from_addr(m_omm, objData, t_em()));
+}

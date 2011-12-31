@@ -69,6 +69,8 @@ int gd_om_class_add_new_page(struct gd_om_class *cls, void * page, error_monitor
 int gd_om_class_add_old_page(struct gd_om_class *cls, void * page, error_monitor_t em);
 
 int32_t gd_om_class_alloc_object(struct gd_om_class *cls);
+int32_t gd_om_class_addr_2_object(struct gd_om_class *cls, void * page, void * addr);
+
 void gd_om_class_free_object(struct gd_om_class *cls, int32_t value, error_monitor_t em);
 void * gd_om_class_get_object(struct gd_om_class *cls, int32_t value, error_monitor_t em);
 
@@ -80,5 +82,3 @@ void * gd_om_class_get_object(struct gd_om_class *cls, int32_t value, error_moni
 #endif
 
 #endif
-
-

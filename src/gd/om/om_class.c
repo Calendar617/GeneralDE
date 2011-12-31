@@ -397,6 +397,26 @@ void * gd_om_class_get_object(struct gd_om_class * class, int32_t oid, error_mon
     return (void*)(page + class->m_object_buf_begin_in_page + (class->m_object_size * posInPage));
 }
 
+int32_t gd_om_class_addr_2_object(struct gd_om_class *cls, void * page, void * addr) {
+    int pos_to_start;
+    int idx_in_page;
+    struct gd_om_data_page_head * head;
+
+    head = (struct gd_om_data_page_head *)page;
+    if (head->m_page_idx < 0
+        || head->m_page_idx >= cls->m_page_array_size
+        || page != cls->m_page_array[head->m_page_idx])
+        return -1;
+
+    pos_to_start = (char*)addr - (((char *)page) + cls->m_object_buf_begin_in_page);
+
+    if (pos_to_start % cls->m_object_size != 0) return -1;
+
+    idx_in_page = pos_to_start / cls->m_object_size;
+
+    return head->m_page_idx * cls->m_object_per_page + idx_in_page;
+}
+
 gd_om_class_id_t om_class_id(gd_om_class_t cls) {
     return cls->m_id;
 }

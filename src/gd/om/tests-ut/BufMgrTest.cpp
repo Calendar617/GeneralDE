@@ -16,21 +16,23 @@ void BufMgrTest::TearDown() {
     Base::TearDown();
 }
 
-void BufMgrTest::init(size_t page_size, size_t buf_size) {
+int BufMgrTest::init(size_t page_size, size_t buf_size) {
     if (m_inited) {
         gd_om_buffer_mgr_fini(&m_bufMgr);
         m_inited = false;
     }
 
-    ASSERT_EQ(
-        0, 
-        gd_om_buffer_mgr_init(
-            &m_bufMgr,
-            page_size,
-            buf_size,
-            t_allocrator()));
+    int r = gd_om_buffer_mgr_init(
+        &m_bufMgr,
+        page_size,
+        buf_size,
+        t_allocrator());
 
-    m_inited = true;
+    if (r == 0) {
+        m_inited = true;
+    }
+
+    return r;
 }
 
 void * BufMgrTest::page_get(void) {

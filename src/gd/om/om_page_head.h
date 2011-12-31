@@ -20,6 +20,8 @@ struct gd_om_data_page_head {
 
 #pragma pack(pop)
 
+#define gd_om_data_page_is_valid(p) ((p)->m_classId != GD_OM_INVALID_CLASSID)
+
 #ifdef __cplusplus
 }
 #endif

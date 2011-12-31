@@ -2,6 +2,7 @@
 #include "gd/om/om_object.h"
 #include "gd/om/om_error.h"
 #include "om_manage_i.h"
+#include "om_page_head.h"
 
 gd_om_oid_t gd_om_obj_alloc(
     gd_om_mgr_t omm,
@@ -112,4 +113,53 @@ gd_om_obj_class(
 
     classId = ((uint32_t)oid) >> 24;
     return gd_om_class_get(&omm->m_classMgr, classId);
+}
+
+gd_om_oid_t
+gd_om_obj_id_from_addr(
+    gd_om_mgr_t omm,
+    void * data,
+    error_monitor_t em)
+{
+    void * page;
+    struct gd_om_data_page_head * head;
+    struct gd_om_class * class;
+    int32_t baseOid;
+
+    assert(omm);
+
+    page = gd_om_buffer_mgr_find_page(&omm->m_bufMgr, data);
+    if (page == NULL) {
+        CPE_ERROR_EX(
+            em, gd_om_invalid_address,
+            "address to oid: address is invalid");
+        return GD_OM_INVALID_OID;
+    }
+
+    head = (struct gd_om_data_page_head *)page;
+
+    if (head->m_classId == GD_OM_INVALID_CLASSID) {
+        CPE_ERROR_EX(
+            em, gd_om_invalid_address,
+            "address to oid: address is invalid, not allocked!");
+        return GD_OM_INVALID_OID;
+    }
+
+    class = gd_om_class_get(&omm->m_classMgr, head->m_classId);
+    if (class == NULL) {
+        CPE_ERROR_EX(
+            em, gd_om_class_not_exist,
+            "class id=%d not exist!", head->m_classId);
+        return GD_OM_INVALID_OID;
+    }
+
+    baseOid = gd_om_class_addr_2_object(class, page, data);
+    if (baseOid < 0) {
+        CPE_ERROR_EX(
+            em, gd_om_invalid_address,
+            "address to oid: internal error, get base oid fail!");
+        return GD_OM_INVALID_OID;
+    }
+
+    return (((uint32_t)class->m_id) << 24) | ((uint32_t)baseOid);
 }

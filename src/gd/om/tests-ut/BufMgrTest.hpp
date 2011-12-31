@@ -15,7 +15,7 @@ public:
     virtual void SetUp();
     virtual void TearDown();
 
-    void init(size_t page_size, size_t buf_size);
+    int init(size_t page_size, size_t buf_size);
 
     void * page_get(void);
 
