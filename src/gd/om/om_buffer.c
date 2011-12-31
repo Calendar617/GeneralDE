@@ -177,6 +177,55 @@ int gd_om_buffer_mgr_add_new_buffer(
     return 0;
 }
 
+static int gd_om_buffer_mgr_reserve_for_attach_buffer(struct gd_om_buffer_mgr * pgm, error_monitor_t em) {
+    if (cpe_range_mgr_reserve_for_put(&pgm->m_buffers, 1) != 0) {
+        CPE_ERROR_EX(em, gd_om_no_memory, "reserve for buffers fail!");
+        return -1;
+    }
+
+    if (cpe_range_mgr_reserve_for_put(&pgm->m_free_pages, (pgm->m_buf_size / pgm->m_page_size) + 1) != 0) {
+        CPE_ERROR_EX(em, gd_om_no_memory, "reserve for free pages fail!");
+        return -1;
+    }
+
+    if (cpe_range_mgr_reserve_for_put(&pgm->m_buffer_ids, 1) != 0) {
+        CPE_ERROR_EX(em, gd_om_no_memory, "reserve for buffer ids fail!");
+        return -1;
+    }
+
+    return 0;
+}
+
+int gd_om_buffer_mgr_attach_old_buffer(
+    struct gd_om_buffer_mgr * pgm,
+    gd_om_buffer_id_t buf_id,
+    error_monitor_t em)
+{
+    char * buf;
+    int leftSize;
+
+    if (gd_om_buffer_mgr_reserve_for_attach_buffer(pgm, em) != 0) return -1;
+
+    buf = (char *)gd_om_buffer_mgr_get_buf(pgm, buf_id, em);
+    if (buf == NULL) return -1;
+
+    cpe_range_put_range(&pgm->m_buffers, (ptr_int_t)buf, ((ptr_int_t)buf) + pgm->m_buf_size);
+    cpe_range_put_one(&pgm->m_buffer_ids, buf_id);
+
+    for(leftSize = pgm->m_buf_size;
+        leftSize > pgm->m_page_size;
+        leftSize -= pgm->m_page_size, buf += pgm->m_page_size)
+    {
+        if (!gd_om_data_page_head_is_valid((struct gd_om_data_page_head*)buf)) {
+            cpe_range_put_range(
+                &pgm->m_free_pages,
+                (ptr_int_t)buf, ((ptr_int_t)buf) + pgm->m_page_size);
+        }
+    }
+
+    return 0;
+}
+
 void * gd_om_page_get(struct gd_om_buffer_mgr * pgm, error_monitor_t em) {
     int tryCount;
     struct cpe_range pageRange;

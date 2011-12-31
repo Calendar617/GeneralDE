@@ -35,6 +35,11 @@ int gd_om_buffer_mgr_add_new_buffer(
     gd_om_buffer_id_t buf_id,
     error_monitor_t em);
 
+int gd_om_buffer_mgr_attach_old_buffer(
+    struct gd_om_buffer_mgr * pgm,
+    gd_om_buffer_id_t buf_id,
+    error_monitor_t em);
+
 void * gd_om_buffer_mgr_find_page(
     struct gd_om_buffer_mgr * pgm,
     void * address);
