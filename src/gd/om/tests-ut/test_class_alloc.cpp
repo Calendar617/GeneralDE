@@ -22,14 +22,16 @@ TEST_F(ClassAllocTest, alloc_from_empty) {
 
 TEST_F(ClassAllocTest, alloc_basic) {
     char page_buf[256];
-    ASSERT_EQ(0, gd_om_class_add_new_page(m_cls, &page_buf, t_em()));
+    gd_om_data_page_head_init(page_buf);
+    ASSERT_EQ(0, gd_om_class_add_page(m_cls, &page_buf, t_em()));
 
     EXPECT_EQ(0, gd_om_class_alloc_object(m_cls));
 }
 
 TEST_F(ClassAllocTest, alloc_all) {
     char page_buf[256];
-    ASSERT_EQ(0, gd_om_class_add_new_page(m_cls, &page_buf, t_em()));
+    gd_om_data_page_head_init(page_buf);
+    ASSERT_EQ(0, gd_om_class_add_page(m_cls, &page_buf, t_em()));
 
     for(size_t i = 0; i < m_cls->m_object_per_page; ++i) {
         EXPECT_EQ((int32_t)i, gd_om_class_alloc_object(m_cls));
@@ -40,7 +42,8 @@ TEST_F(ClassAllocTest, alloc_all) {
 
 TEST_F(ClassAllocTest, free_basic) {
     char page_buf[256];
-    ASSERT_EQ(0, gd_om_class_add_new_page(m_cls, &page_buf, NULL));
+    gd_om_data_page_head_init(page_buf);
+    ASSERT_EQ(0, gd_om_class_add_page(m_cls, &page_buf, NULL));
 
     EXPECT_EQ(0, gd_om_class_alloc_object(m_cls));
     EXPECT_EQ(1, gd_om_class_alloc_object(m_cls));
@@ -53,7 +56,8 @@ TEST_F(ClassAllocTest, free_basic) {
 
 TEST_F(ClassAllocTest, free_not_alloc) {
     char page_buf[256];
-    ASSERT_EQ(0, gd_om_class_add_new_page(m_cls, &page_buf, NULL));
+    gd_om_data_page_head_init(page_buf);
+    ASSERT_EQ(0, gd_om_class_add_page(m_cls, &page_buf, NULL));
 
     EXPECT_EQ(0, gd_om_class_alloc_object(m_cls));
     EXPECT_EQ(1, gd_om_class_alloc_object(m_cls));
@@ -64,7 +68,8 @@ TEST_F(ClassAllocTest, free_not_alloc) {
 
 TEST_F(ClassAllocTest, free_re_alloc) {
     char page_buf[256];
-    ASSERT_EQ(0, gd_om_class_add_new_page(m_cls, &page_buf, NULL));
+    gd_om_data_page_head_init(page_buf);
+    ASSERT_EQ(0, gd_om_class_add_page(m_cls, &page_buf, NULL));
 
     EXPECT_EQ(0, gd_om_class_alloc_object(m_cls));
     EXPECT_EQ(1, gd_om_class_alloc_object(m_cls));

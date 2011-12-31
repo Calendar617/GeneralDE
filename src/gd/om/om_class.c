@@ -240,14 +240,18 @@ static int gd_om_class_reserve_page_array_slot(struct gd_om_class * class, error
     return 0;
 }
 
-int gd_om_class_add_new_page(struct gd_om_class * class, void * page, error_monitor_t em) {
+static
+int gd_om_class_add_new_page(
+    struct gd_om_class * class,
+    struct gd_om_data_page_head * head,
+    void * page,
+    error_monitor_t em)
+{
     int32_t newRangeStart;
-    struct gd_om_data_page_head * head;
     cpe_ba_t alloc_arry;
 
     if (gd_om_class_reserve_page_array_slot(class, em) != 0) return -1;
 
-    head = (struct gd_om_data_page_head *)page;
     alloc_arry = (cpe_ba_t)(head + 1);
 
     head->m_magic = GD_OM_PAGE_MAGIC;
@@ -266,31 +270,16 @@ int gd_om_class_add_new_page(struct gd_om_class * class, void * page, error_moni
     return 0;
 }
 
-static int gd_om_class_check_page_head(struct gd_om_class * class, struct gd_om_data_page_head * head, error_monitor_t em) {
-    if (head->m_magic != GD_OM_PAGE_MAGIC) {
-        CPE_ERROR_EX(em, gd_om_page_head_error, "page head magic error!");
-        return -1;
-    }
-
-    if (head->m_classId != class->m_id) {
-        CPE_ERROR_EX(
-            em, gd_om_page_head_error,
-            "page head class id error, expect %d, but %d!",
-            class->m_id, head->m_classId);
-        return -1;
-    }
-
-    return 0;
-}
-
-int gd_om_class_add_old_page(struct gd_om_class * class, void * page, error_monitor_t em) {
-    struct gd_om_data_page_head * head;
+static
+int gd_om_class_add_old_page(
+    struct gd_om_class * class,
+    struct gd_om_data_page_head * head,
+    void * page,
+    error_monitor_t em)
+{
     cpe_ba_t alloc_arry;
 
     if (gd_om_class_reserve_page_array_slot(class, em) != 0) return -1;
-
-    head = (struct gd_om_data_page_head *)page;
-    if (gd_om_class_check_page_head(class, head, em) != 0) return -1;
 
     alloc_arry = gd_om_class_ba_of_page(page);
 
@@ -320,6 +309,32 @@ int gd_om_class_add_old_page(struct gd_om_class * class, void * page, error_moni
     ++class->m_page_array_size;
 
     return 0;
+}
+
+int gd_om_class_add_page(struct gd_om_class *cls, void * page, error_monitor_t em) {
+    struct gd_om_data_page_head * head;
+
+    head = (struct gd_om_data_page_head *)page;
+
+    if (head->m_magic != GD_OM_PAGE_MAGIC) {
+        CPE_ERROR_EX(em, gd_om_page_head_error, "page head magic error!");
+        return -1;
+    }
+
+    if (head->m_classId == GD_OM_INVALID_CLASSID) {
+        return gd_om_class_add_new_page(cls, head, page, em);
+    }
+    else {
+        if (head->m_classId != cls->m_id) {
+            CPE_ERROR_EX(
+                em, gd_om_page_head_error,
+                "page head class id error, expect %d, but %d!",
+                cls->m_id, head->m_classId);
+            return -1;
+        }
+
+        return gd_om_class_add_old_page(cls, head, page, em);
+    }
 }
 
 int32_t

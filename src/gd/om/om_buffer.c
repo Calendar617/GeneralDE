@@ -85,37 +85,45 @@ static int gd_om_buffer_mgr_reserve_for_new_buffer(struct gd_om_buffer_mgr * pgm
     return 0;
 }
 
-static int
-gd_om_buffer_mgr_add_buffer_i(
+static void
+gd_om_buffer_mgr_init_pages(struct gd_om_buffer_mgr * pgm, void * buf) {
+    int leftSize = pgm->m_buf_size;
+    char * b = (char *)buf;
+
+    while(leftSize > pgm->m_page_size) {
+        gd_om_data_page_head_init(b);
+        b += pgm->m_page_size;
+        leftSize -= pgm->m_page_size;
+    }
+}
+
+static void *
+gd_om_buffer_mgr_get_buf(
     struct gd_om_buffer_mgr * pgm,
     gd_om_buffer_id_t buf_id,
     error_monitor_t em)
 {
-    void * new_buf;
+    void * buf;
 
     if (pgm->m_backend && pgm->m_backend->buf_get) {
-        new_buf = pgm->m_backend->buf_get(buf_id, pgm->m_backend_ctx);
-        if (new_buf == NULL) {
+        buf = pgm->m_backend->buf_get(buf_id, pgm->m_backend_ctx);
+        if (buf == NULL) {
             CPE_ERROR_EX(em, gd_om_buffer_get_fail, "backend get buf %" PTRINT_PREFIX " fail!", buf_id);
-            return -1;
         }
     }
     else {
-        new_buf = (void *)buf_id;
+        buf = (void *)buf_id;
     }
 
-    cpe_range_put_range(&pgm->m_buffers, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
-    cpe_range_put_range(&pgm->m_free_pages, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
-    cpe_range_put_one(&pgm->m_buffer_ids, buf_id);
-
-    return 0;
+    return buf;
 }
 
-static int gd_om_buffer_mgr_add_new_buffer(
+static int gd_om_buffer_mgr_alloc_new_buffer(
     struct gd_om_buffer_mgr * pgm,
     error_monitor_t em)
 {
     gd_om_buffer_id_t new_buf_id;
+    void * new_buf;
 
     if (pgm->m_backend == NULL) {
         CPE_ERROR_EX(em, gd_om_no_buffer, "no backend to alloc new buf!");
@@ -135,16 +143,38 @@ static int gd_om_buffer_mgr_add_new_buffer(
         return -1;
     }
 
-    return gd_om_buffer_mgr_add_buffer_i(pgm, new_buf_id, em);
+    cpe_range_put_one(&pgm->m_buffer_ids, new_buf_id);
+
+    new_buf = gd_om_buffer_mgr_get_buf(pgm, new_buf_id, em);
+    if (new_buf == NULL) return -1;
+
+    gd_om_buffer_mgr_init_pages(pgm, new_buf);
+
+    cpe_range_put_range(&pgm->m_buffers, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
+    cpe_range_put_range(&pgm->m_free_pages, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
+
+    return 0;
 }
 
-int gd_om_buffer_mgr_add_buffer(
+int gd_om_buffer_mgr_add_new_buffer(
     struct gd_om_buffer_mgr * pgm,
-    gd_om_buffer_id_t bufId,
+    gd_om_buffer_id_t buf_id,
     error_monitor_t em)
 {
+    void * new_buf;
+
     if (gd_om_buffer_mgr_reserve_for_new_buffer(pgm, em) != 0) return -1;
-    return gd_om_buffer_mgr_add_buffer_i(pgm, bufId, em);
+
+    new_buf = gd_om_buffer_mgr_get_buf(pgm, buf_id, em);
+    if (new_buf == NULL) return -1;
+
+    gd_om_buffer_mgr_init_pages(pgm, new_buf);
+
+    cpe_range_put_range(&pgm->m_buffers, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
+    cpe_range_put_range(&pgm->m_free_pages, (ptr_int_t)new_buf, ((ptr_int_t)new_buf) + pgm->m_buf_size);
+    cpe_range_put_one(&pgm->m_buffer_ids, buf_id);
+
+    return 0;
 }
 
 void * gd_om_page_get(struct gd_om_buffer_mgr * pgm, error_monitor_t em) {
@@ -158,7 +188,7 @@ void * gd_om_page_get(struct gd_om_buffer_mgr * pgm, error_monitor_t em) {
         pageRange = cpe_range_get_range(&pgm->m_free_pages, pgm->m_page_size);
 
         if (!cpe_range_is_valid(pageRange)) {
-            if (gd_om_buffer_mgr_add_new_buffer(pgm, em) != 0) {
+            if (gd_om_buffer_mgr_alloc_new_buffer(pgm, em) != 0) {
                 return NULL;
             }
             continue;

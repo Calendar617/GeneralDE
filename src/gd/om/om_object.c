@@ -33,7 +33,7 @@ gd_om_oid_t gd_om_obj_alloc(
             return GD_OM_INVALID_OID;
         }
 
-        if (gd_om_class_add_new_page(class, newPage, em) != 0) {
+        if (gd_om_class_add_page(class, newPage, em) != 0) {
             return GD_OM_INVALID_OID;
         }
 

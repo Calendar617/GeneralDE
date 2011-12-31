@@ -65,8 +65,7 @@ gd_om_class_get(struct gd_om_class_mgr * classMgr, gd_om_class_id_t classId);
 struct gd_om_class *
 gd_om_class_find(struct gd_om_class_mgr * classMgr, cpe_hash_string_t className);
 
-int gd_om_class_add_new_page(struct gd_om_class *cls, void * page, error_monitor_t em);
-int gd_om_class_add_old_page(struct gd_om_class *cls, void * page, error_monitor_t em);
+int gd_om_class_add_page(struct gd_om_class *cls, void * page, error_monitor_t em);
 
 int32_t gd_om_class_alloc_object(struct gd_om_class *cls);
 int32_t gd_om_class_addr_2_object(struct gd_om_class *cls, void * page, void * addr);

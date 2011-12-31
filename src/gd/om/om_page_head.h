@@ -20,7 +20,17 @@ struct gd_om_data_page_head {
 
 #pragma pack(pop)
 
-#define gd_om_data_page_is_valid(p) ((p)->m_classId != GD_OM_INVALID_CLASSID)
+#define gd_om_data_page_head_is_valid(p) ((p)->m_classId != GD_OM_INVALID_CLASSID)
+
+#define gd_om_data_page_head_init(p) do {       \
+    struct gd_om_data_page_head * __p =         \
+        (struct gd_om_data_page_head *)(p);     \
+    __p->m_magic = GD_OM_PAGE_MAGIC;            \
+    __p->m_classId = GD_OM_INVALID_CLASSID;     \
+    __p->m_reserve = 0;                         \
+    __p->m_reserve2 = 0;                        \
+    __p->m_page_idx = -1;                       \
+} while(0)
 
 #ifdef __cplusplus
 }

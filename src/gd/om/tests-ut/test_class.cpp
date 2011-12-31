@@ -104,7 +104,8 @@ TEST_F(ClassTest, add_new_page_basic) {
     ASSERT_TRUE(cls);
 
     char page_buf[256];
-    ASSERT_EQ(0, gd_om_class_add_new_page(cls, &page_buf, t_em()));
+    gd_om_data_page_head_init(page_buf);
+    ASSERT_EQ(0, gd_om_class_add_page(cls, &page_buf, t_em()));
 
     EXPECT_EQ((size_t)1, cls->m_page_array_size);
 

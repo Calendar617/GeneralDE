@@ -37,7 +37,7 @@ TEST_F(BufMgrTest, get_page_buf_left) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_TRUE(p == page_get());
     EXPECT_TRUE(p + 10 == page_get());
@@ -62,7 +62,7 @@ TEST_F(BufMgrTest, add_page_no_source) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_TRUE(p == page_get());
     EXPECT_TRUE(p + 10 == page_get());
@@ -86,7 +86,7 @@ TEST_F(BufMgrTest, find_page_buf_begin) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_TRUE(
         p ==
@@ -100,7 +100,7 @@ TEST_F(BufMgrTest, find_page_buf_middle) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_TRUE(
         (p + 20) ==
@@ -114,7 +114,7 @@ TEST_F(BufMgrTest, find_page_buf_last_page) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_TRUE(
         (p + 30) ==
@@ -128,7 +128,7 @@ TEST_F(BufMgrTest, find_page_buf_after_buf) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_TRUE(
         NULL ==
@@ -142,7 +142,7 @@ TEST_F(BufMgrTest, find_page_buf_before_buf) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_TRUE(
         NULL ==
@@ -156,7 +156,7 @@ TEST_F(BufMgrTest, find_page_page_middle) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_TRUE(
         p ==
@@ -170,7 +170,7 @@ TEST_F(BufMgrTest, find_page_page_last) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_TRUE(
         p ==
@@ -184,11 +184,11 @@ TEST_F(BufMgrTest, find_page_multi_buf) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)(p + 40), t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)(p + 40), t_em()));
 
     EXPECT_TRUE(
         (p + 40) ==
@@ -206,11 +206,11 @@ TEST_F(BufMgrTest, find_page_multi_buf_buf_page_left) {
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)p, t_em()));
 
     EXPECT_EQ(
         0
-        , gd_om_buffer_mgr_add_buffer(&m_bufMgr, (gd_om_buffer_id_t)(p + 43), t_em()));
+        , gd_om_buffer_mgr_add_new_buffer(&m_bufMgr, (gd_om_buffer_id_t)(p + 43), t_em()));
 
     EXPECT_TRUE(
         NULL ==
