@@ -22,7 +22,7 @@ CPE_DR_API LPDRMETAENTRY dr_meta_entry_at(LPDRMETA meta, int idx);
 CPE_DR_API int dr_meta_find_entry_idx_by_name(LPDRMETA meta, const char* name);
 CPE_DR_API int dr_meta_find_entry_idx_by_id(LPDRMETA meta, int id);
 CPE_DR_API char *dr_meta_off_to_path(LPDRMETA meta, int off, char * buf, size_t bufSize);
-CPE_DR_API int dr_meta_path_to_off(LPDRMETA meta, const char * path);
+CPE_DR_API int dr_meta_path_to_off(LPDRMETA meta, const char * path, LPDRMETAENTRY * entry);
 CPE_DR_API LPDRMETAENTRY dr_meta_find_entry_by_name(LPDRMETA meta, const char* name);
 CPE_DR_API LPDRMETAENTRY dr_meta_find_entry_by_path(LPDRMETA meta, const char* entryPath);
 
