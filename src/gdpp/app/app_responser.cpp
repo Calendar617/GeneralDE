@@ -12,7 +12,7 @@ Responser::~Responser() {
 int Responser::_process(gd_dp_req_t req, void * ctx, error_monitor_t em) {
     assert(ctx);
     try {
-        return ((Responser *)ctx)->process(*Dp::Request::_cast(req), em);
+        return ((Responser *)ctx)->process(*(Dp::Request*)(req), em);
     }
     catch(::std::exception const & e) {
         CPE_ERROR(
