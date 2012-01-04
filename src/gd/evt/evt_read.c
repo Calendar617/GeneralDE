@@ -54,7 +54,7 @@ int gd_evt_set_from_string(gd_evt_t evt, const char * arg, const char * data, er
         return -1;
     }
 
-    return dr_entry_set_from_string(gd_evt_data(evt), entry, data, em);
+    return dr_entry_set_from_string(gd_evt_data(evt), data, entry, em);
 }
 
 int gd_evt_set_from_int32(gd_evt_t evt, const char * arg, int32_t data, error_monitor_t em) {
