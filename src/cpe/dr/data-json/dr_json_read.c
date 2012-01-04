@@ -74,8 +74,8 @@ void dr_json_do_parse_from_string(
     JSON_PARSE_CTX_COPY_STR_TMP(c, s, l);
     dr_entry_set_from_string(
         parseType->m_data + parseType->m_entry->m_data_start_pos,
-        parseType->m_entry,
         c->m_buf,
+        parseType->m_entry,
         c->m_em);
 }
 
