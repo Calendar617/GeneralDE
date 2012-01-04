@@ -29,7 +29,9 @@ iPhoneSimulator.compiler ?= llvm-$1-4.2
 
 iPhoneSimulator.TARGET_ARCH ?= -arch i386
 
-iPhoneSimulator.CPPFLAGS ?= -D__IPHONE_OS_VERSION_MIN_REQUIRED=$(iphone-os-version-min)
+iPhoneSimulator.CPPFLAGS ?= \
+                    -D__IPHONE_OS_VERSION_MIN_REQUIRED=$(iphone-os-version-min) \
+                    -DTARGET_IPHONE_SIMULATOR
 
 iPhoneSimulator.CFLAGS ?= \
                    -std=c99 \
