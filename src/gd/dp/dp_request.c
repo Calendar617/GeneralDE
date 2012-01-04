@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "gd/dp/dp_manage.h"
 #include "gd/dp/dp_request.h"
 #include "gd/dp/dp_node.h"
@@ -5,17 +6,16 @@
 
 void gd_dp_req_init(
     gd_dp_req_t req,
-    gd_dp_mgr_t mgr, gd_dp_req_t parent,
+    gd_dp_mgr_t mgr,
     cpe_hash_string_t type,
-    gd_dp_node_t from, gd_dp_node_t to,
     void * data, size_t capacity)
 {
     req->m_mgr = mgr;
-    req->m_talloc = parent ? parent->m_talloc : mgr->m_alloc;
+    req->m_talloc = mgr->m_alloc;
     req->m_type = type;
-    req->m_parent = parent;
-    req->m_from = from;
-    req->m_to = to;
+    req->m_parent = NULL;
+    req->m_from = NULL;
+    req->m_to = NULL;
     req->m_data = data;
     req->m_data_capacity = capacity;
     req->m_data_size = 0;
@@ -37,30 +37,39 @@ gd_dp_req_create(
         mem_alloc(mgr->m_alloc, sizeof(struct gd_dp_req ) + capacity);
     if (req == NULL) return NULL;
 
-    gd_dp_req_init(req, mgr, NULL, type, NULL, NULL, (void*)(req + 1), capacity);
+    gd_dp_req_init(req, mgr, type, (void*)(req + 1), capacity);
 
     return req;
 }
 
 gd_dp_req_t
-gd_dp_req_create_child(
-    gd_dp_req_t parent,
+gd_dp_req_create_with_buf(
+    gd_dp_mgr_t mgr,
     cpe_hash_string_t type,
     void * data,
     size_t capacity)
 {
     gd_dp_req_t req;
 
-    if (parent == NULL || parent == NULL) return NULL;
+    req = (gd_dp_req_t) mem_alloc(mgr->m_alloc, sizeof(struct gd_dp_req));
 
-    req = (gd_dp_req_t)
-        mem_alloc(parent->m_mgr->m_alloc, sizeof(struct gd_dp_req ));
-
-    gd_dp_req_init(req, parent->m_mgr, parent, type, parent->m_from, parent->m_to, data, capacity);
-
-    TAILQ_INSERT_TAIL(&parent->m_childs, req, m_brother);
+    gd_dp_req_init(req, mgr, type, data, capacity);
 
     return req;
+}
+
+void gd_dp_req_set_parent(gd_dp_req_t child, gd_dp_req_t parent) {
+    assert(child);
+
+    if (child->m_parent) {
+        TAILQ_REMOVE(&child->m_parent->m_childs, child, m_brother);
+        child->m_parent = NULL;
+    }
+
+    if (parent) {
+        TAILQ_INSERT_TAIL(&parent->m_childs, child, m_brother);
+        child->m_parent = parent;
+    }
 }
 
 void gd_dp_req_free(gd_dp_req_t req) {
@@ -198,12 +207,13 @@ int gd_dp_req_reply(gd_dp_req_t req, void * buf, size_t size, error_monitor_t em
         return req->m_from->m_type->reply(req->m_from, req, buf, size, em);
     }
 
-    replyReq = gd_dp_req_create_child(req, gd_dp_req_type_reply, buf, size);
+    replyReq = gd_dp_req_create_with_buf(req->m_mgr, gd_dp_req_type_reply, buf, size);
     if (replyReq == NULL) {
         CPE_ERROR(em, "create reply requesnt fail!");
         return -1;
     }
 
+    gd_dp_req_set_parent(replyReq, req);
     gd_dp_req_set_to(replyReq, gd_dp_req_from(req));
     gd_dp_req_set_from(replyReq, gd_dp_req_to(req));
     gd_dp_req_set_size(replyReq, size);

@@ -28,7 +28,9 @@ with_dp::t_dp_req_create(const char * type, size_t capacity) {
 
 gd_dp_req_t
 with_dp::t_dp_req_create_child(gd_dp_req_t req, const char * type, void * buf, size_t capacity) {
-    return gd_dp_req_create_child(req, cpe_hs_create(t_tmp_allocrator(), type), buf, capacity);
+    gd_dp_req_t r = gd_dp_req_create_with_buf(m_dp, cpe_hs_create(t_tmp_allocrator(), type), buf, capacity);
+    gd_dp_req_set_parent(r, req);
+    return r;
 }
 
 }}}

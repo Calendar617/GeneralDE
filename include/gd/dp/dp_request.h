@@ -15,13 +15,15 @@ gd_dp_req_create(
     size_t capacity);
 
 gd_dp_req_t
-gd_dp_req_create_child(
-    gd_dp_req_t req,
+gd_dp_req_create_with_buf(
+    gd_dp_mgr_t mgr,
     cpe_hash_string_t type,
     void * data,
     size_t capacity);
 
 void gd_dp_req_free(gd_dp_req_t req);
+
+void gd_dp_req_set_parent(gd_dp_req_t child, gd_dp_req_t parent);
 
 gd_dp_req_t gd_dp_req_parent(gd_dp_req_t req);
 gd_dp_req_t gd_dp_req_parent_find(gd_dp_req_t req, cpe_hash_string_t typeName);
