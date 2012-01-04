@@ -98,6 +98,9 @@ public:
     using BaseT::t_allocrator;
     using BaseT::t_alloc;
     using BaseT::t_strdup;
+    using BaseT::t_tmp_allocrator;
+    using BaseT::t_tmp_alloc;
+    using BaseT::t_tmp_strdup;
 };
 
 template<typename EnvListT, typename BaseT>
@@ -116,6 +119,9 @@ public:
     using BaseT::t_allocrator;
     using BaseT::t_alloc;
     using BaseT::t_strdup;
+    using BaseT::t_tmp_allocrator;
+    using BaseT::t_tmp_alloc;
+    using BaseT::t_tmp_strdup;
 };
 
 }
