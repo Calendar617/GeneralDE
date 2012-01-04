@@ -19,16 +19,20 @@ ErrorCollector::~ErrorCollector() {
 }
 
 static void collect_msg(void * ctx, struct error_info * info, const char * msg) {
-    ::std::ostringstream * os = reinterpret_cast< ::std::ostringstream *>(ctx);
+    ::std::ostream * os = reinterpret_cast< ::std::ostream *>(ctx);
 
     (*os) << msg << ::std::endl;
 }
 
 ::std::string
-ErrorCollector::genErrorMsg(void) {
+ErrorCollector::genErrorMsg(void) const {
     ::std::ostringstream os;
-    cpe_error_list_visit(m_el, collect_msg, &os);
+    genErrorMsg(os);
     return os.str();
+}
+
+void ErrorCollector::genErrorMsg(::std::ostream & os) const {
+    cpe_error_list_visit(m_el, collect_msg, &os);
 }
 
 }}

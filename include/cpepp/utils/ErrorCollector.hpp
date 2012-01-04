@@ -1,5 +1,6 @@
 #ifndef CPEPP_UTILS_ERRORCOLLECTOR_H
 #define CPEPP_UTILS_ERRORCOLLECTOR_H
+#include <sstream>
 #include "cpe/utils/error.h"
 #include "cpe/utils/error_list.h"
 #include "ClassCategory.hpp"
@@ -21,7 +22,18 @@ public:
         }
     }
 
-    ::std::string genErrorMsg(void);
+    template<typename T>
+    void checkThrowWithMsg(const char * prefix) {
+        if (error()) {
+            ::std::ostringstream os;
+            os << prefix;
+            genErrorMsg(os);
+            throw T(os.str().c_str());
+        }
+    }
+
+    ::std::string genErrorMsg(void) const;
+    void genErrorMsg(::std::ostream & os) const;
 
     operator error_monitor_t (void) { return &m_em; }
 

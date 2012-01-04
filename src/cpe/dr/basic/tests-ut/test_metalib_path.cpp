@@ -20,7 +20,7 @@ public:
     }
 
     int path2pos(const char * metaName, const char * path) {
-        return dr_meta_path_to_off(meta(metaName), path);
+        return dr_meta_path_to_off(meta(metaName), path, NULL);
     }
 };
 
