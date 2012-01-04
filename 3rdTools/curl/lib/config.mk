@@ -103,7 +103,7 @@ $(product).c.sources := $(addprefix $(product-base)/, \
                      warnless.c \
                      wildcard.c)
 
-$(product).product.c.includes:=3rdTools/curl/include 3rdTools/curl/include/$(OS_NAME) 3rdTools/curl/include/$(OS_NAME)/curl
+$(product).product.c.includes:=3rdTools/curl/include 3rdTools/curl/include/$(dev-env) 3rdTools/curl/include/$(dev-env)/curl
 $(product).c.includes:=3rdTools/curl/lib/$(dev-env)
 $(product).c.flags.cpp:=-DHAVE_CONFIG_H
 $(product).c.flags.ld:=-lz
