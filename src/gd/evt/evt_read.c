@@ -43,20 +43,106 @@ LPDRMETA gd_evt_meta(gd_evt_t evt) {
     return evt->m_meta;
 }
 
-void gd_evt_set_from_string(gd_evt_t evt, const char * arg, const char * data) {
-    //LPDRMETAENTRY entry = dr_meta_find_entry_by_path(LPDRMETA meta, const char* entryPath);
-
+const char * gd_evt_type(gd_evt_t evt) {
+    return dr_meta_name(evt->m_meta);
 }
 
-void gd_evt_set_from_int32(gd_evt_t evt, const char * arg, int32_t data) {
+int gd_evt_set_from_string(gd_evt_t evt, const char * arg, const char * data, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        CPE_ERROR(em, "event %s have no arg %s!", gd_evt_type(evt), arg);
+        return -1;
+    }
+
+    return dr_entry_set_from_string(gd_evt_data(evt), entry, data, em);
 }
 
-int8_t gd_evt_get_int8(gd_evt_t evt, const char * arg);
-uint8_t gd_evt_get_uint8(gd_evt_t evt, const char * arg);
-int16_t gd_evt_get_int16(gd_evt_t evt, const char * arg);
-uint16_t gd_evt_get_uint16(gd_evt_t evt, const char * arg);
-int32_t gd_evt_get_int32(gd_evt_t evt, const char * arg);
-uint32_t gd_evt_get_uint32(gd_evt_t evt, const char * arg);
-int64_t gd_evt_get_int64(gd_evt_t evt, const char * arg);
-uint64_t gd_evt_get_uint64(gd_evt_t evt, const char * arg);
-const char * gd_evt_get_string(gd_evt_t evt, const char * arg);
+int gd_evt_set_from_int32(gd_evt_t evt, const char * arg, int32_t data, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        return -1;
+    }
+
+    //return dr_entry_set_from_string(gd_evt_data(evt), entry, data, em);
+    return -1;
+}
+
+int gd_evt_try_get_int8(int8_t * result, gd_evt_t evt, const char * arg, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        CPE_ERROR(em, "event %s have no arg %s!", gd_evt_type(evt), arg);
+        return -1;
+    }
+
+    return dr_entry_try_read_int8(result, gd_evt_data(evt), entry, em);
+}
+
+int gd_evt_try_get_uint8(uint8_t * result, gd_evt_t evt, const char * arg, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        CPE_ERROR(em, "event %s have no arg %s!", gd_evt_type(evt), arg);
+        return -1;
+    }
+
+    return dr_entry_try_read_uint8(result, gd_evt_data(evt), entry, em);
+}
+
+int gd_evt_try_get_int16(int16_t * result, gd_evt_t evt, const char * arg, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        CPE_ERROR(em, "event %s have no arg %s!", gd_evt_type(evt), arg);
+        return -1;
+    }
+
+    return dr_entry_try_read_int16(result, gd_evt_data(evt), entry, em);
+}
+
+int gd_evt_try_get_uint16(uint16_t * result, gd_evt_t evt, const char * arg, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        CPE_ERROR(em, "event %s have no arg %s!", gd_evt_type(evt), arg);
+        return -1;
+    }
+
+    return dr_entry_try_read_uint16(result, gd_evt_data(evt), entry, em);
+}
+
+int gd_evt_try_get_int32(int32_t * result, gd_evt_t evt, const char * arg, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        CPE_ERROR(em, "event %s have no arg %s!", gd_evt_type(evt), arg);
+        return -1;
+    }
+
+    return dr_entry_try_read_int32(result, gd_evt_data(evt), entry, em);
+}
+
+int gd_evt_try_get_uint32(uint32_t * result, gd_evt_t evt, const char * arg, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        CPE_ERROR(em, "event %s have no arg %s!", gd_evt_type(evt), arg);
+        return -1;
+    }
+
+    return dr_entry_try_read_uint32(result, gd_evt_data(evt), entry, em);
+}
+
+int gd_evt_try_get_int64(int64_t * result, gd_evt_t evt, const char * arg, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        CPE_ERROR(em, "event %s have no arg %s!", gd_evt_type(evt), arg);
+        return -1;
+    }
+
+    return dr_entry_try_read_int64(result, gd_evt_data(evt), entry, em);
+}
+
+int gd_evt_try_get_uint64(uint64_t * result, gd_evt_t evt, const char * arg, error_monitor_t em) {
+    LPDRMETAENTRY entry = dr_meta_find_entry_by_name(evt->m_meta, arg);
+    if (entry == NULL) {
+        CPE_ERROR(em, "event %s have no arg %s!", gd_evt_type(evt), arg);
+        return -1;
+    }
+
+    return dr_entry_try_read_uint64(result, gd_evt_data(evt), entry, em);
+}

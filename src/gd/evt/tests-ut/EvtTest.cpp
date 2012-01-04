@@ -50,3 +50,8 @@ void EvtTest::createEvtMgr(const char * metalib) {
         t_allocrator());
     EXPECT_TRUE(m_evt_mgr);
 }
+
+gd_evt_t EvtTest::createEvt(const char * typeName) {
+    EXPECT_TRUE(m_evt_mgr);
+    return gd_evt_create(m_evt_mgr, typeName, t_em());
+}
