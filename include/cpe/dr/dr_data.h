@@ -31,7 +31,15 @@ const char * dr_entry_read_string(const void * input, LPDRMETAENTRY entry);
 int dr_entry_print_to_stream(write_stream_t output, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
 const char * dr_entry_to_string(mem_buffer_t buf, const void * input, LPDRMETAENTRY entry);
 
-int dr_entry_set_from_string(void * output, LPDRMETAENTRY entry, const char * input, error_monitor_t em);
+int dr_entry_set_from_int8(void * output, int8_t input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_uint8(void * output, uint8_t input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_int16(void * output, int16_t input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_uint16(void * output, uint16_t input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_int32(void * output, int32_t input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_uint32(void * output, uint32_t input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_int64(void * output, int64_t input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_uint64(void * output, uint64_t input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_string(void * output, const char * input, LPDRMETAENTRY entry, error_monitor_t em);
 int dr_entry_set_defaults(void * inout, LPDRMETAENTRY entry);
 
 void dr_meta_set_defaults(void * inout, LPDRMETA meta);

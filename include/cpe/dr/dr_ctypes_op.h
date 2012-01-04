@@ -29,6 +29,15 @@ uint64_t dr_ctype_read_uint64(const void * input, int type);
 int dr_ctype_print_to_stream(write_stream_t output, const void * input, int type, error_monitor_t em);
 int dr_ctype_set_from_string(void * output, int type, const char * input, error_monitor_t em);
 
+int dr_ctype_set_from_int8(void * output, int8_t input, int type, error_monitor_t em);
+int dr_ctype_set_from_uint8(void * output, uint8_t input, int type, error_monitor_t em);
+int dr_ctype_set_from_int16(void * output, int16_t input, int type, error_monitor_t em);
+int dr_ctype_set_from_uint16(void * output, uint16_t input, int type, error_monitor_t em);
+int dr_ctype_set_from_int32(void * output, int32_t input, int type, error_monitor_t em);
+int dr_ctype_set_from_uint32(void * output, uint32_t input, int type, error_monitor_t em);
+int dr_ctype_set_from_int64(void * output, int64_t input, int type, error_monitor_t em);
+int dr_ctype_set_from_uint64(void * output, uint64_t input, int type, error_monitor_t em);
+
 #ifdef __cplusplus
 }
 #endif
