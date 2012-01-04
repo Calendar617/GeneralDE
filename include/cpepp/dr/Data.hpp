@@ -8,7 +8,7 @@ namespace Cpe { namespace Dr {
 
 class ConstDataElement {
 public:
-    ConstDataElement(const void * data, Entry const & entry);
+    ConstDataElement(const void * data, LPDRMETAENTRY entry);
 
     operator int8_t(void);
     operator uint8_t(void);
@@ -20,14 +20,14 @@ public:
     operator uint64_t(void);
     operator const char *(void);
 
-private:
+protected:
     const void * m_data;
-    Entry const & m_entry;
+    LPDRMETAENTRY m_entry;
 };
 
 class DataElement : public ConstDataElement {
 public:
-    DataElement(void * data, Entry const & entry);
+    DataElement(void * data, LPDRMETAENTRY entry);
 
     DataElement & operator=(int8_t d);
     DataElement & operator=(uint8_t d);
@@ -42,19 +42,22 @@ public:
 
 class ConstData {
 public:
-    Meta const & meta(void) const { return m_meta; };
+    ConstData(const void * data, LPDRMETA meta);
+
+    Meta const & meta(void) const { return *((Meta*)m_meta); }
 
     ConstDataElement operator[](const char * name) const;
 
-private:
+protected:
     const void * m_data;
-    Meta const & m_meta;
+    LPDRMETA m_meta;
 };
 
 class Data : public ConstData {
 public:
-    using ConstData::operator[];
+    Data(void * data, LPDRMETA meta);
 
+    using ConstData::operator[];
     DataElement operator[](const char * name);
 };
 
