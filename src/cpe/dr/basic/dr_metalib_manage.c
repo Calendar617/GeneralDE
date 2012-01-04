@@ -165,7 +165,7 @@ char * dr_meta_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iB
     return writePos == 0 ? NULL : a_pBuf;
 }
 
-int dr_meta_path_to_off(LPDRMETA meta, const char * path) {
+int dr_meta_path_to_off(LPDRMETA meta, const char * path, LPDRMETAENTRY * entry) {
     char * base;
     LPDRMETALIB pstLib;
     LPDRMETA pstCurMeta;
@@ -210,6 +210,7 @@ int dr_meta_path_to_off(LPDRMETA meta, const char * path) {
     pstEntry = dr_meta_find_entry_by_name(pstCurMeta, nameBegin);
     if (pstEntry) {
         off += pstEntry->m_data_start_pos;
+        if (entry) *entry = pstEntry;
         return off;
     }
     else {
