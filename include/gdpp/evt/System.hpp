@@ -5,6 +5,7 @@
 namespace Gd { namespace Evt {
 
 class Event;
+class EventCenter;
 
 }}
 
