@@ -16,6 +16,9 @@ gd_evt_mgr_create(
 
 void gd_evt_mgr_free(gd_evt_mgr_t em);
 
+LPDRMETALIB
+gd_evt_mgr_metalib(gd_evt_mgr_t em);
+
 #ifdef __cplusplus
 }
 #endif

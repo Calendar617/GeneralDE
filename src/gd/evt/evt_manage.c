@@ -30,3 +30,9 @@ void gd_evt_mgr_free(gd_evt_mgr_t evm) {
 
     mem_free(evm->m_alloc, evm);
 }
+
+LPDRMETALIB
+gd_evt_mgr_metalib(gd_evt_mgr_t evm) {
+    assert(evm);
+    return evm->m_metalib;
+}
