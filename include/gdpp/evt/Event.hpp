@@ -1,7 +1,8 @@
-#ifndef GDPP_NM_OBJECT_H
-#define GDPP_NM_OBJECT_H
+#ifndef GDPP_EVT_EVENT_H
+#define GDPP_EVT_EVENT_H
 #include "cpepp/utils/ClassCategory.hpp"
-#include "cpepp/dr/DataProxy.hpp"
+#include "cpepp/dr/Meta.hpp"
+#include "cpepp/dr/Data.hpp"
 #include "gd/evt/evt_read.h"
 #include "System.hpp"
 
@@ -22,7 +23,7 @@ public:
     }
 
     Cpe::Dr::Data args(void) {
-        return Cpe::Dr::ConstData(gd_evt_data(*this), meta());
+        return Cpe::Dr::Data(gd_evt_data(*this), meta());
     }
 };
 
