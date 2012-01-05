@@ -15,6 +15,8 @@ public:
     Nm::Manager & nmManager(void) { return *((Nm::Manager *)gd_app_nm_mgr(*this)); }
 
     operator gd_app_context_t () const { return (gd_app_context_t)(void*)this; }
+
+    static Application & instance(void);
 };
 
 }}
