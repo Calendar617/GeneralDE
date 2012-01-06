@@ -11,11 +11,15 @@ public:
     operator gd_dp_req_t () const { return (gd_dp_req_t)this; }
 
     void * data(void) { return gd_dp_req_data(*this); }
+    void const * data(void) const { return gd_dp_req_data(*this); }
 
-    size_t size(void) { return gd_dp_req_size(*this); }
+    size_t size(void) const { return gd_dp_req_size(*this); }
     void setSize(size_t size) { gd_dp_req_set_size(*this, size); }
 
-    size_t capacity(void) { return gd_dp_req_capacity(*this); }
+    size_t capacity(void) const { return gd_dp_req_capacity(*this); }
+
+    const char * type(void) const { return gd_dp_req_type(*this); }
+    cpe_hash_string_t type_hs(void) const { return gd_dp_req_type_hs(*this); }
 
     mem_allocrator_t talloc(void) { return gd_dp_req_talloc(*this); }
 
@@ -43,20 +47,32 @@ public:
     }
 
     Request & parent(cpe_hash_string_t type);
+    Request const & parent(cpe_hash_string_t type) const;
 
     Request * findParent(cpe_hash_string_t type) { 
         return (Request*)gd_dp_req_parent_find(*this, type);
     }
+    Request const * findParent(cpe_hash_string_t type) const { 
+        return (Request*)gd_dp_req_parent_find(*this, type);
+    }
 
     Request & brother(cpe_hash_string_t type);
+    Request const & brother(cpe_hash_string_t type) const;
 
     Request * findBrother(cpe_hash_string_t type) { 
         return (Request*)gd_dp_req_brother_find(*this, type);
     }
+    Request const * findBrother(cpe_hash_string_t type) const { 
+        return (Request*)gd_dp_req_brother_find(*this, type);
+    }
 
     Request & child(cpe_hash_string_t type);
+    Request const & child(cpe_hash_string_t type) const;
 
     Request * findChild(cpe_hash_string_t type) { 
+        return (Request*)gd_dp_req_child_find(*this, type);
+    }
+    Request const * findChild(cpe_hash_string_t type) const { 
         return (Request*)gd_dp_req_child_find(*this, type);
     }
 
@@ -75,8 +91,11 @@ public:
     template<typename T>
     T & as(void) { checkSize(sizeof(T)); return *((T*)gd_dp_req_data(*this)); }
 
+    template<typename T>
+    T const & as(void) const { checkSize(sizeof(T)); return *((T const*)gd_dp_req_data(*this)); }
+
 private:
-    void checkSize(size_t size);
+    void checkSize(size_t size) const;
 };
 
 }}

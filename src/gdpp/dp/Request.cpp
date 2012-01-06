@@ -14,8 +14,28 @@ Request & Request::parent(cpe_hash_string_t type) {
     return *r;
 }
 
+Request const & Request::parent(cpe_hash_string_t type) const {
+    Request const * r = findParent(type);
+    if (r == NULL) {
+        ::std::ostringstream os;
+        os << "can`t find parent request of type " << cpe_hs_data(type) << "!";
+        throw ::std::runtime_error(os.str().c_str());
+    }
+    return *r;
+}
+
 Request & Request::brother(cpe_hash_string_t type) {
     Request * r = findBrother(type);
+    if (r == NULL) {
+        ::std::ostringstream os;
+        os << "can`t find brother request of type " << cpe_hs_data(type) << "!";
+        throw ::std::runtime_error(os.str().c_str());
+    }
+    return *r;
+}
+
+Request const & Request::brother(cpe_hash_string_t type) const {
+    Request const * r = findBrother(type);
     if (r == NULL) {
         ::std::ostringstream os;
         os << "can`t find brother request of type " << cpe_hs_data(type) << "!";
@@ -34,7 +54,17 @@ Request & Request::child(cpe_hash_string_t type) {
     return *r;
 }
 
-void Request::checkSize(size_t size) {
+Request const & Request::child(cpe_hash_string_t type) const {
+    Request const * r = findChild(type);
+    if (r == NULL) {
+        ::std::ostringstream os;
+        os << "can`t find child request of type " << cpe_hs_data(type) << "!";
+        throw ::std::runtime_error(os.str().c_str());
+    }
+    return *r;
+}
+
+void Request::checkSize(size_t size) const {
     if (size > this->size()) {
         ::std::ostringstream os;
         os << "request have not enough data, require " << size
