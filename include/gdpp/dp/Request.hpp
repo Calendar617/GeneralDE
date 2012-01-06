@@ -10,17 +10,17 @@ class Request : public Cpe::Utils::SimulateObject {
 public:
     operator gd_dp_req_t () const { return (gd_dp_req_t)this; }
 
-    void * data(void) { return gd_dp_req_data((gd_dp_req_t)this); }
+    void * data(void) { return gd_dp_req_data(*this); }
 
-    size_t size(void) { return gd_dp_req_size((gd_dp_req_t)this); }
+    size_t size(void) { return gd_dp_req_size(*this); }
     void setSize(size_t size) { gd_dp_req_set_size(*this, size); }
 
-    size_t capacity(void) { return gd_dp_req_capacity((gd_dp_req_t)this); }
+    size_t capacity(void) { return gd_dp_req_capacity(*this); }
 
-    mem_allocrator_t talloc(void) { return gd_dp_req_talloc((gd_dp_req_t)this); }
+    mem_allocrator_t talloc(void) { return gd_dp_req_talloc(*this); }
 
-    gd_dp_mgr_t mgr() {
-        return gd_dp_req_getMgr( (gd_dp_req_t)this );
+    gd_dp_mgr_t mgr(void) {
+        return gd_dp_req_mgr( *this );
     }
 
     void setParent(gd_dp_req_t parent) {
@@ -28,11 +28,11 @@ public:
     }
 
     int reply(void * buf, size_t size, error_monitor_t em) { 
-        return gd_dp_req_reply((gd_dp_req_t)this, buf, size, em);
+        return gd_dp_req_reply(*this, buf, size, em);
     }
 
     int reply(void * buf, size_t size) { 
-        return gd_dp_req_reply((gd_dp_req_t)this, buf, size, NULL);
+        return gd_dp_req_reply(*this, buf, size, NULL);
     }
 
     Request * parent(void) {
@@ -45,19 +45,19 @@ public:
     Request & parent(cpe_hash_string_t type);
 
     Request * findParent(cpe_hash_string_t type) { 
-        return (Request*)gd_dp_req_parent_find((gd_dp_req_t)this, type);
+        return (Request*)gd_dp_req_parent_find(*this, type);
     }
 
     Request & brother(cpe_hash_string_t type);
 
     Request * findBrother(cpe_hash_string_t type) { 
-        return (Request*)gd_dp_req_brother_find((gd_dp_req_t)this, type);
+        return (Request*)gd_dp_req_brother_find(*this, type);
     }
 
     Request & child(cpe_hash_string_t type);
 
     Request * findChild(cpe_hash_string_t type) { 
-        return (Request*)gd_dp_req_child_find((gd_dp_req_t)this, type);
+        return (Request*)gd_dp_req_child_find(*this, type);
     }
 
     static Request * _create(gd_dp_mgr_t mgr, cpe_hash_string_t type, size_t capacity) {
@@ -73,7 +73,7 @@ public:
     static void _free(Request * req) { if (req) { gd_dp_req_free(*req); } }
 
     template<typename T>
-    T & as(void) { checkSize(sizeof(T)); return *((T*)gd_dp_req_data((gd_dp_req_t)this)); }
+    T & as(void) { checkSize(sizeof(T)); return *((T*)gd_dp_req_data(*this)); }
 
 private:
     void checkSize(size_t size);

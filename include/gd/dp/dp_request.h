@@ -23,6 +23,8 @@ gd_dp_req_create_with_buf(
 
 void gd_dp_req_free(gd_dp_req_t req);
 
+gd_dp_mgr_t gd_dp_req_mgr(gd_dp_req_t req);
+
 void gd_dp_req_set_parent(gd_dp_req_t child, gd_dp_req_t parent);
 
 gd_dp_req_t gd_dp_req_parent(gd_dp_req_t req);

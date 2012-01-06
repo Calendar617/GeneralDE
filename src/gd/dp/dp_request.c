@@ -58,6 +58,11 @@ gd_dp_req_create_with_buf(
     return req;
 }
 
+gd_dp_mgr_t gd_dp_req_mgr(gd_dp_req_t req) {
+    assert(req);
+    return req->m_mgr;
+}
+
 void gd_dp_req_set_parent(gd_dp_req_t child, gd_dp_req_t parent) {
     assert(child);
 
