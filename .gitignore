@@ -5,3 +5,4 @@ GTAGS
 .DS_Store
 xcuserdata
 /buildtools/build
+.emacs.desktop*
