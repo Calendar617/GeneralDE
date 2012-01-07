@@ -1,6 +1,6 @@
-#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include "cpe/pal/unistd.h"
 #include "cpe/cfg/cfg_manage.h"
 #include "gd/app/app_context.h"
 #include "gd/nm/nm_manage.h"

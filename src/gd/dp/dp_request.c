@@ -209,7 +209,7 @@ int gd_dp_req_reply(gd_dp_req_t req, void * buf, size_t size, error_monitor_t em
     }
 
     if (req->m_from->m_type && req->m_from->m_type->reply) {
-        return req->m_from->m_type->reply(req->m_from, req, buf, size, em);
+        return req->m_from->m_type->reply(req->m_from, req, (char *)buf, size, em);
     }
 
     replyReq = gd_dp_req_create_with_buf(req->m_mgr, gd_dp_req_type_reply, buf, size);

@@ -8,7 +8,7 @@ gd_dp_rsp_t gd_dp_rsp_create(gd_dp_mgr_t dp, const char * name) {
 
     size_t nameLen = strlen(name);
 
-    gd_dp_rsp_t r = mem_alloc(dp->m_alloc, sizeof(struct gd_dp_rsp) + nameLen + 1);
+    gd_dp_rsp_t r = (gd_dp_rsp_t)mem_alloc(dp->m_alloc, sizeof(struct gd_dp_rsp) + nameLen + 1);
     if (r == NULL) return NULL;
 
     r->m_dp = dp;

@@ -1,8 +1,8 @@
 #define _GNU_SOURCE
 #include <stdio.h>
-#include <dlfcn.h>
 #include <assert.h>
 #include <string.h>
+#include "cpe/pal/dlfcn.h"
 #include "app_internal_ops.h"
 
 struct gd_app_lib {

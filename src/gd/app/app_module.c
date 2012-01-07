@@ -28,7 +28,7 @@ int gd_app_module_load_fun(
     char * nameBuf;
     int rv = 0;
 
-    nameBuf = mem_alloc(NULL, nameBufCapacity);
+    nameBuf = (char *)mem_alloc(NULL, nameBufCapacity);
     if (nameBuf == NULL) {
         CPE_ERROR(em, "create module %s: alloc name buf fail!", moduleName);
         return -1;
@@ -37,16 +37,16 @@ int gd_app_module_load_fun(
     memcpy(nameBuf, moduleName, nameLen + 1);
 
     strcpy(nameBuf + nameLen, "_global_init");
-    module->m_global_init = gd_app_lib_sym(module->m_lib, nameBuf, NULL);
+    module->m_global_init = (gd_app_module_global_init)gd_app_lib_sym(module->m_lib, nameBuf, NULL);
 
     strcpy(nameBuf + nameLen, "_global_fini");
-    module->m_global_fini = gd_app_lib_sym(module->m_lib, nameBuf, NULL);
+    module->m_global_fini = (gd_app_module_global_fini)gd_app_lib_sym(module->m_lib, nameBuf, NULL);
 
     strcpy(nameBuf + nameLen, "_app_init");
-    module->m_app_init = gd_app_lib_sym(module->m_lib, nameBuf, NULL);
+    module->m_app_init = (gd_app_module_app_init)gd_app_lib_sym(module->m_lib, nameBuf, NULL);
 
     strcpy(nameBuf + nameLen, "_app_fini");
-    module->m_app_fini = gd_app_lib_sym(module->m_lib, nameBuf, NULL);
+    module->m_app_fini = (gd_app_module_app_fini)gd_app_lib_sym(module->m_lib, nameBuf, NULL);
 
     mem_free(NULL, nameBuf);
 
@@ -83,7 +83,7 @@ gd_app_module_create(
     struct gd_app_module * module = NULL;
     char * buf;
 
-    buf = mem_alloc(NULL, nameLen + sizeof(struct gd_app_module));
+    buf = (char *)mem_alloc(NULL, nameLen + sizeof(struct gd_app_module));
     if (buf == NULL) {
         CPE_ERROR(em, "create module %s: alloc buf fail!", moduleName);
         return NULL;

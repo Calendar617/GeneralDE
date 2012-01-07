@@ -1,7 +1,7 @@
 #include <assert.h>
-#include <strings.h>
-#include <unistd.h>
 #include "cpe/cfg/cfg_manage.h"
+#include "cpe/pal/strings.h"
+#include "cpe/pal/unistd.h"
 #include "gd/app/app_context.h"
 #include "app_internal_ops.h"
 

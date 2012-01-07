@@ -42,7 +42,7 @@ gd_app_runing_module_data_load(
     }
 
     size_t nameLen = cpe_hs_len(moduleName);
-    char groupNameBuf[(sizeof(g_module_name_prefix) - 1) + (nameLen + 1)];
+    char groupNameBuf[(sizeof(g_module_name_prefix) - 1) + (nameLen + 1)]; //TODO: wangjian, vs2008不支持动态数组
     memcpy(groupNameBuf, g_module_name_prefix, sizeof(g_module_name_prefix) - 1);
     memcpy(groupNameBuf + sizeof(g_module_name_prefix) - 1, cpe_hs_data(moduleName), nameLen + 1);
 
@@ -76,7 +76,7 @@ void gd_app_runing_module_data_free(gd_app_context_t context, cpe_hash_string_t 
     if (rootGroup == NULL) return;
 
     size_t bufCapacity = cpe_hs_len_to_binary_len((sizeof(g_module_name_prefix) - 1) + cpe_hs_len(moduleName)) ;
-    char groupNameBuf[bufCapacity];
+    char groupNameBuf[bufCapacity]; //TODO: wangjian, vs2008不支持动态数组
     cpe_hs_init((cpe_hash_string_t)groupNameBuf, bufCapacity, g_module_name_prefix);
     cpe_hs_strcat((cpe_hash_string_t)groupNameBuf, bufCapacity, cpe_hs_data(moduleName));
 
@@ -98,7 +98,7 @@ gd_app_module_data(gd_app_context_t context, struct gd_app_module * module) {
     nmm = gd_app_nm_mgr(context);
 
     size_t bufCapacity = cpe_hs_len_to_binary_len((sizeof(g_module_name_prefix) - 1) + cpe_hs_len(module->m_name)) ;
-    char groupNameBuf[bufCapacity];
+    char groupNameBuf[bufCapacity]; //TODO: wangjian, vs2008不支持动态数组
     cpe_hs_init((cpe_hash_string_t)groupNameBuf, bufCapacity, g_module_name_prefix);
     cpe_hs_strcat((cpe_hash_string_t)groupNameBuf, bufCapacity, cpe_hs_data(module->m_name));
 
