@@ -2,6 +2,7 @@
 #include <string.h>
 #include "cpe/pal/strings.h"
 #include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/dr/dr_error.h"
 #include "../dr_ctype_ops.h"
 #include "dr_metalib_ops.h"
 #include "dr_inbuild_error.h"

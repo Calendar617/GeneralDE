@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "cpe/pal/stdio.h"
+#include "cpe/pal/strings.h"
 #include "cpe/dr/dr_data.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_internal_types.h"
@@ -24,10 +24,10 @@ struct SProcessStack{
 };
 
 void dr_meta_set_defaults(void * inout, LPDRMETA meta) {
-    assert(inout);
-
     struct SProcessStack processStack[CPE_DR_MAX_LEVEL];
     int stackPos;
+
+    assert(inout);
 
     bzero(inout, dr_meta_size(meta));
 
@@ -36,11 +36,15 @@ void dr_meta_set_defaults(void * inout, LPDRMETA meta) {
     processStack[0].m_data = inout;
 
     for(stackPos = 0; stackPos >= 0;) {
+        LPDRMETA curMeta;
+        int curEntryPos;
+        void * data;
+
         assert(stackPos < CPE_DR_MAX_LEVEL);
 
-        LPDRMETA curMeta = processStack[stackPos].m_meta;
-        int curEntryPos = processStack[stackPos].m_entry_pos;
-        void * data = processStack[stackPos].m_data;
+        curMeta = processStack[stackPos].m_meta;
+        curEntryPos = processStack[stackPos].m_entry_pos;
+        data = processStack[stackPos].m_data;
 
         if (curMeta == NULL) {
             --stackPos;

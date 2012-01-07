@@ -1,12 +1,14 @@
 #ifndef CPE_PAL_EXTERNAL_H
 #define CPE_PAL_EXTERNAL_H
 
-#if defined(WIN32) && !defined(CPE_BUILD_STATIC)
-	#define CPE_API_EXPORT __declspec(dllexport)
-	#define CPE_API_IMPORT extern __declspec(dllimport)
+#ifdef _MSC_VER
+#  define IMPORT_DIRECTIVE __declspec(dllimport) 
+#  define EXPORT_DIRECTIVE __declspec(dllexport)
+#  define CALL __stdcall
 #else
-	#define CPE_API_EXPORT
-	#define CPE_API_IMPORT
+#  define IMPORT_DIRECTIVE __attribute__((__visibility__("default")))
+#  define EXPORT_DIRECTIVE __attribute__ ((visibility("default")))
+#  define CALL  
 #endif
 
 #endif

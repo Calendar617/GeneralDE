@@ -139,6 +139,7 @@ CPE_CFG_GEN_ADD_FUN_TYPE(uint64, CPE_CFG_TYPE_UINT64)
 
 cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value) {
     int capacity;
+	cfg_t rv;
 
     if (typeId == CPE_CFG_TYPE_STRING) return cfg_seq_add_string(s, value);
     if (typeId == CPE_CFG_TYPE_STRUCT) return cfg_seq_add_struct(s);
@@ -147,7 +148,7 @@ cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value) {
     capacity = dr_type_size(typeId);
     if (capacity <= 0) return NULL;
 
-    cfg_t rv = cfg_seq_item_create((struct cfg_seq *)s, typeId, capacity);
+    rv = cfg_seq_item_create((struct cfg_seq *)s, typeId, capacity);
     if (rv == NULL) return NULL;
 
     if (dr_ctype_set_from_string(cfg_data(rv), typeId, value, NULL) != 0) {
@@ -160,6 +161,7 @@ cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value) {
 
 cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * value, cfg_policy_t policy) {
     int capacity;
+    cfg_t rv;
 
     if (typeId == CPE_CFG_TYPE_STRING) return cfg_struct_add_string(s, name, value, policy);
     if (typeId == CPE_CFG_TYPE_STRUCT) return cfg_struct_add_struct(s, name, policy);
@@ -168,7 +170,7 @@ cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * 
     capacity = dr_type_size(typeId);
     if (capacity <= 0) return NULL;
 
-    cfg_t rv = cfg_struct_item_create((struct cfg_struct *)s, name, typeId, capacity, policy);
+    rv = cfg_struct_item_create((struct cfg_struct *)s, name, typeId, capacity, policy);
     if (rv == NULL) return NULL;
 
     if (dr_ctype_set_from_string(cfg_data(rv), typeId, value, NULL) != 0) {
@@ -181,11 +183,12 @@ cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * 
 
 cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value, cfg_policy_t policy) {
     int32_t v32;
+	int64_t v64;
+
     if (dr_ctype_set_from_string(&v32, CPE_DR_TYPE_INT32, value, NULL) == 0) {
         return cfg_struct_add_int32(s, name, v32, policy);
     }
 
-    int64_t v64;
     if (dr_ctype_set_from_string(&v64, CPE_DR_TYPE_INT64, value, NULL) == 0) {
         return cfg_struct_add_int64(s, name, v64, policy);
     }
@@ -195,11 +198,12 @@ cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value, 
 
 cfg_t cfg_seq_add_value_auto(cfg_t s, const char * value) {
     int32_t v32;
-    if (dr_ctype_set_from_string(&v32, CPE_DR_TYPE_INT32, value, NULL) == 0) {
+    int64_t v64;
+
+	if (dr_ctype_set_from_string(&v32, CPE_DR_TYPE_INT32, value, NULL) == 0) {
         return cfg_seq_add_int32(s, v32);
     }
 
-    int64_t v64;
     if (dr_ctype_set_from_string(&v64, CPE_DR_TYPE_INT64, value, NULL) == 0) {
         return cfg_seq_add_int64(s, v64);
     }

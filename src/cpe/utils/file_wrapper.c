@@ -1,9 +1,9 @@
 #include <sys/stat.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <dirent.h>
-#include <string.h>
 #include <errno.h>
+#include "cpe/pal/unistd.h"
+#include "cpe/pal/stdio.h"
+#include "cpe/pal/dirent.h"
+#include "cpe/pal/string.h"
 #include "file_internal.h"
 
 int dir_mk(const char * path, mode_t mode, error_monitor_t em) {
