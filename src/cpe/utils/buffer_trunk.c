@@ -20,7 +20,7 @@ size_t mem_trunk_append(struct mem_buffer * buffer, struct mem_buffer_trunk * tr
         writeSize = size;
     }
 
-    memcpy(mem_trunk_data(trunk) + trunk->m_size, buf, writeSize);
+    memcpy((char*)mem_trunk_data(trunk) + trunk->m_size, buf, writeSize);
 
     buffer->m_size += writeSize;
     trunk->m_size += writeSize;

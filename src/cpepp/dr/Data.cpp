@@ -12,7 +12,7 @@ ConstDataElement::ConstDataElement(const void * data, LPDRMETAENTRY entry)
 {
 }
 
-ConstDataElement::ConstDataElement::operator int8_t(void) {
+ConstDataElement::operator int8_t(void) {
     int8_t r;
     Utils::ErrorCollector em;
 
@@ -26,7 +26,7 @@ ConstDataElement::ConstDataElement::operator int8_t(void) {
     return r;
 }
 
-ConstDataElement::ConstDataElement::operator uint8_t(void) {
+ConstDataElement::operator uint8_t(void) {
     uint8_t r;
     Utils::ErrorCollector em;
 
@@ -40,7 +40,7 @@ ConstDataElement::ConstDataElement::operator uint8_t(void) {
     return r;
 }
 
-ConstDataElement::ConstDataElement::operator int16_t(void) {
+ConstDataElement::operator int16_t(void) {
     int16_t r;
     Utils::ErrorCollector em;
 
@@ -54,7 +54,7 @@ ConstDataElement::ConstDataElement::operator int16_t(void) {
     return r;
 }
 
-ConstDataElement::ConstDataElement::operator uint16_t(void) {
+ConstDataElement::operator uint16_t(void) {
     uint16_t r;
     Utils::ErrorCollector em;
 
@@ -68,7 +68,7 @@ ConstDataElement::ConstDataElement::operator uint16_t(void) {
     return r;
 }
 
-ConstDataElement::ConstDataElement::operator int32_t(void) {
+ConstDataElement::operator int32_t(void) {
     int32_t r;
     Utils::ErrorCollector em;
 
@@ -82,7 +82,7 @@ ConstDataElement::ConstDataElement::operator int32_t(void) {
     return r;
 }
 
-ConstDataElement::ConstDataElement::operator uint32_t(void) {
+ConstDataElement::operator uint32_t(void) {
     uint32_t r;
     Utils::ErrorCollector em;
 
@@ -96,7 +96,7 @@ ConstDataElement::ConstDataElement::operator uint32_t(void) {
     return r;
 }
 
-ConstDataElement::ConstDataElement::operator int64_t(void) {
+ConstDataElement::operator int64_t(void) {
     int64_t r;
     Utils::ErrorCollector em;
 
@@ -110,7 +110,7 @@ ConstDataElement::ConstDataElement::operator int64_t(void) {
     return r;
 }
 
-ConstDataElement::ConstDataElement::operator uint64_t(void) {
+ConstDataElement::operator uint64_t(void) {
     uint64_t r;
     Utils::ErrorCollector em;
 
@@ -124,7 +124,7 @@ ConstDataElement::ConstDataElement::operator uint64_t(void) {
     return r;
 }
 
-ConstDataElement::ConstDataElement::operator const char *(void) {
+ConstDataElement::operator const char *(void) {
     const char * r = dr_entry_read_string(m_data, m_entry);
     if (r == NULL) {
         ::std::ostringstream os;

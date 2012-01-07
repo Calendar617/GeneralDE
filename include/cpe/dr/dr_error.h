@@ -34,7 +34,7 @@ typedef enum {
     CPE_DR_ERROR_INVALID_METALIB_PARAM,    /**< 元数据库参数不正确*/
     CPE_DR_ERROR_INVALID_METALIB_CHECKSUM, /**< 元数据库校验和不正确*/
     CPE_DR_ERROR_TOO_MUCH_MACROS,          /**< 需加到元数据描述库中的宏定义数比预定义的要多 */
-    CPE_DR_ERROR_MACRO_NO_VALUE,           /**< 宏定义元素没有值属性*/
+    CPE_DR_ERROR_MACRO_NO_VALUE,           /**< 宏定义元素没有值属性 */
     CPE_DR_ERROR_UNSUPPORTED_TYPE,           /**< 不支持的数据类型 */
     CPE_DR_ERROR_METALIB_ROOT_NO_NAME,         /**< 元数据描述库根元素必须指定name属性*/
     CPE_DR_ERROR_NO_SPACE_FOR_MATA,            /**< 没有足够的空间存储自定义数据类型*/

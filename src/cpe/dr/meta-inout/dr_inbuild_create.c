@@ -1,7 +1,7 @@
 #include <stdlib.h>
-#include <strings.h>
 #include <string.h>
 #include <assert.h>
+#include "cpe/pal/strings.h"
 #include "cpe/dr/dr_error.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_data.h"

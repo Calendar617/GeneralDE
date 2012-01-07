@@ -1,8 +1,8 @@
 #ifndef CPE_FILE_PRIVATE_H
 #define CPE_FILE_PRIVATE_H
 #include <sys/stat.h>
-#include <dirent.h>
 #include <errno.h>
+#include "cpe/pal/dirent.h"
 #include "cpe/utils/file.h"
 
 #ifdef __cplusplus
