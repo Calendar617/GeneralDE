@@ -1,5 +1,6 @@
-#include <string.h>
-#include <stdlib.h>
+#include "cpe/pal/stdlib.h"
+#include "cpe/pal/string.h"
+#include "cpe/pal/strings.h"
 #include "cpe/pal/unistd.h"
 #include "cpe/cfg/cfg_manage.h"
 #include "gd/app/app_context.h"

@@ -8,7 +8,7 @@
 gd_tl_manage_t gd_tl_manage_create(mem_allocrator_t alloc) {
     int i;
 
-    gd_tl_manage_t tm = mem_alloc(alloc, sizeof(struct gd_tl_manage));
+    gd_tl_manage_t tm = (gd_tl_manage_t)mem_alloc(alloc, sizeof(struct gd_tl_manage));
     if (tm == NULL) return NULL;
 
     tm->m_alloc = alloc;

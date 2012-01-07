@@ -1,6 +1,6 @@
 #include <assert.h>
-#include <string.h>
-#include <strings.h>
+#include "cpe/pal/string.h"
+#include "cpe/pal/strings.h"
 #include "gd/dp/dp_manage.h"
 #include "gd/dp/dp_responser.h"
 #include "dp_internal_ops.h"

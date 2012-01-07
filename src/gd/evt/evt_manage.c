@@ -11,7 +11,7 @@ gd_evt_mgr_create(
 {
     gd_evt_mgr_t evm;
 
-    evm = mem_alloc(alloc, sizeof(struct gd_evt_mgr));
+    evm = (gd_evt_mgr_t)mem_alloc(alloc, sizeof(struct gd_evt_mgr));
     if (evm == NULL) return NULL;
 
     evm->m_alloc = alloc;

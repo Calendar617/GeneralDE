@@ -8,7 +8,7 @@ gd_om_mgr_create(
     size_t page_size,
     size_t buffer_size)
 {
-    gd_om_mgr_t omm = mem_alloc(alloc, sizeof(struct gd_om_mgr));
+    gd_om_mgr_t omm = (gd_om_mgr_t)mem_alloc(alloc, sizeof(struct gd_om_mgr));
     if (omm == NULL) return NULL;
 
     omm->m_alloc = alloc;

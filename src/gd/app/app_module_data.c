@@ -1,5 +1,6 @@
 #include <assert.h>
-#include <string.h>
+#include "cpe/pal/string.h"
+#include "cpe/pal/stackbuf.h"
 #include "cpe/cfg/cfg_read.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
@@ -29,6 +30,10 @@ gd_app_runing_module_data_load(
     gd_nm_mgr_t nmm;
     gd_nm_node_t rootGroup;
     gd_nm_node_t moduleGroup;
+
+    size_t nameLen = cpe_hs_len(moduleName);
+    char groupNameBuf[CPE_STACK_BUF_LEN((sizeof(g_module_name_prefix) - 1) + (nameLen + 1))];
+
     nmm = gd_app_nm_mgr(context);
 
     rootGroup = gd_nm_mgr_find_node(nmm, gd_app_module_root_group_name);
@@ -41,8 +46,7 @@ gd_app_runing_module_data_load(
         gd_nm_node_set_type(rootGroup, &g_module_root_group);
     }
 
-    size_t nameLen = cpe_hs_len(moduleName);
-    char groupNameBuf[(sizeof(g_module_name_prefix) - 1) + (nameLen + 1)]; //TODO: wangjian, vs2008不支持动态数组
+    //TODO: wangjians check sizes
     memcpy(groupNameBuf, g_module_name_prefix, sizeof(g_module_name_prefix) - 1);
     memcpy(groupNameBuf + sizeof(g_module_name_prefix) - 1, cpe_hs_data(moduleName), nameLen + 1);
 
@@ -70,15 +74,16 @@ void gd_app_runing_module_data_free(gd_app_context_t context, cpe_hash_string_t 
     gd_nm_node_t rootGroup;
     gd_nm_node_t moduleGroup;
 
+    size_t bufCapacity = cpe_hs_len_to_binary_len((sizeof(g_module_name_prefix) - 1) + cpe_hs_len(moduleName)) ;
+    char groupNameBuf[CPE_STACK_BUF_LEN(bufCapacity)];
+
     nmm = gd_app_nm_mgr(context);
 
     rootGroup = gd_nm_mgr_find_node(nmm, gd_app_module_root_group_name);
     if (rootGroup == NULL) return;
 
-    size_t bufCapacity = cpe_hs_len_to_binary_len((sizeof(g_module_name_prefix) - 1) + cpe_hs_len(moduleName)) ;
-    char groupNameBuf[bufCapacity]; //TODO: wangjian, vs2008不支持动态数组
-    cpe_hs_init((cpe_hash_string_t)groupNameBuf, bufCapacity, g_module_name_prefix);
-    cpe_hs_strcat((cpe_hash_string_t)groupNameBuf, bufCapacity, cpe_hs_data(moduleName));
+    cpe_hs_init((cpe_hash_string_t)groupNameBuf, sizeof(groupNameBuf), g_module_name_prefix);
+    cpe_hs_strcat((cpe_hash_string_t)groupNameBuf, sizeof(groupNameBuf), cpe_hs_data(moduleName));
 
     moduleGroup = gd_nm_group_find_member(rootGroup, (cpe_hash_string_t)groupNameBuf);
     if (moduleGroup) {
@@ -95,12 +100,12 @@ gd_app_module_data(gd_app_context_t context, struct gd_app_module * module) {
     gd_nm_mgr_t nmm;
     gd_nm_node_t rootGroup;
 
-    nmm = gd_app_nm_mgr(context);
-
     size_t bufCapacity = cpe_hs_len_to_binary_len((sizeof(g_module_name_prefix) - 1) + cpe_hs_len(module->m_name)) ;
-    char groupNameBuf[bufCapacity]; //TODO: wangjian, vs2008不支持动态数组
-    cpe_hs_init((cpe_hash_string_t)groupNameBuf, bufCapacity, g_module_name_prefix);
-    cpe_hs_strcat((cpe_hash_string_t)groupNameBuf, bufCapacity, cpe_hs_data(module->m_name));
+    char groupNameBuf[CPE_STACK_BUF_LEN(bufCapacity)];
+    cpe_hs_init((cpe_hash_string_t)groupNameBuf, sizeof(groupNameBuf), g_module_name_prefix);
+    cpe_hs_strcat((cpe_hash_string_t)groupNameBuf, sizeof(groupNameBuf), cpe_hs_data(module->m_name));
+
+    nmm = gd_app_nm_mgr(context);
 
     rootGroup = gd_nm_mgr_find_node(nmm, gd_app_module_root_group_name);
 

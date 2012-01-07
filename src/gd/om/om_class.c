@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/strings.h"
 #include "cpe/utils/bitarry.h"
 #include "cpe/utils/range_bitarry.h"
 #include "gd/om/om_error.h"
@@ -233,7 +234,7 @@ static int gd_om_class_reserve_page_array_slot(struct gd_om_class * theClass, er
         }
 
         mem_free(theClass->m_alloc, theClass->m_page_array);
-        theClass->m_page_array = new_page_array;
+        theClass->m_page_array = (void **)new_page_array;
         theClass->m_page_array_capacity = new_page_array_capacity;
     }
 

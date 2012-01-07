@@ -20,7 +20,7 @@ gd_nm_node_alloc(
 
     nameLen = cpe_hs_len_to_binary_len(strlen(name));
 
-    buf = mem_alloc(nmm->m_alloc, nameLen + bodyLen + capacity);
+    buf = (char*)mem_alloc(nmm->m_alloc, nameLen + bodyLen + capacity);
     if (buf == NULL) return NULL;
 
     cpe_hs_init((cpe_hash_string_t)buf, nameLen, name);

@@ -30,7 +30,7 @@ gd_app_lib_create(const char * libName, error_monitor_t em) {
 
     nameLen = strlen(libName);
 
-    buf = mem_alloc(NULL, nameLen + 1 + sizeof(struct gd_app_lib));
+    buf = (char*)mem_alloc(NULL, nameLen + 1 + sizeof(struct gd_app_lib));
     if (buf == NULL) {
         CPE_ERROR(em, "create lib %s: alloc buf fail!", libName);
         return NULL;

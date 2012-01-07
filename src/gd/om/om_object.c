@@ -9,39 +9,39 @@ gd_om_oid_t gd_om_obj_alloc(
     cpe_hash_string_t className,
     error_monitor_t em)
 {
-    struct gd_om_class * class;
+    struct gd_om_class * theClass;
     int32_t baseOid;
 
     assert(omm);
     assert(className);
 
-    class = gd_om_class_find(&omm->m_classMgr, className);
-    if (class == NULL) {
+    theClass = gd_om_class_find(&omm->m_classMgr, className);
+    if (theClass == NULL) {
         CPE_ERROR_EX(
             em, gd_om_class_not_exist,
-            "class %s not exist!", cpe_hs_data(className));
+            "theClass %s not exist!", cpe_hs_data(className));
         return GD_OM_INVALID_OID; 
     }
 
-    baseOid = gd_om_class_alloc_object(class);
+    baseOid = gd_om_class_alloc_object(theClass);
     if (baseOid < 0) {
         void * newPage = gd_om_page_get(&omm->m_bufMgr, em);
         if (newPage == NULL) {
             CPE_ERROR_EX(
                 em, gd_om_no_memory,
-                "object of class %s alloc new page fail!", cpe_hs_data(className));
+                "object of theClass %s alloc new page fail!", cpe_hs_data(className));
             return GD_OM_INVALID_OID;
         }
 
-        if (gd_om_class_add_page(class, newPage, em) != 0) {
+        if (gd_om_class_add_page(theClass, newPage, em) != 0) {
             return GD_OM_INVALID_OID;
         }
 
-        baseOid = gd_om_class_alloc_object(class);
+        baseOid = gd_om_class_alloc_object(theClass);
         if (baseOid < 0) {
             CPE_ERROR_EX(
                 em, gd_om_no_memory,
-                "object of class %s alloc oid fail!", cpe_hs_data(className));
+                "object of theClass %s alloc oid fail!", cpe_hs_data(className));
             return GD_OM_INVALID_OID;
         }
     }
@@ -49,12 +49,12 @@ gd_om_oid_t gd_om_obj_alloc(
     if (baseOid > 0xFFFFFF) {
         CPE_ERROR_EX(
             em, gd_om_no_memory,
-            "object of class %s count overflow!", cpe_hs_data(className));
-        gd_om_class_free_object(class, baseOid, NULL);
+            "object of theClass %s count overflow!", cpe_hs_data(className));
+        gd_om_class_free_object(theClass, baseOid, NULL);
         return GD_OM_INVALID_OID; 
     }
 
-    return (((uint32_t)class->m_id) << 24) | ((uint32_t)baseOid);
+    return (((uint32_t)theClass->m_id) << 24) | ((uint32_t)baseOid);
 }
 
 void gd_om_obj_free(
@@ -63,19 +63,19 @@ void gd_om_obj_free(
     error_monitor_t em)
 {
     gd_om_class_id_t classId;
-    struct gd_om_class * class;
+    struct gd_om_class * theClass;
 
     assert(omm);
 
     classId = ((uint32_t)oid) >> 24;
-    class = gd_om_class_get(&omm->m_classMgr, classId);
+    theClass = gd_om_class_get(&omm->m_classMgr, classId);
 
-    if (class == NULL) {
-        CPE_ERROR_EX(em, gd_om_class_not_exist, "class id=%d not exist!", classId);
+    if (theClass == NULL) {
+        CPE_ERROR_EX(em, gd_om_class_not_exist, "theClass id=%d not exist!", classId);
         return;
     }
 
-    gd_om_class_free_object(class, oid & 0xFFFFFF, em);
+    gd_om_class_free_object(theClass, oid & 0xFFFFFF, em);
 }
 
 void * gd_om_obj_get(
@@ -84,21 +84,21 @@ void * gd_om_obj_get(
     error_monitor_t em)
 {
     gd_om_class_id_t classId;
-    struct gd_om_class * class;
+    struct gd_om_class * theClass;
 
     assert(omm);
 
     classId = ((uint32_t)oid) >> 24;
-    class = gd_om_class_get(&omm->m_classMgr, classId);
+    theClass = gd_om_class_get(&omm->m_classMgr, classId);
 
-    if (class == NULL) {
+    if (theClass == NULL) {
         CPE_ERROR_EX(
             em, gd_om_class_not_exist,
-            "class id=%d not exist!", classId);
+            "theClass id=%d not exist!", classId);
         return NULL;
     }
 
-    return gd_om_class_get_object(class, oid & 0xFFFFFF, em);
+    return gd_om_class_get_object(theClass, oid & 0xFFFFFF, em);
 }
 
 gd_om_class_t
@@ -123,7 +123,7 @@ gd_om_obj_id_from_addr(
 {
     void * page;
     struct gd_om_data_page_head * head;
-    struct gd_om_class * class;
+    struct gd_om_class * theClass;
     int32_t baseOid;
 
     assert(omm);
@@ -145,15 +145,15 @@ gd_om_obj_id_from_addr(
         return GD_OM_INVALID_OID;
     }
 
-    class = gd_om_class_get(&omm->m_classMgr, head->m_classId);
-    if (class == NULL) {
+    theClass = gd_om_class_get(&omm->m_classMgr, head->m_classId);
+    if (theClass == NULL) {
         CPE_ERROR_EX(
             em, gd_om_class_not_exist,
-            "class id=%d not exist!", head->m_classId);
+            "theClass id=%d not exist!", head->m_classId);
         return GD_OM_INVALID_OID;
     }
 
-    baseOid = gd_om_class_addr_2_object(class, page, data);
+    baseOid = gd_om_class_addr_2_object(theClass, page, data);
     if (baseOid < 0) {
         CPE_ERROR_EX(
             em, gd_om_invalid_address,
@@ -161,5 +161,5 @@ gd_om_obj_id_from_addr(
         return GD_OM_INVALID_OID;
     }
 
-    return (((uint32_t)class->m_id) << 24) | ((uint32_t)baseOid);
+    return (((uint32_t)theClass->m_id) << 24) | ((uint32_t)baseOid);
 }
