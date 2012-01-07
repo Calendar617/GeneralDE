@@ -3,9 +3,9 @@
 #include "cpe/pal/api_external.h"
 
 #ifdef CPE_DR_BUILD_DLL
-#    define CPE_DR_API CPE_API_EXPORT
+#    define CPE_DR_API EXPORT_DIRECTIVE
 #else
-#    define CPE_DR_API CPE_API_IMPORT
+#    define CPE_DR_API IMPORT_DIRECTIVE
 #endif
   
 #endif

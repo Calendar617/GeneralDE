@@ -302,7 +302,7 @@ int mem_buffer_strcat(mem_buffer_t buffer, const char * s) {
     copyLeft -= copySize;
     
     if (copyLeft > 0) {
-        buf = mem_buffer_alloc(buffer, copyLeft);
+        buf = (char*)mem_buffer_alloc(buffer, copyLeft);
         if (buf == NULL) return -1;
         memcpy(buf, s + copySize, copyLeft);
     }

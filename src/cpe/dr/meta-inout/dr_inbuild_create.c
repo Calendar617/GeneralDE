@@ -1,10 +1,11 @@
 #include <stdlib.h>
-#include <string.h>
 #include <assert.h>
+#include "cpe/pal/string.h"
 #include "cpe/pal/strings.h"
 #include "cpe/dr/dr_error.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_data.h"
+#include "cpe/dr/dr_types.h"
 #include "../dr_ctype_ops.h"
 #include "dr_inbuild.h"
 #include "dr_metalib_ops.h"
@@ -33,7 +34,7 @@ static int dr_inbuild_build_add_string(struct DRInBuildCreateCtx * ctx, const ch
         return -1;
     }
 
-    strncpy(p, data, dataSize);
+    strncpy((char*)p, data, dataSize);
 
     return dr_lib_addr_to_pos(ctx->m_metaLib, p);
 }
@@ -71,11 +72,12 @@ static void dr_inbuild_build_calc_entry_defaultvalue(
 static void dr_inbuild_build_calc_entry_composite_type(
     struct DRInBuildCreateCtx * ctx, LPDRMETA createdMeta, struct DRInBuildMetaEntry * entryEle)
 {
+    LPDRMETA refMeta;
     if (entryEle->m_data.m_type != CPE_DR_TYPE_UNKOWN) {
         return;
     }
 
-    LPDRMETA refMeta = dr_lib_find_meta_by_name(ctx->m_metaLib, entryEle->m_ref_type_name);
+    refMeta = dr_lib_find_meta_by_name(ctx->m_metaLib, entryEle->m_ref_type_name);
     if (refMeta) {
         char * base = (char*)(createdMeta) - createdMeta->m_self_pos;
         entryEle->m_data.m_type = refMeta->m_type;

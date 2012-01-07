@@ -55,8 +55,9 @@ ssize_t mem_pos_seek(struct mem_buffer_pos * pos, ssize_t n) {
         while(n > 0) {
             int d;
 
-            if (pos->m_trunk == NULL || pos->m_pos_in_trunk == 0) {;
-                struct mem_buffer_trunk * pre = 
+            if (pos->m_trunk == NULL || pos->m_pos_in_trunk == 0) {
+                struct mem_buffer_trunk * pre;
+                pre = 
                     pos->m_trunk == NULL
                     ? TAILQ_LAST(&pos->m_buffer->m_trunks, mem_buffer_trunk_list)
                     : TAILQ_PREV(pos->m_trunk, mem_buffer_trunk_list, m_next);
@@ -83,7 +84,7 @@ ssize_t mem_pos_seek(struct mem_buffer_pos * pos, ssize_t n) {
             if (d == 0) continue;
             if (d >= n) d = n;
 
-            assert(pos->m_pos_in_trunk >= d);
+            assert(pos->m_pos_in_trunk >= (size_t)d);
             pos->m_pos_in_trunk -= d;
             done -= d;
             n -= d;

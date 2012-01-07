@@ -1,5 +1,6 @@
 #include <string.h>
 #include "yajl/yajl_parse.h"
+#include "cpe/pal/strings.h"
 #include "cpe/dr/dr_json.h"
 #include "cpe/dr/dr_error.h"
 #include "cpe/dr/dr_data.h"
