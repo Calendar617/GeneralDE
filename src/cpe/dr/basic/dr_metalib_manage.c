@@ -1,6 +1,6 @@
-#include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#include "cpe/pal/stdio.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_ctypes_info.h"
 #include "cpe/dr/dr_error.h"
@@ -251,12 +251,12 @@ int dr_meta_find_entry_idx_by_name(LPDRMETA meta, const char* name) {
 }
 
 int dr_meta_find_entry_idx_by_id(LPDRMETA meta, int a_iId) {
+    int i;
+    LPDRMETAENTRY pstEntryBegin = (LPDRMETAENTRY)(meta + 1);
+
     if (a_iId < 0) {
         return -1;
     }
-
-    int i;
-    LPDRMETAENTRY pstEntryBegin = (LPDRMETAENTRY)(meta + 1);
 
     for(i = 0; i < meta->m_entry_count; ++i) {
         LPDRMETAENTRY pstCurEntry = pstEntryBegin + i;

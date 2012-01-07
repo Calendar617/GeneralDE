@@ -126,6 +126,8 @@ cfg_t cfg_find_cfg(cfg_t cfg, const char * path) {
 
     while(cfg && path < end) {
         if (path[0] == '[') {
+			const char * seqEndTag;
+
             if (cfg->m_type != CPE_CFG_TYPE_SEQUENCE) {
                 if (cfg->m_type == CPE_CFG_TYPE_STRUCT) {
                     cfg = cfg_struct_find_cfg(cfg, "");
@@ -137,7 +139,7 @@ cfg_t cfg_find_cfg(cfg_t cfg, const char * path) {
                 return NULL;
             }
 
-            const char * seqEndTag = strchr(nextSeqTag, ']');
+            seqEndTag = strchr(nextSeqTag, ']');
             if (seqEndTag == NULL) return NULL;
 
             cfg = cfg_do_find_cfg_from_seq(cfg, path + 1, seqEndTag);

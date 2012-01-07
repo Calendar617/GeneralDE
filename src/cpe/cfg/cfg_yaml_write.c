@@ -1,4 +1,5 @@
 #include "yaml.h"
+#include "cpe/pal/strings.h"
 #include "cpe/pal/stdio.h"
 #include "cpe/utils/stream_mem.h"
 #include "cpe/dr/dr_ctypes_op.h"
@@ -129,13 +130,14 @@ static int cfg_yaml_do_write_cfg_seq(struct cfg_yaml_write_ctx * ctx, struct cfg
     }
 
     for(; count > 0 && b; ++i, --count) {
+        int subNode;
         if (i >= CPE_CFG_SEQ_BLOCK_ITEM_COUNT) {
             i = 0;
             b = b->m_next;
             if (b == NULL) break;
         }
 
-        int subNode = cfg_yaml_do_write_cfg(ctx, b->m_items[i]);
+        subNode = cfg_yaml_do_write_cfg(ctx, b->m_items[i]);
         if (!subNode) {
             continue;
         }

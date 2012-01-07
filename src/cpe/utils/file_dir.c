@@ -1,4 +1,4 @@
-#include <string.h>
+#include "cpe/pal/string.h"
 #include "file_internal.h"
 
 int dir_mk_recursion(const char * path, mode_t mode, error_monitor_t em, mem_allocrator_t talloc) {

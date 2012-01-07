@@ -20,7 +20,7 @@ class Noncreatable {
 };
 
 class SimulateObject : public Noncreatable, public Nondestoryable, public Noncopyable {
-};
+ };
 
 }}
 

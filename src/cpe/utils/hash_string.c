@@ -9,8 +9,9 @@
     }                                                   \
 
 #define cpe_hs_check_init(hs)                           \
+    int32_t * b;                                        \
     cpe_hs_check_len_init(hs);                          \
-    int32_t * b = (int32_t *)(hs);                      \
+    b = (int32_t *)(hs);                      \
     if (*b == 0) {                                      \
         *b = cpe_hash_str((char *)(b + 2), *__len);     \
         if (*b == 0) *b = 1;                            \

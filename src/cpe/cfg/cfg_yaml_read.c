@@ -168,7 +168,10 @@ else {                                                                  \
 #endif
 
 static void cfg_yaml_add_value(struct cfg_yaml_read_ctx * ctx, const char * value) {
-    const char * tag = (const char *)ctx->m_input_event.data.scalar.tag;
+	int typeId;
+    const char * tag;
+	
+    tag = (const char *)ctx->m_input_event.data.scalar.tag;
     if (tag) {
         if (strcmp(tag, YAML_BOOL_TAG) == 0) {
             int32_t v = cfg_yaml_read_bool(value);
@@ -189,7 +192,7 @@ static void cfg_yaml_add_value(struct cfg_yaml_read_ctx * ctx, const char * valu
         }
     }
 
-    int typeId = cfg_yaml_get_type_from_tag(ctx) ;
+    typeId = cfg_yaml_get_type_from_tag(ctx) ;
     cfg_yaml_do_add_value(value, ctx, typeId, value);
 }
 
