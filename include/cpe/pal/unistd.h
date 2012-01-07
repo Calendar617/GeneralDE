@@ -4,6 +4,8 @@
 #if defined _MSC_VER
 #include <io.h>
 #include <process.h>
+#include <direct.h>
+#define mkdir(__f, __m) _mkdir(__f)
 #else
 #include <unistd.h>
 #endif
