@@ -116,6 +116,10 @@
 # define S_IXOTH  0                            /* execute, others */
 #endif
 
+#if ! defined S_IRWXU
+# define S_IRWXU ( S_IRUSR | S_IWUSR | S_IXUSR )
+#endif
+
 /* Indicates that d_type field is available in dirent structure */
 #define _DIRENT_HAVE_D_TYPE
 

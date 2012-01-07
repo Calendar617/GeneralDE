@@ -21,11 +21,13 @@ int dir_mk(const char * path, mode_t mode, error_monitor_t em) {
             break;
         case EEXIST:
             break;
+#if defined ELOOP
         case ELOOP:
             CPE_ERROR_EX(
                 em, errno,
                 "A loop exists in symbolic links encountered during resolution of the path argument.");
             break;
+#endif
         case EMLINK:
             CPE_ERROR_EX(
                 em, errno,
@@ -142,11 +144,13 @@ int dir_rm(const char *path, error_monitor_t em) {
                 em, errno, 
                 "A physical I/O error has occurred.");
             break;
+#if defined ELOOP
         case ELOOP:
             CPE_ERROR_EX(
                 em, errno, 
                 "A loop exists in symbolic links encountered during resolution of the path argument.");
             break;
+#endif
         case ENAMETOOLONG:
             CPE_ERROR_EX(
                 em, errno, 
@@ -197,12 +201,14 @@ int file_rm(const char *path, error_monitor_t em) {
                 "  is being used by the system or another process and the implementation"
                 " considers this an error.");
             break;
+#if defined ELOOP
         case ELOOP:
             CPE_ERROR_EX(
                 em, errno,
                 "A loop exists in symbolic links encountered during  resolution  of"
                 " the path argument.");
             break;
+#endif
         case ENAMETOOLONG:
             CPE_ERROR_EX(
                 em, errno,
@@ -270,9 +276,11 @@ int inode_stat_by_path(const char * path, struct stat * buf, int ignoreError, er
         case EIO:
             CPE_ERROR_EX(em, errno, "An error occurred while reading from the file system.");
             break;
+#if defined ELOOP
         case ELOOP:
             CPE_ERROR_EX(em, errno, "A loop exists in symbolic links encountered during resolution of the path argument.");
             break;
+#endif
         case ENAMETOOLONG:
             CPE_ERROR_EX(em, errno, "The length of the path argument exceeds {PATH_MAX} or a pathname component is longer than {NAME_MAX}.");
             break;
@@ -282,6 +290,7 @@ int inode_stat_by_path(const char * path, struct stat * buf, int ignoreError, er
         case ENOTDIR:
             CPE_ERROR_EX(em, errno, "A component of the path prefix is not a directory.");
             break;
+#if defined EOVERFLOW
         case EOVERFLOW:
             CPE_ERROR_EX(
                 em, errno,
@@ -289,6 +298,7 @@ int inode_stat_by_path(const char * path, struct stat * buf, int ignoreError, er
                 "or the file serial number cannot be represented correctly in the structure "
                 "pointed  to  by buf.");
             break;
+#endif
         }
     }
     return status;
@@ -307,15 +317,18 @@ int inode_stat_by_fileno(int fno, struct stat * buf, int ignoreError, error_moni
         case EIO:
             CPE_ERROR_EX(em, errno, "An error occurred while reading from the file system.");
             break;
+#if defined ELOOP
         case ELOOP:
             CPE_ERROR_EX(em, errno, "A loop exists in symbolic links encountered during resolution of the path argument.");
             break;
+#endif
         case ENAMETOOLONG:
             CPE_ERROR_EX(em, errno, "The length of the path argument exceeds {PATH_MAX} or a pathname component is longer than {NAME_MAX}.");
             break;
         case ENOTDIR:
             CPE_ERROR_EX(em, errno, "A component of the path prefix is not a directory.");
             break;
+#if defined EOVERFLOW
         case EOVERFLOW:
             CPE_ERROR_EX(
                 em, errno,
@@ -323,6 +336,7 @@ int inode_stat_by_fileno(int fno, struct stat * buf, int ignoreError, error_moni
                 "or the file serial number cannot be represented correctly in the structure "
                 "pointed  to  by buf.");
             break;
+#endif
         }
     }
     return status;
