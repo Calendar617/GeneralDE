@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <string.h>
+#include "cpe/pal/stdio.h"
 #include "cpe/dr/dr_data.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_internal_types.h"
@@ -16,14 +17,16 @@ int dr_entry_set_defaults(void * inout, LPDRMETAENTRY entry) {
     return 0;
 }
 
+struct SProcessStack{
+    LPDRMETA m_meta;
+    int m_entry_pos;
+    void * m_data;
+};
+
 void dr_meta_set_defaults(void * inout, LPDRMETA meta) {
     assert(inout);
 
-    struct {
-        LPDRMETA m_meta;
-        int m_entry_pos;
-        void * m_data;
-    } processStack[CPE_DR_MAX_LEVEL];
+    struct SProcessStack processStack[CPE_DR_MAX_LEVEL];
     int stackPos;
 
     bzero(inout, dr_meta_size(meta));

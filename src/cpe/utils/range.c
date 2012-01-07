@@ -259,7 +259,7 @@ int cpe_range_mgr_reserve_for_put(cpe_range_mgr_t ra, int put_count) {
     }
 
     if (newCapacity != ra->m_range_capacity) {
-        newBuf = mem_alloc(ra->m_alloc, sizeof(struct cpe_range) * newCapacity);
+        newBuf = (struct cpe_range*)mem_alloc(ra->m_alloc, sizeof(struct cpe_range) * newCapacity);
         if (newBuf == NULL) return -1;
 
         if (ra->m_range_count > 0) {

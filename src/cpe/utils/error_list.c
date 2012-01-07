@@ -82,7 +82,7 @@ int cpe_error_list_have_msg(error_list_t el, const char * partMsg) {
 
 void cpe_error_list_collect(struct error_info * info, void * context, const char * fmt, va_list args) {
     error_list_t el = (error_list_t)context;
-    struct error_list_node * node = mem_alloc(el->m_alloc, sizeof(struct error_list_node));
+    struct error_list_node * node = (struct error_list_node *)mem_alloc(el->m_alloc, sizeof(struct error_list_node));
     if (node == NULL) {
         return;
     }
