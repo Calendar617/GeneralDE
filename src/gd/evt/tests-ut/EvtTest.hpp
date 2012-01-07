@@ -18,7 +18,7 @@ public:
 
     void createEvtMgr(const char * metalib);
 
-    gd_evt_t createEvt(const char * typeName);
+    gd_evt_t createEvt(const char * typeName, size_t attach_capacity = 0, ssize_t data_capacity = -1);
 
     gd_tl_manage_t m_tl_mgr;
     struct mem_buffer m_buffer;

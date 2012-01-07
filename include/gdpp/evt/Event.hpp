@@ -18,6 +18,9 @@ public:
         return Cpe::Dr::Meta::_cast(gd_evt_meta(*this));
     }
 
+    void * attach_buf(void) { return gd_evt_attach(*this); }
+    size_t attach_capacity(void) { return gd_evt_attach_capacity(*this); }
+
     Cpe::Dr::ConstData args(void) const { 
         return Cpe::Dr::ConstData(gd_evt_data(*this), meta());
     }

@@ -13,7 +13,9 @@ public:
 
     Cpe::Dr::MetaLib const & metaLib(void) const { return *(Cpe::Dr::MetaLib*)gd_evt_mgr_metalib(*this); }
 
-    Event & createEvent(const char * name);
+    Event & createEvent(size_t attach_capacity, const char * name, ssize_t data_capacity = -1);
+
+    static EventCenter & _cast(gd_evt_mgr_t evm);
 };
 
 }}

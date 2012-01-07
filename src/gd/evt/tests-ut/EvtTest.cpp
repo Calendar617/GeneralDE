@@ -51,7 +51,7 @@ void EvtTest::createEvtMgr(const char * metalib) {
     EXPECT_TRUE(m_evt_mgr);
 }
 
-gd_evt_t EvtTest::createEvt(const char * typeName) {
+gd_evt_t EvtTest::createEvt(const char * typeName, size_t attach_capacity, ssize_t data_capacity) {
     EXPECT_TRUE(m_evt_mgr);
-    return gd_evt_create(m_evt_mgr, typeName, t_em());
+    return gd_evt_create(m_evt_mgr, attach_capacity, typeName, data_capacity, t_em());
 }

@@ -53,6 +53,11 @@ gd_tl_t gd_tl_event_tl(gd_tl_event_t event) {
     return event->m_tl;
 }
 
+gd_tl_event_t
+gd_tl_event_from_data(void * data) {
+    return (gd_tl_event_t)( ((char *)data) - sizeof(struct gd_tl_event));
+}
+
 int gd_tl_event_enqueue_local(
     gd_tl_event_t event,
     gd_tl_time_span_t delay,

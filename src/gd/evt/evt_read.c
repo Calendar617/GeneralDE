@@ -5,7 +5,7 @@
 #include "gd/evt/evt_read.h"
 #include "evt_internal_types.h"
 
-gd_evt_t gd_evt_create(gd_evt_mgr_t evm, const char * typeName, error_monitor_t em) {
+gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * typeName, ssize_t data_capacity, error_monitor_t em) {
     gd_tl_event_t tl_evt;
     LPDRMETA meta;
     gd_evt_t evt;
@@ -18,9 +18,17 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, const char * typeName, error_monitor_t 
         return NULL;
     }
 
+    if (data_capacity < 0) {
+        data_capacity = dr_meta_size(meta);
+    }
+    else if (data_capacity < dr_meta_size(meta)) {
+        CPE_ERROR(em, "data_capacity %zd is to small to contain type %s!", data_capacity, typeName);
+        return NULL;
+    }
+
     tl_evt = gd_tl_event_create(
         evm->m_tl,
-        sizeof(struct gd_evt) + dr_meta_size(meta));
+        sizeof(struct gd_evt) + data_capacity + attach_capacity);
     if (tl_evt == NULL) {
         CPE_ERROR(em, "create tl_event fail!");
         return NULL;
@@ -29,6 +37,7 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, const char * typeName, error_monitor_t 
     evt = (gd_evt_t)gd_tl_event_data(tl_evt);
 
     evt->m_meta = meta;
+    evt->m_data_capacity = data_capacity;
 
     dr_meta_set_defaults(evt + 1, meta);
 
@@ -37,6 +46,20 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, const char * typeName, error_monitor_t 
 
 void * gd_evt_data(gd_evt_t evt) {
     return evt + 1;
+}
+
+size_t gd_evt_data_capacity(gd_evt_t evt) {
+    return evt->m_data_capacity;
+}
+
+void * gd_evt_attach(gd_evt_t evt) {
+    return ((char*)(evt + 1)) + evt->m_data_capacity;
+}
+
+size_t gd_evt_attach_capacity(gd_evt_t evt) {
+    size_t total = gd_tl_event_capacity(gd_tl_event_from_data(evt));
+    assert(total >= (sizeof(struct gd_evt) + evt->m_data_capacity));
+    return total - sizeof(struct gd_evt) - evt->m_data_capacity;
 }
 
 LPDRMETA gd_evt_meta(gd_evt_t evt) {

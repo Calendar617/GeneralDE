@@ -11,6 +11,7 @@ struct gd_evt_mgr {
 
 struct gd_evt {
     LPDRMETA m_meta;
+    size_t m_data_capacity;
 };
 
 #endif

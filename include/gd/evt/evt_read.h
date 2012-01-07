@@ -8,11 +8,21 @@
 extern "C" {
 #endif
 
-gd_evt_t gd_evt_create(gd_evt_mgr_t evm, const char * typeName, error_monitor_t em);
+gd_evt_t gd_evt_create(
+    gd_evt_mgr_t evm,
+    size_t attach_capacity,
+    const char * typeName,
+    ssize_t data_capacity,
+    error_monitor_t em);
 
 const char * gd_evt_type(gd_evt_t evt);
-void * gd_evt_data(gd_evt_t evt);
 LPDRMETA gd_evt_meta(gd_evt_t evt);
+
+size_t gd_evt_data_capacity(gd_evt_t evt);
+void * gd_evt_data(gd_evt_t evt);
+
+size_t gd_evt_attach_capacity(gd_evt_t evt);
+void * gd_evt_attach(gd_evt_t evt);
 
 int gd_evt_set_from_string(gd_evt_t evt, const char * arg, const char * data, error_monitor_t em);
 int gd_evt_set_from_int8(gd_evt_t evt, const char * arg, int8_t data, error_monitor_t em);
