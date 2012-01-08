@@ -24,6 +24,8 @@ void * gd_evt_data(gd_evt_t evt);
 size_t gd_evt_attach_capacity(gd_evt_t evt);
 void * gd_evt_attach(gd_evt_t evt);
 
+gd_evt_t gd_evt_cvt(gd_tl_event_t tl_evt);
+
 int gd_evt_set_from_string(gd_evt_t evt, const char * arg, const char * data, error_monitor_t em);
 int gd_evt_set_from_int8(gd_evt_t evt, const char * arg, int8_t data, error_monitor_t em);
 int gd_evt_set_from_uint8(gd_evt_t evt, const char * arg, uint8_t data, error_monitor_t em);

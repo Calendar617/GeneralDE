@@ -20,6 +20,10 @@ public:
     Responser & createResponser(const char * name);
     void deleteResponser(const char * name);
 
+    void dispatch(const char * cmd, gd_dp_req_t req);
+    void dispatch(cpe_hash_string_t cmd, gd_dp_req_t req);
+    void dispatch(int32_t cmd, gd_dp_req_t req);
+
     //rsp by name
     Responser * findRspByName(const char * name) { 
         return (Responser*)gd_dp_rsp_find_by_name(*this, name);

@@ -34,7 +34,7 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * ty
         return NULL;
     }
 
-    evt = (gd_evt_t)gd_tl_event_data(tl_evt);
+    evt = gd_evt_cvt(tl_evt);
 
     evt->m_meta = meta;
     evt->m_data_capacity = data_capacity;
@@ -54,6 +54,10 @@ size_t gd_evt_data_capacity(gd_evt_t evt) {
 
 void * gd_evt_attach(gd_evt_t evt) {
     return ((char*)(evt + 1)) + evt->m_data_capacity;
+}
+
+gd_evt_t gd_evt_cvt(gd_tl_event_t tl_evt) {
+    return (gd_evt_t)gd_tl_event_data(tl_evt);
 }
 
 size_t gd_evt_attach_capacity(gd_evt_t evt) {

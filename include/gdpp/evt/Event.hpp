@@ -28,6 +28,9 @@ public:
     Cpe::Dr::Data args(void) {
         return Cpe::Dr::Data(gd_evt_data(*this), meta());
     }
+
+    static Event & _cast(gd_evt_t evt);
+    static Event & _cast(gd_tl_event_t tl_evt);
 };
 
 }}
