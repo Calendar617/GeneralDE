@@ -5,7 +5,10 @@
 namespace Gd { namespace Dp {
 
 class Request;
-class DpManager;
+class Responser;
+class ConstResponserIterator;
+class ResponserIterator;
+class Manager;
 
 }}
 

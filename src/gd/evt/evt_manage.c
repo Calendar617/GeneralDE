@@ -1,11 +1,10 @@
 #include <assert.h>
-#include "gd/tl/tl_manage.h"
 #include "gd/evt/evt_manage.h"
 #include "evt_internal_types.h"
 
 gd_evt_mgr_t
 gd_evt_mgr_create(
-    gd_tl_manage_t tlm,
+    gd_tl_t tl,
     LPDRMETALIB metalib,
     mem_allocrator_t alloc)
 {
@@ -16,7 +15,7 @@ gd_evt_mgr_create(
 
     evm->m_alloc = alloc;
     evm->m_metalib = metalib;
-    evm->m_tl = gd_tl_create(tlm);
+    evm->m_tl = tl;
     if (evm->m_tl == NULL) {
         mem_free(alloc, evm);
         return NULL;

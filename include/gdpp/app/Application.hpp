@@ -15,6 +15,9 @@ public:
 
     mem_allocrator_t allocrator(void) { return gd_app_alloc(*this); }
 
+    Dp::Manager & dpManager(void) { return *((Dp::Manager *)gd_app_dp_mgr(*this)); }
+    Dp::Manager const & dpManager(void) const { return *((Dp::Manager *)gd_app_dp_mgr(*this)); }
+
     Nm::Manager & nmManager(void) { return *((Nm::Manager *)gd_app_nm_mgr(*this)); }
     Nm::Manager const & nmManager(void) const { return *((Nm::Manager *)gd_app_nm_mgr(*this)); }
 

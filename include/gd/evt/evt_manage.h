@@ -10,7 +10,7 @@ extern "C" {
 
 gd_evt_mgr_t
 gd_evt_mgr_create(
-    gd_tl_manage_t tlm,
+    gd_tl_t tl,
     LPDRMETALIB metalib,
     mem_allocrator_t alloc);
 

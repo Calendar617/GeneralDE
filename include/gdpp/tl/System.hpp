@@ -5,6 +5,7 @@
 namespace Gd { namespace Tl {
 
 class Timer;
+class TimeLine;
 class Manager;
 
 }}
