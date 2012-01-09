@@ -38,8 +38,12 @@ public:
         return args()[name];
     }
 
+    Event * clone(mem_allocrator_t alloc = NULL) const;
+    void destory(void);
+
     static Event & _cast(gd_evt_t evt);
     static Event & _cast(gd_tl_event_t tl_evt);
+
 };
 
 }}

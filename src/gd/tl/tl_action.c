@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/string.h"
 #include "gd/tl/tl_action.h"
 #include "gd/tl/tl_errno.h"
 #include "tl_internal_types.h"
@@ -11,6 +12,32 @@ gd_tl_event_t gd_tl_event_create(gd_tl_t tl, size_t dataSize) {
     TAILQ_INSERT_HEAD(&tl->m_manage->m_event_building_queue, node, m_next);
 
     return &node->m_event;
+}
+
+gd_tl_event_t gd_tl_event_clone(gd_tl_event_t e, mem_allocrator_t alloc) {
+    struct gd_tl_free_event * r;
+
+    r = (struct gd_tl_free_event *)mem_alloc(alloc, sizeof(struct gd_tl_free_event) + e->m_capacity);
+    if (r == NULL) return NULL;
+
+    r->m_alloc = alloc;
+    r->m_event.m_tl = NULL;
+    r->m_event.m_capacity = e->m_capacity;
+    memcpy(r + 1, e + 1, e->m_capacity);
+
+    return &r->m_event;
+}
+
+void gd_tl_event_free(gd_tl_event_t e) {
+    struct gd_tl_free_event * fe;
+
+    if (e == NULL) return;
+    if (e->m_tl != NULL) return; //managed event
+
+    fe = (struct gd_tl_free_event *)
+        (((char*)e)
+         - (sizeof(struct gd_tl_free_event) - sizeof(struct gd_tl_event)));
+    mem_free(fe->m_alloc, fe);
 }
 
 gd_tl_event_t gd_tl_action_add(gd_tl_t tl) {
