@@ -5,3 +5,8 @@ GTAGS
 .DS_Store
 xcuserdata
 /buildtools/build
+*.user
+*.ncb
+*.pdb
+*.suo
+.emacs.desktop*
