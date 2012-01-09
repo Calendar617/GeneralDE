@@ -48,7 +48,7 @@ void cpe_range_mgr_dump(write_stream_t stream, cpe_range_mgr_t ra) {
     }
 }
 
-int cpe_range_get_one(cpe_range_mgr_t ra) {
+ptr_int_t cpe_range_get_one(cpe_range_mgr_t ra) {
     struct cpe_range r;
 
     assert(ra);
