@@ -1,9 +1,9 @@
 $(call assert-not-null,GCC)
 
 product-support-types+=lib progn
-product-def-all-items+= c.libraries c.includes c.sources c.ldpathes c.flags.cpp c.flags.ld c.linker    \
+product-def-all-items+= c.libraries c.includes c.frameworks c.sources c.ldpathes c.flags.cpp c.flags.ld c.linker    \
                         c.flags.lan c.flags.lan.c c.flags.lan.cc c.flags.lan.m c.flags.lan.mm \
-                        product.c.includes product.c.libraries product.c.flags.ld product.c.ldpathes product.c.defs
+                        product.c.includes product.c.frameworks product.c.libraries product.c.flags.ld product.c.ldpathes product.c.defs
 
 c-source-dir-to-binary-dir = $(addprefix $(CPDE_OUTPUT_ROOT)/obj,$(subst $(CPDE_ROOT),,$1))
 
@@ -17,12 +17,18 @@ c-source-to-object = $(call c-source-dir-to-binary-dir,\
 c-generate-depend-ld-flags=$(addprefix -L$(CPDE_OUTPUT_ROOT)/,\
 								 $(sort  $(r.$1.c.ldpathes) $(call product-gen-depend-value-list,$1,product.c.ldpathes))) \
                            $(addprefix -l,$(sort $(r.$1.c.libraries) $(call product-gen-depend-value-list,$1,product.c.libraries))) \
+                            $(addprefix -framework ,\
+								 $(sort $(r.$1.c.frameworks) $(r.$1.product.c.frameworks) \
+									$(call product-gen-depend-value-list,$1,product.c.frameworks))) \
                            $(call product-gen-depend-value-list,$1,product.c.flags.ld) \
                            $(r.$1.c.flags.ld)
 
 c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
 								 $(sort $(r.$1.c.includes) $(r.$1.product.c.includes) \
 									$(call product-gen-depend-value-list,$1,product.c.includes))) \
+                            $(addprefix -F,\
+								 $(sort $(r.$1.c.frameworks) $(r.$1.product.c.frameworks) \
+									$(call product-gen-depend-value-list,$1,product.c.frameworks))) \
                            $(addprefix -D,$(sort $(call product-gen-depend-value-list,$1,product.c.defs))) \
                            $(r.$1.c.flags.cpp)
 
