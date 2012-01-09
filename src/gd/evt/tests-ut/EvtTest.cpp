@@ -45,7 +45,7 @@ void EvtTest::createEvtMgr(const char * metalib) {
             NULL));
 
     m_evt_mgr = gd_evt_mgr_create(
-        m_tl_mgr,
+        gd_tl_create(m_tl_mgr),
         (LPDRMETALIB)mem_buffer_make_continuous(&m_buffer, 0),
         t_allocrator());
     EXPECT_TRUE(m_evt_mgr);
