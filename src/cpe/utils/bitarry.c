@@ -135,7 +135,7 @@ char * cpe_ba_to_str(char * dest, cpe_ba_t ba, size_t bit_capacity) {
 
 char * cpe_ba_to_str_create(mem_allocrator_t alloc, cpe_ba_t ba, size_t bit_capacity) {
     return cpe_ba_to_str(
-        mem_alloc(alloc, bit_capacity + 1),
+        (char*)mem_alloc(alloc, bit_capacity + 1),
         ba,
         bit_capacity);
 }

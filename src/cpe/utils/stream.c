@@ -30,7 +30,7 @@ int stream_do_write_to_mem(struct write_stream * input_stream, const void * buf,
         size = stream->m_capacity - stream->m_pos;
     }
 
-    memcpy(stream->m_buffer + stream->m_pos, buf, size);
+    memcpy((char*)stream->m_buffer + stream->m_pos, buf, size);
     stream->m_pos += size;
     return size;
 }
@@ -50,7 +50,7 @@ int stream_do_read_from_mem(struct read_stream * input_stream, void * buf, size_
         size = stream->m_capacity - stream->m_pos;
     }
 
-    memcpy(buf, stream->m_buffer + stream->m_pos, size);
+    memcpy(buf, (char*)stream->m_buffer + stream->m_pos, size);
     stream->m_pos += size;
     return size;
 }

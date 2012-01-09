@@ -1,6 +1,6 @@
 #ifndef CPE_UTILS_STREAM_H
 #define CPE_UTILS_STREAM_H
-#include <stdarg.h>
+#include "cpe/pal/stdarg.h"
 #include "cpe/pal/types.h"
 
 #ifdef __cplusplus

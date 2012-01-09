@@ -95,7 +95,7 @@ cfg_t cfg_struct_item_do_create(struct cfg_struct * s, const char * name, int ty
     item->m_data.m_manage = s->m_manage;
     item->m_data.m_parent = (cfg_t)s;
     item->m_data.m_type = type;
-    item->m_name = data;
+    item->m_name = (const char*)data;
 
     if (RB_INSERT(cfg_struct_item_tree, &s->m_items, item) != NULL) {
         mem_free(item->m_data.m_manage->m_alloc, data);
@@ -116,6 +116,7 @@ cfg_t cfg_struct_item_do_create(struct cfg_struct * s, const char * name, int ty
 
 cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type, size_t capacity, cfg_policy_t policy) {
     struct cfg_struct_item * old_item;
+    cfg_t newCfg;
 
     assert(s || s->m_manage);
     assert(name);
@@ -134,7 +135,7 @@ cfg_t cfg_struct_item_create(struct cfg_struct * s, const char * name, int type,
         case 2: {/*old(seq)-add-to-new(struct)*/
             assert(old_item->m_data.m_type == CPE_CFG_TYPE_SEQUENCE);
             RB_REMOVE(cfg_struct_item_tree, &s->m_items, old_item);
-            cfg_t newCfg = cfg_struct_item_do_create(s, name, type, capacity);
+            newCfg = cfg_struct_item_do_create(s, name, type, capacity);
             if (newCfg) {
                 struct cfg_seq * subSeq = (struct cfg_seq *)cfg_struct_add_seq(newCfg, "", cfg_replace);
                 assert(subSeq);

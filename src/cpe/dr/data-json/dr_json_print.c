@@ -1,5 +1,6 @@
-#include <string.h>
 #include "yajl/yajl_gen.h"
+#include "cpe/pal/string.h"
+#include "cpe/pal/stackbuf.h"
 #include "cpe/utils/stream_mem.h"
 #include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/dr/dr_json.h"
@@ -7,6 +8,7 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_internal_types.h"
 #include "../dr_ctype_ops.h"
+#include <assert.h>
 
 static void dr_json_print_composite_type(
     yajl_gen g,
@@ -60,9 +62,10 @@ static void dr_print_print_numeric(yajl_gen g, int typeId, const void * data, er
 }
 
 static void dr_print_print_string(yajl_gen g, int typeId, size_t bufLen, const void * data, error_monitor_t em) {
-    char buf[bufLen + 1];
-    struct write_stream_mem bufS = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, bufLen + 1);
+    char buf[CPE_STACK_BUF_LEN(bufLen) + 1];
+    struct write_stream_mem bufS = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, CPE_STACK_BUF_LEN(bufLen) + 1);
     int len = dr_ctype_print_to_stream((write_stream_t)&bufS, data, typeId, em);
+
     if (len > 0) {
         buf[len] = 0;
         JSON_PRINT_CHECK_GEN_RESULT(yajl_gen_string(g, (const unsigned char *)buf, len));
@@ -121,7 +124,7 @@ static void dr_json_print_struct(yajl_gen g, LPDRMETA meta, const void * data, e
     int entryPos = 0;
     for(entryPos = 0; entryPos < meta->m_entry_count; ++entryPos) {
         LPDRMETAENTRY curEntry = dr_meta_entry_at(meta, entryPos);
-        const void * curData = data + curEntry->m_data_start_pos;
+        const void * curData = (const char *)data + curEntry->m_data_start_pos;
         dr_json_print_entry(g, meta, curEntry, curData, em, level);
     }
 }
@@ -161,7 +164,7 @@ static void dr_json_print_union(yajl_gen g, LPDRMETA meta, LPDRMETAENTRY parentE
     }
 
     if (printEntry) {
-        const void * curData = data + printEntry->m_data_start_pos;
+        const void * curData = (const char *)data + printEntry->m_data_start_pos;
         dr_json_print_entry(g, meta, printEntry, curData, em, level);
     }
 }

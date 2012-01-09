@@ -1,5 +1,6 @@
 #include <string.h>
 #include "yajl/yajl_parse.h"
+#include "cpe/pal/strings.h"
 #include "cpe/dr/dr_json.h"
 #include "cpe/dr/dr_error.h"
 #include "cpe/dr/dr_data.h"
@@ -18,17 +19,18 @@
         __ctx->m_buf[__len] = 0;                            \
     } while(0)
 
+enum dr_json_read_select_state {
+    dr_json_read_select_not_use
+    , dr_json_read_select_use
+    , dr_json_read_select_error
+};
+
 struct dr_json_parse_stack_info {
     LPDRMETA m_meta;
     void * m_data;
     LPDRMETAENTRY m_entry;
 
-    /*for select union*/
-    enum {
-        dr_json_read_select_not_use
-        , dr_json_read_select_use
-        , dr_json_read_select_error
-    } m_select_state;
+    enum dr_json_read_select_state m_select_state;
 
     int32_t m_select_data;
 };
@@ -73,7 +75,7 @@ void dr_json_do_parse_from_string(
 
     JSON_PARSE_CTX_COPY_STR_TMP(c, s, l);
     dr_entry_set_from_string(
-        parseType->m_data + parseType->m_entry->m_data_start_pos,
+        (char*)parseType->m_data + parseType->m_entry->m_data_start_pos,
         c->m_buf,
         parseType->m_entry,
         c->m_em);
@@ -166,7 +168,7 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
         dr_json_parse_stack_init(
             nestStackNode,
             refType,
-            curStack->m_data + entry->m_data_start_pos);
+            (char*)curStack->m_data + entry->m_data_start_pos);
 
         selectEntry = dr_entry_select_entry(entry);
         if (selectEntry) {

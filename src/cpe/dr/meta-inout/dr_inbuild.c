@@ -1,10 +1,10 @@
 #include <stdlib.h>
-#include <strings.h>
+#include "cpe/pal/strings.h"
 #include "cpe/dr/dr_error.h"
 #include "dr_inbuild.h"
 
 struct DRInBuildMetaLib * dr_inbuild_create_lib(void) {
-    struct DRInBuildMetaLib * inBuildMetaLib = malloc(sizeof(struct DRInBuildMetaLib));
+    struct DRInBuildMetaLib * inBuildMetaLib = (struct DRInBuildMetaLib *)malloc(sizeof(struct DRInBuildMetaLib));
     if (inBuildMetaLib == NULL) {
         return NULL;
     }

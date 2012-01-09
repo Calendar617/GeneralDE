@@ -1,9 +1,13 @@
 #ifndef CPE_UTILS_ERRORMONITOR_H
 #define CPE_UTILS_ERRORMONITOR_H
-#include <stdarg.h>
+#include "cpe/pal/stdarg.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifdef _MSC_VER
+#define __attribute__(a)
 #endif
 
 typedef enum {
@@ -50,13 +54,21 @@ void cpe_error_monitor_init(
 void cpe_error_monitor_add_node(error_monitor_t monitor, struct error_monitor_node * node);
 void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor_node * node);
 
+#ifdef _MSC_VER
+#define _CPE_DO_ERROR_NOTIFY(monitor, level, en, format, ...)   \
+    if (monitor) {                                                  \
+    (monitor)->m_curent_location.m_errno = en;                  \
+    (monitor)->m_curent_location.m_level = level;               \
+    cpe_error_do_notify((monitor), format, __VA_ARGS__);             \
+    }
+#else
 #define _CPE_DO_ERROR_NOTIFY(monitor, level, en, format, args...)   \
     if (monitor) {                                                  \
         (monitor)->m_curent_location.m_errno = en;                  \
         (monitor)->m_curent_location.m_level = level;               \
         cpe_error_do_notify((monitor), format, ##args);             \
     }
-
+#endif
 #define CPE_DEF_ERROR_MONITOR_NODE_INITIALIZER(fun, context) \
     { (fun), (context), NULL }
 
@@ -79,20 +91,37 @@ void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor
 #define CPE_ERROR_SET_ERRNO(monitor, e) monitor->m_curent_location.m_errno = e
 #define CPE_ERROR_SET_LEVEL(monitor, l) monitor->m_curent_location.m_level = l
 
+#ifdef _MSC_VER //for msvc
+#define CPE_INFO(monitor, format, ...)                                  \
+    _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_INFO, 0, format, __VA_ARGS__)
+
+#define CPE_WARNING(monitor, format, ...)                               \
+    _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_WARNING, -1, format, __VA_ARGS__)
+
+#define CPE_ERROR(monitor, format, ...)                                 \
+    _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_ERROR, -1, format, __VA_ARGS__)
+
+#define CPE_WARNING_EX(monitor, en, format, ...)                        \
+    _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_WARNING, en, format, __VA_ARGS__)
+
+#define CPE_ERROR_EX(monitor, en, format, ...)                          \
+    _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_ERROR, en, format, __VA_ARGS__)
+#else //for other(gcc)
 #define CPE_INFO(monitor, format, args...)                          \
     _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_INFO, 0, format, ##args)
 
-#define CPE_WARNING(monitor, format, args...)                       \
+#define CPE_WARNING(monitor, format, args...)                           \
     _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_WARNING, -1, format, ##args)
 
 #define CPE_ERROR(monitor, format, args...)                         \
     _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_ERROR, -1, format, ##args)
 
-#define CPE_WARNING_EX(monitor, en, format, args...)                \
+#define CPE_WARNING_EX(monitor, en, format, args...)                    \
     _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_WARNING, en, format, ##args)
 
 #define CPE_ERROR_EX(monitor, en, format, args...)                  \
     _CPE_DO_ERROR_NOTIFY(monitor, CPE_EL_ERROR, en, format, ##args)
+#endif
 
 #ifdef __cplusplus
 }

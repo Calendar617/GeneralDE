@@ -1,25 +1,27 @@
 #include <assert.h>
 #include "yaml.h"
+#include "cpe/pal/strings.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/dr/dr_ctypes_info.h"
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_ops.h"
 
+enum cfg_yaml_parse_state {
+    cfg_yaml_parse_in_map,
+    cfg_yaml_parse_in_seq
+};
+
 struct cfg_yaml_read_ctx {
     yaml_parser_t m_parser;
     yaml_event_t m_input_event;
 
     cfg_t m_curent;
-
-    enum parse_state {
-        parse_in_map,
-        parse_in_seq
-    } m_state;
+    enum cfg_yaml_parse_state m_state;
 
     struct {
         cfg_t m_node;
-        enum parse_state m_state;
+        enum cfg_yaml_parse_state m_state;
     } m_node_stack[CPE_CFG_MAX_LEVEL];
     int m_node_stack_pos;
 
@@ -76,8 +78,8 @@ static int cfg_yaml_read_ctx_init(
 
     ctx->m_state =
         root->m_type == CPE_CFG_TYPE_STRUCT
-        ? parse_in_map
-        : parse_in_seq;
+        ? cfg_yaml_parse_in_map
+        : cfg_yaml_parse_in_seq;
 
     ctx->m_curent = root;
     ctx->m_node_stack_pos = -1;
@@ -141,6 +143,19 @@ int32_t cfg_yaml_read_bool(const char * value) {
     }
 }
 
+#ifdef _MSC_VER
+
+#define cfg_yaml_do_add_value(__type, __ctx, ...)                   \
+    if ((__ctx)->m_curent->m_type == CPE_CFG_TYPE_STRUCT) {                 \
+    cfg_struct_add_ ## __type(                                          \
+    (__ctx)->m_curent, (__ctx)->m_name, __VA_ARGS__, (__ctx)->m_policy); \
+    }                                                                       \
+else {                                                                  \
+    cfg_seq_add_ ## __type((__ctx)->m_curent, __VA_ARGS__);                  \
+}
+
+#else
+
 #define cfg_yaml_do_add_value(__type, __ctx, args...)                   \
 if ((__ctx)->m_curent->m_type == CPE_CFG_TYPE_STRUCT) {                 \
     cfg_struct_add_ ## __type(                                          \
@@ -150,8 +165,13 @@ else {                                                                  \
     cfg_seq_add_ ## __type((__ctx)->m_curent, ##args);                  \
 }
 
+#endif
+
 static void cfg_yaml_add_value(struct cfg_yaml_read_ctx * ctx, const char * value) {
-    const char * tag = (const char *)ctx->m_input_event.data.scalar.tag;
+	int typeId;
+    const char * tag;
+	
+    tag = (const char *)ctx->m_input_event.data.scalar.tag;
     if (tag) {
         if (strcmp(tag, YAML_BOOL_TAG) == 0) {
             int32_t v = cfg_yaml_read_bool(value);
@@ -172,14 +192,14 @@ static void cfg_yaml_add_value(struct cfg_yaml_read_ctx * ctx, const char * valu
         }
     }
 
-    int typeId = cfg_yaml_get_type_from_tag(ctx) ;
+    typeId = cfg_yaml_get_type_from_tag(ctx) ;
     cfg_yaml_do_add_value(value, ctx, typeId, value);
 }
 
 static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
     if (ctx->m_curent == NULL) return;
 
-    if(ctx->m_state == parse_in_map) {
+    if(ctx->m_state == cfg_yaml_parse_in_map) {
         if (ctx->m_curent->m_type != CPE_CFG_TYPE_STRUCT) return;
 
         if (ctx->m_name == NULL) {
@@ -250,8 +270,8 @@ static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {
 }
 
 static void cfg_yaml_on_sequence_begin(struct cfg_yaml_read_ctx * ctx) {
-    enum parse_state old_state = ctx->m_state;
-    ctx->m_state = parse_in_seq;
+    enum cfg_yaml_parse_state old_state = ctx->m_state;
+    ctx->m_state = cfg_yaml_parse_in_seq;
     ++ctx->m_node_stack_pos;
     if (ctx->m_node_stack_pos >= CPE_CFG_MAX_LEVEL) {
         ctx->m_curent = NULL;
@@ -262,7 +282,7 @@ static void cfg_yaml_on_sequence_begin(struct cfg_yaml_read_ctx * ctx) {
 
     if (ctx->m_curent == NULL) return;
 
-    if (old_state == parse_in_map) {
+    if (old_state == cfg_yaml_parse_in_map) {
         const char * name = NULL;
 
         if (ctx->m_curent->m_type != CPE_CFG_TYPE_STRUCT) return;
@@ -296,8 +316,8 @@ static void cfg_yaml_on_sequence_begin(struct cfg_yaml_read_ctx * ctx) {
 }
 
 static void cfg_yaml_on_map_begin(struct cfg_yaml_read_ctx * ctx) {
-    enum parse_state old_state = ctx->m_state;
-    ctx->m_state = parse_in_map;
+    enum cfg_yaml_parse_state old_state = ctx->m_state;
+    ctx->m_state = cfg_yaml_parse_in_map;
     ++ctx->m_node_stack_pos;
     if (ctx->m_node_stack_pos >= CPE_CFG_MAX_LEVEL) {
         ctx->m_curent = NULL;
@@ -308,7 +328,7 @@ static void cfg_yaml_on_map_begin(struct cfg_yaml_read_ctx * ctx) {
 
     if (ctx->m_curent == NULL) return;
 
-    if (old_state == parse_in_map) {
+    if (old_state == cfg_yaml_parse_in_map) {
         if (ctx->m_curent->m_type != CPE_CFG_TYPE_STRUCT) return;
 
         if (ctx->m_name != NULL) {

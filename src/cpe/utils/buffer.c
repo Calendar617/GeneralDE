@@ -83,7 +83,7 @@ ssize_t mem_buffer_read(void * buf, size_t size, struct mem_buffer * buffer) {
             readSize = trunk->m_size;
         }
 
-        memcpy(buf + readedSize, mem_trunk_data(trunk), readSize);
+        memcpy((char*)buf + readedSize, mem_trunk_data(trunk), readSize);
         readedSize += readSize;
 
         trunk = TAILQ_NEXT(trunk, m_next);
@@ -115,7 +115,7 @@ ssize_t mem_buffer_append(struct mem_buffer * buffer, const void * buf, size_t s
         return -1;
     }
 
-    writedSize += mem_trunk_append(buffer, trunk, buf + writedSize, size - writedSize);
+    writedSize += mem_trunk_append(buffer, trunk, (const char*)buf + writedSize, size - writedSize);
 
     return size;
 }
@@ -217,7 +217,7 @@ void * mem_buffer_alloc(struct mem_buffer * buffer, size_t size) {
         return NULL;
     }
 
-    result = mem_trunk_data(trunk) + trunk->m_size;
+    result = (char*)mem_trunk_data(trunk) + trunk->m_size;
 
     trunk->m_size += size;
     buffer->m_size += size;
@@ -302,7 +302,7 @@ int mem_buffer_strcat(mem_buffer_t buffer, const char * s) {
     copyLeft -= copySize;
     
     if (copyLeft > 0) {
-        buf = mem_buffer_alloc(buffer, copyLeft);
+        buf = (char*)mem_buffer_alloc(buffer, copyLeft);
         if (buf == NULL) return -1;
         memcpy(buf, s + copySize, copyLeft);
     }
