@@ -35,7 +35,7 @@ int cpe_range_mgr_is_empty(cpe_range_mgr_t ra);
 int cpe_range_is_valid(struct cpe_range r);
 int cpe_range_size(struct cpe_range r);
 
-int cpe_range_get_one(cpe_range_mgr_t ra);
+ptr_int_t cpe_range_get_one(cpe_range_mgr_t ra);
 int cpe_range_put_one(cpe_range_mgr_t ra, ptr_int_t value);
 
 struct cpe_range cpe_range_get_range(cpe_range_mgr_t ra, size_t require_count);
