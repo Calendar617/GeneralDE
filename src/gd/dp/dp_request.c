@@ -171,6 +171,12 @@ int gd_dp_req_set_size(gd_dp_req_t req, size_t size) {
     return 0;
 }
 
+void gd_dp_req_set_buf(gd_dp_req_t req, void * buf, size_t capacity) {
+    req->m_data = buf;
+    req->m_data_capacity = capacity;
+    req->m_data_size = 0;
+}
+
 mem_allocrator_t
 gd_dp_req_talloc(gd_dp_req_t req) {
     return req->m_talloc;
