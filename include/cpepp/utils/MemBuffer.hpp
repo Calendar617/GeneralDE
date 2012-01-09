@@ -34,7 +34,12 @@ public:
 
     operator mem_buffer_t () { return &m_buf; }
 
-    void * make_continuous(size_t reserve) { return mem_buffer_make_continuous(&m_buf, reserve); }
+    size_t size(void) const { return mem_buffer_size(const_cast<mem_buffer_t>(&m_buf)); }
+    void setSize(size_t size);
+
+    void clear(void) { mem_buffer_clear_data(&m_buf); }
+
+    void * make_continuous(size_t reserve = 0) { return mem_buffer_make_continuous(&m_buf, reserve); }
     void * make_exactly(void) { return mem_buffer_make_exactly(&m_buf); }
 
     void * alloc(size_t len) { return mem_buffer_alloc(&m_buf, len); }

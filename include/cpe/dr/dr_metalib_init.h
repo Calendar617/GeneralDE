@@ -13,6 +13,8 @@ CPE_DR_API const char *dr_lib_name(LPDRMETALIB a_pstLib);
 CPE_DR_API int dr_lib_version(LPDRMETALIB a_pstLib);
 CPE_DR_API int dr_lib_build_version(LPDRMETALIB a_pstLib);
 
+CPE_DR_API LPDRMETALIB dr_lib_attach(void const * p, size_t size);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
