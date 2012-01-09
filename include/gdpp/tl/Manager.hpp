@@ -9,7 +9,7 @@ class Manager : public Cpe::Utils::SimulateObject {
 public:
     operator gd_tl_manage_t (void) const { return (gd_tl_manage_t)(this); }
 
-    
+    int tick(int count = -1) { return gd_tl_manage_tick(*this, count); }
 };
 
 }}

@@ -27,6 +27,11 @@ struct gd_tl_event {
     size_t m_capacity;
 };
 
+struct gd_tl_free_event {
+    mem_allocrator_t m_alloc;
+    struct gd_tl_event m_event;
+};
+
 struct gd_tl_event_node {
     TAILQ_ENTRY(gd_tl_event_node) m_next;
 

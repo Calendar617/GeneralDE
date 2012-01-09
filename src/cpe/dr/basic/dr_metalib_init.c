@@ -22,3 +22,16 @@ int dr_lib_build_version(LPDRMETALIB a_pstLib) {
     assert(a_pstLib);
     return a_pstLib->m_build_version;
 }
+
+LPDRMETALIB dr_lib_attach(void const * p, size_t size) {
+    LPDRMETALIB lib = (LPDRMETALIB)p;
+    if (p == NULL) return NULL;
+
+    if (size < sizeof(struct tagDRMetaLib)) return NULL;
+
+    if (lib->m_magic != CPE_DR_MAGIC) return NULL;
+
+    if (size < lib->m_size) return NULL;
+
+    return lib;
+}

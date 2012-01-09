@@ -1,5 +1,6 @@
 #ifndef GD_TL_ACTION_H
 #define GD_TL_ACTION_H
+#include "cpe/utils/memory.h"
 #include "tl_types.h"
 
 #ifdef __cplusplus
@@ -7,6 +8,8 @@ extern "C" {
 #endif
 
 gd_tl_event_t gd_tl_event_create(gd_tl_t tl, size_t dataSize);
+gd_tl_event_t gd_tl_event_clone(gd_tl_event_t e, mem_allocrator_t alloc);
+void gd_tl_event_free(gd_tl_event_t e);
 
 void * gd_tl_event_data(gd_tl_event_t event);
 size_t gd_tl_event_capacity(gd_tl_event_t event);
