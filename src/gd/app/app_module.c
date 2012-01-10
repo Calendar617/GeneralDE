@@ -203,9 +203,8 @@ gd_app_runing_module_create_i(
 }
 
 static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
-    assert(context);
-
     const char * moduleName;
+    assert(context);
 
     moduleName = cfg_get_string(cfg, "name", NULL);
     if (moduleName == NULL) {

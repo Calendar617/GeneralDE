@@ -43,10 +43,11 @@ void gd_tl_event_free(gd_tl_event_t e) {
 gd_tl_event_t gd_tl_action_add(gd_tl_t tl) {
     union gd_tl_action * action;
     int nextEndPos;
+    gd_tl_manage_t tm;
 
     if (tl == NULL || tl->m_manage == NULL) return NULL;
 
-    gd_tl_manage_t tm = tl->m_manage;
+   tm = tl->m_manage;
 
     nextEndPos = tm->m_action_end_pos + 1;
     if (nextEndPos >= GD_TL_ACTION_MAX) {

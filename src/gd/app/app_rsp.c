@@ -83,9 +83,9 @@ int gd_app_rsp_bind(
     gd_dp_rsp_t rsp,
     cfg_t responsToCfg)
 {
-    assert(responsToCfg);
-
     int rv = 0;
+
+    assert(responsToCfg);
 
     switch(cfg_type(responsToCfg)) {
     case CPE_CFG_TYPE_SEQUENCE: {
@@ -176,6 +176,8 @@ int gd_app_rsp_init(
     }
 
     if (initSymName) {
+        int rv;
+
         init = (gd_app_rsp_init_fun_t)gd_app_lib_sym(gd_app_module_lib(ctx->m_module), initSymName, NULL);
         if (init == NULL) {
             APP_CTX_ERROR(
@@ -185,7 +187,7 @@ int gd_app_rsp_init(
             return -1;
         }
 
-        int rv = init(rsp, ctx->m_context, ctx->m_module, cfg);
+        rv = init(rsp, ctx->m_context, ctx->m_module, cfg);
         if (rv == 0) {
             if(gd_dp_rsp_processor(rsp) == NULL) {
                 rv = -1;

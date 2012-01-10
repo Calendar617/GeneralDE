@@ -12,4 +12,12 @@ Application::instance(void) {
     return *(Application*)g_app_context;
 }
 
+Application &
+Application::_cast(gd_app_context_t ctx) {
+    if (ctx == NULL) {
+        throw ::std::runtime_error("cast to Application fail: input ctx is NULL!");
+    }
+    return *(Application*)ctx;
+}
+
 }}

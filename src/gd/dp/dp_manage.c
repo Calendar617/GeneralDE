@@ -74,10 +74,11 @@ static gd_dp_rsp_t gd_dp_rsp_binding_cmd_next(gd_dp_rsp_it_t it) {
 }
 
 void gd_dp_rsp_find_by_numeric(gd_dp_rsp_it_t it, gd_dp_mgr_t dp, int32_t cmd) {
+    struct gd_dp_binding_numeric buf;
+
     assert(it);
     assert(dp);
 
-    struct gd_dp_binding_numeric buf;
     buf.m_head.m_kt = gd_dp_key_numeric;
     buf.m_value = cmd;
 

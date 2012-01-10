@@ -53,8 +53,9 @@ void gd_dp_binding_free_i(struct gd_dp_binding * binding) {
     }
     else {
         if (binding->m_cmd_binding_next) {
+            int rv;
             binding->m_cmd_binding_next->m_cmd_binding_pre = NULL;
-            int rv = cpe_hash_table_insert_unique(&binding->m_rsp->m_dp->m_cmd_2_rsps, binding->m_cmd_binding_next);
+            rv = cpe_hash_table_insert_unique(&binding->m_rsp->m_dp->m_cmd_2_rsps, binding->m_cmd_binding_next);
             assert(rv == 0);
             (void)rv;
         }
