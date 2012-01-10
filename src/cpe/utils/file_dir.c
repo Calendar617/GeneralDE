@@ -50,6 +50,7 @@ int dir_rm_recursion(const char * path, error_monitor_t em, mem_allocrator_t tal
     pathSize = strlen(path);
     haveError = 0;
 
+    (void)dbuf;
     /*remove sub entities*/
     while((rv = readdir_r(dirp, &dbuf, &dp)) == 0 && dp) {
         if (strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0) continue;
