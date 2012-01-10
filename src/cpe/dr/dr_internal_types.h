@@ -9,7 +9,7 @@ struct tagDRMetaLib {
     /*000*/ int16_t m_magic;
     /*002*/ int16_t m_build_version;
     int8_t reserve1[4];
-    /*008*/ int32_t m_size;
+    /*008*/ uint32_t m_size;
     int8_t reserve2[16];
     /*028*/ int32_t m_id;
     /*032*/ int32_t m_tag_set_version;
@@ -28,7 +28,7 @@ struct tagDRMetaLib {
     /*088*/ int32_t m_startpos_meta_by_unknown; /*what is this index?*/
     /*088*/ int32_t m_startpos_meta;
     /*096*/ int32_t m_startpos_str;
-    /*100*/ int32_t m_buf_size_str;
+    /*100*/ uint32_t m_buf_size_str;
     int8_t reserve7[8];
     /*112*/ int32_t m_buf_size_meta;
     int8_t reserve8[4];

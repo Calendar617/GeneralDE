@@ -6,6 +6,10 @@
 #include <process.h>
 #include <direct.h>
 #define mkdir(__f, __m) _mkdir(__f)
+#define rmdir _rmdir
+#define unlink _unlink
+#define getcwd _getcwd
+#define chdir _chdir
 #else
 #include <unistd.h>
 #endif
