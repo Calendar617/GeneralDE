@@ -93,11 +93,13 @@ static void dr_inbuild_build_calc_entry_composite_type(
 static void dr_inbuild_build_calc_entry_select(
     struct DRInBuildCreateCtx * ctx, LPDRMETA createdMeta, struct DRInBuildMetaEntry * entryEle)
 {
+    LPDRMETAENTRY selectEntry;
+
     if (entryEle->m_selector_path == NULL) {
         return;
     }
 
-    LPDRMETAENTRY selectEntry = dr_meta_find_entry_by_path(createdMeta, entryEle->m_selector_path);
+    selectEntry = dr_meta_find_entry_by_path(createdMeta, entryEle->m_selector_path);
     if (selectEntry == NULL) {
         CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_SELECT_VALUE, "entry at %s not exist!", entryEle->m_selector_path);
     }
