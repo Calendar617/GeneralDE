@@ -73,6 +73,11 @@ void cpe_error_log_to_file(struct error_info * info, void * context, const char 
 }
 
 void cpe_error_log_to_consol(struct error_info * info, void * context, const char * fmt, va_list args) {
+#if defined(_MSC_VER)
+	char buf[1024];
+	vsnprintf_s(buf, sizeof(buf), 128, fmt, args);
+	OutputDebugStringA(buf);
+#endif
     vprintf(fmt, args);
     printf("\n");
 }

@@ -6,12 +6,12 @@
 extern "C" {
 #endif
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined _MSC_VER
+#if _MSC_VER >= 1400  // VC 8.0 and later deprecate snprintf and _snprintf.
+# define snprintf(__buf, __size, __fmt, ...) _snprintf_s(__buf, __size, 128, __fmt, __VA_ARGS__)
+#else
 # define snprintf _snprintf
-#elif _MSC_VER >= 1400  // VC 8.0 and later deprecate snprintf and _snprintf.
-# define snprintf _snprintf_s
-#elif _MSC_VER
-# define snprintf _snprintf
+#endif
 #endif
 
 #ifdef __cplusplus

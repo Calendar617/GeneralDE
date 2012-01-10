@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <string.h>
+#include "cpe/pal/string.h"
 #include "cpe/cfg/cfg_read.h"
 #include "gd/app/app_log.h"
 #include "gd/app/app_context.h"
