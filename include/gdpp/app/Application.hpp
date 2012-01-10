@@ -15,6 +15,9 @@ public:
 
     mem_allocrator_t allocrator(void) { return gd_app_alloc(*this); }
 
+    Cpe::Cfg::Node & cfg(void) { return *(Cpe::Cfg::Node *)gd_app_cfg(*this); }
+    Cpe::Cfg::Node const & cfg(void) const { return *(Cpe::Cfg::Node *)gd_app_cfg(*this); }
+
     Dp::Manager & dpManager(void) { return *((Dp::Manager *)gd_app_dp_mgr(*this)); }
     Dp::Manager const & dpManager(void) const { return *((Dp::Manager *)gd_app_dp_mgr(*this)); }
 
