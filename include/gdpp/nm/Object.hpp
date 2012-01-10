@@ -27,6 +27,7 @@ public:
     void * operator new (size_t size, gd_nm_mgr_t nmm, const char * name);
 
     void operator delete(void *p);
+    void operator delete(void * p, gd_nm_mgr_t nmm, const char * name) { operator delete(p); }
 
     static Object * _cast(gd_nm_node_t node);
     static Object * _cast_throw(gd_nm_node_t node);
