@@ -3,6 +3,9 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_ctype_ops.h"
 
+#if defined _MSC_VER
+#    pragma warning(disable: 4244)
+#endif
 
 struct DRCtypeTypeReadOps {
     int (*to_int8)(int8_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);

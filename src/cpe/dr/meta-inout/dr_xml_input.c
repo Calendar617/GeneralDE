@@ -1,6 +1,8 @@
-#include <string.h>
 #include "libxml/tree.h"
 #include "libxml/xmlstring.h"
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_strings.h"
+#include "cpe/pal/pal_stackbuf.h"
 #include "cpe/dr/dr_metalib_build.h"
 #include "cpe/dr/dr_metalib_xml.h"
 #include "cpe/dr/dr_error.h"
@@ -24,7 +26,7 @@ enum DRXmlParseState {
     buf[len] = 0;
 
 #define DR_DO_READ_INT(__d, __e)                                        \
-    if (len >= INTEGER_BUF_LEN) {                                       \
+    if (len >= CPE_INTEGER_BUF_LEN) {                                       \
         DR_NOTIFY_ERROR(ctx->m_em, (__e));                              \
         return;                                                         \
     }                                                                   \
@@ -47,8 +49,7 @@ static void dr_build_xml_process_metalib(
     int nb_attributes,
     const xmlChar** attributes)
 {
-    const int INTEGER_BUF_LEN = 10;
-    char buf[INTEGER_BUF_LEN];
+    char buf[CPE_INTEGER_BUF_LEN];
     int indexAttribute = 0;
     int index = 0;
     int haveVersion = 0;
@@ -80,7 +81,7 @@ static void dr_build_xml_process_metalib(
             DR_COPY_STR(ctx->m_metaLib->m_data.szName, (char const *)valueBegin, len);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_TAGSET_VERSION) == 0) {
-            if (len >= INTEGER_BUF_LEN) {
+            if (len >= CPE_INTEGER_BUF_LEN) {
                 DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
                 ctx->m_state = PS_Error;
                 return;
@@ -90,7 +91,7 @@ static void dr_build_xml_process_metalib(
             sscanf(buf, "%d", &ctx->m_metaLib->m_data.iTagSetVersion);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
-            if (len > INTEGER_BUF_LEN - 1) {
+            if (len > CPE_INTEGER_BUF_LEN - 1) {
                 DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_VERSION);
                 return;
             }
@@ -128,23 +129,22 @@ static void dr_build_xml_process_macro(
     int nb_attributes,
     const xmlChar** attributes)
 {
-    const int INTEGER_BUF_LEN = 10;
-    char buf[INTEGER_BUF_LEN];
+    char buf[CPE_INTEGER_BUF_LEN];
     int indexAttribute = 0;
     int index = 0;
     int haveValue = 0;
+    struct DRInBuildMacro * newMacro;
+    int haveError = 0;
 
     if (ctx->m_state != PS_InMetaLib) {
         return;
     }
 
-    struct DRInBuildMacro * newMacro = dr_inbuild_metalib_add_macro(ctx->m_metaLib);
+    newMacro = dr_inbuild_metalib_add_macro(ctx->m_metaLib);
     if (newMacro == NULL) {
         DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NO_MEMORY);
         return;
     }
-
-    int haveError = 0;
 
     for(index = 0, indexAttribute = 0;
         indexAttribute < nb_attributes && !haveError;
@@ -152,7 +152,7 @@ static void dr_build_xml_process_macro(
     {
         const xmlChar *localname = attributes[index];
         /*const xmlChar *prefix = attributes[index+1];*/
-        /*const xmlChar *nsURI = attributes[index+2]*/;
+        /*const xmlChar *nsURI = attributes[index+2];*/
         const xmlChar *valueBegin = attributes[index+3];
         const xmlChar *valueEnd = attributes[index+4];
 
@@ -174,7 +174,7 @@ static void dr_build_xml_process_macro(
             DR_COPY_STR(newMacro->m_desc, (char const *)valueBegin, len);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_MACRO_VALUE) == 0) {
-            if (len >= INTEGER_BUF_LEN) {
+            if (len >= CPE_INTEGER_BUF_LEN) {
                 DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
                 return;
             }
@@ -183,7 +183,7 @@ static void dr_build_xml_process_macro(
             DR_COPY_STR(
                 buf,
                 (char const *)valueBegin,
-                len >= INTEGER_BUF_LEN ? INTEGER_BUF_LEN - 1 : len);
+                len >= CPE_INTEGER_BUF_LEN ? CPE_INTEGER_BUF_LEN - 1 : len);
             sscanf(buf, "%d", &newMacro->m_data.m_value);
         }
         else {
@@ -211,8 +211,7 @@ static void dr_build_xml_process_meta(
     const xmlChar** attributes,
     int32_t metaType)
 {
-    const int INTEGER_BUF_LEN = 10;
-    char buf[INTEGER_BUF_LEN];
+    char buf[CPE_INTEGER_BUF_LEN];
     int indexAttribute = 0;
     int index = 0;
     int version = -1;
@@ -260,7 +259,7 @@ static void dr_build_xml_process_meta(
             DR_COPY_STR(newMeta->m_desc, (char const *)valueBegin, len);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_ID) == 0) {
-            if (len >= INTEGER_BUF_LEN) {
+            if (len >= CPE_INTEGER_BUF_LEN) {
                 DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
                 return;
             }
@@ -269,7 +268,7 @@ static void dr_build_xml_process_meta(
             sscanf(buf, "%d", &newMeta->m_data.m_id);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
-            if (len >= INTEGER_BUF_LEN) {
+            if (len >= CPE_INTEGER_BUF_LEN) {
                 DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
                 return;
             }
@@ -278,7 +277,7 @@ static void dr_build_xml_process_meta(
             sscanf(buf, "%d", &version);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_ALIGN) == 0) {
-            if (len >= INTEGER_BUF_LEN) {
+            if (len >= CPE_INTEGER_BUF_LEN) {
                 DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_META_INVALID_ALIGN_VALUE);
                 return;
             }
@@ -318,20 +317,20 @@ static void dr_build_xml_process_entry(
     int nb_attributes,
     const xmlChar** attributes)
 {
-    const int INTEGER_BUF_LEN = 10;
-    char buf[INTEGER_BUF_LEN];
+    char buf[CPE_INTEGER_BUF_LEN];
     int indexAttribute = 0;
     int index = 0;
     int version = -1;
     int haveError = 0;
     int haveMin = 0;
     int haveMax = 0;
+    struct DRInBuildMetaEntry * newEntry;
 
     if (ctx->m_state != PS_InMeta || ctx->m_curentMeta == NULL) {
         return;
     }
 
-    struct DRInBuildMetaEntry * newEntry = dr_inbuild_meta_add_entry(ctx->m_curentMeta);
+    newEntry = dr_inbuild_meta_add_entry(ctx->m_curentMeta);
     if (newEntry == NULL) {
         DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NO_MEMORY);
         return;

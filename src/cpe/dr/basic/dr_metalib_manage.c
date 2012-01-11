@@ -121,7 +121,7 @@ char * dr_meta_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iB
         return NULL;
     }
 
-    while(a_iOff >= 0 && writePos < a_iBufSize) {
+    while(a_iOff >= 0 && (size_t)writePos < a_iBufSize) {
         int beginPos, endPos, curPos;
         LPDRMETAENTRY curEntry = NULL;
 

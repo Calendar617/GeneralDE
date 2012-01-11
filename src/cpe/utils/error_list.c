@@ -1,5 +1,5 @@
-#include <string.h>
-#include <stdio.h>
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/pal/pal_queue.h"
 #include "cpe/utils/error_list.h"
 

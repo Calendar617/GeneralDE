@@ -21,6 +21,7 @@ public:
     operator uint32_t(void);
     operator int64_t(void);
     operator uint64_t(void);
+    operator const char * (void);
 
     int8_t dft(int8_t dft);
     uint8_t dft(uint8_t dft);
@@ -30,6 +31,7 @@ public:
     uint32_t dft(uint32_t dft);
     int64_t dft(int64_t dft);
     uint64_t dft(uint64_t dft);
+    const char * dft(const char * dft);
 };
 
 }}

@@ -128,7 +128,7 @@ static void cpe_range_merge_neighbers(cpe_range_mgr_t ra, int beginPos) {
 
     if (removeCount > 0) {
         ra->m_range_count -= removeCount;
-        if (keepPos + 1 < ra->m_range_count) {
+        if ((size_t)(keepPos + 1) < ra->m_range_count) {
             memmove(
                 ra->m_ranges + keepPos + 1,
                 ra->m_ranges + keepPos + 1 + removeCount,

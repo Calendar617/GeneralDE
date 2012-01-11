@@ -13,7 +13,7 @@ public:
     ~RangeMgr();
 
     bool empty(void) const { 
-        return cpe_range_mgr_is_empty(const_cast<struct cpe_range_mgr *>(&m_rm));
+        return cpe_range_mgr_is_empty(const_cast<struct cpe_range_mgr *>(&m_rm)) ? true : false;
     }
     void clear(void) { cpe_range_mgr_clear(&m_rm); }
 

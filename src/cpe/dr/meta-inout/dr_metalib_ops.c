@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <string.h>
+#include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_error.h"

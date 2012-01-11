@@ -10,14 +10,14 @@ extern "C" {
 
 #if defined(_WIN64) || (__WORDSIZE == 64)
     //64位系统
-    #define CPE_DR_PALTFROM_ALIGN_VALUE		8	/**<平台缺省字节对齐值*/
-    #define CPE_DR_SIZEOF_POINTER 8         /**<指针变量存储的字节数*/
-    #define  CPE_DR_POINTER_TYPE_ALIGN 8	/*指针数据类型对齐方式*/
+    #define CPE_DR_PALTFROM_ALIGN_VALUE		8
+    #define CPE_DR_SIZEOF_POINTER 8
+    #define  CPE_DR_POINTER_TYPE_ALIGN 8
 #else
     //32位系统
-    #define CPE_DR_PALTFROM_ALIGN_VALUE		4	/**<平台缺省字节对齐值*/
-    #define CPE_DR_SIZEOF_POINTER 4             /**<指针变量存储的字节数*/
-    #define CPE_DR_POINTER_TYPE_ALIGN 4	        /*指针数据类型对齐方式*/
+    #define CPE_DR_PALTFROM_ALIGN_VALUE
+    #define CPE_DR_SIZEOF_POINTER 4
+    #define CPE_DR_POINTER_TYPE_ALIGN 4
 #endif
 
 
@@ -58,11 +58,11 @@ extern "C" {
 
 typedef int64_t dr_longlong;
 typedef uint64_t dr_ulonglong;
-typedef uint16_t dr_wchar_t;  /**<Wchar基本数据类型*/
-typedef uint32_t dr_date_t;	/**<data基本数据类型*/
-typedef uint32_t dr_time_t;	/**<time基本数据类型*/
-typedef uint64_t dr_datetime_t; /**<datetime基本数据类型*/
-typedef uint32_t dr_ip_t;  /**<IPv4数据类型*/
+typedef uint16_t dr_wchar_t;
+typedef uint32_t dr_date_t;
+typedef uint32_t dr_time_t;
+typedef uint64_t dr_datetime_t;
+typedef uint32_t dr_ip_t;
 
 typedef struct tagDRMetaLib	*LPDRMETALIB;
 typedef struct tagDRLibParam	DRLIBPARAM;
@@ -75,28 +75,26 @@ typedef struct tagDRMacro		*LPDRMACRO;
 typedef struct tagDRMacrosGroup		*LPDRMACROSGROUP;
 
 
-/**初始化元数据库的结构体
-*/
 struct tagDRLibParam
 {
-	int iID;        /**< 元数库的ID*/ 
+	int iID;
 
-	int iTagSetVersion; /**< 元数据描述XML标签集的版本*/
+	int iTagSetVersion;
 
-	size_t iSize;		/**< 元数据的内存大小，tdr_init_lib将根据此数据分配空间*/
-	size_t iMacrosGroupSize;      /**< 自定义数据类型所占的空间大小*/
-	size_t iMetaSize;      /**< 自定义数据类型所占的空间大小*/
-	size_t iStrBufSize;    /**< 字符串缓冲区所占的大小*/
+	size_t iSize;
+	size_t iMacrosGroupSize;
+	size_t iMetaSize;
+	size_t iStrBufSize;
 
-	int iMaxMacros;     /**< 此元数据库包含的最大宏定义数*/
-	int iMaxMetas;	/**< 此元数据库包含的最大结构体数*/
+	int iMaxMacros;
+	int iMaxMetas;
 
-	int iMaxMacrosGroupNum; /*最多能容纳的宏定义组数目, Add at DR build Version: 0x00000008*/
+	int iMaxMacrosGroupNum;
 
-	int iRes;           /**< 预留位，暂未使用*/
-	int  iVersion;     /**< 元数库的版本*/
+	int iRes;
+	int  iVersion;
 
-	char szName[CPE_DR_NAME_LEN];  /**< 元数据库名字*/
+	char szName[CPE_DR_NAME_LEN];
 };
 
 #ifdef __cplusplus

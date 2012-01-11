@@ -4,6 +4,10 @@
 #include "cpe/dr/dr_data.h"
 #include "../dr_internal_types.h"
 
+#if defined _MSC_VER
+#    pragma warning(disable: 4018)
+#endif
+
 struct DRCtypeTypeFromStringOps {
     int (* set_from_string)(void * output, LPDRMETAENTRY entry, const char * input, error_monitor_t em);
 };
@@ -25,7 +29,7 @@ static int dr_set_string_from_string(void * output, LPDRMETAENTRY entry, const c
     }
 
     len = strlen(input);
-    if (len + 1 > entry->m_unitsize) {
+    if (len + 1 > (size_t)entry->m_unitsize) {
         len = entry->m_unitsize - 1;
     }
 

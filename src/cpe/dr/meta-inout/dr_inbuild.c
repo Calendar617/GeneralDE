@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include "cpe/pal/pal_stdlib.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/dr/dr_error.h"
 #include "dr_inbuild.h"
