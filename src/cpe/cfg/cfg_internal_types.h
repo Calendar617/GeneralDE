@@ -1,6 +1,6 @@
 #ifndef CPE_CFG_IMPL_INTERNAL_TYPES_H
 #define CPE_CFG_IMPL_INTERNAL_TYPES_H
-#include "cpe/pal/tree.h"
+#include "cpe/pal/pal_tree.h"
 #include "cpe/utils/memory.h"
 #include "cpe/cfg/cfg_types.h"
 

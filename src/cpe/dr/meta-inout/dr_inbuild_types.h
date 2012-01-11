@@ -2,7 +2,7 @@
 #define CPE_DR_BUILD_INBUILD_TYPES_H
 #include "cpe/utils/buffer.h"
 #include "../dr_internal_types.h"
-#include "cpe/pal/queue.h"
+#include "cpe/pal/pal_queue.h"
 
 struct DRInBuildMacro;
 struct DRInBuildMeta;

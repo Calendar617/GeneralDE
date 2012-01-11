@@ -1,5 +1,5 @@
 #include <string.h>
-#include "cpe/pal/queue.h"
+#include "cpe/pal/pal_queue.h"
 #include "cpe/utils/file.h"
 #include "cpe/utils/buffer.h"
 #include "file_internal.h"

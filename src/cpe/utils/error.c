@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "cpe/pal/strings.h"
+#include "cpe/pal/pal_strings.h"
 #include "cpe/utils/error.h"
 
 void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...) {

@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "cpe/pal/strings.h"
+#include "cpe/pal/pal_strings.h"
 #include "cpe/utils/hash.h"
 
 struct cpe_hash_bucket {

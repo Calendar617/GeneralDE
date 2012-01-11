@@ -1,6 +1,6 @@
 #ifndef CPE_MEM_ALLOCRATOR_H
 #define CPE_MEM_ALLOCRATOR_H
-#include "cpe/pal/types.h"
+#include "cpe/pal/pal_types.h"
 
 #ifdef __cplusplus
 extern "C" {
