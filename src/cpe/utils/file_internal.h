@@ -2,7 +2,7 @@
 #define CPE_FILE_PRIVATE_H
 #include <sys/stat.h>
 #include <errno.h>
-#include "cpe/pal/dirent.h"
+#include "cpe/pal/pal_dirent.h"
 #include "cpe/utils/file.h"
 
 #ifdef __cplusplus

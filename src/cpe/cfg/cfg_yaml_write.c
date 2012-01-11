@@ -1,6 +1,6 @@
 #include "yaml.h"
-#include "cpe/pal/strings.h"
-#include "cpe/pal/stdio.h"
+#include "cpe/pal/pal_strings.h"
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/utils/stream_mem.h"
 #include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/cfg/cfg_manage.h"

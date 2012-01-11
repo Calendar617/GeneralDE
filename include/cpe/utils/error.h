@@ -1,6 +1,6 @@
 #ifndef CPE_UTILS_ERRORMONITOR_H
 #define CPE_UTILS_ERRORMONITOR_H
-#include "cpe/pal/stdarg.h"
+#include "cpe/pal/pal_stdarg.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,6 +1,6 @@
 #ifndef CPE_UTILS_BITARR_H
 #define CPE_UTILS_BITARR_H
-#include "cpe/pal/types.h"
+#include "cpe/pal/pal_types.h"
 #include "memory.h"
 
 #ifdef __cplusplus

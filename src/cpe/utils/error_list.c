@@ -1,6 +1,6 @@
-#include "cpe/pal/string.h"
-#include "cpe/pal/stdio.h"
-#include "cpe/pal/queue.h"
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_stdio.h"
+#include "cpe/pal/pal_queue.h"
 #include "cpe/utils/error_list.h"
 
 #define CPE_ERROR_LIST_MSG_MAX_LEN 128

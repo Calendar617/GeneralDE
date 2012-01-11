@@ -1,6 +1,6 @@
 #ifndef CPE_MEM_BUFFER_H
 #define CPE_MEM_BUFFER_H
-#include "cpe/pal/queue.h"
+#include "cpe/pal/pal_queue.h"
 #include "memory.h"
 
 #ifdef __cplusplus

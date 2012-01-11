@@ -1,6 +1,6 @@
 #include <assert.h>
 #include "yaml.h"
-#include "cpe/pal/strings.h"
+#include "cpe/pal/pal_strings.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/dr/dr_ctypes_info.h"
 #include "cpe/cfg/cfg_manage.h"

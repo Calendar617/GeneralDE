@@ -1,6 +1,6 @@
 #include "yajl/yajl_gen.h"
-#include "cpe/pal/string.h"
-#include "cpe/pal/stackbuf.h"
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_stackbuf.h"
 #include "cpe/utils/stream_mem.h"
 #include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/dr/dr_json.h"

@@ -1,6 +1,6 @@
 #ifndef CPE_DR_EXTERNAL_H
 #define CPE_DR_EXTERNAL_H
-#include "cpe/pal/api_external.h"
+#include "cpe/pal/pal_external.h"
 
 #if defined CPE_DR_DLL
 #    if defined CPE_DR_BUILD_DLL

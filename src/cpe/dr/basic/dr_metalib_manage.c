@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "cpe/pal/stdio.h"
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_ctypes_info.h"
 #include "cpe/dr/dr_error.h"

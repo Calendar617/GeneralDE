@@ -1,6 +1,6 @@
 #ifndef CPE_CFG_TYPES_H
 #define CPE_CFG_TYPES_H
-#include "cpe/pal/types.h"
+#include "cpe/pal/pal_types.h"
 #include "cpe/dr/dr_ctypes_info.h"
 
 #ifdef __cplusplus
