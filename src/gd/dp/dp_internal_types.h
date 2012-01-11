@@ -1,6 +1,6 @@
 #ifndef GD_DP_IMPL_INTERNAL_TYPES_H
 #define GD_DP_IMPL_INTERNAL_TYPES_H
-#include "cpe/pal/queue.h"
+#include "cpe/pal/pal_queue.h"
 #include "cpe/utils/memory.h"
 #include "cpe/utils/hash_string.h"
 #include "cpe/utils/hash.h"

@@ -1,6 +1,6 @@
 #ifndef GD_TL_INTERNAL_TYPES_H
 #define GD_TL_INTERNAL_TYPES_H
-#include "cpe/pal/queue.h"
+#include "cpe/pal/pal_queue.h"
 #include "cpe/utils/memory.h"
 #include "gd/tl/tl_types.h"
 

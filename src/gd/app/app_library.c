@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include "cpe/pal/dlfcn.h"
+#include "cpe/pal/pal_dlfcn.h"
 #include "app_internal_ops.h"
 
 struct gd_app_lib {

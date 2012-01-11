@@ -1,6 +1,6 @@
 #include <sstream>
 #include <stdexcept>
-#include "cpe/pal/stackbuf.h"
+#include "cpe/pal/pal_stackbuf.h"
 #include "cpepp/utils/ErrorCollector.hpp"
 #include "gdpp/app/Log.hpp"
 #include "gdpp/dp/Manager.hpp"

@@ -1,5 +1,6 @@
 #ifndef GDPP_APP_SYSTEM_H
 #define GDPP_APP_SYSTEM_H
+#include "cpepp/cfg/System.hpp"
 #include "gd/app/app_types.h"
 #include "gdpp/nm/System.hpp"
 #include "gdpp/tl/System.hpp"

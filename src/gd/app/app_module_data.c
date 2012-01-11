@@ -1,6 +1,6 @@
 #include <assert.h>
-#include "cpe/pal/string.h"
-#include "cpe/pal/stackbuf.h"
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_stackbuf.h"
 #include "cpe/cfg/cfg_read.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"

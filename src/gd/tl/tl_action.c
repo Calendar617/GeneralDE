@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "cpe/pal/string.h"
+#include "cpe/pal/pal_string.h"
 #include "gd/tl/tl_action.h"
 #include "gd/tl/tl_errno.h"
 #include "tl_internal_types.h"

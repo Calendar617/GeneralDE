@@ -1,6 +1,6 @@
 #ifndef GDPP_LOG_H
 #define GDPP_LOG_H
-#include "cpe/pal/stdio.h"
+#include "cpe/pal/pal_stdio.h"
 #include "gd/app/app_log.h"
 #include "System.hpp"
 

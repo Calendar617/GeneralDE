@@ -1,8 +1,8 @@
 #ifndef GD_DP_TYPES_H
 #define GD_DP_TYPES_H
+#include "cpe/pal/pal_types.h"
 #include "cpe/utils/memory.h"
 #include "cpe/utils/error.h"
-#include "cpe/pal/types.h"
 
 #ifdef __cplusplus
 extern "C" {

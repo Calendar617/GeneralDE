@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "cpe/pal/stackbuf.h"
+#include "cpe/pal/pal_stackbuf.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "nm_internal_ops.h"

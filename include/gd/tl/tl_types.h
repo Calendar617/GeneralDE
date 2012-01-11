@@ -1,6 +1,6 @@
 #ifndef GD_TL_TYPES_H
 #define GD_TL_TYPES_H
-#include "cpe/pal/types.h"
+#include "cpe/pal/pal_types.h"
 
 typedef struct gd_tl_event * gd_tl_event_t;
 typedef struct gd_tl * gd_tl_t;

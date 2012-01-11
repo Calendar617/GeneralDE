@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "cpe/pal/queue.h"
+#include "cpe/pal/pal_queue.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/cfg/cfg_read.h"
 #include "gd/nm/nm_manage.h"

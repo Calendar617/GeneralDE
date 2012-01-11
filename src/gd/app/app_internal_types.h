@@ -1,6 +1,6 @@
 #ifndef GD_APP_SVR_CONTEXT_H
 #define GD_APP_SVR_CONTEXT_H
-#include "cpe/pal/queue.h"
+#include "cpe/pal/pal_queue.h"
 #include "cpe/utils/memory.h"
 #include "cpe/utils/error.h"
 #include "cpe/utils/hash_string.h"

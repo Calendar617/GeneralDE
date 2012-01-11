@@ -1,6 +1,6 @@
 #ifndef GD_OM_TYPES_H
 #define GD_OM_TYPES_H
-#include "cpe/pal/types.h"
+#include "cpe/pal/pal_types.h"
 #include "cpe/utils/hash_string.h"
 #include "cpe/utils/range.h"
 
