@@ -128,9 +128,11 @@ void * gd_app_lib_sym(struct gd_app_lib * lib, const char * symName, error_monit
 
     sym = lib
         ? dlsym(lib->m_handler, symName)
-        : dlsym(gd_app_default_lib_handler, symName);
+        : gd_app_default_lib_handler
+		  ? dlsym(gd_app_default_lib_handler, symName)
+		  : NULL;
 
-    if (sym == NULL) {
+    if (sym == NULL && em) {
         const char * e = dlerror();
         if (e) {
             CPE_ERROR(em, "find symbol %s error: %s\n", symName, e);
