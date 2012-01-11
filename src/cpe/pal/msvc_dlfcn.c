@@ -293,7 +293,8 @@ void *dlsym( void *handle, const char *name )
             }
         }
 
-        CloseHandle( hModule );
+		//wangjian hModule is global, can`t close
+        //CloseHandle( hModule );
     }
 
     if( symbol == NULL )

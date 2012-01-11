@@ -77,6 +77,7 @@ void cpe_error_log_to_consol(struct error_info * info, void * context, const cha
 	char buf[1024];
 	vsnprintf_s(buf, sizeof(buf), 128, fmt, args);
 	OutputDebugStringA(buf);
+	OutputDebugStringA("\n");
 #endif
     vprintf(fmt, args);
     printf("\n");

@@ -3,7 +3,7 @@
 
 #if defined _MSC_VER
 #include "msvc_dirent.h"
-# define readdir_r(__dir, __buf, __dp) ((*(__dp) = readdir(__dir)) == NULL ? 0 : -1)
+# define readdir_r(__dir, __buf, __dp) ((*(__dp) = readdir(__dir)) == NULL ? -1 : 0)
 #else
 #include <dirent.h>
 #endif
