@@ -3,6 +3,7 @@
 #include "cpepp/utils/ClassCategory.hpp"
 #include "cpe/cfg/cfg.h"
 #include "System.hpp"
+#include "NodeIterator.hpp"
 
 namespace Cpe { namespace Cfg {
 
@@ -12,6 +13,18 @@ public:
     bool isValid(void) const { return this != NULL; }
 
     Node & operator[](const char * path) { return *((Node*)cfg_find_cfg(*this, path)); }
+
+    NodeConstIterator childs(void) const {
+        NodeConstIterator r;
+        cfg_it_init(&r.m_it, *this);
+        return r;
+    }
+
+    NodeIterator childs(void) {
+        NodeIterator r;
+        cfg_it_init(&r.m_it, *this);
+        return r;
+    }
 
     operator int8_t(void);
     operator uint8_t(void);

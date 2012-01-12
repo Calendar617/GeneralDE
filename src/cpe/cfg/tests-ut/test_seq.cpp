@@ -164,34 +164,34 @@ TEST_F(SeqTest, remove_trunk_last_with_more_left) {
 }
 
 TEST_F(SeqTest, it_empty) {
-    cfg_seq_it_t it;
-    cfg_seq_it_init(&it, m_root);
+    cfg_it_t it;
+    cfg_it_init(&it, m_seq);
 
-    ASSERT_FALSE(cfg_seq_it_next(&it));
+    ASSERT_FALSE(cfg_it_next(&it));
 }
 
 TEST_F(SeqTest, it_basic) {
     cfg_seq_add_int32(m_seq, 1);
     cfg_seq_add_int32(m_seq, 2);
 
-    cfg_seq_it_t it;
-    cfg_seq_it_init(&it, m_seq);
+    cfg_it_t it;
+    cfg_it_init(&it, m_seq);
 
-    cfg_t cfg_a = cfg_seq_it_next(&it);
+    cfg_t cfg_a = cfg_it_next(&it);
     ASSERT_TRUE(cfg_a);
     ASSERT_EQ(1, cfg_as_int32(cfg_a, -1));
 
-    cfg_t cfg_b = cfg_seq_it_next(&it);
+    cfg_t cfg_b = cfg_it_next(&it);
     ASSERT_TRUE(cfg_b);
     ASSERT_EQ(2, cfg_as_int32(cfg_b, -1));
 
-    ASSERT_FALSE(cfg_seq_it_next(&it));
+    ASSERT_FALSE(cfg_it_next(&it));
 }
 
 TEST_F(SeqTest, it_init_cfg_null) {
-    cfg_seq_it_t it;
-    cfg_seq_it_init(&it, NULL);
+    cfg_it_t it;
+    cfg_it_init(&it, NULL);
 
-    ASSERT_FALSE(cfg_seq_it_next(&it));
+    ASSERT_FALSE(cfg_it_next(&it));
 }
 

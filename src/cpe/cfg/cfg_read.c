@@ -1,4 +1,5 @@
-#include <string.h>
+#include <assert.h>
+#include "cpe/pal/pal_string.h"
 #include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_types.h"
@@ -178,4 +179,82 @@ cfg_t cfg_find_cfg(cfg_t cfg, const char * path) {
     }
 
     return cfg;
+}
+
+static cfg_t cfg_seq_it_next(cfg_it_t * it) {
+    cfg_t rv;
+    struct cfg_seq_block * block;
+
+    assert(it);
+
+    if (it->m_data.m_seq_it.m_left_count == 0 || it->m_data.m_seq_it.m_block == NULL) {
+        return NULL;
+    }
+
+    block = (struct cfg_seq_block *)it->m_data.m_seq_it.m_block;
+    rv = block->m_items[it->m_data.m_seq_it.m_pos_in_block];
+
+    --it->m_data.m_seq_it.m_left_count;
+    ++it->m_data.m_seq_it.m_pos_in_block;
+    if (it->m_data.m_seq_it.m_pos_in_block >= CPE_CFG_SEQ_BLOCK_ITEM_COUNT) {
+        it->m_data.m_seq_it.m_pos_in_block -= CPE_CFG_SEQ_BLOCK_ITEM_COUNT;
+        it->m_data.m_seq_it.m_block = block->m_next;
+    }
+
+    return rv;
+}
+
+static cfg_t cfg_struct_it_next(cfg_it_t * it) {
+    struct cfg_struct_item * item;
+    cfg_t rv;
+
+    assert(it);
+
+    if (it == NULL
+        || it->m_data.m_struct_it.m_curent == NULL
+        || it->m_data.m_struct_it.m_curent->m_parent == NULL)
+    {
+        return NULL;
+    }
+
+    rv = it->m_data.m_struct_it.m_curent;
+
+    item = RB_NEXT(
+        cfg_struct_item_tree,
+        &((struct cfg_struct *)it->m_data.m_struct_it.m_curent->m_parent)->m_items,
+        cfg_to_struct_item(it->m_data.m_struct_it.m_curent));
+
+    it->m_data.m_struct_it.m_curent = (item == NULL) ? NULL : &item->m_data;
+
+    return rv;
+}
+
+void cfg_it_init(cfg_it_t * it, cfg_t cfg) {
+    assert(it);
+
+    if (cfg == NULL) {
+        it->next = NULL;
+        return;
+    }
+
+    switch (cfg ->m_type) {
+    case CPE_CFG_TYPE_SEQUENCE: {
+        struct cfg_seq * seq = (struct cfg_seq *)cfg;
+        it->m_data.m_seq_it.m_block = &seq->m_block_head;
+        it->m_data.m_seq_it.m_pos_in_block = 0;
+        it->m_data.m_seq_it.m_left_count = seq->m_count;
+        it->next = cfg_seq_it_next;
+        break;
+    }
+    case CPE_CFG_TYPE_STRUCT: {
+        struct cfg_struct_item * item;
+        item = RB_MIN(cfg_struct_item_tree, &((struct cfg_struct *)cfg)->m_items);
+        it->m_data.m_struct_it.m_curent = (item == NULL) ? NULL : &item->m_data;
+        it->next = cfg_struct_it_next;
+        break;
+    }
+    default:
+        it->next = NULL;
+        break;
+    }
 }
