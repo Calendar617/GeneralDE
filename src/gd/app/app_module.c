@@ -254,7 +254,7 @@ int gd_app_modules_load(gd_app_context_t context) {
     int rv;
     cfg_t moduleListCfg;
     cfg_t moduleCfg;
-    struct cfg_seq_it cfgIt;
+    struct cfg_it cfgIt;
 
     moduleListCfg = cfg_find_cfg(context->m_cfg, "modules.load");
 
@@ -269,8 +269,8 @@ int gd_app_modules_load(gd_app_context_t context) {
     }
 
     rv = 0;
-    cfg_seq_it_init(&cfgIt, moduleListCfg);
-    while(rv == 0 && (moduleCfg = cfg_seq_it_next(&cfgIt))) {
+    cfg_it_init(&cfgIt, moduleListCfg);
+    while(rv == 0 && (moduleCfg = cfg_it_next(&cfgIt))) {
         if (gd_app_runing_module_create(context, moduleCfg) != 0) {
             rv = -1;
         }

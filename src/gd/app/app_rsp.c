@@ -89,10 +89,10 @@ int gd_app_rsp_bind(
 
     switch(cfg_type(responsToCfg)) {
     case CPE_CFG_TYPE_SEQUENCE: {
-        struct cfg_seq_it cfgIt;
+        struct cfg_it cfgIt;
         cfg_t subResponsToCfg;
-        cfg_seq_it_init(&cfgIt, responsToCfg);
-        while((subResponsToCfg = cfg_seq_it_next(&cfgIt))) {
+        cfg_it_init(&cfgIt, responsToCfg);
+        while((subResponsToCfg = cfg_it_next(&cfgIt))) {
             if (gd_app_rsp_bind(ctx, rsp, subResponsToCfg) != 0) {
                 rv = -1;
             }
@@ -341,10 +341,10 @@ int gd_app_rsp_load_i(
 
     if (cfg_type(rspsCfg) == CPE_CFG_TYPE_STRUCT) {
         cfg_t subRspsCfg;
-        struct cfg_struct_it cfgIt;
+        struct cfg_it cfgIt;
         int rv = 0;
-        cfg_struct_it_init(&cfgIt, rspsCfg);
-        while((subRspsCfg = cfg_struct_it_next(&cfgIt))) {
+        cfg_it_init(&cfgIt, rspsCfg);
+        while((subRspsCfg = cfg_it_next(&cfgIt))) {
             if (gd_app_rsp_load_i(ctx, subRspsCfg) != 0) {
                 rv = -1;
             }
@@ -354,10 +354,10 @@ int gd_app_rsp_load_i(
     }
     else if (cfg_type(rspsCfg) == CPE_CFG_TYPE_SEQUENCE) {
         cfg_t rspCfg;
-        struct cfg_seq_it cfgIt;
+        struct cfg_it cfgIt;
         int rv = 0;
-        cfg_seq_it_init(&cfgIt, rspsCfg);
-        while((rspCfg = cfg_seq_it_next(&cfgIt))) {
+        cfg_it_init(&cfgIt, rspsCfg);
+        while((rspCfg = cfg_it_next(&cfgIt))) {
             if (gd_app_rsp_create(ctx, rspCfg) != 0) {
                 rv = -1;
             }
