@@ -40,6 +40,8 @@ int dr_entry_set_from_uint32(void * output, uint32_t input, LPDRMETAENTRY entry,
 int dr_entry_set_from_int64(void * output, int64_t input, LPDRMETAENTRY entry, error_monitor_t em);
 int dr_entry_set_from_uint64(void * output, uint64_t input, LPDRMETAENTRY entry, error_monitor_t em);
 int dr_entry_set_from_string(void * output, const char * input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_ctype(void * output, const void * input, int input_type, LPDRMETAENTRY entry, error_monitor_t em);
+
 int dr_entry_set_defaults(void * inout, LPDRMETAENTRY entry);
 
 void dr_meta_set_defaults(void * inout, LPDRMETA meta);
