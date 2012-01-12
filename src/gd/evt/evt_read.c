@@ -44,6 +44,21 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * ty
     return evt;
 }
 
+int gd_evt_send(
+    gd_evt_t evt,
+    gd_tl_time_span_t delay,
+    gd_tl_time_span_t span,
+    int repeatCount)
+{
+    gd_tl_event_t tl_evt;
+
+    assert(evt);
+
+    tl_evt = gd_tl_event_from_data(evt);
+
+    return gd_tl_event_send_ex(tl_evt, delay, span, repeatCount);
+}
+
 void * gd_evt_data(gd_evt_t evt) {
     return evt + 1;
 }

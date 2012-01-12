@@ -14,6 +14,13 @@ Event & EventCenter::createEvent(size_t attach_capacity, const char * typeName, 
     return *(Event *)r;
 }
 
+void EventCenter::sendEvent(Event & event) {
+    int r = gd_evt_send(event, 0, 0, 1);
+    if (r != 0) {
+        throw ::std::runtime_error("send event fail!");
+    }
+}
+
 EventCenter & EventCenter::_cast(gd_evt_mgr_t evm) {
     if (evm == NULL) {
         throw ::std::runtime_error("cast to EventCenter: input is NULL!");

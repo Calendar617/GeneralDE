@@ -15,6 +15,12 @@ gd_evt_t gd_evt_create(
     ssize_t data_capacity,
     error_monitor_t em);
 
+int gd_evt_send(
+    gd_evt_t evt,
+    gd_tl_time_span_t delay,
+    gd_tl_time_span_t span,
+    int repeatCount);
+
 const char * gd_evt_type(gd_evt_t evt);
 LPDRMETA gd_evt_meta(gd_evt_t evt);
 
