@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/utils/error.h"
 
