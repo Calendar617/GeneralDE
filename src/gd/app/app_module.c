@@ -176,7 +176,7 @@ gd_app_runing_module_create_i(
         return NULL;
     }
 
-    moduleDataGroup = gd_app_runing_module_data_load(context, module->m_name, moduleCfg);
+    moduleDataGroup = gd_app_runing_module_data_load(context, module->m_name);
     if (moduleDataGroup == NULL) {
         if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_free(module, context->m_em);
         mem_free(context->m_alloc, runing_module);
@@ -204,6 +204,7 @@ gd_app_runing_module_create_i(
 
 static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
     const char * moduleName;
+    cfg_t moduleInitCfg;
     assert(context);
 
     moduleName = cfg_get_string(cfg, "name", NULL);
@@ -212,14 +213,17 @@ static int gd_app_runing_module_create(gd_app_context_t context, cfg_t cfg) {
         return -1;
     }
 
+    moduleInitCfg = 
+        cfg_find_cfg(
+            cfg_find_cfg(gd_app_cfg(context), "modules"),
+            moduleName);
+    if (moduleInitCfg == NULL) moduleInitCfg = cfg;
+
     return gd_app_runing_module_create_i(
         context,
         moduleName,
         cfg_get_string(cfg, "library", NULL),
-        cfg_find_cfg(
-            cfg_find_cfg(gd_app_cfg(context), "modules"),
-            moduleName)
-        ) == NULL
+        moduleInitCfg) == NULL
         ? -1
         : 0;
 }

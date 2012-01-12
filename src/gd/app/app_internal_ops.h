@@ -24,8 +24,7 @@ void gd_app_modules_unload(gd_app_context_t context);
 gd_nm_node_t
 gd_app_runing_module_data_load(
     gd_app_context_t context,
-    cpe_hash_string_t moduleName,
-    cfg_t cfg);
+    cpe_hash_string_t moduleName);
 
 void gd_app_runing_module_data_free(
     gd_app_context_t context,

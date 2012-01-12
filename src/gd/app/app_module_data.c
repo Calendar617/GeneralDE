@@ -24,8 +24,7 @@ static struct gd_nm_node_type g_module_group = {
 gd_nm_node_t
 gd_app_runing_module_data_load(
     gd_app_context_t context,
-    cpe_hash_string_t moduleName,
-    cfg_t moduleCfg)
+    cpe_hash_string_t moduleName)
 {
     gd_nm_mgr_t nmm;
     gd_nm_node_t rootGroup;
