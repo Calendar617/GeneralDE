@@ -47,4 +47,8 @@ const char * Node::dft(const char * dft) {
     return cfg_as_string(*this, dft); 
 }
 
+NodeConstIterator::NodeConstIterator() {
+    m_it.next = NULL;
+}
+
 }}
