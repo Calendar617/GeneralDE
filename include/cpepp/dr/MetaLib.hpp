@@ -19,7 +19,7 @@ public:
     int buildVersion(void) const { return dr_lib_build_version(*this); }
 
     Meta const * findMeta(const char * name) const { return (Meta const *)dr_lib_find_meta_by_name(*this, name); }
-    Meta const & meta(const char * name);
+    Meta const & meta(const char * name) const;
 
     Meta const * findMeta(int id) const  { return (Meta const *)dr_lib_find_meta_by_id(*this, id); }
     Meta const & meta(int id) const;
