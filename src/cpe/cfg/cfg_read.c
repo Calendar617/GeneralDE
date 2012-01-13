@@ -81,15 +81,13 @@ CPE_CFG_GEN_READ_TYPE(int64);
 CPE_CFG_GEN_READ_TYPE(uint64);
 
 const char * cfg_as_string(cfg_t cfg, const char * dft) {
-    return cfg->m_type == CPE_DR_TYPE_STRING
+    return cfg && cfg->m_type == CPE_DR_TYPE_STRING
         ? (const char *)cfg_data(cfg)
         : dft;
 }
 
 const char * cfg_get_string(cfg_t cfg, const char * path, const char * dft) {
     cfg_t at = cfg_find_cfg(cfg, path);
-    if (at == NULL) return dft;
-
     return cfg_as_string(at, dft);
 }
 
