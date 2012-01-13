@@ -19,3 +19,6 @@ LDFLAGS.share:=--shared
 dep.iconv?=system
 
 $(self-dev-env).default-lib-type:=dynamic
+$(self-dev-env).make-static-lib-name=$1.lib
+$(self-dev-env).make-dynamic-lib-name=$1.dll
+$(self-dev-env).make-executable-name=$1.exe
