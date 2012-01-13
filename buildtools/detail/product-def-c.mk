@@ -72,11 +72,11 @@ $(eval r.$1.c.lib.type=$(if $(r.$1.c.lib.type),$(r.$1.c.lib.type),$($(dev-env).d
 r.$1.product.c.libraries+=$1
 r.$1.product.c.ldpathes+=$(if $(r.$1.buildfor),$(r.$1.buildfor)-lib,lib)
 r.$1.product:=$(if $(r.$1.product),$(r.$1.product),\
-                   $(r.$1.output)/lib$1.$(if $(filter static,$(r.$1.c.lib.type)),a,so))
+                   $(r.$1.output)/$(call $(dev-env).$(if $(filter static,$(r.$1.c.lib.type)),make-static-lib-name,make-dynamic-lib-name),$1))
 endef
 
 define product-def-rule-c-product-for-progn
-r.$1.product:=$(if $(r.$1.product),$(r.$1.product),$(r.$1.output)/$1)
+r.$1.product:=$(if $(r.$1.product),$(r.$1.product),$(r.$1.output)/$(call $(dev-env).make-executable-name,$1))
 endef
 
 product-def-rule-c-link-cmd-progn=$$(product-def-c-linker-$(r.$1.c.linker)) $2 -o $3 $$(call c-generate-depend-ld-flags,$1)
