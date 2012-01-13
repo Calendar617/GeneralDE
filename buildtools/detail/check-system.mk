@@ -8,6 +8,10 @@ ifeq ($(ORIGN_OS_NAME),Darwin)
 OS_NAME:=mac
 endif
 
+ifeq ($(filter CYGWIN%,$(ORIGN_OS_NAME)),$(ORIGN_OS_NAME))
+OS_NAME:=cygwin
+endif
+
 ifeq ($(OS_NAME),)
 $(error unknown orign os name $(ORIGN_OS_NAME))
 endif
