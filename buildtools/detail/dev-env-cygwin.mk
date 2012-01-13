@@ -11,9 +11,9 @@ CFLAGS+=-ggdb
 CXXFLAGS+=-ggdb
 endif
 
-LDFLAGS.share:=--shared -z defs
+LDFLAGS.share:=--shared -Xlinker --no-undefined
 
-$(self-dev-env).default-lib-type:=dynamic
+$(self-dev-env).default-lib-type:=static
 $(self-dev-env).make-static-lib-name=lib$1.a
 $(self-dev-env).make-dynamic-lib-name=$1.dll
 $(self-dev-env).make-executable-name=$1.exe
