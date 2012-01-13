@@ -10,3 +10,4 @@ xcuserdata
 *.pdb
 *.suo
 .emacs.desktop*
+*.stackdump

@@ -8,7 +8,7 @@
 
 namespace Cpe { namespace Dr {
 
-Meta const & MetaLib::meta(const char * name) {
+Meta const & MetaLib::meta(const char * name) const {
     Meta const * r = findMeta(name);
     if (r == NULL) {
         ::std::ostringstream os;
