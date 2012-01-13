@@ -16,9 +16,9 @@ endef
 # $(call install-def-rule-copy,product-name,source-dir,target-dir)
 define install-def-rule-one-dir-r
 auto-build-dirs+=$(CPDE_OUTPUT_ROOT)/$3 \
-                 $(subst $(CPDE_ROOT)/$2,$(CPDE_OUTPUT_ROOT)/$3,$(sort $(dir $(shell find $(CPDE_ROOT)/$2 -type f))))
+                 $(subst $(CPDE_ROOT)/$2,$(CPDE_OUTPUT_ROOT)/$3,$(sort $(dir $(if $(wildcard $(CPDE_ROOT)/$2),$(shell find $(CPDE_ROOT)/$2 -type f)))))
 
-$(foreach f,$(shell find $(CPDE_ROOT)/$2 -type f),\
+$(foreach f,$(if $(wildcard $(CPDE_ROOT)/$2),$(shell find $(CPDE_ROOT)/$2 -type f)),\
     $(eval $(call install-def-rule-copy,$1,$f,$(subst $(CPDE_ROOT)/$2,$(CPDE_OUTPUT_ROOT)/$3,$f))) \
 )
 endef
@@ -27,7 +27,7 @@ endef
 define install-def-rule-one-dir
 auto-build-dirs+=$(CPDE_OUTPUT_ROOT)/$3
 
-$(foreach f,$(shell find $(CPDE_ROOT)/$2 -maxdepth 1 -type f),\
+$(foreach f,$(if $(wildcard $(CPDE_ROOT)/$2),$(shell find $(CPDE_ROOT)/$2 -maxdepth 1 -type f)),\
     $(eval $(call install-def-rule-copy,$1,$f,$(subst $(CPDE_ROOT)/$2,$(CPDE_OUTPUT_ROOT)/$3,$f))) \
 )
 endef
