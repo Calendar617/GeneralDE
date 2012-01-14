@@ -19,8 +19,7 @@
  */
 
 #include <windows.h>
-#include <stdio.h>
-
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/pal/msvc_dlfcn.h"
 
 /* Note:
@@ -163,7 +162,7 @@ static void save_err_ptr_str( const void *ptr )
 {
     char ptr_buf[19]; /* 0x<pointer> up to 64 bits. */
 
-    sprintf( ptr_buf, "0x%p", ptr );
+    snprintf( ptr_buf, sizeof(ptr_buf), "0x%p", ptr );
 
     save_err_str( ptr_buf );
 }

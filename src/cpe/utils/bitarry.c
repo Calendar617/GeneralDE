@@ -30,7 +30,7 @@ void cpe_ba_set_from_string(cpe_ba_t ba, size_t bit_capacity, const char * str) 
 
     cpe_ba_set_all(ba, bit_capacity, cpe_ba_false);
 
-    for(i = 0; i < bit_capacity; ++i) {
+    for(i = 0; i < (int)bit_capacity; ++i) {
         if (str[i] != '0') {
             cpe_ba_set(ba, i, cpe_ba_true);
         }

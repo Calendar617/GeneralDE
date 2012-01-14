@@ -95,6 +95,8 @@ int dir_is_empty(const char * path, error_monitor_t em) {
     struct dirent * dp;
     int rv;
 
+    (void)dbuf; /*for vc compile warning*/
+
     dirp = dir_open(path, 0, NULL);
     if (dirp == NULL) { return 1; }
 
