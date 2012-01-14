@@ -87,29 +87,31 @@ public:
         ec().sendEvent(event);
     }
 
-    /*恶心的代码，具体参看头文�*/
 	virtual void registerResponser(const char * oid, EventResponser& realResponser, EventResponser & useResponser, EventProcessFun fun) {
-        IdVector & ids = _idRsps[(ptr_int_t)&realResponser];
+        try {
+            IdVector & ids = _idRsps[(ptr_int_t)&realResponser];
 
-        ptr_int_t newId = allocProcessor();
+            ptr_int_t newId = allocProcessor();
 
-        ids.reserve(ids.size() + 1);
+            ids.reserve(ids.size() + 1);
 
-        ::std::ostringstream os;
-        os << "rsp." << newId;
+            ::std::ostringstream os;
+            os << "rsp." << newId;
 
-        Gd::Dp::Responser & rsp = _app.dpManager().createResponser(os.str().c_str());
-        rsp.setProcessor(apply_evt);
+            Gd::Dp::Responser & rsp = _app.dpManager().createResponser(os.str().c_str());
+            rsp.setProcessor(apply_evt);
 
-        ProcessorNode & pn = _processors[newId];
-        pn._processor = &useResponser;
-        pn._process_fun = fun;
+            ProcessorNode & pn = _processors[newId];
+            pn._processor = &useResponser;
+            pn._process_fun = fun;
 
-        rsp.setContext(&pn);
+            rsp.setContext(&pn);
 
-        _app.dpManager().bind(rsp, oid);
+            _app.dpManager().bind(rsp, oid);
 
-        ids.push_back(newId);
+            ids.push_back(newId);
+        }
+        APP_CTX_CATCH_EXCEPTION_RETHROW(_app, "register EventResponser to oid %s: ", oid);
     }
 
 	virtual void unregisterResponser(EventResponser & r) {
@@ -280,8 +282,7 @@ EventCenter & EventCenter::instance(Application & app, cpe_hash_string_t name) {
         dynamic_cast<EventCenter *>(
             &app.nmManager().object(name));
     if (r == NULL) {
-        APP_THROW_EXCEPTION(
-            ::std::runtime_error, "EventCenter cast fail!");
+        APP_CTX_THROW_EXCEPTION(app, ::std::runtime_error, "EventCenter cast fail!");
     }
 
     return *r;

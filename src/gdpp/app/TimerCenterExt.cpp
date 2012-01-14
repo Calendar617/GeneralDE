@@ -103,7 +103,8 @@ TimerCenter & TimerCenter::instance(Application & app, cpe_hash_string_t name) {
         dynamic_cast<TimerCenter *>(
             &app.nmManager().object(name));
     if (r == NULL) {
-        APP_THROW_EXCEPTION(
+        APP_CTX_THROW_EXCEPTION(
+            app,
             ::std::runtime_error, "TimerCenter cast fail!");
     }
 
