@@ -122,7 +122,7 @@ int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monit
         ++count;
 
         if (rsp->m_processor == NULL) {
-            CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
+            CPE_ERROR(em, "responser %s have no processor", rsp->m_name);
             rv = -1;
             continue;
         }
@@ -134,7 +134,7 @@ int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monit
     }
 
     if (count == 0) {
-        CPE_ERROR(em, "no responser to process %s\n", cpe_hs_data(cmd));
+        CPE_ERROR(em, "no responser to process %s", cpe_hs_data(cmd));
         return -1;
     }
 
@@ -155,7 +155,7 @@ int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) 
         ++count;
 
         if (rsp->m_processor == NULL) {
-            CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
+            CPE_ERROR(em, "responser %s have no processor", rsp->m_name);
             rv = -1;
             continue;
         }
@@ -167,8 +167,7 @@ int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) 
     }
 
     if (count == 0) {
-        CPE_ERROR(em, "no responser to process %d", cmd);
-        return -1;
+        CPE_INFO(em, "no responser to process %d", cmd);
     }
 
     return rv;
@@ -179,12 +178,12 @@ int gd_dp_dispatch_by_name(const char * name, gd_dp_req_t req, error_monitor_t e
     rsp = gd_dp_rsp_find_by_name(req->m_mgr, name);
 
     if (rsp == 0) {
-        CPE_ERROR(em, "no responser name %s\n", name);
+        CPE_ERROR(em, "no responser name %s", name);
         return -1;
     }
     
     if (rsp->m_processor == NULL) {
-        CPE_ERROR(em, "responser %s have no processor\n", rsp->m_name);
+        CPE_ERROR(em, "responser %s have no processor", rsp->m_name);
         return -1;
     }
 

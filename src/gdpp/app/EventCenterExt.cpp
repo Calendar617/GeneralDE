@@ -188,7 +188,7 @@ private:
                 evt->dump((write_stream_t)&stream);
 
                 APP_CTX_INFO(
-                    ec->_app, "dispatch event: success, oid=%s, event=%s!",
+                    ec->_app, "dispatch event: success, oid=%s, event=%s",
                     cpe_hs_data((cpe_hash_string_t)evt->attach_buf()),
                     buf);
             }
@@ -201,7 +201,7 @@ private:
                 evt->dump((write_stream_t)&stream);
 
                 APP_CTX_ERROR(
-                    ec->_app, "dispatch event: catch exception: %s, oid=%s, event=%s!",
+                    ec->_app, "dispatch event: catch exception: %s, oid=%s, event=%s",
                     e.what(),
                     cpe_hs_data((cpe_hash_string_t)evt->attach_buf()),
                     buf);
