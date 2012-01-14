@@ -2,8 +2,9 @@
 #include <stdexcept>
 #include <vector>
 #include <map>
-#include <string>
 #include <sstream>
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_strings.h"
 #include "cpe/pal/pal_external.h"
 #include "cpe/utils/stream_mem.h"
 #include "cpepp/utils/OpGuard.hpp"
