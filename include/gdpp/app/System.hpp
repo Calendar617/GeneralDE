@@ -20,6 +20,12 @@ class EventResponser;
 class EventResponserBase;
 typedef void (EventResponser::*EventProcessFun)(const char * oid, Event const & e);
 
+typedef int32_t TimerID;
+class TimerCenter;
+class TimerProcessor;
+class TimerProcessorBase;
+typedef void (TimerProcessor::*TimerProcessFun)(TimerID id);
+
 }}
 
 #endif

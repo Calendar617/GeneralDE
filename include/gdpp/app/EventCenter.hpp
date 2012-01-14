@@ -17,7 +17,7 @@ public:
 #ifdef _MSC_VER
         this->registerResponser(oid, r, *((EventResponser*)((void*)&r)), static_cast<EventProcessFun>(fun));
 #else
-        this->registerResponser(oid, static_cast<EventResponser&>(r), static_cast<EventResponser&>(r), static_cast<ProcessFun>(fun));
+        this->registerResponser(oid, static_cast<EventResponser&>(r), static_cast<EventResponser&>(r), static_cast<EventProcessFun>(fun));
 #endif
     }
 
