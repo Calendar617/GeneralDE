@@ -11,7 +11,7 @@ namespace Gd { namespace App {
 class Application;
 class Module;
 class Library;
-class Responser;
+class ReqResponser;
 
 }}
 

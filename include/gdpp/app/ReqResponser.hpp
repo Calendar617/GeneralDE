@@ -5,10 +5,10 @@
 
 namespace Gd { namespace App {
 
-class Responser {
+class ReqResponser {
 public:
     virtual int process(Dp::Request & req, error_monitor_t em) = 0;
-    virtual ~Responser();
+    virtual ~ReqResponser();
 
     static int _process(gd_dp_req_t req, void * ctx, error_monitor_t em);
     static gd_dp_rsp_type_t _type;
@@ -23,7 +23,7 @@ int rsp_ ## __rsp_name ## _init(                    \
     gd_app_module_t module,                         \
     cfg_t cfg)                                      \
 {                                                   \
-    ::Gd::App::Responser * processor =              \
+    ::Gd::App::ReqResponser * processor =              \
           new __rsp_type(                           \
               *((::Gd::App::Application *)context), \
               *((::Gd::App::Module*)module),        \
@@ -32,7 +32,7 @@ int rsp_ ## __rsp_name ## _init(                    \
                                                     \
     gd_dp_rsp_set_opt(                              \
         rsp, gd_dp_rsp_set_processor,               \
-        &::Gd::App::Responser::_process);           \
+        &::Gd::App::ReqResponser::_process);           \
                                                     \
     gd_dp_rsp_set_opt(                              \
         rsp, gd_dp_rsp_set_context,                 \
@@ -40,7 +40,7 @@ int rsp_ ## __rsp_name ## _init(                    \
                                                     \
     gd_dp_rsp_set_opt(                              \
         rsp, gd_dp_rsp_set_type,                    \
-        ::Gd::App::Responser::_type);               \
+        ::Gd::App::ReqResponser::_type);               \
                                                     \
     return 0;                                       \
 }
