@@ -40,6 +40,7 @@ public:
     EventCenterImpl(
         Gd::App::Application & app, Cpe::Cfg::Node & cfg)
         : _app(app)
+        , _is_debug(cfg["debug"].dft(0))
         , _tl(NULL)
         , _emm(NULL)
         , _req(NULL)
@@ -179,6 +180,18 @@ private:
             gd_dp_req_set_buf(ec->_req, (void*)input, (size_t)0);
 
             ec->_app.dpManager().dispatch((cpe_hash_string_t)evt->attach_buf(), ec->_req);
+
+            if (ec->_is_debug) {
+                char buf[512];
+                struct write_stream_mem stream = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, sizeof(buf) - 1);
+                bzero(buf, sizeof(buf));
+                evt->dump((write_stream_t)&stream);
+
+                APP_CTX_INFO(
+                    ec->_app, "dispatch event: success, oid=%s, event=%s!",
+                    cpe_hs_data((cpe_hash_string_t)evt->attach_buf()),
+                    buf);
+            }
         }
         catch(::std::exception const & e) {
             if (evt) {
@@ -247,6 +260,7 @@ private:
     }
 
     Gd::App::Application & _app;
+    int _is_debug;
     gd_tl_t _tl;
     gd_evt_mgr_t _emm;
     gd_dp_req_t _req;
