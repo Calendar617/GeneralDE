@@ -1,5 +1,6 @@
 #ifndef GDPP_EVT_EVENT_H
 #define GDPP_EVT_EVENT_H
+#include "cpe/utils/stream.h"
 #include "cpepp/utils/ClassCategory.hpp"
 #include "cpepp/utils/CString.hpp"
 #include "cpepp/dr/Meta.hpp"
@@ -37,6 +38,8 @@ public:
     Cpe::Dr::DataElement operator[] (const char * name) {
         return args()[name];
     }
+
+    void dump(write_stream_t stream) const;
 
     Event * clone(mem_allocrator_t alloc = NULL) const;
     void destory(void);

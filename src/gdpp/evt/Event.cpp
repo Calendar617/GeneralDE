@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "cpe/dr/dr_json.h"
 #include "gd/tl/tl_action.h"
 #include "gdpp/evt/Event.hpp"
 
@@ -30,6 +31,10 @@ Event * Event::clone(mem_allocrator_t alloc) const {
 void Event::destory(void) {
     gd_tl_event_t tl_evt = gd_tl_event_from_data((void*)(gd_evt_t)this);
     gd_tl_event_free(tl_evt);
+}
+
+void Event::dump(write_stream_t stream) const {
+    dr_json_print(stream, gd_evt_data(*this), gd_evt_meta(*this), DR_JSON_PRINT_MINIMIZE, NULL);
 }
 
 }}

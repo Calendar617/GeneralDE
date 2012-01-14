@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include "cpe/pal/pal_external.h"
+#include "cpe/utils/stream_mem.h"
 #include "cpepp/utils/OpGuard.hpp"
 #include "cpepp/utils/RangeMgr.hpp"
 #include "cpepp/utils/MemBuffer.hpp"
@@ -170,13 +171,30 @@ private:
 
     static void dispatch_evt(gd_tl_event_t input, void * context) {
         EventCenterImpl * ec = (EventCenterImpl*)context;
-
+        Event * evt = NULL;
         try {
-            Event & e = Event::_cast(input);
+            evt = &Event::_cast(input);
 
             gd_dp_req_set_buf(ec->_req, (void*)input, (size_t)0);
 
-            ec->_app.dpManager().dispatch((cpe_hash_string_t)e.attach_buf(), ec->_req);
+            ec->_app.dpManager().dispatch((cpe_hash_string_t)evt->attach_buf(), ec->_req);
+        }
+        catch(::std::exception const & e) {
+            if (evt) {
+                char buf[512];
+                struct write_stream_mem stream = CPE_WRITE_STREAM_MEM_INITIALIZER(buf, sizeof(buf) - 1);
+                bzero(buf, sizeof(buf));
+                evt->dump((write_stream_t)&stream);
+
+                APP_CTX_ERROR(
+                    ec->_app, "dispatch event: catch exception: %s, oid=%s, event=%s!",
+                    e.what(),
+                    cpe_hs_data((cpe_hash_string_t)evt->attach_buf()),
+                    buf);
+            }
+            else {
+                APP_CTX_ERROR(ec->_app, "dispatch event: catch exception: %s!", e.what());
+            }
         }
         catch(...) {
             APP_CTX_ERROR(ec->_app, "dispatch event: catch unknown exception!");
