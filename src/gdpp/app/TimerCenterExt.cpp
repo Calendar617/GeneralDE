@@ -4,6 +4,7 @@
 #include "cpepp/utils/OpGuard.hpp"
 #include "cpepp/dr/MetaLib.hpp"
 #include "gdpp/nm/Manager.hpp"
+#include "gd/tl/tl_action.h"
 #include "gdpp/tl/Manager.hpp"
 #include "gdpp/app/Log.hpp"
 #include "gdpp/app/Application.hpp"
@@ -13,6 +14,12 @@ namespace Gd { namespace App {
 
 class TimerCenterImpl : public TimerCenterExt {
 public:
+    struct TimerData {
+        TimerProcessor * _realResponser;
+        TimerProcessor * _useResponser;
+        TimerProcessor _fun;
+    };
+ 
     TimerCenterImpl(
         Gd::App::Application & app, Cpe::Cfg::Node & cfg)
         : _app(app)
@@ -50,14 +57,33 @@ private:
         }
     }
 
+    static void dispatch_timer(gd_tl_event_t input, void * context) {
+        TimerCenterImpl * ec = (TimerCenterImpl*)context;
+        TimerID timerId = *reinterpret_cast<TimerID*>(gd_tl_event_data(input));
+
+        try {
+
+        }
+        catch(::std::exception const & e) {
+            APP_CTX_ERROR(
+                ec->_app, "dispatch timer(id=%d): catch exception: %s!",
+                timerId, e.what());
+        }
+        catch(...) {
+            APP_CTX_ERROR(
+                ec->_app, "dispatch timer(id=%d): catch unknown exception!",
+                timerId);
+        }
+    }
+
     static gd_tl_t createTl(Gd::App::Application & app, TimerCenterImpl & self) {
         gd_tl_t tl = gd_tl_create(app.tlManager());
         if (tl == NULL) {
             APP_CTX_THROW_EXCEPTION(app, ::std::runtime_error, "create tl fail!");
         }
 
-        //gd_tl_set_opt(tl, gd_tl_set_event_dispatcher, dispatch_evt);
-        //gd_tl_set_opt(tl, gd_tl_set_event_op_context, &self);
+        gd_tl_set_opt(tl, gd_tl_set_event_dispatcher, dispatch_timer);
+        gd_tl_set_opt(tl, gd_tl_set_event_op_context, &self);
 
         return tl;
     }
