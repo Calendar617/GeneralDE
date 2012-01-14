@@ -45,7 +45,7 @@ void dr_cfg_read_i(
 
         if (entry->m_data_start_pos + entry->m_unitsize > capacity) {
             CPE_WARNING(
-                em, "read from %s: read %s.%s, size overflow, require %d, but only %d!",
+                em, "read from %s: read %s.%s, size overflow, require %d, but only %zd!",
                 cfg_name(cfg),
                 dr_meta_name(meta), cfg_name(item),
                 entry->m_data_start_pos + entry->m_unitsize,
