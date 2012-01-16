@@ -76,4 +76,15 @@ MetaLib::_load_from_xml_file(const char * file, Utils::MemBuffer & buf) {
     return _cast(buf.make_continuous(), buf.size());
 }
 
+MetaLib const &
+MetaLib::_load_from_xml(const char * xml, Utils::MemBuffer & buf) {
+    Utils::ErrorCollector ec;
+
+    if (dr_create_lib_from_xml_ex(buf, xml, strlen(xml), ec) != 0) {
+        ec.checkThrowWithMsg< ::std::runtime_error>();
+    }
+
+    return _cast(buf.make_continuous(), buf.size());
+}
+
 }}

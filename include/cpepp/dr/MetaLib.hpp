@@ -29,6 +29,7 @@ public:
 
     static MetaLib const & _load_from_bin_file(const char * file, Utils::MemBuffer & buf);
     static MetaLib const & _load_from_xml_file(const char * file, Utils::MemBuffer & buf);
+    static MetaLib const & _load_from_xml(const char * xml, Utils::MemBuffer & buf);
 };
 
 }}
