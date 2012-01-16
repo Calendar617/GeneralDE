@@ -7,7 +7,9 @@
 #include "gdpp/app/TimerProcessor.hpp"
 #include "../TimerCenterExt.hpp"
 
-typedef LOKI_TYPELIST_1(Gd::App::testenv::with_app) TimerCenterTestBase;
+typedef LOKI_TYPELIST_2(
+    utils::testenv::with_em,
+    Gd::App::testenv::with_app) TimerCenterTestBase;
 
 class TimerCenterTest : public testenv::fixture<TimerCenterTestBase> {
 public:

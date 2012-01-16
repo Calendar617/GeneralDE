@@ -7,7 +7,9 @@
 #include "gdpp/app/EventResponser.hpp"
 #include "../EventCenterExt.hpp"
 
-typedef LOKI_TYPELIST_1(Gd::App::testenv::with_app) EventCenterTestBase;
+typedef LOKI_TYPELIST_2(
+    utils::testenv::with_em,
+    Gd::App::testenv::with_app) EventCenterTestBase;
 
 class EventCenterTest : public testenv::fixture<EventCenterTestBase> {
 public:

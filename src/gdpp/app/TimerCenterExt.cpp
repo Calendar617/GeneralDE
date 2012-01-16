@@ -143,6 +143,16 @@ public:
         }
     }
 
+    virtual bool haveTimer(TimerID timerId) const {
+        int pagePos = timerId / _timer_count_in_page;
+        if (pagePos >= (int)_timer_page_count) return false;
+
+        TimerData const * timerPage = _timer_buf[pagePos];
+
+        return timerPage[timerId % _timer_count_in_page]
+            ._realProcessor != NULL;
+    }
+
 private:
     void freeTl(void) {
         gd_tl_free(_tl);
@@ -168,7 +178,8 @@ private:
                 bzero(newTimerBuf, sizeof(TimerData *) * newTimerPageCapacity);
                 memcpy(newTimerBuf, _timer_buf, sizeof(TimerData*) * _timer_page_count);
 
-                mem_free(_alloc, _timer_buf);
+                if (_timer_buf) mem_free(_alloc, _timer_buf);
+
                 _timer_buf = newTimerBuf;
                 _timer_page_capacity = newTimerPageCapacity;
 
@@ -318,10 +329,7 @@ private:
         const TimerData * lTimerData = (const TimerData*)l;
         const TimerData * rTimerData = (const TimerData*)r;
 
-        return 
-            ((ptr_int_t)lTimerData->_realProcessor)
-            - ((ptr_int_t)rTimerData->_realProcessor);
-        
+        return lTimerData->_realProcessor == rTimerData->_realProcessor;
     }
 
     void initProcessorHash(void) {

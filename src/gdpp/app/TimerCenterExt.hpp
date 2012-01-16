@@ -6,6 +6,8 @@ namespace Gd { namespace App {
 
 class TimerCenterExt : public TimerCenter {
 public:
+    virtual bool haveTimer(TimerID) const = 0;
+
     virtual ~TimerCenterExt();
 };
 
