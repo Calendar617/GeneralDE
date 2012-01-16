@@ -376,10 +376,7 @@ TimerCenter & TimerCenter::instance(Application & app, cpe_hash_string_t name) {
     return *r;
 }
 
-static cpe_hash_string_buf s_Event_req_type_name_buf = CPE_HS_BUF_MAKE("app.event.req");
-cpe_hash_string_t TimerCenter::req_type_name = (cpe_hash_string_t)s_Event_req_type_name_buf;
-
-static cpe_hash_string_buf s_Event_DEFAULT_NAME_buf = CPE_HS_BUF_MAKE("app.event.req");
+static cpe_hash_string_buf s_Event_DEFAULT_NAME_buf = CPE_HS_BUF_MAKE("AppTimerCenter");
 cpe_hash_string_t TimerCenter::DEFAULT_NAME = (cpe_hash_string_t)s_Event_DEFAULT_NAME_buf;
 
 }}
@@ -394,14 +391,8 @@ int AppTimerCenter_app_init(Gd::App::Application & app, Gd::App::Module & module
             ? -1
             : 0;
     }
-    catch(::std::exception const & e) {
-        APP_CTX_ERROR(app, "create AppTimerCenter: catch exception %s!", e.what());
-        return -1;
-    }
-    catch(...) {
-        APP_CTX_ERROR(app, "create AppTimerCenter: catch unknown exception!");
-        return -1;
-    }
+    APP_CTX_CATCH_EXCEPTION(app, "create AppTimerCenter: ");
+    return -1;
 }
 
 extern "C"

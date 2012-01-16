@@ -130,8 +130,19 @@ public:
 
 private:
     Cpe::Dr::MetaLib const &  loadMetaLib(Cpe::Utils::MemBuffer & buf, Cpe::Cfg::Node & cfg) {
-        const char * file = cfg["laod-from"];
-        return Cpe::Dr::MetaLib::_load_from_xml_file(file, buf);
+        const char * file = cfg["load-from"].dft((const char *)NULL);
+        if (file) {
+            return Cpe::Dr::MetaLib::_load_from_xml_file(file, buf);
+        }
+
+        if (const char * xml = cfg["load-from-memory"].dft((const char *)NULL)) {
+            return Cpe::Dr::MetaLib::_load_from_xml(xml, buf);
+        }
+
+        APP_CTX_THROW_EXCEPTION(
+            _app,
+            ::std::runtime_error,
+            "unknown event def, no load-from and load-from-memory configured!");
     }
 
     Gd::Evt::EventCenter & ec(void) {
@@ -289,7 +300,7 @@ EventCenter & EventCenter::instance(Application & app, cpe_hash_string_t name) {
 static cpe_hash_string_buf s_Event_req_type_name_buf = CPE_HS_BUF_MAKE("app.event.req");
 cpe_hash_string_t EventCenter::req_type_name = (cpe_hash_string_t)s_Event_req_type_name_buf;
 
-static cpe_hash_string_buf s_Event_DEFAULT_NAME_buf = CPE_HS_BUF_MAKE("app.event.req");
+static cpe_hash_string_buf s_Event_DEFAULT_NAME_buf = CPE_HS_BUF_MAKE("AppEventCenter");
 cpe_hash_string_t EventCenter::DEFAULT_NAME = (cpe_hash_string_t)s_Event_DEFAULT_NAME_buf;
 
 }}
@@ -297,11 +308,15 @@ cpe_hash_string_t EventCenter::DEFAULT_NAME = (cpe_hash_string_t)s_Event_DEFAULT
 extern "C"
 EXPORT_DIRECTIVE
 int AppEventCenter_app_init(Gd::App::Application & app, Gd::App::Module & module, Cpe::Cfg::Node & cfg) {
-    return (new (app.nmManager(), cpe_hs_data(Gd::App::EventCenter::DEFAULT_NAME))
-            Gd::App::EventCenterImpl(app, cfg))
-        == NULL
-        ? -1
-        : 0;
+    try {
+        return (new (app.nmManager(), cpe_hs_data(Gd::App::EventCenter::DEFAULT_NAME))
+                Gd::App::EventCenterImpl(app, cfg))
+            == NULL
+            ? -1
+            : 0;
+    }
+    APP_CTX_CATCH_EXCEPTION(app, "create AppEventCenter: ");
+    return -1;
 }
 
 extern "C"

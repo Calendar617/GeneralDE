@@ -42,7 +42,6 @@ public:
     static TimerCenter & instance(Application & app, cpe_hash_string_t name = DEFAULT_NAME);
 
     static cpe_hash_string_t DEFAULT_NAME;
-    static cpe_hash_string_t req_type_name;
 };
 
 }}
