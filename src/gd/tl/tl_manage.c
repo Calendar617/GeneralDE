@@ -18,7 +18,6 @@ gd_tl_manage_t gd_tl_manage_create(mem_allocrator_t alloc) {
     tm->m_time_ctx = 0;
     tm->m_time_current = tm->m_time_get(tm->m_time_ctx);
 
-    tm->m_tl_count = 0;
     tm->m_action_begin_pos = tm->m_action_end_pos = 0;
 
     for(i = 0; i < GD_TL_ACTION_MAX; ++i) {
@@ -27,6 +26,8 @@ gd_tl_manage_t gd_tl_manage_create(mem_allocrator_t alloc) {
         action->m_event.m_capacity = GD_TL_ACTION_MAX - sizeof(struct gd_tl_event);
     }
  
+    TAILQ_INIT(&tm->m_tls);
+
     TAILQ_INIT(&tm->m_event_queue);
     TAILQ_INIT(&tm->m_event_building_queue);
 
@@ -60,12 +61,19 @@ static void gd_tl_action_queue_clear(gd_tl_manage_t tm) {
     }
 }
 
+void gd_tl_queue_clear(gd_tl_manage_t tm) {
+    while(!TAILQ_EMPTY(&tm->m_tls)) {
+        gd_tl_free(TAILQ_FIRST(&tm->m_tls));
+    }
+}
+
 void gd_tl_manage_free(gd_tl_manage_t tm) {
     if (tm == NULL) return;
 
     gd_tl_event_queue_clear(&tm->m_event_building_queue);
     gd_tl_event_queue_clear(&tm->m_event_queue);
     gd_tl_action_queue_clear(tm);
+    gd_tl_queue_clear(tm);
 
     mem_free(tm->m_alloc, tm);
 }
@@ -111,9 +119,8 @@ int gd_tl_manage_set_opt(gd_tl_manage_t tm, gd_tl_manage_option_t opt,...) {
 gd_tl_t gd_tl_create(gd_tl_manage_t tm) {
     gd_tl_t tl;
 
-    if (tm->m_tl_count >= GD_TL_TL_MAX) return NULL;
-
-    tl = &tm->m_tls[tm->m_tl_count++];
+    tl = mem_alloc(tm->m_alloc, sizeof(struct gd_tl));
+    if (tl == NULL) return NULL;
 
     tl->m_manage = tm;
     tl->m_event_dispatcher = NULL;
@@ -121,8 +128,23 @@ gd_tl_t gd_tl_create(gd_tl_manage_t tm) {
     tl->m_event_construct = NULL;
     tl->m_event_destory = NULL;
     tl->m_event_op_context = NULL;
-    
+    TAILQ_INIT(&tl->m_events);
+
+    TAILQ_INSERT_TAIL(&tm->m_tls, tl, m_next);
+
     return tl;
+}
+
+void gd_tl_free(gd_tl_t tl) {
+    if (tl == NULL) return;
+
+    while(!TAILQ_EMPTY(&tl->m_events)) {
+        gd_tl_event_node_free(TAILQ_FIRST(&tl->m_events));
+    }
+
+    TAILQ_REMOVE(&tl->m_manage->m_tls, tl, m_next);
+
+    mem_free(tl->m_manage->m_alloc, tl);
 }
 
 gd_tl_time_t gd_tl_manage_time(gd_tl_manage_t tm) {

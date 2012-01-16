@@ -30,6 +30,7 @@ typedef enum gd_tl_option {
 } gd_tl_option_t;
 
 gd_tl_t gd_tl_create(gd_tl_manage_t tm);
+void gd_tl_free(gd_tl_t tl);
 int gd_tl_set_opt(gd_tl_t tl, gd_tl_option_t opt, ...);
 
 /*event enqueue*/

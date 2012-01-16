@@ -67,9 +67,7 @@ TEST_F(TlTest, manage_setopt_unknown) {
 }
 
 TEST_F(TlTest, manage_create_tl) {
-    for(int i = 0; i < GD_TL_TL_MAX; ++i) {
+    for(int i = 0; i < 100; ++i) {
         EXPECT_TRUE(gd_tl_create(m_manage) != NULL);
     }
-
-    EXPECT_TRUE(gd_tl_create(m_manage) == NULL);
 }

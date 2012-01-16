@@ -80,6 +80,7 @@ static int gd_tl_manage_dispatch_event(gd_tl_manage_t tm, int maxCount) {
         }
 
         TAILQ_REMOVE(&tm->m_event_queue, node, m_next);
+        node->m_state = gd_tl_event_node_state_free;
 
         gd_tl_event_do_dispatch(&node->m_event, rv);
         gd_tl_event_queue_clear(&tm->m_event_building_queue);

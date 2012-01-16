@@ -9,8 +9,6 @@ gd_tl_event_t gd_tl_event_create(gd_tl_t tl, size_t dataSize) {
     struct gd_tl_event_node * node = gd_tl_event_node_alloc(tl, dataSize);
     if (node == NULL) return NULL;
 
-    TAILQ_INSERT_HEAD(&tl->m_manage->m_event_building_queue, node, m_next);
-
     return &node->m_event;
 }
 
@@ -32,12 +30,16 @@ void gd_tl_event_free(gd_tl_event_t e) {
     struct gd_tl_free_event * fe;
 
     if (e == NULL) return;
-    if (e->m_tl != NULL) return; //managed event
 
-    fe = (struct gd_tl_free_event *)
-        (((char*)e)
-         - (sizeof(struct gd_tl_free_event) - sizeof(struct gd_tl_event)));
-    mem_free(fe->m_alloc, fe);
+    if (e->m_tl == NULL) {
+        fe = (struct gd_tl_free_event *)
+            (((char*)e)
+             - (sizeof(struct gd_tl_free_event) - sizeof(struct gd_tl_event)));
+        mem_free(fe->m_alloc, fe);
+    }
+    else {
+        gd_tl_event_node_free(gd_tl_event_to_node(e));
+    }
 }
 
 gd_tl_event_t gd_tl_action_add(gd_tl_t tl) {
@@ -103,6 +105,7 @@ int gd_tl_event_enqueue_local(
 
     /*be careful, input not be managed by manage!!!*/
     gd_tl_event_node_remove_from_building_queue(input);
+    input->m_state = gd_tl_event_node_state_free;
 
     r = gd_tl_event_node_insert(input);
     if (r != 0) {

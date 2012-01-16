@@ -1,10 +1,10 @@
 #ifndef GD_TL_TEST_TLTEST_H
 #define GD_TL_TEST_TLTEST_H
-#include "gtest/gtest.h"
+#include "cpe/utils/tests-env/test-fixture.hpp"
 #include "gd/tl/tl.h"
 #include "../tl_internal_ops.h"
 
-class TlTest : public ::testing::Test {
+class TlTest : public testenv::fixture<> {
 public:
     TlTest();
 
