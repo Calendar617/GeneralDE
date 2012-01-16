@@ -27,6 +27,9 @@ public:
         const char * name,
         const char * cfg);
 
+    int t_app_uninstall_module(
+        const char * name);
+
     int t_app_install_rsps(
         gd_app_module_t module,
         const char * cfg);
@@ -39,6 +42,9 @@ public:
     gd_nm_mgr_t t_nm(void);
 
     gd_app_module_t t_app_find_module(const char * moduleName);
+
+    void t_app_set_timer_source_last_event(void);
+    int t_app_tick(int count = -1);
 
 private:
     gd_app_context_t m_app;

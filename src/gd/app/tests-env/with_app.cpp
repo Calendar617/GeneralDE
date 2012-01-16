@@ -1,6 +1,7 @@
 #include "cpe/utils/stream_mem.h"
 #include "cpe/utils/error.h"
 #include "cpe/cfg/cfg_manage.h"
+#include "gd/tl/tl_manage.h"
 #include "gd/app/tests-env/with_app.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
 
@@ -83,6 +84,10 @@ with_app::t_app_install_module(
     return t_app_install_module(name, NULL, cfg);
 }
 
+int with_app::t_app_uninstall_module(const char * name) {
+    return gd_app_uninstall_module(t_app(), name);
+}
+
 int with_app::t_app_install_rsps(
     gd_app_module_t module,
     const char * strCfg)
@@ -129,6 +134,22 @@ gd_dp_mgr_t with_app::t_dp(void) {
 
 gd_nm_mgr_t with_app::t_nm(void) {
     return gd_app_nm_mgr(t_app());
+}
+
+void with_app::t_app_set_timer_source_last_event(void) {
+    gd_tl_manage_set_opt(
+        gd_app_tl_mgr(t_app()),
+        gd_tl_set_time_source_context,
+        gd_app_tl_mgr(t_app()));
+
+    gd_tl_manage_set_opt(
+        gd_app_tl_mgr(t_app()),
+        gd_tl_set_time_source,
+        gd_tl_time_source_last_event);
+}
+
+int with_app::t_app_tick(int count) {
+    return gd_tl_manage_tick(gd_app_tl_mgr(t_app()), count);
 }
 
 }}}

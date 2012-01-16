@@ -19,10 +19,17 @@ namespace Gd { namespace App {
 
 class TimerCenterImpl : public TimerCenterExt {
 public:
+    enum TimerDataState {
+        TimerDataState_NotInResponserHash = 0
+        , TimerDataState_InResponserHash
+    };
+
     struct TimerData {
         TimerID _id;
-        TimerProcessor * _realResponser;
-        TimerProcessor * _useResponser;
+        TimerDataState _state;
+        gd_tl_event_t _tl_event;
+        TimerProcessor * _realProcessor;
+        TimerProcessor * _useProcessor;
         TimerProcessFun _fun;
         cpe_hash_entry _hh_for_responser_to_timer;
     };
@@ -43,8 +50,9 @@ public:
 
         opGuard.addOp(*this, &TimerCenterImpl::freeTimerBuf);
 
-        initResponserHash();
-        opGuard.addOp(*this, &TimerCenterImpl::finiResponserHash);
+        initProcessorHash();
+        opGuard.addOp(*this, &TimerCenterImpl::finiProcessorHash);
+
 
         _tl = createTl(app, *this);
         opGuard.addOp(*this, &TimerCenterImpl::freeTl);
@@ -54,38 +62,69 @@ public:
 
     ~TimerCenterImpl() {
         freeTl();
-        finiResponserHash();
+        finiProcessorHash();
         freeTimerBuf();
     }
 
 	virtual TimerID registerTimer(
-        TimerProcessor& realResponser, TimerProcessor & useResponser, TimerProcessFun fun,
+        TimerProcessor& realProcessor, TimerProcessor & useProcessor, TimerProcessFun fun,
         gd_tl_time_span_t delay, gd_tl_time_span_t span, int repeatCount)
     {
         TimerID newTimerId = allocTimer();
         TimerData * newTimerData = getTimer(newTimerId);
         assert(newTimerData);
-        assert(newTimerData->_realResponser == NULL);
+        assert(newTimerData->_realProcessor == NULL);
+        assert(newTimerData->_tl_event == NULL);
+        assert(newTimerData->_state == TimerDataState_NotInResponserHash);
 
-        newTimerData->_realResponser = &realResponser;
-        newTimerData->_useResponser = &useResponser;
+        newTimerData->_realProcessor = &realProcessor;
+        newTimerData->_useProcessor = &useProcessor;
         newTimerData->_fun = fun;
+        newTimerData->_tl_event = gd_tl_event_create(_tl, sizeof(TimerID));
+        if (newTimerData->_tl_event == NULL) {
+            clearTimerData(*newTimerData);
+            freeTimerId(newTimerId);
+
+            APP_CTX_THROW_EXCEPTION(
+                _app,
+                ::std::runtime_error,
+                "registerTimer: create tl event fail!");
+        }
+        *(TimerID*)gd_tl_event_data(newTimerData->_tl_event) = newTimerId;
 
         int r = cpe_hash_table_insert(&_responser_to_timer, newTimerData);
-        assert(r == 0);
+        if (r != 0) {
+            clearTimerData(*newTimerData);
+            freeTimerId(newTimerId);
+            APP_CTX_THROW_EXCEPTION(
+                _app,
+                ::std::runtime_error,
+                "registerTimer: insert to responser timer list fail!");
+        }
+        newTimerData->_state = TimerDataState_InResponserHash;
+
+        r = gd_tl_event_send_ex(newTimerData->_tl_event, delay, span, repeatCount);
+        if (r != 0) {
+            clearTimerData(*newTimerData);
+            freeTimerId(newTimerId);
+            APP_CTX_THROW_EXCEPTION(
+                _app,
+                ::std::runtime_error,
+                "registerTimer: register to tl fail!");
+        }
 
         return newTimerId;
     }
 
 	virtual void unregisterTimer(TimerProcessor & r) {
         TimerData key;
-        key._realResponser = &r;
+        key._realProcessor = &r;
 
         TimerData * preNode = (TimerData*)cpe_hash_table_find(&_responser_to_timer, &key);
         while(preNode) {
             TimerData * nextNode = 
                 (TimerData *)cpe_hash_table_find_next(&_responser_to_timer, preNode);
-            assert(preNode->_realResponser);
+            assert(preNode->_realProcessor);
             freeTimer(*preNode);
             preNode = nextNode;
         }
@@ -96,7 +135,7 @@ public:
         if (timerData == NULL) {
             APP_CTX_ERROR(_app, "unregister timer %d fail, not valid timer!", timerId);
         }
-        else if (timerData->_realResponser == NULL) {
+        else if (timerData->_realProcessor == NULL) {
             APP_CTX_ERROR(_app, "unregister timer %d fail, not allocked timer!", timerId);
         }
         else {
@@ -106,9 +145,8 @@ public:
 
 private:
     void freeTl(void) {
-        if (_tl) {
-            _tl = NULL;
-        }
+        gd_tl_free(_tl);
+        _tl = NULL;
     }
 
     TimerData * getTimer(TimerID timerId) {
@@ -117,7 +155,7 @@ private:
 
         TimerData * timerPage = _timer_buf[pagePos];
 
-        return &timerPage[timerId % _timer_page_count];
+        return &timerPage[timerId % _timer_count_in_page];
     }
 
     TimerID allocTimer(void) {
@@ -132,7 +170,7 @@ private:
 
                 mem_free(_alloc, _timer_buf);
                 _timer_buf = newTimerBuf;
-                _timer_page_count = newTimerPageCapacity;
+                _timer_page_capacity = newTimerPageCapacity;
 
                 if (_debug) {
                     APP_CTX_INFO(_app, "resize timer buf to %zd", newTimerPageCapacity);
@@ -178,12 +216,40 @@ private:
         _timer_page_capacity = 0;
     }
 
+    static void destory_timer(gd_tl_event_t event, void * context) {
+        TimerCenterImpl * ec = (TimerCenterImpl*)context;
+        TimerID timerId = *reinterpret_cast<TimerID*>(gd_tl_event_data(event));
+
+        TimerData * timerData = ec->getTimer(timerId);
+        if (timerData == NULL) {
+            APP_CTX_ERROR(ec->_app, "destory timer %d: timer not exist!", timerId);
+            return;
+        }
+
+        if (timerData->_tl_event != event) {
+            APP_CTX_ERROR(ec->_app, "destory timer %d: tl_event mismatch!", timerId);
+            return;
+        }
+
+        timerData->_tl_event = NULL;
+        ec->clearTimerData(*timerData);
+        ec->freeTimerId(timerId);
+    }
+
     static void dispatch_timer(gd_tl_event_t input, void * context) {
         TimerCenterImpl * ec = (TimerCenterImpl*)context;
         TimerID timerId = *reinterpret_cast<TimerID*>(gd_tl_event_data(input));
 
         try {
+            TimerData * timerData = ec->getTimer(timerId);
+            if (timerData == NULL) {
+                APP_CTX_THROW_EXCEPTION(
+                    ec->_app,
+                    ::std::runtime_error,
+                    "get timer data fail!");
+            }
 
+            (timerData->_useProcessor->*(timerData->_fun))(timerId);
         }
         catch(::std::exception const & e) {
             APP_CTX_ERROR(
@@ -204,28 +270,48 @@ private:
         }
 
         gd_tl_set_opt(tl, gd_tl_set_event_dispatcher, dispatch_timer);
+        gd_tl_set_opt(tl, gd_tl_set_event_destory, destory_timer);
         gd_tl_set_opt(tl, gd_tl_set_event_op_context, &self);
 
         return tl;
     }
 
     void freeTimer(TimerData & data) {
-        assert(data._realResponser);
-        cpe_hash_table_remove_by_ins(&_responser_to_timer, &data);
-        data._realResponser = NULL;
-        data._useResponser = NULL;
-        data._fun = NULL;
-        _ids.putOne(data._id);
+        assert(data._realProcessor);
+        assert(data._tl_event);
+
+        clearTimerData(data);
+        freeTimerId(data._id);
 
         if (_debug) {
             APP_CTX_INFO(_app, "unregister timer %d", data._id);
         }
     }
-
     
+    void clearTimerData(TimerData & data) {
+        if (data._tl_event) {
+            gd_tl_event_free(data._tl_event);
+            data._tl_event = NULL;
+        }
+        else {
+            if (data._state == TimerDataState_InResponserHash) {
+                cpe_hash_table_remove_by_ins(&_responser_to_timer, &data);
+                data._state = TimerDataState_NotInResponserHash;
+            }
+
+            data._realProcessor = NULL;
+            data._useProcessor = NULL;
+            data._fun = NULL;
+        }
+    }
+
+    void freeTimerId(TimerID timerId) {
+        _ids.putOne(timerId);
+    }
+
     static  uint32_t cpe_responser_hash_fun(const void * o) {
         const TimerData * timerData = (const TimerData*)o;
-        return (((ptr_int_t)timerData->_realResponser) & 0xFFFFFFFF);
+        return (((ptr_int_t)timerData->_realProcessor) & 0xFFFFFFFF);
     }
 
     static int cpe_responser_cmp_fun(const void * l, const void * r) {
@@ -233,12 +319,12 @@ private:
         const TimerData * rTimerData = (const TimerData*)r;
 
         return 
-            ((ptr_int_t)lTimerData->_realResponser)
-            - ((ptr_int_t)rTimerData->_realResponser);
+            ((ptr_int_t)lTimerData->_realProcessor)
+            - ((ptr_int_t)rTimerData->_realProcessor);
         
     }
 
-    void initResponserHash(void) {
+    void initProcessorHash(void) {
         int r = cpe_hash_table_init(
             &_responser_to_timer,
             _alloc,
@@ -254,7 +340,7 @@ private:
         }
     }
 
-    void finiResponserHash(void) {
+    void finiProcessorHash(void) {
         cpe_hash_table_fini(&_responser_to_timer);
     }
 

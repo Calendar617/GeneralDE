@@ -139,9 +139,7 @@ private:
     }
 
     void freeTl(void) {
-        if (_tl) {
-            _tl = NULL;
-        }
+        gd_tl_free(_tl);
     }
 
     void freeEvtMgr(void) {
