@@ -114,7 +114,7 @@ void cpe_hash_table_set_destory_fun(
     hstable->m_destory_context = destory_context;
 }
 
-#define cpe_hash_check_need_resize(hstable, count) ((count) > (hstable)->m_bucket_capacity)
+#define cpe_hash_check_need_resize(hstable, count) (((size_t)(count)) > (hstable)->m_bucket_capacity)
 
 int cpe_hash_table_check_resize(cpe_hash_table_t hstable, int32_t suggestCapacity) {
     if (cpe_hash_check_need_resize(hstable, suggestCapacity)) {
@@ -129,7 +129,7 @@ int cpe_hash_table_resize(cpe_hash_table_t hstable, int32_t suggestCapacity) {
     int32_t newCapacity;
     int32_t newBucketsBufSize;
     struct cpe_hash_bucket * newBuckets;
-    int i;
+    size_t i;
 
     newCapacity = select_next_prime(suggestCapacity);
     if (newCapacity < 0) return -1;
@@ -168,7 +168,7 @@ void cpe_hash_table_fini(cpe_hash_table_t hstable) {
     if (hstable == NULL) return;
 
     if (hstable->m_destory_fun) {
-        int i;
+        size_t i;
         for(i = 0; i < hstable->m_bucket_capacity; ++i) {
             struct cpe_hash_entry * e = (hstable->m_buckets + i)->m_entry;
             while(e) {
@@ -383,7 +383,8 @@ void * cpe_hash_table_find_next(cpe_hash_table_t hstable, const void * obj) {
 static
 struct cpe_hash_entry *
 cpe_hash_search_next_bucket(cpe_hash_table_t hstable, int32_t startPos) {
-    for(; startPos < hstable->m_bucket_capacity; ++startPos) {
+    assert(startPos >= 0);
+    for(; ((size_t)startPos) < hstable->m_bucket_capacity; ++startPos) {
         struct cpe_hash_entry * entry
             = (hstable->m_buckets + startPos)->m_entry;
         if (entry) return entry;
