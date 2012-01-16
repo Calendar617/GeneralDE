@@ -29,7 +29,7 @@
         snprintf(__buf, 1023, __format, __VA_ARGS__);                \
         APP_CTX_ERROR(                                          \
             __app,                                              \
-            "while %s, catch exception %s", __buf, __e.what()); \
+            "%s catch exception %s", __buf, __e.what()); \
         throw;                                                  \
     }                                                           \
     catch(...) {                                                \
@@ -37,7 +37,7 @@
         snprintf(__buf, 1023, __format, __VA_ARGS__);                \
         APP_CTX_ERROR(                                          \
             __app,                                              \
-            "while %s, catch unknown exception", __buf);        \
+            "%s catch unknown exception", __buf);        \
         throw;                                                  \
     }
 
@@ -47,14 +47,14 @@
         snprintf(__buf, 1023, __format, __VA_ARGS__);                \
         APP_CTX_ERROR(                                          \
             __app,                                              \
-            "while %s, catch exception %s", __buf, __e.what()); \
+            "%s catch exception %s", __buf, __e.what()); \
     }                                                           \
     catch(...) {                                                \
         char __buf[1024];                                       \
         snprintf(__buf, 1023, __format, __VA_ARGS__);                \
         APP_CTX_ERROR(                                          \
             __app,                                              \
-            "while %s, catch unknown exception", __buf);        \
+            "%s catch unknown exception", __buf);        \
     }
 
 #define APP_CATCH_EXCEPTION_RETHROW(__format, ...)          \
@@ -83,7 +83,7 @@
         snprintf(__buf, 1023, __format, ##args);                \
         APP_CTX_ERROR(                                          \
             __app,                                              \
-            "while %s, catch exception %s", __buf, __e.what()); \
+            "%s catch exception %s", __buf, __e.what()); \
         throw;                                                  \
     }                                                           \
     catch(...) {                                                \
@@ -91,7 +91,7 @@
         snprintf(__buf, 1023, __format, ##args);                \
         APP_CTX_ERROR(                                          \
             __app,                                              \
-            "while %s, catch unknown exception", __buf);        \
+            "%s catch unknown exception", __buf);        \
         throw;                                                  \
     }
 
@@ -101,14 +101,14 @@
         snprintf(__buf, 1023, __format, ##args);                \
         APP_CTX_ERROR(                                          \
             __app,                                              \
-            "while %s, catch exception %s", __buf, __e.what()); \
+            "%s catch exception %s", __buf, __e.what()); \
     }                                                           \
     catch(...) {                                                \
         char __buf[1024];                                       \
         snprintf(__buf, 1023, __format, ##args);                \
         APP_CTX_ERROR(                                          \
             __app,                                              \
-            "while %s, catch unknown exception", __buf);        \
+            "%s catch unknown exception", __buf);        \
     }
 
 #define APP_CATCH_EXCEPTION_RETHROW(__format, args...)          \
