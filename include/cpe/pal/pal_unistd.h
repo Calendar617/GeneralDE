@@ -10,6 +10,7 @@
 #define unlink _unlink
 #define getcwd _getcwd
 #define chdir _chdir
+#define fileno _fileno
 #else
 #include <unistd.h>
 #endif
