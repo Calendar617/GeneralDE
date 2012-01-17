@@ -47,12 +47,15 @@ uint64_t cfg_get_uint64(cfg_t cfg, const char * path, uint64_t dft);
 const char * cfg_get_string(cfg_t cfg, const char * path, const char * dft);
 
 /*struct operations*/
+int cfg_struct_count(cfg_t cfg);
 cfg_t cfg_struct_find_cfg(cfg_t cfg, const char * name);
 
 /*sequence operations*/
 int cfg_seq_count(cfg_t cfg);
 cfg_t cfg_seq_at(cfg_t cfg, int pos);
 
+
+int cfg_child_count(cfg_t cfg);
 void cfg_it_init(cfg_it_t * it, cfg_t cfg);
 #define cfg_it_next(it) ((it)->next ? (it)->next(it) : NULL)
 
