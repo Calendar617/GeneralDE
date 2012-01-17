@@ -12,6 +12,7 @@ int cfg_struct_item_cmp(struct cfg_struct_item * l, struct cfg_struct_item * r) 
 RB_GENERATE(cfg_struct_item_tree, cfg_struct_item, m_linkage, cfg_struct_item_cmp);
 
 void cfg_struct_init(struct cfg_struct * s) {
+    s->m_count = 0;
     RB_INIT(&s->m_items);
 }
 
@@ -28,6 +29,12 @@ struct cfg_struct_item * cfg_struct_find_item(struct cfg_struct * s, const char 
 
     tmp.m_name = name;
     return RB_FIND(cfg_struct_item_tree, &s->m_items, &tmp);
+}
+
+int cfg_struct_count(cfg_t cfg) {
+    assert(cfg);
+
+    return ((struct cfg_struct *)cfg)->m_count;
 }
 
 cfg_t cfg_struct_find_cfg(cfg_t cfg, const char * name) {
@@ -48,6 +55,7 @@ void cfg_struct_item_delete(struct cfg_struct * s, cfg_t cfg) {
 
     cfg_fini(&item->m_data);
 
+    --s->m_count;
     /*name is the alloc start adress, see cfg_struct_add_item*/
     mem_free(item->m_data.m_manage->m_alloc, (void*)item->m_name);
 }
@@ -110,6 +118,7 @@ cfg_t cfg_struct_item_do_create(struct cfg_struct * s, const char * name, int ty
             cfg_seq_init((struct cfg_seq *)newCfg);
         }
 
+        ++s->m_count;
         return newCfg;
     }
 }

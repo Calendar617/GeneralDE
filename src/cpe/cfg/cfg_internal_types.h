@@ -25,6 +25,7 @@ RB_HEAD(cfg_struct_item_tree, cfg_struct_item);
 
 struct cfg_struct {
     CPE_CFG_HEAD_DATA
+    int m_count;
     struct cfg_struct_item_tree m_items;
 };
 

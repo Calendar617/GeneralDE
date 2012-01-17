@@ -24,6 +24,7 @@ int stream_vprintf(struct write_stream * stream, const char * fmt, va_list ap);
 
 int stream_do_flush_dummy(struct write_stream * stream);
 
+int stream_putc_count(struct write_stream * stream, char c, size_t n);
 #define stream_putc(stream, c) do{ char __b = c; (stream)->write((stream), &__b, 1); } while(0)
 #define stream_read(stream, buf, size) (stream)->read((stream), buf, size)
 
