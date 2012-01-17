@@ -61,3 +61,25 @@ void read_stream_mem_init(struct read_stream_mem * stream, const void * buf, siz
     stream->m_capacity = size;
     stream->m_pos = 0;
 }
+
+int stream_putc_count(struct write_stream * stream, char c, size_t n) {
+    char buf[128];
+    int rv;
+
+    memset(buf, c, 128);
+    while(n > 0) {
+        size_t curN = n > 128 ? 128 : n;
+        int curRv;
+        n -= curN;
+
+        curRv = stream->write(stream, buf, curN);
+        if (curRv < 0) {
+            rv = -1;
+            break;
+        }
+
+        rv += curRv;
+    }
+
+    return rv;
+}
