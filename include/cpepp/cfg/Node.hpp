@@ -13,6 +13,9 @@ public:
     bool isValid(void) const { return this != NULL; }
 
     Node & operator[](const char * path) { return *((Node*)cfg_find_cfg(*this, path)); }
+    Node const & operator[](const char * path) const { return *((Node*)cfg_find_cfg(*this, path)); }
+
+    size_t childCount(void) const { return (size_t)cfg_child_count(*this); }
 
     NodeConstIterator childs(void) const {
         NodeConstIterator r;

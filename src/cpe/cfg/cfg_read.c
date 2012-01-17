@@ -256,3 +256,15 @@ void cfg_it_init(cfg_it_t * it, cfg_t cfg) {
         break;
     }
 }
+
+int cfg_child_count(cfg_t cfg) {
+    assert(cfg);
+    switch (cfg->m_type) {
+    case CPE_CFG_TYPE_SEQUENCE:
+        return cfg_struct_count(cfg);
+    case CPE_CFG_TYPE_STRUCT:
+        return cfg_seq_count(cfg);
+    default:
+        return 0;
+    }
+}
