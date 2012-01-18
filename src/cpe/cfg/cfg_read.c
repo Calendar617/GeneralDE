@@ -46,23 +46,23 @@ int cfg_is_value(cfg_t cfg) {
     return cfg->m_type > CPE_DR_TYPE_COMPOSITE;
 }
 
-#define CPE_CFG_GEN_READ_TYPE(__type)                            \
-__type ## _t cfg_as_  ## __type(cfg_t at, __type ## _t dft) {    \
-    __type ## _t rv;                                             \
+#define CPE_CFG_GEN_READ_TYPE(__type_t, __type)                  \
+__type_t cfg_as_  ## __type(cfg_t at, __type_t dft) {    \
+    __type_t rv;                                             \
     if (at == NULL || !cfg_is_value(at) ) return dft;            \
     return dr_ctype_try_read_ ## __type(                         \
         &rv, cfg_data(at), at->m_type, NULL) == 0                \
         ? rv                                                     \
         : dft;                                                   \
 }                                                                \
-int cfg_try_as_  ## __type(cfg_t at, __type ## _t * data) {      \
+int cfg_try_as_  ## __type(cfg_t at, __type_t * data) {      \
     if (at == NULL || !cfg_is_value(at) ) return -1;             \
     return dr_ctype_try_read_ ## __type(                         \
         data, cfg_data(at), at->m_type, NULL);                   \
 }                                                                \
-__type ## _t cfg_get_  ## __type(                                \
-    cfg_t cfg, const char * path, __type ## _t dft) {            \
-    __type ## _t rv;                                             \
+__type_t cfg_get_  ## __type(                                \
+    cfg_t cfg, const char * path, __type_t dft) {            \
+    __type_t rv;                                             \
     cfg_t at = cfg_find_cfg(cfg, path);                          \
     if (at == NULL || !cfg_is_value(at) ) return dft;            \
     return dr_ctype_try_read_ ## __type(                         \
@@ -71,14 +71,16 @@ __type ## _t cfg_get_  ## __type(                                \
         : dft;                                                   \
 }
 
-CPE_CFG_GEN_READ_TYPE(int8);
-CPE_CFG_GEN_READ_TYPE(uint8);
-CPE_CFG_GEN_READ_TYPE(int16);
-CPE_CFG_GEN_READ_TYPE(uint16);
-CPE_CFG_GEN_READ_TYPE(int32);
-CPE_CFG_GEN_READ_TYPE(uint32);
-CPE_CFG_GEN_READ_TYPE(int64);
-CPE_CFG_GEN_READ_TYPE(uint64);
+CPE_CFG_GEN_READ_TYPE(int8_t, int8);
+CPE_CFG_GEN_READ_TYPE(uint8_t, uint8);
+CPE_CFG_GEN_READ_TYPE(int16_t, int16);
+CPE_CFG_GEN_READ_TYPE(uint16_t, uint16);
+CPE_CFG_GEN_READ_TYPE(int32_t, int32);
+CPE_CFG_GEN_READ_TYPE(uint32_t, uint32);
+CPE_CFG_GEN_READ_TYPE(int64_t, int64);
+CPE_CFG_GEN_READ_TYPE(uint64_t, uint64);
+CPE_CFG_GEN_READ_TYPE(float, float);
+CPE_CFG_GEN_READ_TYPE(double, double);
 
 const char * cfg_as_string(cfg_t cfg, const char * dft) {
     return cfg && cfg->m_type == CPE_DR_TYPE_STRING
