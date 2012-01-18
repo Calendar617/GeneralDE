@@ -176,8 +176,7 @@ private:
 
             (pn->_processor->*(pn->_process_fun))(cpe_hs_data((cpe_hash_string_t)e.attach_buf()), e);
         }
-        catch(...) {
-        }
+        APP_CATCH_EXCEPTION("process event:"); //TODO: record to app
 
         return 0;
     }
@@ -212,9 +211,10 @@ private:
                 evt->dump((write_stream_t)&stream);
 
                 APP_CTX_ERROR(
-                    ec->_app, "dispatch event: catch exception: %s, oid=%s, event=%s",
+                    ec->_app, "dispatch event: catch exception: %s, oid=%s, event=%s%s",
                     e.what(),
                     cpe_hs_data((cpe_hash_string_t)evt->attach_buf()),
+                    evt->type().c_str(),
                     buf);
             }
             else {
