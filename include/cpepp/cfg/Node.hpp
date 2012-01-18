@@ -37,6 +37,8 @@ public:
     operator uint32_t(void) const;
     operator int64_t(void) const;
     operator uint64_t(void) const;
+    operator float(void) const;
+    operator double(void) const;
     operator const char * (void) const;
 
     int8_t dft(int8_t dft) const;
@@ -47,6 +49,8 @@ public:
     uint32_t dft(uint32_t dft) const;
     int64_t dft(int64_t dft) const;
     uint64_t dft(uint64_t dft) const;
+    float dft(float dft) const;
+    double dft(double dft) const;
     const char * dft(const char * dft) const;
 };
 

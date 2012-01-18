@@ -1,3 +1,5 @@
+#define _ISOC99_SOURCE
+#include <stdlib.h>
 #include <ctype.h>
 #include <limits.h>
 #include <string.h>
@@ -204,6 +206,39 @@ DR_TYPE_BUILD_READ_UINT_FUN(32, UINT_MAX)
 DR_TYPE_BUILD_READ_INT_FUN(64, LONG_MIN, LONG_MAX)
 DR_TYPE_BUILD_READ_UINT_FUN(64, ULONG_MAX)
 
+static int dr_set_float_from_string(void * output, LPDRMETAENTRY entry, const char * s, error_monitor_t em) { 
+    char * end;
+    float b;
+
+    end = NULL;
+    b = strtof(s, &end);
+
+    if (*end != 0) {
+        CPE_ERROR(em, "scan float from string %s fail, end point is %d", s, (end - s));
+        return -1;
+    }
+    else {
+        memcpy(output, &b, sizeof(b));
+        return 0;
+    }
+}
+
+static int dr_set_double_from_string(void * output, LPDRMETAENTRY entry, const char * s, error_monitor_t em) { 
+    char * end;
+    double b;
+
+    end = NULL;
+    b = strtod(s, &end);
+
+    if (*end != 0) {
+        CPE_ERROR(em, "scan double from string %s fail, end point is %d", s, (end - s));
+        return -1;
+    }
+    else {
+        memcpy(output, &b, sizeof(b));
+        return 0;
+    }
+}
 
 struct DRCtypeTypeFromStringOps g_dr_from_string_ops[] = {
     {/*CPE_DR_TYPE_UNION*/ NULL}
@@ -223,8 +258,8 @@ struct DRCtypeTypeFromStringOps g_dr_from_string_ops[] = {
     , {/*CPE_DR_TYPE_TIME*/ NULL}
     , {/*CPE_DR_TYPE_DATETIME*/ NULL}
     , {/*CPE_DR_TYPE_MONEY*/ NULL}
-    , {/*CPE_DR_TYPE_FLOAT*/ NULL}
-    , {/*CPE_DR_TYPE_DOUBLE*/ NULL}
+    , {/*CPE_DR_TYPE_FLOAT*/ dr_set_float_from_string}
+    , {/*CPE_DR_TYPE_DOUBLE*/ dr_set_double_from_string}
     , {/*CPE_DR_TYPE_IP*/ NULL}
     , {/*CPE_DR_TYPE_CHAR*/ dr_set_char_from_string}
     , {/*CPE_DR_TYPE_STRING*/ dr_set_string_from_string}
