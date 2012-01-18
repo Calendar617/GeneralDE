@@ -30,6 +30,12 @@ int dr_printf_uint32_to_stream(write_stream_t stream, const void * data, LPDRMET
 int dr_printf_uint64_to_stream(write_stream_t stream, const void * data, LPDRMETAENTRY entry, error_monitor_t em) {
     return stream_printf(stream, "%I64u", *((uint64_t*)data));
 }
+int dr_printf_float_to_stream(write_stream_t stream, const void * data, LPDRMETAENTRY entry, error_monitor_t em) {
+    return stream_printf(stream, "%f", *((float*)data));
+}
+int dr_printf_double_to_stream(write_stream_t stream, const void * data, LPDRMETAENTRY entry, error_monitor_t em) {
+    return stream_printf(stream, "%f", *((double*)data));
+}
 
 int dr_printf_char_to_stream(write_stream_t stream, const void * data, LPDRMETAENTRY entry, error_monitor_t em) {
     char tmp = *((char*)data);
@@ -63,8 +69,8 @@ struct DRCtypeTypePrintOps g_dr_print_ops[] = {
     , {/*CPE_DR_TYPE_TIME*/ NULL}
     , {/*CPE_DR_TYPE_DATETIME*/ NULL}
     , {/*CPE_DR_TYPE_MONEY*/ NULL}
-    , {/*CPE_DR_TYPE_FLOAT*/ NULL}
-    , {/*CPE_DR_TYPE_DOUBLE*/ NULL}
+    , {/*CPE_DR_TYPE_FLOAT*/ dr_printf_float_to_stream}
+    , {/*CPE_DR_TYPE_DOUBLE*/ dr_printf_double_to_stream}
     , {/*CPE_DR_TYPE_IP*/ NULL}
     , {/*CPE_DR_TYPE_CHAR*/ dr_printf_char_to_stream}
     , {/*CPE_DR_TYPE_STRING*/ dr_printf_string_to_stream}
