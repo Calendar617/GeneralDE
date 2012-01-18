@@ -1,8 +1,8 @@
 #define _ISOC99_SOURCE
-#include <stdlib.h>
 #include <ctype.h>
 #include <limits.h>
-#include <string.h>
+#include "cpe/pal/pal_stdlib.h"
+#include "cpe/pal/pal_string.h"
 #include "cpe/dr/dr_data.h"
 #include "../dr_internal_types.h"
 
@@ -206,6 +206,29 @@ DR_TYPE_BUILD_READ_UINT_FUN(32, UINT_MAX)
 DR_TYPE_BUILD_READ_INT_FUN(64, LONG_MIN, LONG_MAX)
 DR_TYPE_BUILD_READ_UINT_FUN(64, ULONG_MAX)
 
+#ifdef _CPE_NO_STRTOF
+static int dr_set_float_from_string(void * output, LPDRMETAENTRY entry, const char * s, error_monitor_t em) {
+    char * end;
+    double b;
+
+    end = NULL;
+    b = strtod(s, &end);
+
+    if (*end != 0) {
+        CPE_ERROR(em, "scan float from string %s fail, end point is %d", s, (end - s));
+        return -1;
+    }
+    else if (b < -3.40E+38 || b > +3.40E+38 ) {
+        CPE_ERROR(em, "scan float from string %s fail, value %f overflow", s, b);
+        return -1;
+    }
+    else {
+        float b2 = (float)b;
+        memcpy(output, &b2, sizeof(b2));
+        return 0;
+    }
+}
+#else
 static int dr_set_float_from_string(void * output, LPDRMETAENTRY entry, const char * s, error_monitor_t em) { 
     char * end;
     float b;
@@ -222,6 +245,7 @@ static int dr_set_float_from_string(void * output, LPDRMETAENTRY entry, const ch
         return 0;
     }
 }
+#endif
 
 static int dr_set_double_from_string(void * output, LPDRMETAENTRY entry, const char * s, error_monitor_t em) { 
     char * end;
