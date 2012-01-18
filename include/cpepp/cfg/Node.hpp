@@ -29,25 +29,25 @@ public:
         return r;
     }
 
-    operator int8_t(void);
-    operator uint8_t(void);
-    operator int16_t(void);
-    operator uint16_t(void);
-    operator int32_t(void);
-    operator uint32_t(void);
-    operator int64_t(void);
-    operator uint64_t(void);
-    operator const char * (void);
+    operator int8_t(void) const;
+    operator uint8_t(void) const;
+    operator int16_t(void) const;
+    operator uint16_t(void) const;
+    operator int32_t(void) const;
+    operator uint32_t(void) const;
+    operator int64_t(void) const;
+    operator uint64_t(void) const;
+    operator const char * (void) const;
 
-    int8_t dft(int8_t dft);
-    uint8_t dft(uint8_t dft);
-    int16_t dft(int16_t dft);
-    uint16_t dft(uint16_t dft);
-    int32_t dft(int32_t dft);
-    uint32_t dft(uint32_t dft);
-    int64_t dft(int64_t dft);
-    uint64_t dft(uint64_t dft);
-    const char * dft(const char * dft);
+    int8_t dft(int8_t dft) const;
+    uint8_t dft(uint8_t dft) const;
+    int16_t dft(int16_t dft) const;
+    uint16_t dft(uint16_t dft) const;
+    int32_t dft(int32_t dft) const;
+    uint32_t dft(uint32_t dft) const;
+    int64_t dft(int64_t dft) const;
+    uint64_t dft(uint64_t dft) const;
+    const char * dft(const char * dft) const;
 };
 
 }}

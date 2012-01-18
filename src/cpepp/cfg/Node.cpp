@@ -4,7 +4,7 @@
 namespace Cpe { namespace Cfg {
 
 #define CPE_CFG_GEN_READ_TYPE(__type)                               \
-Node::operator __type ## _t(void) {                                 \
+Node::operator __type ## _t(void) const {                           \
     __type ## _t rv;                                                \
     if (cfg_try_as_ ## __type (*this, &rv) != 0) {                  \
         if (this == NULL) {                                         \
@@ -17,7 +17,7 @@ Node::operator __type ## _t(void) {                                 \
                                                                     \
     return rv;                                                      \
 }                                                                   \
-__type ## _t Node::dft(__type ## _t v) {                            \
+__type ## _t Node::dft(__type ## _t v) const {                      \
     return cfg_as_ ## __type(*this, v);                             \
 }
 
@@ -30,7 +30,7 @@ CPE_CFG_GEN_READ_TYPE(uint32);
 CPE_CFG_GEN_READ_TYPE(int64);
 CPE_CFG_GEN_READ_TYPE(uint64);
 
-Node::operator const char *(void) {
+Node::operator const char *(void) const {
     const char * r = cfg_as_string(*this, NULL);
     if (r == NULL) {
         if (this == NULL) {
@@ -43,7 +43,7 @@ Node::operator const char *(void) {
     return r;
 }
 
-const char * Node::dft(const char * dft) {
+const char * Node::dft(const char * dft) const {
     return cfg_as_string(*this, dft); 
 }
 
