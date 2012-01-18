@@ -14,7 +14,7 @@ gd_tl_manage_t gd_tl_manage_create(mem_allocrator_t alloc) {
     tm->m_alloc = alloc;
     
     tm->m_time_get = gd_tl_time_source_msec;
-    tm->m_time_cvt = gd_tl_time_cvt_sec2msec;
+    tm->m_time_cvt = 0;
     tm->m_time_ctx = 0;
     tm->m_time_current = tm->m_time_get(tm->m_time_ctx);
 
