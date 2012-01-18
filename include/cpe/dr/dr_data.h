@@ -17,6 +17,8 @@ int dr_entry_try_read_int32(int32_t * result, const void * input, LPDRMETAENTRY 
 int dr_entry_try_read_uint32(uint32_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
 int dr_entry_try_read_int64(int64_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
 int dr_entry_try_read_uint64(uint64_t * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_try_read_float(float * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_try_read_double(double * result, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
 
 int8_t dr_entry_read_int8(const void * input, LPDRMETAENTRY entry);
 uint8_t dr_entry_read_uint8(const void * input, LPDRMETAENTRY entry);
@@ -26,6 +28,8 @@ int32_t dr_entry_read_int32(const void * input, LPDRMETAENTRY entry);
 uint32_t dr_entry_read_uint32(const void * input, LPDRMETAENTRY entry);
 int64_t dr_entry_read_int64(const void * input, LPDRMETAENTRY entry);
 uint64_t dr_entry_read_uint64(const void * input, LPDRMETAENTRY entry);
+float dr_entry_read_float(const void * input, LPDRMETAENTRY entry);
+double dr_entry_read_double(const void * input, LPDRMETAENTRY entry);
 const char * dr_entry_read_string(const void * input, LPDRMETAENTRY entry);
 
 int dr_entry_print_to_stream(write_stream_t output, const void * input, LPDRMETAENTRY entry, error_monitor_t em);
@@ -39,6 +43,8 @@ int dr_entry_set_from_int32(void * output, int32_t input, LPDRMETAENTRY entry, e
 int dr_entry_set_from_uint32(void * output, uint32_t input, LPDRMETAENTRY entry, error_monitor_t em);
 int dr_entry_set_from_int64(void * output, int64_t input, LPDRMETAENTRY entry, error_monitor_t em);
 int dr_entry_set_from_uint64(void * output, uint64_t input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_float(void * output, float input, LPDRMETAENTRY entry, error_monitor_t em);
+int dr_entry_set_from_double(void * output, double input, LPDRMETAENTRY entry, error_monitor_t em);
 int dr_entry_set_from_string(void * output, const char * input, LPDRMETAENTRY entry, error_monitor_t em);
 int dr_entry_set_from_ctype(void * output, const void * input, int input_type, LPDRMETAENTRY entry, error_monitor_t em);
 
@@ -54,6 +60,8 @@ int dr_meta_try_read_int32(int32_t * result, const void * input, LPDRMETA meta, 
 int dr_meta_try_read_uint32(uint32_t * result, const void * input, LPDRMETA meta, const char * entry, error_monitor_t em);
 int dr_meta_try_read_int64(int64_t * result, const void * input, LPDRMETA meta, const char * entry, error_monitor_t em);
 int dr_meta_try_read_uint64(uint64_t * result, const void * input, LPDRMETA meta, const char * entry, error_monitor_t em);
+int dr_meta_try_read_float(float * result, const void * input, LPDRMETA meta, const char * entry, error_monitor_t em);
+int dr_meta_try_read_double(double * result, const void * input, LPDRMETA meta, const char * entry, error_monitor_t em);
 
 int8_t dr_meta_read_int8(const void * input, LPDRMETA meta, const char * entry);
 uint8_t dr_meta_read_uint8(const void * input, LPDRMETA meta, const char * entry);
@@ -63,6 +71,8 @@ int32_t dr_meta_read_int32(const void * input, LPDRMETA meta, const char * entry
 uint32_t dr_meta_read_uint32(const void * input, LPDRMETA meta, const char * entry);
 int64_t dr_meta_read_int64(const void * input, LPDRMETA meta, const char * entry);
 uint64_t dr_meta_read_uint64(const void * input, LPDRMETA meta, const char * entry);
+float dr_meta_read_float(const void * input, LPDRMETA meta, const char * entry);
+double dr_meta_read_double(const void * input, LPDRMETA meta, const char * entry);
 const char * dr_meta_read_string(const void * input, LPDRMETA meta, const char * entry);
 
 #ifdef __cplusplus

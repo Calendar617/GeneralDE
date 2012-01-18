@@ -22,6 +22,10 @@ int dr_entry_set_from_ctype(void * output, const void * input, int input_type, L
         return dr_entry_set_from_uint64(output, *(const uint64_t *)input, entry, em);
     case CPE_DR_TYPE_UINT8:
         return dr_entry_set_from_uint8(output, *(const uint8_t *)input, entry, em);
+    case CPE_DR_TYPE_FLOAT:
+        return dr_entry_set_from_float(output, *(const float *)input, entry, em);
+    case CPE_DR_TYPE_DOUBLE:
+        return dr_entry_set_from_double(output, *(const double *)input, entry, em);
     case CPE_DR_TYPE_STRING:
         return dr_entry_set_from_string(output, (const char *)input, entry, em);
     default:
