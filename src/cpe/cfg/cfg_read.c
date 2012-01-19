@@ -43,7 +43,7 @@ int cfg_type_is_value(int type) {
 }
 
 int cfg_is_value(cfg_t cfg) {
-    return cfg->m_type > CPE_DR_TYPE_COMPOSITE;
+    return cfg ? (cfg->m_type > CPE_DR_TYPE_COMPOSITE) : 0;
 }
 
 #define CPE_CFG_GEN_READ_TYPE(__type_t, __type)                  \
@@ -260,7 +260,8 @@ void cfg_it_init(cfg_it_t * it, cfg_t cfg) {
 }
 
 int cfg_child_count(cfg_t cfg) {
-    assert(cfg);
+    if (cfg == NULL) return 0;
+
     switch (cfg->m_type) {
     case CPE_CFG_TYPE_SEQUENCE:
         return cfg_struct_count(cfg);
