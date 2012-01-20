@@ -1,5 +1,5 @@
-#include <string.h>
-#include <stdlib.h>
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_stdlib.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/cfg/cfg_manage.h"
 #include "gd/app/app_context.h"
