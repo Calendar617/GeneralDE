@@ -1,6 +1,7 @@
 #ifndef CPEPP_CFG_NODE_H
 #define CPEPP_CFG_NODE_H
 #include "cpepp/utils/ClassCategory.hpp"
+#include "cpepp/utils/CString.hpp"
 #include "cpe/cfg/cfg.h"
 #include "System.hpp"
 #include "NodeIterator.hpp"
@@ -11,6 +12,13 @@ class Node : public Cpe::Utils::SimulateObject {
 public:
     operator cfg_t (void) const { return (cfg_t)this; }
     bool isValid(void) const { return this != NULL; }
+
+    Utils::CString const & name(void) const { return Utils::CString::_cast(cfg_name(*this)); }
+    bool isValue(void) const { return cfg_is_value(*this) ? true : false; }
+    int type(void) const { return cfg_type(*this); }
+
+    Node * parent(void) { return (Node *)cfg_parent(*this); }
+    Node const * parent(void) const { return (Node const *)cfg_parent(*this); }
 
     Node & operator[](const char * path) { return *((Node*)cfg_find_cfg(*this, path)); }
     Node const & operator[](const char * path) const { return *((Node*)cfg_find_cfg(*this, path)); }
@@ -52,6 +60,22 @@ public:
     float dft(float dft) const;
     double dft(double dft) const;
     const char * dft(const char * dft) const;
+
+    int8_t asInt8(void) const { return *this; }
+    uint8_t asUInt8(void) const { return *this; }
+    int16_t asInt16(void) const { return *this; }
+    uint16_t asUInt16(void) const { return *this; }
+    int32_t asInt32(void) const { return *this; }
+    uint32_t asUInt32(void) const { return *this; }
+    int64_t asInt64(void) const { return *this; }
+    uint64_t asUInt64(void) const { return *this; }
+    float asFloat(void) const { return *this; }
+    double asDouble(void) const { return *this; }
+    Utils::CString const & asString(void) const { 
+        return Utils::CString::_cast((const char *)(*this));
+    }
+
+    static Node const & invalid(void) { return *(Node const *)0; }
 };
 
 }}
