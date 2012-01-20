@@ -187,11 +187,11 @@ TEST_F(ReadTest, map_input_seq_seq) {
     EXPECT_EQ(
         0, read(
             "-\n"
-            "  - 1.1\n"
-            "  - 1.2\n"
+            "  - '1.1'\n"
+            "  - '1.2'\n"
             "-\n"
-            "  - 2.1\n"
-            "  - 2.2\n"
+            "  - '2.1'\n"
+            "  - '2.2'\n"
             ));
 
     EXPECT_STREQ(
@@ -209,11 +209,11 @@ TEST_F(ReadTest, map_input_seq_map_seq) {
     EXPECT_EQ(
         0, read(
             "- a:\n"
-            "  - 1.1\n"
-            "  - 1.2\n"
+            "  - '1.1'\n"
+            "  - '1.2'\n"
             "- b:\n"
-            "  - 2.1\n"
-            "  - 2.2\n"
+            "  - '2.1'\n"
+            "  - '2.2'\n"
             ));
 
     EXPECT_STREQ(
@@ -234,10 +234,10 @@ TEST_F(ReadTest, root_seq_no_value) {
         0, read(
             "- a:\n"
             "  - \n"
-            "  - 1.2\n"
+            "  - '1.2'\n"
             "- b:\n"
-            "  - 2.1\n"
-            "  - 2.2\n"
+            "  - '2.1'\n"
+            "  - '2.2'\n"
             ));
 
     EXPECT_STREQ(
@@ -296,10 +296,10 @@ TEST_F(ReadTest, seq_basic) {
             seq, 
             "- a:\n"
             "  - \n"
-            "  - 1.2\n"
+            "  - '1.2'\n"
             "- b:\n"
-            "  - 2.1\n"
-            "  - 2.2\n"
+            "  - '2.1'\n"
+            "  - '2.2'\n"
             ));
 
     EXPECT_STREQ(

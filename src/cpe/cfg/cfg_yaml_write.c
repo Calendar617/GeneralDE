@@ -70,7 +70,7 @@ static int cfg_yaml_do_write_cfg_scalar(struct cfg_yaml_write_ctx * ctx, cfg_t c
 
             buf[len] = 0;
 
-            if (cfg->m_type != CPE_CFG_TYPE_INT32) {
+            if (cfg->m_type != CPE_CFG_TYPE_INT32 && cfg->m_type != CPE_CFG_TYPE_FLOAT) {
                 snprintf(ctx->m_tag_buffer, CFG_YAML_TAG_BUF_LEN, "!%s", dr_type_name(cfg->m_type));
                 tag = ctx->m_tag_buffer;
             }

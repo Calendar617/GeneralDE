@@ -111,31 +111,33 @@ cfg_t cfg_seq_add_string(cfg_t s, const char * value) {
     return rv;
 }
 
-#define CPE_CFG_GEN_ADD_FUN_TYPE(__type, __typeId)                       \
+#define CPE_CFG_GEN_ADD_FUN_TYPE(__type_t, __type, __typeId)      \
 cfg_t cfg_struct_add_ ## __type(                                  \
-        cfg_t s, const char * name, __type ## _t v, cfg_policy_t policy) {                \
+        cfg_t s, const char * name, __type_t v, cfg_policy_t policy) {                \
     cfg_t rv = cfg_struct_item_create(                            \
         (struct cfg_struct *)s, name, __typeId, sizeof(v), policy);            \
     if (rv == NULL) return NULL;                                        \
-    *(( __type ## _t*)cfg_data(rv)) = v;                             \
+    *(( __type_t*)cfg_data(rv)) = v;                             \
     return rv;                                                          \
 }                                                                       \
-cfg_t cfg_seq_add_ ## __type(cfg_t s, __type ## _t v) {        \
+cfg_t cfg_seq_add_ ## __type(cfg_t s, __type_t v) {        \
     cfg_t rv = cfg_seq_item_create(                               \
         (struct cfg_seq *)s, __typeId, sizeof(v));                   \
     if (rv == NULL) return NULL;                                        \
-    *(( __type ## _t*)cfg_data(rv)) = v;                             \
+    *(( __type_t*)cfg_data(rv)) = v;                             \
     return rv;                                                          \
 }
 
-CPE_CFG_GEN_ADD_FUN_TYPE(int8, CPE_CFG_TYPE_INT8)
-CPE_CFG_GEN_ADD_FUN_TYPE(uint8, CPE_CFG_TYPE_UINT8)
-CPE_CFG_GEN_ADD_FUN_TYPE(int16, CPE_CFG_TYPE_INT16)
-CPE_CFG_GEN_ADD_FUN_TYPE(uint16, CPE_CFG_TYPE_UINT16)
-CPE_CFG_GEN_ADD_FUN_TYPE(int32, CPE_CFG_TYPE_INT32)
-CPE_CFG_GEN_ADD_FUN_TYPE(uint32, CPE_CFG_TYPE_UINT32)
-CPE_CFG_GEN_ADD_FUN_TYPE(int64, CPE_CFG_TYPE_INT64)
-CPE_CFG_GEN_ADD_FUN_TYPE(uint64, CPE_CFG_TYPE_UINT64)
+CPE_CFG_GEN_ADD_FUN_TYPE(int8_t, int8, CPE_CFG_TYPE_INT8)
+CPE_CFG_GEN_ADD_FUN_TYPE(uint8_t, uint8, CPE_CFG_TYPE_UINT8)
+CPE_CFG_GEN_ADD_FUN_TYPE(int16_t, int16, CPE_CFG_TYPE_INT16)
+CPE_CFG_GEN_ADD_FUN_TYPE(uint16_t, uint16, CPE_CFG_TYPE_UINT16)
+CPE_CFG_GEN_ADD_FUN_TYPE(int32_t, int32, CPE_CFG_TYPE_INT32)
+CPE_CFG_GEN_ADD_FUN_TYPE(uint32_t, uint32, CPE_CFG_TYPE_UINT32)
+CPE_CFG_GEN_ADD_FUN_TYPE(int64_t, int64, CPE_CFG_TYPE_INT64)
+CPE_CFG_GEN_ADD_FUN_TYPE(uint64_t, uint64, CPE_CFG_TYPE_UINT64)
+CPE_CFG_GEN_ADD_FUN_TYPE(float, float, CPE_CFG_TYPE_FLOAT)
+CPE_CFG_GEN_ADD_FUN_TYPE(double, double, CPE_CFG_TYPE_DOUBLE)
 
 cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value) {
     int capacity;
@@ -182,6 +184,8 @@ cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * 
 }
 
 cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value, cfg_policy_t policy) {
+    float f;
+    float d;
     int32_t v32;
 	int64_t v64;
 
@@ -193,10 +197,20 @@ cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value, 
         return cfg_struct_add_int64(s, name, v64, policy);
     }
 
+    if (dr_ctype_set_from_string(&f, CPE_DR_TYPE_FLOAT, value, NULL) == 0) {
+        return cfg_struct_add_float(s, name, f, policy);
+    }
+
+    if (dr_ctype_set_from_string(&d, CPE_DR_TYPE_DOUBLE, value, NULL) == 0) {
+        return cfg_struct_add_double(s, name, d, policy);
+    }
+
     return cfg_struct_add_string(s, name, value, policy);
 }
 
 cfg_t cfg_seq_add_value_auto(cfg_t s, const char * value) {
+    float f;
+    float d;
     int32_t v32;
     int64_t v64;
 
@@ -206,6 +220,14 @@ cfg_t cfg_seq_add_value_auto(cfg_t s, const char * value) {
 
     if (dr_ctype_set_from_string(&v64, CPE_DR_TYPE_INT64, value, NULL) == 0) {
         return cfg_seq_add_int64(s, v64);
+    }
+
+    if (dr_ctype_set_from_string(&f, CPE_DR_TYPE_FLOAT, value, NULL) == 0) {
+        return cfg_seq_add_float(s, f);
+    }
+
+    if (dr_ctype_set_from_string(&d, CPE_DR_TYPE_DOUBLE, value, NULL) == 0) {
+        return cfg_seq_add_double(s, d);
     }
 
     return cfg_seq_add_string(s, value);

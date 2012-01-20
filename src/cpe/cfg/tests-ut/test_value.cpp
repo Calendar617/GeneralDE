@@ -14,3 +14,10 @@ TEST_F(CfgTest, value_int8) {
     EXPECT_EQ(3, cfg_get_int8(cfg, "", 0));
 }
 
+TEST_F(CfgTest, value_float) {
+    cfg_t cfg = cfg_struct_add_float(m_root, "a", 3.2f, cfg_replace);
+    ASSERT_TRUE(cfg);
+
+    EXPECT_EQ(3.2f, cfg_get_float(cfg, "", 0));
+}
+
