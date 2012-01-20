@@ -2,7 +2,7 @@ $(call assert-not-null,GCC)
 
 product-support-types+=lib progn
 product-def-all-items+= c.libraries c.includes c.frameworks c.sources c.ldpathes c.flags.cpp c.flags.ld c.linker    \
-                        c.flags.lan c.flags.lan.c c.flags.lan.cc c.flags.lan.m c.flags.lan.mm \
+                        c.flags.lan c.flags.lan.c c.flags.lan.cc c.flags.lan.m c.flags.lan.mm c.lib.type \
                         product.c.includes product.c.frameworks product.c.libraries product.c.flags.ld product.c.ldpathes product.c.defs
 
 c-source-dir-to-binary-dir = $(addprefix $(CPDE_OUTPUT_ROOT)/obj,$(subst $(CPDE_ROOT),,$1))
