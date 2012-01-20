@@ -13,6 +13,9 @@ class DataElement;
 class ConstData;
 class Data;
 
+/*exceptions*/
+class type_convert_error;
+
 }}
 
 #endif
