@@ -24,6 +24,8 @@ cfg_t cfg_struct_add_int32(cfg_t s, const char * name, int32_t v, cfg_policy_t p
 cfg_t cfg_struct_add_uint32(cfg_t s, const char * name, uint32_t v, cfg_policy_t policy);
 cfg_t cfg_struct_add_int64(cfg_t s, const char * name, int64_t v, cfg_policy_t policy);
 cfg_t cfg_struct_add_uint64(cfg_t s, const char * name, uint64_t v, cfg_policy_t policy);
+cfg_t cfg_struct_add_float(cfg_t s, const char * name, float v, cfg_policy_t policy);
+cfg_t cfg_struct_add_double(cfg_t s, const char * name, double v, cfg_policy_t policy);
 cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * value, cfg_policy_t policy);
 cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value, cfg_policy_t policy);
 
@@ -39,6 +41,8 @@ cfg_t cfg_seq_add_int32(cfg_t s, int32_t v);
 cfg_t cfg_seq_add_uint32(cfg_t s, uint32_t v);
 cfg_t cfg_seq_add_int64(cfg_t s, int64_t v);
 cfg_t cfg_seq_add_uint64(cfg_t s, uint64_t v);
+cfg_t cfg_seq_add_float(cfg_t s, float v);
+cfg_t cfg_seq_add_double(cfg_t s, double v);
 cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value);
 cfg_t cfg_seq_add_value_auto(cfg_t s, const char * value);
 
