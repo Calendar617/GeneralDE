@@ -1,5 +1,6 @@
-#include <stdexcept>
+#include "cpepp/dr/Exceptions.hpp"
 #include "cpepp/cfg/Node.hpp"
+#include "cpepp/cfg/Exceptions.hpp"
 
 namespace Cpe { namespace Cfg {
 
@@ -8,10 +9,10 @@ Node::operator __type_t(void) const {                                   \
     __type_t rv;                                                        \
     if (cfg_try_as_ ## __type (*this, &rv) != 0) {                      \
         if (this == NULL) {                                             \
-            throw ::std::runtime_error("Cfg Node is not valid!");       \
+            throw invalid_cfg_node("Cfg Node is not valid!");           \
         }                                                               \
         else {                                                          \
-            throw ::std::runtime_error("Cfg Node read " #__type " fail!"); \
+            throw Dr::type_convert_error("Cfg Node read " #__type " fail!"); \
         }                                                               \
     }                                                                   \
                                                                         \
@@ -36,10 +37,10 @@ Node::operator const char *(void) const {
     const char * r = cfg_as_string(*this, NULL);
     if (r == NULL) {
         if (this == NULL) {
-            throw ::std::runtime_error("Cfg Node is not valid!");
+            throw invalid_cfg_node("Cfg Node is not valid!");
         }
         else {
-            throw ::std::runtime_error("Cfg Node read int8 fail!");
+            throw Dr::type_convert_error("Cfg Node read int8 fail!");
         }
     }
     return r;

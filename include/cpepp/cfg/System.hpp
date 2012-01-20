@@ -8,6 +8,9 @@ class Node;
 class NodeIterator;
 class NodeConstIterator;
 
+/*exceptions*/
+class invalid_cfg_node;
+
 }}
 
 #endif
