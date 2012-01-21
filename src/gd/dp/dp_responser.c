@@ -33,6 +33,8 @@ gd_dp_rsp_t gd_dp_rsp_create(gd_dp_mgr_t dp, const char * name) {
 }
 
 void gd_dp_rsp_free_i(gd_dp_rsp_t rsp) {
+    gd_dp_pbuf_remove_rsp(rsp->m_dp, rsp);
+
     while(rsp->m_bindings) {
         gd_dp_binding_free(rsp->m_bindings);
     }

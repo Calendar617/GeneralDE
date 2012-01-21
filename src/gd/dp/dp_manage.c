@@ -40,6 +40,8 @@ gd_dp_mgr_t gd_dp_mgr_create(mem_allocrator_t alloc) {
         (cpe_hash_destory_t)gd_dp_binding_free_i,
         NULL);
 
+    TAILQ_INIT(&dpm->m_processiong_rsps);
+
     return dpm;
 }
 
@@ -108,17 +110,23 @@ gd_dp_rsp_t gd_dp_rsp_find_first_by_string(gd_dp_mgr_t dp, const char * cmd) {
     return gd_dp_rsp_next(&it);
 }
 
-int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monitor_t em) {
+static int gd_dp_do_dispatch_i(struct gd_dp_rsp_it * rsps, gd_dp_req_t req, error_monitor_t em) {
     gd_dp_rsp_t rsp;
-    struct gd_dp_rsp_it rspIt;
     int rv;
     int count;
+    gd_dp_mgr_t dm = req->m_mgr;
+    struct gd_dp_processing_rsp_buf pbuf;
 
+    gd_dp_pbuf_init(dm, &pbuf);
+
+    rv = 0;
     count = 0;
 
-    gd_dp_rsp_find_by_string(&rspIt, req->m_mgr, cpe_hs_data(cmd));
+    while((rsp = gd_dp_rsp_next(rsps))) {
+        gd_dp_pbuf_add_rsp(&pbuf, rsp, em);
+    }
 
-    while((rsp = gd_dp_rsp_next(&rspIt))) {
+    while((rsp = gd_dp_pbuf_retrieve_first(&pbuf))) {
         ++count;
 
         if (rsp->m_processor == NULL) {
@@ -133,44 +141,26 @@ int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monit
         }
     }
 
+    gd_dp_pbuf_fini(dm, &pbuf);
+
     if (count == 0) {
-        CPE_ERROR(em, "no responser to process %s", cpe_hs_data(cmd));
-        return -1;
+        CPE_INFO(em, "no responser to process cmd");
+        rv = -1;
     }
 
     return rv;
 }
 
-int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) {
-    gd_dp_rsp_t rsp;
+int gd_dp_dispatch_by_string(cpe_hash_string_t cmd, gd_dp_req_t req, error_monitor_t em) {
     struct gd_dp_rsp_it rspIt;
-    int rv;
-    int count;
+    gd_dp_rsp_find_by_string(&rspIt, req->m_mgr, cpe_hs_data(cmd));
+    return gd_dp_do_dispatch_i(&rspIt, req, em);
+}
 
-    count = 0;
-
+int gd_dp_dispatch_by_numeric(int32_t cmd, gd_dp_req_t req, error_monitor_t em) {
+    struct gd_dp_rsp_it rspIt;
     gd_dp_rsp_find_by_numeric(&rspIt, req->m_mgr, cmd);
-
-    while((rsp = gd_dp_rsp_next(&rspIt))) {
-        ++count;
-
-        if (rsp->m_processor == NULL) {
-            CPE_ERROR(em, "responser %s have no processor", rsp->m_name);
-            rv = -1;
-            continue;
-        }
-
-        if (rsp->m_processor(req, rsp->m_context, em) != 0) {
-            rv = -1;
-            continue;
-        }
-    }
-
-    if (count == 0) {
-        CPE_INFO(em, "no responser to process %d", cmd);
-    }
-
-    return rv;
+    return gd_dp_do_dispatch_i(&rspIt, req, em);
 }
 
 int gd_dp_dispatch_by_name(const char * name, gd_dp_req_t req, error_monitor_t em) {

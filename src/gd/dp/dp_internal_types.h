@@ -11,10 +11,14 @@
 extern "C" {
 #endif
 
+struct gd_dp_processing_rsp_buf;
+typedef TAILQ_HEAD(gd_dp_processing_rsp_buf_list, gd_dp_processing_rsp_buf) gd_dp_processing_rsp_buf_list_t;
+
 struct gd_dp_mgr {
     mem_allocrator_t m_alloc;
     struct cpe_hash_table m_rsps;
     struct cpe_hash_table m_cmd_2_rsps;
+    gd_dp_processing_rsp_buf_list_t m_processiong_rsps;
 };
 
 typedef enum gd_dp_key_type {
@@ -60,7 +64,7 @@ struct gd_dp_rsp {
     struct cpe_hash_entry m_hh;
 };
 
-typedef TAILQ_HEAD(gd_dp_rsp_list, gd_dp_req) gd_dp_rsp_list_t;
+typedef TAILQ_HEAD(gd_dp_req_list, gd_dp_req) gd_dp_req_list_t;
 
 struct gd_dp_req {
     gd_dp_mgr_t m_mgr;
@@ -73,13 +77,31 @@ struct gd_dp_req {
     size_t m_data_capacity;
     size_t m_data_size;
 
-    gd_dp_rsp_list_t m_childs;
+    gd_dp_req_list_t m_childs;
     TAILQ_ENTRY(gd_dp_req) m_brother;
 };
 
 struct gd_dp_node {
     gd_nm_node_t m_nm_node;
     gd_dp_node_type_t m_type;
+};
+
+#define PROCESSING_BUF_RSP_COUNT (128)
+
+typedef TAILQ_HEAD(gd_dp_processing_rsp_block_list, gd_dp_processing_rsp_block) gd_dp_processing_rsp_block_list_t;
+
+struct gd_dp_processing_rsp_block {
+    size_t m_write_pos;
+    size_t m_read_pos;
+    gd_dp_rsp_t m_rsps[PROCESSING_BUF_RSP_COUNT];
+    TAILQ_ENTRY(gd_dp_processing_rsp_block) m_next;
+};
+
+struct gd_dp_processing_rsp_buf {
+    mem_allocrator_t m_alloc;
+    gd_dp_processing_rsp_block_list_t m_blocks;
+    TAILQ_ENTRY(gd_dp_processing_rsp_buf) m_sh_other;
+    struct gd_dp_processing_rsp_block m_first_block;
 };
 
 #ifdef __cplusplus
