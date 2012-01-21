@@ -1,7 +1,7 @@
-#include <stdexcept>
 #include "cpepp/utils/ErrorCollector.hpp"
 #include "gdpp/evt/Event.hpp"
 #include "gdpp/evt/EventCenter.hpp"
+#include "gdpp/evt/Exceptions.hpp"
 
 namespace Gd { namespace Evt {
 
@@ -9,7 +9,7 @@ Event & EventCenter::createEvent(size_t attach_capacity, const char * typeName, 
     Cpe::Utils::ErrorCollector em;
     gd_evt_t r = gd_evt_create(*this, attach_capacity, typeName, data_capacity, em);
     if (r == NULL) {
-        em.checkThrowWithMsg< ::std::runtime_error>();
+        em.checkThrowWithMsg< no_responser_error>();
     }
     return *(Event *)r;
 }

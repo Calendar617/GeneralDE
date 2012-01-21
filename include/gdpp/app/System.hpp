@@ -14,6 +14,7 @@ class Module;
 class Library;
 class ReqResponser;
 
+typedef int32_t ProcessorID;
 typedef ::Gd::Evt::Event Event;
 class EventCenter;
 class EventResponser;

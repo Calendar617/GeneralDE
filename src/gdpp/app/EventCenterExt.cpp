@@ -6,6 +6,7 @@
 #include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/pal/pal_external.h"
+#include "cpe/utils/hash.h"
 #include "cpe/utils/stream_mem.h"
 #include "cpepp/utils/OpGuard.hpp"
 #include "cpepp/utils/RangeMgr.hpp"
@@ -26,29 +27,40 @@ namespace Gd { namespace App {
 
 class EventCenterImpl : public EventCenterExt {
 public:
-    struct ProcessorNode {
-        ProcessorNode() : _processor(NULL), _process_fun(NULL) {}
-
-        EventResponser * _processor;
-        EventProcessFun _process_fun;
+    enum ProcessorDataState {
+        ProcessorDataState_NotInResponserHash = 0
+        , ProcessorDataState_InResponserHash
     };
-    typedef ::std::vector<ProcessorNode> ProcessorNodeContainer;
 
-    typedef ::std::vector<int> IdVector;
-    typedef ::std::map< ptr_int_t, IdVector> IdRspMap;
-
+    struct ProcessorData {
+        ProcessorID _id;
+        ProcessorDataState _state;
+        EventResponser * _realResponser;
+        EventResponser * _useResponser;
+        EventProcessFun _fun;
+        cpe_hash_entry _hh_for_responser_to_processor;
+    };
+ 
     EventCenterImpl(
         Gd::App::Application & app, Cpe::Cfg::Node & cfg)
         : _app(app)
+        , _alloc(app.allocrator())
         , _is_debug(cfg["debug"].dft(0))
         , _tl(NULL)
         , _emm(NULL)
         , _req(NULL)
         , _oid_max_len(cfg["oid-max-len"].dft(32))
         , _metaLibBuf(app.allocrator())
+        , _processor_count_in_page(cfg["processor_count_per_page"].dft(2048))
+        , _processor_page_count(0)
+        , _processor_page_capacity(0)
+        , _processor_buf(NULL)
         , _ids(app.allocrator())
-    {
+   {
         Cpe::Utils::OpGuard opGuard;
+
+        initProcessorHash();
+        opGuard.addOp(*this, &EventCenterImpl::finiProcessorHash);
 
         _tl = createTl(app, *this);
         opGuard.addOp(*this, &EventCenterImpl::freeTl);
@@ -67,6 +79,8 @@ public:
         freeReq();
         freeEvtMgr();
         freeTl();
+        finiProcessorHash();
+        freeProcessorBuf();
     }
 
     virtual Event & createEvent(const char * typeName, ssize_t capacity) {
@@ -89,42 +103,57 @@ public:
 
 	virtual void registerResponser(const char * oid, EventResponser& realResponser, EventResponser & useResponser, EventProcessFun fun) {
         try {
-            IdVector & ids = _idRsps[(ptr_int_t)&realResponser];
+            ProcessorID newProcessorId = allocProcessor();
+            ProcessorData * newProcessorData = getProcessor(newProcessorId);
+            assert(newProcessorData);
+            assert(newProcessorData->_realResponser == NULL);
+            assert(newProcessorData->_state == ProcessorDataState_NotInResponserHash);
 
-            ptr_int_t newId = allocProcessor();
+            newProcessorData->_realResponser = &realResponser;
+            newProcessorData->_useResponser = &useResponser;
+            newProcessorData->_fun = fun;
 
-            ids.reserve(ids.size() + 1);
+            int r = cpe_hash_table_insert(&_responser_to_processor, newProcessorData);
+            if (r != 0) {
+                clearProcessorData(*newProcessorData);
+                freeProcessorId(newProcessorId);
+                APP_CTX_THROW_EXCEPTION(
+                    _app,
+                    ::std::runtime_error,
+                    "registerProcessor: insert to responser processor list fail!");
+            }
+            newProcessorData->_state = ProcessorDataState_InResponserHash;
 
-            ::std::ostringstream os;
-            os << "rsp." << newId;
+            char rspNameBuf[32];
+            snprintf(rspNameBuf, sizeof(rspNameBuf), "rsp.%d", newProcessorId);
+            try {
+                Gd::Dp::Responser & rsp = _app.dpManager().createResponser(rspNameBuf);
 
-            Gd::Dp::Responser & rsp = _app.dpManager().createResponser(os.str().c_str());
-            rsp.setProcessor(apply_evt);
+                rsp.setProcessor(apply_evt);
+                rsp.setContext(newProcessorData);
 
-            ProcessorNode & pn = _processors[newId];
-            pn._processor = &useResponser;
-            pn._process_fun = fun;
-
-            rsp.setContext(&pn);
-
-            _app.dpManager().bind(rsp, oid);
-
-            ids.push_back(newId);
+                _app.dpManager().bind(rsp, oid);
+            }
+            catch(...) {
+                clearProcessorData(*newProcessorData);
+                freeProcessorId(newProcessorId);
+                throw;
+            }
         }
         APP_CTX_CATCH_EXCEPTION_RETHROW(_app, "register EventResponser to oid %s: ", oid);
     }
 
 	virtual void unregisterResponser(EventResponser & r) {
-        ptr_int_t rId = (ptr_int_t)&r;
+        ProcessorData key;
+        key._realResponser = &r;
 
-        IdRspMap::iterator pos = _idRsps.find(rId);
-        if (pos == _idRsps.end()) return;
-
-        IdVector & ids = pos->second;
-        for(IdVector::iterator idIt = ids.begin(); idIt != ids.end(); ++idIt) {
-            ::std::ostringstream os;
-            os << "rsp." << *idIt;
-            _app.dpManager().deleteResponser(os.str().c_str());
+        ProcessorData * preNode = (ProcessorData*)cpe_hash_table_find(&_responser_to_processor, &key);
+        while(preNode) {
+            ProcessorData * nextNode = 
+                (ProcessorData *)cpe_hash_table_find_next(&_responser_to_processor, preNode);
+            assert(preNode->_realResponser);
+            freeProcessor(*preNode);
+            preNode = nextNode;
         }
     }
 
@@ -168,13 +197,13 @@ private:
     }
 
     static int apply_evt(gd_dp_req_t req, void * ctx, error_monitor_t em) {
-        ProcessorNode * pn = (ProcessorNode*)ctx;
+        ProcessorData * pn = (ProcessorData*)ctx;
 
         try {
             gd_tl_event_t input = (gd_tl_event_t)gd_dp_req_data(req);
             Event & e = Event::_cast(input);
 
-            (pn->_processor->*(pn->_process_fun))(cpe_hs_data((cpe_hash_string_t)e.attach_buf()), e);
+            (pn->_useResponser->*(pn->_fun))(cpe_hs_data((cpe_hash_string_t)e.attach_buf()), e);
         }
         APP_CATCH_EXCEPTION("process event:"); //TODO: record to app
 
@@ -254,23 +283,134 @@ private:
         return r;
     }
 
-    ptr_int_t allocProcessor(void) {
-        if (_ids.empty()) {
-            _processors.resize(_processors.size() + 128);
-            _ids.putRange(_processors.size() - 128, _processors.size());
-        }
+    ProcessorData * getProcessor(ProcessorID processorId) {
+        size_t pagePos = processorId / _processor_count_in_page;
+        assert(pagePos < _processor_page_count);
 
-        return _ids.getOne();
+        ProcessorData * processorPage = _processor_buf[pagePos];
+
+        return &processorPage[processorId % _processor_count_in_page];
     }
 
-    void releaseProcessor(int id) {
-        assert(id < (int)_processors.size());
-        _processors[id]._processor = NULL;
-        _processors[id]._process_fun = NULL;
-        _ids.putOne(id);
+    ProcessorID allocProcessor(void) {
+        if (_ids.empty()) {
+            if (_processor_page_count + 1 >= _processor_page_capacity) {
+                size_t newProcessorPageCapacity = _processor_page_count + 128;
+                ProcessorData ** newProcessorBuf = (ProcessorData **)mem_alloc(_alloc, sizeof(ProcessorData*) * newProcessorPageCapacity);
+                if (newProcessorBuf == NULL) throw ::std::bad_alloc();
+
+                bzero(newProcessorBuf, sizeof(ProcessorData *) * newProcessorPageCapacity);
+                memcpy(newProcessorBuf, _processor_buf, sizeof(ProcessorData*) * _processor_page_count);
+
+                if (_processor_buf) mem_free(_alloc, _processor_buf);
+
+                _processor_buf = newProcessorBuf;
+                _processor_page_capacity = newProcessorPageCapacity;
+
+                if (_is_debug) {
+                    APP_CTX_INFO(_app, "resize processor buf to %zd", newProcessorPageCapacity);
+                }
+            }
+
+            ptr_int_t newStart = _processor_page_count * _processor_count_in_page;
+            ProcessorData * newPage =
+                (ProcessorData *)mem_alloc(_alloc, sizeof(ProcessorData) * _processor_count_in_page);
+            if (newPage == NULL) {
+                throw ::std::bad_alloc();
+            }
+            bzero(newPage, sizeof(ProcessorData) * _processor_count_in_page);
+            for(size_t i = 0; i < _processor_count_in_page; ++i) {
+                newPage[i]._id = newStart + i;
+            }
+
+            _ids.putRange(newStart, newStart + _processor_count_in_page);
+            _processor_buf[_processor_page_count] = newPage;
+            ++_processor_page_count;
+
+            if (_is_debug) {
+                APP_CTX_INFO(
+                    _app,
+                    "alloc a new processor page[%d,%d), page count is %zd",
+                    (ProcessorID)newStart, (ProcessorID)(newStart + _processor_page_count),
+                    _processor_page_count);
+            }
+        }
+
+        return (ProcessorID)_ids.getOne();
+    }
+
+    void freeProcessorBuf(void) {
+        if (_processor_buf == NULL) return;
+
+        for(size_t i = 0; i < _processor_page_count; ++i) {
+            mem_free(_alloc, _processor_buf[i]);
+        }
+
+        mem_free(_alloc, _processor_buf);
+        _processor_page_count = 0;
+        _processor_page_capacity = 0;
+    }
+
+    void freeProcessor(ProcessorData & data) {
+        assert(data._realResponser);
+
+        char rspNameBuf[32];
+        snprintf(rspNameBuf, sizeof(rspNameBuf), "rsp.%d", data._id);
+        _app.dpManager().deleteResponser(rspNameBuf);
+
+        clearProcessorData(data);
+        freeProcessorId(data._id);
+    }
+    
+    void clearProcessorData(ProcessorData & data) {
+        if (data._state == ProcessorDataState_InResponserHash) {
+            cpe_hash_table_remove_by_ins(&_responser_to_processor, &data);
+            data._state = ProcessorDataState_NotInResponserHash;
+        }
+
+        data._realResponser = NULL;
+        data._useResponser = NULL;
+        data._fun = NULL;
+    }
+
+    void freeProcessorId(ProcessorID processorId) {
+        _ids.putOne(processorId);
+    }
+
+    static  uint32_t cpe_responser_hash_fun(const void * o) {
+        const ProcessorData * processorData = (const ProcessorData*)o;
+        return (((ptr_int_t)processorData->_realResponser) & 0xFFFFFFFF);
+    }
+
+    static int cpe_responser_cmp_fun(const void * l, const void * r) {
+        const ProcessorData * lProcessorData = (const ProcessorData*)l;
+        const ProcessorData * rProcessorData = (const ProcessorData*)r;
+
+        return lProcessorData->_realResponser == rProcessorData->_realResponser;
+    }
+
+    void initProcessorHash(void) {
+        int r = cpe_hash_table_init(
+            &_responser_to_processor,
+            _alloc,
+            cpe_responser_hash_fun,
+            cpe_responser_cmp_fun,
+            CPE_HASH_OBJ2ENTRY(ProcessorData, _hh_for_responser_to_processor),
+            _processor_count_in_page);
+        if (r != 0) {
+            APP_CTX_THROW_EXCEPTION(
+                _app,
+                ::std::runtime_error,
+                "init responser_to_processor fail!");
+        }
+    }
+
+    void finiProcessorHash(void) {
+        cpe_hash_table_fini(&_responser_to_processor);
     }
 
     Gd::App::Application & _app;
+    mem_allocrator_t _alloc;
     int _is_debug;
     gd_tl_t _tl;
     gd_evt_mgr_t _emm;
@@ -278,9 +418,12 @@ private:
     size_t _oid_max_len;
     Cpe::Utils::MemBuffer _metaLibBuf;
 
+    size_t _processor_count_in_page;
+    size_t _processor_page_count;
+    size_t _processor_page_capacity;
+    ProcessorData ** _processor_buf;
+    cpe_hash_table _responser_to_processor;
     Cpe::Utils::RangeMgr _ids;
-    ProcessorNodeContainer _processors;
-    IdRspMap _idRsps;
 };
 
 EventCenter::~EventCenter() {
