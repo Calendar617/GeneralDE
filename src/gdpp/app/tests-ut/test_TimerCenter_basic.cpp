@@ -19,6 +19,29 @@ TEST_F(TimerCenterTest, basic) {
     ::testing::Mock::VerifyAndClear(&timerProcessor);
 }
 
+TEST_F(TimerCenterTest, multi_times) {
+    TimerProcessorMock timerProcessor;
+
+    EXPECT_EQ(
+        0,
+        timerCenter().registerTimer(
+            timerProcessor, 
+            &TimerProcessorMock::on_timer1,
+            0,
+            1,
+            -1));
+
+    EXPECT_CALL(timerProcessor, on_timer1(::testing::Eq((Gd::App::TimerID)0)))
+        .Times(3)
+        .WillRepeatedly(::testing::Return());
+
+    t_app_tick();
+    t_app_tick();
+    t_app_tick();
+
+    ::testing::Mock::VerifyAndClear(&timerProcessor);
+}
+
 
 TEST_F(TimerCenterTest, remove_by_id) {
     TimerProcessorMock timerProcessor;

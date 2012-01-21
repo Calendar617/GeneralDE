@@ -62,9 +62,12 @@ void gd_dp_pbuf_remove_rsp(gd_dp_mgr_t dm, gd_dp_rsp_t rsp) {
                         block->m_rsps + i + 1,
                         sizeof(gd_dp_rsp_t) * (block->m_write_pos - i - 1));
                     --block->m_write_pos;
-                    block = 0;
+
+                    block = NULL;
                 }
             }
+
+            if (block == NULL) break;
         }
     }
 }
@@ -72,7 +75,7 @@ void gd_dp_pbuf_remove_rsp(gd_dp_mgr_t dm, gd_dp_rsp_t rsp) {
 gd_dp_rsp_t gd_dp_pbuf_retrieve_first(struct gd_dp_processing_rsp_buf * buf) {
     struct gd_dp_processing_rsp_block * block;
 
-    while((block == TAILQ_FIRST(&buf->m_blocks)) && block->m_read_pos >= block->m_write_pos) {
+    while((block = TAILQ_FIRST(&buf->m_blocks)) && block->m_read_pos >= block->m_write_pos) {
         TAILQ_REMOVE(&buf->m_blocks, block, m_next);
         if (block != &buf->m_first_block) {
             mem_free(buf->m_alloc, block);
