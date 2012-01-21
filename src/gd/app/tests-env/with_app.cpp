@@ -67,7 +67,7 @@ with_app::t_app_install_module(
         EXPECT_EQ(0, cfg_read(cfg, (read_stream_t)&stream, cfg_replace, &em));
     }
 
-    gd_app_module_t m =gd_app_install_module(t_app(), name, libName, cfg);
+    gd_app_module_t m = gd_app_install_module(t_app(), name, libName, cfg);
 
     if (cfg) {
         cfg_free(cfg);

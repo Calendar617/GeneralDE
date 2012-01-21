@@ -6,7 +6,8 @@ void EventCenterTest::SetUp() {
     gd_set_default_library(dlopen(NULL, RTLD_NOW));
     t_app_install_module(
         "AppEventCenter",
-        NULL,
+        NULL
+        ,
         "load-from-memory:\n"
         "    <metalib tagsetversion='1' name='event'  version='1'>\n"
         "    <struct name='event1' version='1'>\n"
