@@ -83,9 +83,23 @@ static int gd_tl_manage_dispatch_event(gd_tl_manage_t tm, int maxCount) {
         node->m_state = gd_tl_event_node_state_free;
 
         gd_tl_event_do_dispatch(&node->m_event, rv);
-        gd_tl_event_queue_clear(&tm->m_event_building_queue);
 
-        gd_tl_event_node_free(node);
+        if (node->m_repeatCount > 0) {
+            --node->m_repeatCount;
+        }
+
+        if (node->m_repeatCount != 0) {
+            node->m_execute_time += node->m_span;
+            if (gd_tl_event_node_insert(node) != 0) {
+                gd_tl_event_node_free(node);
+            }
+            
+        }
+        else {
+            gd_tl_event_node_free(node);
+        }
+
+        gd_tl_event_queue_clear(&tm->m_event_building_queue);
 
         ++count;
     }
