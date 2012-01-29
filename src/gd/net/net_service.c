@@ -26,26 +26,50 @@ gd_net_svr_crate_i(
 
     svr->m_mgr = nmgr;
     svr->m_type = type;
+    svr->m_close_op = gd_net_svr_close_op_leave;
+    svr->m_state = gd_net_svr_state_init;
     svr->m_name = (char *)buf;
     svr->m_chanel_read = readChanel;
     svr->m_chanel_write = writeChanel;
 
-    TAILQ_INSERT_TAIL(&nmgr->m_svrs, svr, m_svr_next);
+    TAILQ_INSERT_TAIL(&nmgr->m_svrs_init, svr, m_svr_next);
 
     return svr;
+}
+
+void gd_net_svr_free_i(gd_net_svr_t svr) {
+    switch(svr->m_state) {
+    case gd_net_svr_state_init:
+        TAILQ_REMOVE(&svr->m_mgr->m_svrs_init, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_starting:
+        TAILQ_REMOVE(&svr->m_mgr->m_svrs_starting, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_runing:
+        TAILQ_REMOVE(&svr->m_mgr->m_svrs_runing, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_shutingdown:
+        TAILQ_REMOVE(&svr->m_mgr->m_svrs_shutingdown, svr, m_svr_next);
+        break;
+    }
+
+    mem_free(svr->m_mgr->m_alloc, svr->m_name);
 }
 
 void gd_net_svr_free(gd_net_svr_t svr) {
     assert(svr);
 
-    TAILQ_REMOVE(&svr->m_mgr->m_svrs, svr, m_svr_next);
-
-    mem_free(svr->m_mgr->m_alloc, svr->m_name);
+    g_net_svr_ops[svr->m_type].m_free(svr);
 }
 
 gd_net_svr_type_t
 gd_net_svr_type(gd_net_svr_t svr) {
     return svr->m_type;
+}
+
+gd_net_svr_state_t
+gd_net_svr_state(gd_net_svr_t svr) {
+    return svr->m_state;
 }
 
 const char *
@@ -63,3 +87,25 @@ gd_net_svr_chanel_write(gd_net_svr_t svr) {
     return svr->m_chanel_write;
 }
 
+struct gd_net_svr_op g_net_svr_ops[] = {
+        /*gd_net_svr_type_local*/
+    {   /*free*/ NULL
+      , /*init*/ NULL
+      , /*fini*/ NULL
+    }
+    ,   /*gd_net_svr_type_tcp_client*/
+    {   /*free*/ gd_net_svr_free_tcp_client
+      , /*init*/ NULL
+      , /*fini*/ NULL
+    }
+    ,   /*gd_net_svr_type_tcp_listener*/
+    {   /*free*/ NULL
+      , /*init*/ NULL
+      , /*fini*/ NULL
+    }
+    ,   /*gd_net_svr_type_tcp_server*/
+    {   /*free*/ NULL
+      , /*init*/ NULL
+      , /*fini*/ NULL
+    }
+};

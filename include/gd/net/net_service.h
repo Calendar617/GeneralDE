@@ -12,8 +12,12 @@ void gd_net_svr_free(gd_net_svr_t svr);
 
 const char * gd_net_svr_name(gd_net_svr_t svr);
 gd_net_svr_type_t gd_net_svr_type(gd_net_svr_t svr);
+gd_net_svr_state_t gd_net_svr_state(gd_net_svr_t svr);
 gd_net_chanel_t gd_net_svr_chanel_read(gd_net_svr_t svr);
 gd_net_chanel_t gd_net_svr_chanel_write(gd_net_svr_t svr);
+
+void get_set_svr_set_close_op(gd_net_svr_t svr, gd_net_svr_close_op_t op);
+gd_net_svr_close_op_t gd_net_svr_close_op(gd_net_svr_t svr);
 
 #ifdef __cplusplus
 }
