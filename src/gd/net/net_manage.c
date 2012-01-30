@@ -11,7 +11,7 @@
 #include "gd/net/net_manage.h"
 #include "gd/net/net_chanel.h"
 #include "gd/net/net_service.h"
-#include "net_internal_types.h"
+#include "net_internal_ops.h"
 
 gd_net_mgr_t
 gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
@@ -57,6 +57,8 @@ void gd_net_mgr_free(gd_net_mgr_t nmgr) {
     gd_net_svr_t svr;
     assert(nmgr);
 
+    gd_net_mgr_free_controler(nmgr);
+
     ev_loop_destroy(nmgr->m_ev_loop);
     nmgr->m_ev_loop = NULL;
 
@@ -73,6 +75,8 @@ void gd_net_mgr_free(gd_net_mgr_t nmgr) {
     while((chanel = TAILQ_FIRST(&nmgr->m_chanels))) {
         gd_net_chanel_free(chanel);
     }
+
+    mem_free(nmgr->m_alloc, nmgr);
 }
 
 int gd_net_svr_fd_add(

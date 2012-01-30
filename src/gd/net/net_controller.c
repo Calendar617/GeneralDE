@@ -67,3 +67,16 @@ int gd_net_mgr_create_controler(gd_net_mgr_t nmgr) {
     return 0;
 }
 
+void gd_net_mgr_free_controler(gd_net_mgr_t nmgr) {
+    if (nmgr->m_control_fd_client != -1) {
+        gd_net_socket_close(&nmgr->m_control_fd_client, nmgr->m_em);
+    }
+
+    if (nmgr->m_control_fd_svr != -1) {
+        gd_net_socket_close(&nmgr->m_control_fd_svr, nmgr->m_em);
+    }
+
+    if (nmgr->m_control_fd_listen != -1) {
+        gd_net_socket_close(&nmgr->m_control_fd_listen, nmgr->m_em);
+    }
+}

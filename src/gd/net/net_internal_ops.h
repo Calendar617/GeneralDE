@@ -40,6 +40,7 @@ extern struct gd_net_svr_op g_net_svr_ops[];
 
 /*mgr control ops*/
 int gd_net_mgr_create_controler(gd_net_mgr_t nmgr);
+void gd_net_mgr_free_controler(gd_net_mgr_t nmgr);
 
 /*service local operations*/
 
