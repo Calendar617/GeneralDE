@@ -32,27 +32,13 @@ gd_net_svr_crate_i(
     svr->m_chanel_read = readChanel;
     svr->m_chanel_write = writeChanel;
 
-    TAILQ_INSERT_TAIL(&nmgr->m_svrs_init, svr, m_svr_next);
+    gd_net_svr_enqueue(svr);
 
     return svr;
 }
 
 void gd_net_svr_free_i(gd_net_svr_t svr) {
-    switch(svr->m_state) {
-    case gd_net_svr_state_init:
-        TAILQ_REMOVE(&svr->m_mgr->m_svrs_init, svr, m_svr_next);
-        break;
-    case gd_net_svr_state_starting:
-        TAILQ_REMOVE(&svr->m_mgr->m_svrs_starting, svr, m_svr_next);
-        break;
-    case gd_net_svr_state_runing:
-        TAILQ_REMOVE(&svr->m_mgr->m_svrs_runing, svr, m_svr_next);
-        break;
-    case gd_net_svr_state_shutingdown:
-        TAILQ_REMOVE(&svr->m_mgr->m_svrs_shutingdown, svr, m_svr_next);
-        break;
-    }
-
+    gd_net_svr_dequeue(svr);
     mem_free(svr->m_mgr->m_alloc, svr->m_name);
 }
 

@@ -26,21 +26,20 @@ void gd_net_svr_fd_remove(
     gd_net_mgr_t nmgr,
     int fd);
 
+void gd_net_svr_enqueue(gd_net_svr_t svr);
+void gd_net_svr_dequeue(gd_net_svr_t svr);
+
 void gd_net_svr_update_state(
     gd_net_svr_t svr,
     gd_net_svr_state_t state);
 
 typedef struct gd_net_svr_op {
     void (*m_free)(gd_net_svr_t svr);
-    void (*m_init)(gd_net_svr_t svr);
+    gd_net_svr_state_t (*m_init)(gd_net_svr_t svr);
     void (*m_fini)(gd_net_svr_t svr);
 } * gd_net_svr_op_t;
 
 extern struct gd_net_svr_op g_net_svr_ops[];
-
-/*mgr control ops*/
-int gd_net_mgr_create_controler(gd_net_mgr_t nmgr);
-void gd_net_mgr_free_controler(gd_net_mgr_t nmgr);
 
 /*service local operations*/
 

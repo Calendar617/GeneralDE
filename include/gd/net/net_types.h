@@ -24,6 +24,7 @@ typedef enum gd_net_svr_state {
     , gd_net_svr_state_starting
     , gd_net_svr_state_runing
     , gd_net_svr_state_shutingdown
+    , gd_net_svr_state_waiting
 } gd_net_svr_state_t;
 
 typedef enum gd_net_svr_close_op {

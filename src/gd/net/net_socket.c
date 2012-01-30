@@ -38,4 +38,3 @@ void gd_net_socket_close(int * fd, error_monitor_t em) {
     }
     *fd = 0;
 }
-

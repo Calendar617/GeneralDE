@@ -1,12 +1,6 @@
 #include <assert.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <fcntl.h>
-#include <arpa/inet.h>
 #include <errno.h>
 #include "cpe/pal/pal_string.h"
-#include "cpe/pal/pal_unistd.h"
-#include "ev.h"
 #include "cpe/pal/pal_strings.h"
 #include "gd/net/net_manage.h"
 #include "gd/net/net_chanel.h"
@@ -30,24 +24,15 @@ gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
 
     nmgr->m_alloc = alloc;
     nmgr->m_em = em;
+
     nmgr->m_fds = NULL;
     nmgr->m_fds_capacity = 0;
-
-    nmgr->m_control_fd_listen = -1;
-    nmgr->m_control_fd_client = -1;
-    nmgr->m_control_fd_svr = -1;
 
     TAILQ_INIT(&nmgr->m_chanels);
     TAILQ_INIT(&nmgr->m_svrs_init);
     TAILQ_INIT(&nmgr->m_svrs_runing);
     TAILQ_INIT(&nmgr->m_svrs_shutingdown);
-
-    if (gd_net_mgr_create_controler(nmgr) != 0) {
-        ev_loop_destroy(nmgr->m_ev_loop);
-        nmgr->m_ev_loop = NULL;
-        mem_free(alloc, nmgr);
-        return NULL;
-    }
+    TAILQ_INIT(&nmgr->m_svrs_waiting);
 
     return nmgr;
 }
@@ -56,8 +41,6 @@ void gd_net_mgr_free(gd_net_mgr_t nmgr) {
     gd_net_chanel_t chanel;
     gd_net_svr_t svr;
     assert(nmgr);
-
-    gd_net_mgr_free_controler(nmgr);
 
     ev_loop_destroy(nmgr->m_ev_loop);
     nmgr->m_ev_loop = NULL;
@@ -69,6 +52,18 @@ void gd_net_mgr_free(gd_net_mgr_t nmgr) {
     }
 
     while((svr = TAILQ_FIRST(&nmgr->m_svrs_init))) {
+        gd_net_svr_free(svr);
+    }
+
+    while((svr = TAILQ_FIRST(&nmgr->m_svrs_runing))) {
+        gd_net_svr_free(svr);
+    }
+
+    while((svr = TAILQ_FIRST(&nmgr->m_svrs_shutingdown))) {
+        gd_net_svr_free(svr);
+    }
+
+    while((svr = TAILQ_FIRST(&nmgr->m_svrs_waiting))) {
         gd_net_svr_free(svr);
     }
 
@@ -137,7 +132,48 @@ error_monitor_t gd_net_mgr_em(gd_net_mgr_t nmgr) {
     return nmgr->m_em;
 }
 
-int gd_net_mgr_run(gd_net_mgr_t nmgr) {
-    ev_loop(nmgr->m_ev_loop, 0);
-    return 0;
+void gd_net_svr_enqueue(gd_net_svr_t svr) {
+    switch(svr->m_state) {
+    case gd_net_svr_state_init:
+        TAILQ_INSERT_TAIL(&svr->m_mgr->m_svrs_init, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_starting:
+        TAILQ_INSERT_TAIL(&svr->m_mgr->m_svrs_starting, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_runing:
+        TAILQ_INSERT_TAIL(&svr->m_mgr->m_svrs_runing, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_shutingdown:
+        TAILQ_INSERT_TAIL(&svr->m_mgr->m_svrs_shutingdown, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_waiting:
+        TAILQ_INSERT_TAIL(&svr->m_mgr->m_svrs_waiting, svr, m_svr_next);
+        break;
+    }
+}
+
+void gd_net_svr_dequeue(gd_net_svr_t svr) {
+    switch(svr->m_state) {
+    case gd_net_svr_state_init:
+        TAILQ_REMOVE(&svr->m_mgr->m_svrs_init, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_starting:
+        TAILQ_REMOVE(&svr->m_mgr->m_svrs_starting, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_runing:
+        TAILQ_REMOVE(&svr->m_mgr->m_svrs_runing, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_shutingdown:
+        TAILQ_REMOVE(&svr->m_mgr->m_svrs_shutingdown, svr, m_svr_next);
+        break;
+    case gd_net_svr_state_waiting:
+        TAILQ_REMOVE(&svr->m_mgr->m_svrs_waiting, svr, m_svr_next);
+        break;
+    }
+}
+
+void gd_net_svr_update_state(
+    gd_net_svr_t svr,
+    gd_net_svr_state_t state)
+{
 }

@@ -1,5 +1,6 @@
 #ifndef GD_NET_INTERNAL_TYPES_H
 #define GD_NET_INTERNAL_TYPES_H
+#include "ev.h"
 #include "cpe/pal/pal_queue.h"
 #include "cpe/utils/error.h"
 #include "cpe/utils/memory.h"
@@ -16,20 +17,17 @@ typedef TAILQ_HEAD(gd_net_svr_list, gd_net_svr) gd_net_svr_list_t;
 struct gd_net_mgr {
     mem_allocrator_t m_alloc;
     error_monitor_t m_em;
+
     gd_net_chanel_list_t m_chanels;
     gd_net_svr_list_t m_svrs_init;
     gd_net_svr_list_t m_svrs_starting;
     gd_net_svr_list_t m_svrs_runing;
     gd_net_svr_list_t m_svrs_shutingdown;
+    gd_net_svr_list_t m_svrs_waiting;
 
     gd_net_svr_t * m_fds;
     size_t m_fds_capacity;
     struct ev_loop * m_ev_loop;
-
-    int m_control_fd_listen;
-    int m_control_fd_svr;
-    int m_control_fd_client;
-    gd_net_svr_t m_control_svr;
 };
 
 struct gd_net_chanel {
