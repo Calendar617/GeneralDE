@@ -1,4 +1,11 @@
 #include <assert.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <arpa/inet.h>
+#include <errno.h>
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_unistd.h"
 #include "ev.h"
 #include "cpe/pal/pal_strings.h"
 #include "gd/net/net_manage.h"
@@ -12,6 +19,7 @@ gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
 
     nmgr = (gd_net_mgr_t)mem_alloc(alloc, sizeof(struct gd_net_mgr));
     if (nmgr == NULL) return NULL;
+    bzero(nmgr, sizeof(struct gd_net_mgr));
 
     nmgr->m_ev_loop = ev_loop_new(EVFLAG_AUTO);
     if (!nmgr->m_ev_loop) {
@@ -25,10 +33,21 @@ gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
     nmgr->m_fds = NULL;
     nmgr->m_fds_capacity = 0;
 
+    nmgr->m_control_fd_listen = -1;
+    nmgr->m_control_fd_client = -1;
+    nmgr->m_control_fd_svr = -1;
+
     TAILQ_INIT(&nmgr->m_chanels);
     TAILQ_INIT(&nmgr->m_svrs_init);
     TAILQ_INIT(&nmgr->m_svrs_runing);
     TAILQ_INIT(&nmgr->m_svrs_shutingdown);
+
+    if (gd_net_mgr_create_controler(nmgr) != 0) {
+        ev_loop_destroy(nmgr->m_ev_loop);
+        nmgr->m_ev_loop = NULL;
+        mem_free(alloc, nmgr);
+        return NULL;
+    }
 
     return nmgr;
 }

@@ -5,7 +5,6 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include "cpe/pal/pal_string.h"
-#include "cpe/pal/pal_unistd.h"
 #include "cpe/utils/error.h"
 #include "gd/net/net_service_tcp.h"
 #include "net_internal_ops.h"
@@ -21,7 +20,6 @@ gd_net_svr_create_tcp_client(
 {
     gd_net_svr_t svr;
     struct gd_net_svr_tcp_client * svr_tcp;
-    int flags;
 
     svr = gd_net_svr_crate_i(
         nmgr,
@@ -45,11 +43,14 @@ gd_net_svr_create_tcp_client(
         return NULL;
     }
 
-    flags = fcntl(svr_tcp->m_fd, F_GETFL, 0);
-    fcntl(svr_tcp->m_fd, F_SETFL, flags | O_NONBLOCK);
+    if (!gd_net_socket_set_none_block(svr_tcp->m_fd, nmgr->m_em)) {
+        gd_net_socket_close(&svr_tcp->m_fd, nmgr->m_em);
+        gd_net_svr_free_i(svr);
+        return NULL;
+    }
 
     if (gd_net_svr_fd_add(nmgr, svr, svr_tcp->m_fd) != 0) {
-        close(svr_tcp->m_fd);
+        gd_net_socket_close(&svr_tcp->m_fd, nmgr->m_em);
         gd_net_svr_free_i(svr);
         return NULL;
     }
@@ -66,7 +67,7 @@ void gd_net_svr_free_tcp_client(gd_net_svr_t svr) {
 
     gd_net_svr_fd_remove(svr->m_mgr, svr_tcp->m_fd);
 
-    close(svr_tcp->m_fd);
+    gd_net_socket_close(&svr_tcp->m_fd, svr->m_mgr->m_em);
 
     gd_net_svr_free_i(svr);
 }

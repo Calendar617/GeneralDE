@@ -21,9 +21,15 @@ struct gd_net_mgr {
     gd_net_svr_list_t m_svrs_starting;
     gd_net_svr_list_t m_svrs_runing;
     gd_net_svr_list_t m_svrs_shutingdown;
+
     gd_net_svr_t * m_fds;
     size_t m_fds_capacity;
     struct ev_loop * m_ev_loop;
+
+    int m_control_fd_listen;
+    int m_control_fd_svr;
+    int m_control_fd_client;
+    gd_net_svr_t m_control_svr;
 };
 
 struct gd_net_chanel {
