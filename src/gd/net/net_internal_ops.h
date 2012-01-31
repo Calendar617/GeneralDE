@@ -48,7 +48,13 @@ void gd_net_svr_free_tcp_client(gd_net_svr_t svr);
 gd_net_svr_state_t gd_net_svr_init_tcp_client(gd_net_svr_t svr);
 void gd_net_svr_fini_tcp_client(gd_net_svr_t svr);
 
+/*service tcp server operations*/
+void gd_net_svr_free_tcp_server(gd_net_svr_t svr);
+gd_net_svr_state_t gd_net_svr_init_tcp_server(gd_net_svr_t svr);
+void gd_net_svr_fini_tcp_server(gd_net_svr_t svr);
+
 /*tcp ops*/
+int gd_net_socket_open(int * fd, error_monitor_t em);
 void gd_net_socket_close(int * fd, error_monitor_t em);
 int gd_net_socket_set_none_block(int fd, error_monitor_t em);
 

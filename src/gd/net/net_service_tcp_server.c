@@ -19,7 +19,6 @@ gd_net_svr_create_tcp_server(
 {
     gd_net_svr_t svr;
     struct gd_net_svr_tcp_server * svr_tcp;
-    int flags;
 
     svr = gd_net_svr_crate_i(
         nmgr,
@@ -35,22 +34,7 @@ gd_net_svr_create_tcp_server(
         ip,
         sizeof(svr_tcp->m_ip));
     svr_tcp->m_port = port;
-
-    svr_tcp->m_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (svr_tcp->m_fd == -1) {
-        CPE_ERROR(nmgr->m_em, "create tcp server: socke fail, errno=%d!", errno);
-        gd_net_svr_free_i(svr);
-        return NULL;
-    }
-
-    flags = fcntl(svr_tcp->m_fd, F_GETFL, 0);
-    fcntl(svr_tcp->m_fd, F_SETFL, flags | O_NONBLOCK);
-
-    if (gd_net_svr_fd_add(nmgr, svr, svr_tcp->m_fd) != 0) {
-        close(svr_tcp->m_fd);
-        gd_net_svr_free_i(svr);
-        return NULL;
-    }
+    svr_tcp->m_fd = -1;
 
     return svr;
 }
@@ -61,11 +45,74 @@ void gd_net_svr_free_tcp_server(gd_net_svr_t svr) {
     assert(svr->m_type == gd_net_svr_type_tcp_server);
 
     svr_tcp = (struct gd_net_svr_tcp_server *)svr;
-
-    gd_net_svr_fd_remove(svr->m_mgr, svr_tcp->m_fd);
-
-    close(svr_tcp->m_fd);
+    assert(svr_tcp->m_fd == -1);
 
     gd_net_svr_free_i(svr);
 }
 
+gd_net_svr_state_t
+gd_net_svr_init_tcp_server(gd_net_svr_t svr) {
+    struct sockaddr_in addr;
+    struct gd_net_svr_tcp_server * svr_tcp;
+    error_monitor_t em;
+
+    em = svr->m_mgr->m_em;
+    svr_tcp = (struct gd_net_svr_tcp_server *)svr;
+
+    bzero(&addr, sizeof(addr));
+    addr.sin_family = PF_INET;
+    addr.sin_port = htons(svr_tcp->m_port);
+    addr.sin_addr.s_addr = inet_addr(svr_tcp->m_ip);
+
+    if (gd_net_socket_open(&svr_tcp->m_fd, em) != 0) {
+        return gd_net_svr_state_init;
+    }
+
+    if (gd_net_socket_set_none_block(svr_tcp->m_fd, em) != 0) {
+        gd_net_socket_close(&svr_tcp->m_fd, em);
+        return gd_net_svr_state_init;
+    }
+
+    if(bind(svr_tcp->m_fd, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+        CPE_ERROR(em, "gd_net_svr_init_tcp_server: bind fail, error=%s!", strerror(errno));
+        gd_net_socket_close(&svr_tcp->m_fd, em);
+        return gd_net_svr_state_init;
+    }
+
+    if (listen(svr_tcp->m_fd, 1) != 0) {
+        CPE_ERROR(em, "gd_net_svr_init_tcp_server: listen fail, error=%s!", strerror(errno));
+        gd_net_socket_close(&svr_tcp->m_fd, em);
+        return gd_net_svr_state_init;
+    }
+
+    if (gd_net_svr_fd_add(svr->m_mgr, svr, svr_tcp->m_fd) != 0) {
+        gd_net_socket_close(&svr_tcp->m_fd, em);
+        return gd_net_svr_state_init;
+    }
+
+    return gd_net_svr_state_runing;
+}
+
+void gd_net_svr_fini_tcp_server(gd_net_svr_t svr) {
+    struct gd_net_svr_tcp_server * svr_tcp;
+    svr_tcp = (struct gd_net_svr_tcp_server *)svr;
+
+    gd_net_svr_fd_remove(svr->m_mgr, svr_tcp->m_fd);
+
+    gd_net_socket_close(&svr_tcp->m_fd, svr_tcp->m_mgr->m_em);
+}
+
+const char *
+gd_net_svr_tcp_server_ip(gd_net_svr_t svr) {
+    assert(svr);
+    assert(svr->m_type = gd_net_svr_type_tcp_server);
+
+    return ((struct gd_net_svr_tcp_server *)svr)->m_ip;
+}
+
+short gd_net_svr_tcp_server_port(gd_net_svr_t svr) {
+    assert(svr);
+    assert(svr->m_type = gd_net_svr_type_tcp_server);
+
+    return ((struct gd_net_svr_tcp_server *)svr)->m_port;
+}

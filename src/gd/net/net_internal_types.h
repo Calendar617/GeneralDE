@@ -65,6 +65,7 @@ struct gd_net_svr_tcp_client {
     char m_ip[32];
     short m_port;
     int m_fd;
+    struct ev_io m_watcher;
 };
 
 struct gd_net_svr_tcp_server {
@@ -72,6 +73,7 @@ struct gd_net_svr_tcp_server {
     char m_ip[32];
     short m_port;
     int m_fd;
+    struct ev_io m_watcher;
 };
 
 #ifdef __cplusplus

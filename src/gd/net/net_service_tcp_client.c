@@ -35,25 +35,7 @@ gd_net_svr_create_tcp_client(
         ip,
         sizeof(svr_tcp->m_ip));
     svr_tcp->m_port = port;
-
-    svr_tcp->m_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (svr_tcp->m_fd == -1) {
-        CPE_ERROR(nmgr->m_em, "create tcp client: socke fail, errno=%d!", errno);
-        gd_net_svr_free_i(svr);
-        return NULL;
-    }
-
-    if (!gd_net_socket_set_none_block(svr_tcp->m_fd, nmgr->m_em)) {
-        gd_net_socket_close(&svr_tcp->m_fd, nmgr->m_em);
-        gd_net_svr_free_i(svr);
-        return NULL;
-    }
-
-    if (gd_net_svr_fd_add(nmgr, svr, svr_tcp->m_fd) != 0) {
-        gd_net_socket_close(&svr_tcp->m_fd, nmgr->m_em);
-        gd_net_svr_free_i(svr);
-        return NULL;
-    }
+    svr_tcp->m_fd = -1;
 
     return svr;
 }
@@ -64,10 +46,7 @@ void gd_net_svr_free_tcp_client(gd_net_svr_t svr) {
     assert(svr->m_type == gd_net_svr_type_tcp_client);
 
     svr_tcp = (struct gd_net_svr_tcp_client *)svr;
-
-    gd_net_svr_fd_remove(svr->m_mgr, svr_tcp->m_fd);
-
-    gd_net_socket_close(&svr_tcp->m_fd, svr->m_mgr->m_em);
+    assert(svr_tcp->m_fd == -1);
 
     gd_net_svr_free_i(svr);
 }
@@ -76,26 +55,54 @@ gd_net_svr_state_t
 gd_net_svr_init_tcp_client(gd_net_svr_t svr) {
     struct sockaddr_in addr;
     struct gd_net_svr_tcp_client * svr_tcp;
-    int r;
+    error_monitor_t em;
+    gd_net_svr_state_t nextState;
 
     assert(svr->m_type == gd_net_svr_type_tcp_client);
 
+    em = svr->m_mgr->m_em;
     svr_tcp = (struct gd_net_svr_tcp_client *)svr;
+
+    if (gd_net_socket_open(&svr_tcp->m_fd, em) != 0) {
+        return gd_net_svr_state_init;
+    }
+
+    if (!gd_net_socket_set_none_block(svr_tcp->m_fd, em)) {
+        gd_net_socket_close(&svr_tcp->m_fd, em);
+        return gd_net_svr_state_init;
+    }
 
     bzero(&addr, sizeof(addr));
     addr.sin_family = PF_INET;
     addr.sin_port = htons(svr_tcp->m_port);
     addr.sin_addr.s_addr = inet_addr(svr_tcp->m_ip);
-
-    if ((r = connect(svr_tcp->m_fd, (struct sockaddr*)&addr, sizeof(addr))) == 0) {
-        return gd_net_svr_state_runing;
+    if (connect(svr_tcp->m_fd, (struct sockaddr*)&addr, sizeof(addr)) != 0) {
+        nextState = gd_net_svr_state_runing;
     }
     else if (errno == EINPROGRESS) {
-        return gd_net_svr_state_starting;
+        nextState = gd_net_svr_state_starting;
     }
     else {
+        nextState = gd_net_svr_state_init;
+    }
+
+    if (nextState == gd_net_svr_state_init) return nextState;
+
+    if (gd_net_svr_fd_add(svr->m_mgr, svr, svr_tcp->m_fd) != 0) {
+        gd_net_socket_close(&svr_tcp->m_fd, em);
         return gd_net_svr_state_init;
     }
+
+    return nextState;
+}
+
+void gd_net_svr_fini_tcp_client(gd_net_svr_t svr) {
+    struct gd_net_svr_tcp_client * svr_tcp;
+    svr_tcp = (struct gd_net_svr_tcp_client *)svr;
+
+    gd_net_svr_fd_remove(svr->m_mgr, svr_tcp->m_fd);
+
+    gd_net_socket_close(&svr_tcp->m_fd, svr->m_mgr->m_em);
 }
 
 const char *

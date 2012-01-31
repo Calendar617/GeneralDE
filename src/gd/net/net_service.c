@@ -81,8 +81,8 @@ struct gd_net_svr_op g_net_svr_ops[] = {
     }
     ,   /*gd_net_svr_type_tcp_client*/
     {   /*free*/ gd_net_svr_free_tcp_client
-      , /*init*/ NULL
-      , /*fini*/ NULL
+      , /*init*/ gd_net_svr_init_tcp_client
+      , /*fini*/ gd_net_svr_fini_tcp_client
     }
     ,   /*gd_net_svr_type_tcp_listener*/
     {   /*free*/ NULL

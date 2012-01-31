@@ -176,4 +176,7 @@ void gd_net_svr_update_state(
     gd_net_svr_t svr,
     gd_net_svr_state_t state)
 {
+    gd_net_svr_dequeue(svr);
+    svr->m_state = state;
+    gd_net_svr_enqueue(svr);
 }
