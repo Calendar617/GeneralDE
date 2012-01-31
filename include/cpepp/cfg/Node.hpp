@@ -76,6 +76,8 @@ public:
     }
 
     static Node const & invalid(void) { return *(Node const *)0; }
+
+    static Node & _cast(cfg_t cfg) { return  *(Node *)cfg; }
 };
 
 }}
