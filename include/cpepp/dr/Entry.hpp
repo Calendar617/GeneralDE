@@ -16,7 +16,7 @@ public:
     Utils::CString const & cname(void) const { return Utils::CString::_cast(dr_entry_cname(*this)); }
     Utils::CString const & desc(void) const { return Utils::CString::_cast(dr_entry_desc(*this)); }
 
-    Meta const & owner(void) const { *(Meta const *)dr_entry_self_meta(*this); };
+    Meta const & owner(void) const { return *(Meta const *)dr_entry_self_meta(*this); };
 
     const void * dftValue(void) const { return dr_entry_dft_value(*this); }
 
@@ -27,7 +27,7 @@ public:
 
     int arryCount(void) const { return dr_entry_array_count(*this); }
 
-    Entry const * selector(void) const { (Entry const *)dr_entry_select_entry(*this); }
+    Entry const * selector(void) const { return (Entry const *)dr_entry_select_entry(*this); }
 
     static Entry const & _cast(LPDRMETAENTRY entry);
 };
