@@ -26,6 +26,7 @@ public:
     size_t size(void) const { return dr_entry_size(*this); }
 
     int arryCount(void) const { return dr_entry_array_count(*this); }
+    Entry const * arrayCountRefer(void) const { return (Entry const *)dr_entry_array_refer_entry(*this); }
 
     Entry const * selector(void) const { return (Entry const *)dr_entry_select_entry(*this); }
 
