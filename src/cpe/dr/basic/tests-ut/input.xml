@@ -35,7 +35,8 @@
 
 <struct name="CmdLogout" version="10" cname = "注销消息结构" id='5'>
 	<entry name="reason" type="int" />
-	<entry name="attr" type="tinyint" count="MAX_ATTR_SIZE" />
+	<entry name="attrcount" type="int" />
+	<entry name="attr" type="tinyint" count="MAX_ATTR_SIZE" refer='attrcount'/>
 </struct>
 
 <union name="PkgBody" version="10" id='4'>

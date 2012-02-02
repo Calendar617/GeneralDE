@@ -48,7 +48,7 @@ MetaData metaDataCases[] = {
     /*  name       desc             type                size entry_num   current_version  base_version*/
       {"PkgHead",  "PkgHead.desc",  CPE_DR_TYPE_STRUCT, 20,  6,          1,               1}
     , {"CmdLogin", "",              CPE_DR_TYPE_STRUCT, 200, 3,          10,              10}
-    , {"CmdLogout","",              CPE_DR_TYPE_STRUCT, 132, 2,          10,              10}
+    , {"CmdLogout","",              CPE_DR_TYPE_STRUCT, 136, 3,          10,              10}
     , {"PkgBody",  "",              CPE_DR_TYPE_UNION,  200, 2,          10,              10}
     , {"Pkg",      "",              CPE_DR_TYPE_STRUCT, 220, 2,          10,              10}
 };

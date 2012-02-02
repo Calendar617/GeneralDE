@@ -387,7 +387,6 @@ dr_entry_select_entry(LPDRMETAENTRY entry) {
     }
 }
 
-
 LPDRMACROSGROUP dr_entry_macrosgroup(LPDRMETAENTRY entry) {
     //TODO
     return NULL;
@@ -407,6 +406,19 @@ int dr_entry_type(LPDRMETAENTRY entry) {
 
 int dr_entry_array_count(LPDRMETAENTRY entry) {
     return entry->m_array_count;
+}
+
+LPDRMETAENTRY
+dr_entry_array_refer_entry(LPDRMETAENTRY entry) {
+    assert(entry);
+    if (entry->m_array_refer_entry_pos < 0) {
+        return NULL;
+    }
+    else {
+        LPDRMETA pstMeta = (LPDRMETA)((char * )entry - entry->m_self_to_meta_pos);
+        char * base = (char *)(pstMeta) - pstMeta->m_self_pos;
+        return (LPDRMETAENTRY)(base + entry->m_array_refer_entry_pos);
+    }
 }
 
 LPDRMETA dr_entry_self_meta(LPDRMETAENTRY entry) {
