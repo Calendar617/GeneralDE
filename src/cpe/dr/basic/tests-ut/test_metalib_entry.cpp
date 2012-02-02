@@ -223,3 +223,15 @@ TEST_F(MetaLibManagerEntryTest, default_no_default) {
 
     EXPECT_FALSE(dr_entry_dft_value(e));
 }
+
+TEST_F(MetaLibManagerEntryTest, array_refer_basic) {
+    LPDRMETAENTRY e = entry("CmdLogout", "attr");
+    LPDRMETAENTRY referEntry = dr_entry_array_refer_entry(e);
+    ASSERT_TRUE(referEntry);
+
+    EXPECT_STREQ("attrcount", dr_entry_name(referEntry));
+    EXPECT_EQ(referEntry->m_data_start_pos, e->m_array_refer_data_start_pos);
+
+    printf("attr: start=0x%x, pos=0x%x\n", address_to_start(e), address_to_pos(e));
+    printf("refer start pos=0x%x\n", referEntry->m_data_start_pos);
+}

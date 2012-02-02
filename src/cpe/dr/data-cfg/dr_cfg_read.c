@@ -9,7 +9,7 @@
 #include "../dr_internal_types.h"
 #include "../dr_ctype_ops.h"
 
-void dr_cfg_read_i(
+int dr_cfg_read_i(
     char * buf,
     size_t capacity,
     cfg_t cfg,
@@ -18,20 +18,23 @@ void dr_cfg_read_i(
 {
     cfg_it_t itemIt;
     cfg_t item;
+    int size;
 
     assert(cfg);
 
     if (meta == NULL) {
         CPE_ERROR(em, "read from %s: meta is empty!", cfg_name(cfg));
-        return;
+        return 0;
     }
 
     if (meta->m_type != CPE_DR_TYPE_STRUCT) {
         CPE_ERROR(
             em, "read from %s: not support read to %s!",
             cfg_name(cfg), dr_type_name(meta->m_type));
-        return;
+        return 0;
     }
+
+    size = meta->m_data_size;
 
     cfg_it_init(&itemIt, cfg);
     while((item = cfg_it_next(&itemIt))) {
@@ -54,12 +57,18 @@ void dr_cfg_read_i(
         }
 
         if (entry->m_type <= CPE_DR_TYPE_COMPOSITE) {
-            dr_cfg_read_i(
+            int itemSize;
+
+            itemSize = dr_cfg_read_i(
                 buf + entry->m_data_start_pos,
                 entry->m_unitsize,
                 item,
                 dr_entry_ref_meta(entry),
                 em);
+
+            if (itemSize + entry->m_data_start_pos > size) {
+                size = itemSize + entry->m_data_start_pos;
+            }
         }
         else {
             dr_entry_set_from_ctype(
@@ -70,6 +79,8 @@ void dr_cfg_read_i(
                 em);
         }
     }
+
+    return size;
 }
 
 int dr_cfg_read(
@@ -80,16 +91,17 @@ int dr_cfg_read(
     error_monitor_t em)
 {
     int ret = 0;
+    int size = 0;
 
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
-        dr_cfg_read_i((char *)buf, capacity, cfg, meta, em);
+        size = dr_cfg_read_i((char *)buf, capacity, cfg, meta, em);
         CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
     }
     else {
         CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
-        dr_cfg_read_i((char *)buf, capacity, cfg, meta, &logError);
+        size = dr_cfg_read_i((char *)buf, capacity, cfg, meta, &logError);
     }
 
-    return ret;
+    return ret ? ret : size;
 }
