@@ -48,7 +48,7 @@ int ParseTest::read(const char * data, const char * typeName) {
     CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
     //CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
 
-    return dr_json_read(&m_buffer, data, meta, &em);
+    return dr_json_read_to_buffer(&m_buffer, data, meta, &em);
 }
 
 void * ParseTest::result(int startPos) {

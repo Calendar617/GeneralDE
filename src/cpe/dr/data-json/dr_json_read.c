@@ -28,6 +28,7 @@ enum dr_json_read_select_state {
 struct dr_json_parse_stack_info {
     LPDRMETA m_meta;
     void * m_data;
+    size_t m_capacity;
     LPDRMETAENTRY m_entry;
 
     enum dr_json_read_select_state m_select_state;
@@ -50,10 +51,11 @@ static int dr_json_null(void * ctx) {
 }
 
 static void dr_json_parse_stack_init(
-    struct dr_json_parse_stack_info * stackInfo, LPDRMETA meta, void * data)
+    struct dr_json_parse_stack_info * stackInfo, LPDRMETA meta, void * data, size_t capacity)
 {
     stackInfo->m_meta = meta;
     stackInfo->m_data = data;
+    stackInfo->m_capacity = capacity;
     stackInfo->m_entry = NULL;
     stackInfo->m_select_state = dr_json_read_select_not_use;
     stackInfo->m_select_data = 0;
@@ -168,7 +170,8 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
         dr_json_parse_stack_init(
             nestStackNode,
             refType,
-            (char*)curStack->m_data + entry->m_data_start_pos);
+            (char*)curStack->m_data + entry->m_data_start_pos,
+            refType->m_data_size);
 
         selectEntry = dr_entry_select_entry(entry);
         if (selectEntry) {
@@ -199,7 +202,7 @@ static int dr_json_end_map(void * ctx) {
     struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
     if (c->m_stackPos >= 0 && c->m_stackPos < CPE_DR_MAX_LEVEL) {
         /*clear current stack*/
-        dr_json_parse_stack_init(&c->m_typeStacks[c->m_stackPos], NULL, NULL);
+        dr_json_parse_stack_init(&c->m_typeStacks[c->m_stackPos], NULL, NULL, 0);
     }
     --c->m_stackPos;
     return 1;
@@ -244,13 +247,13 @@ static void dr_json_parse_ctx_init(
     p = mem_buffer_alloc(buffer, dr_meta_size(meta));
     dr_meta_set_defaults(p, meta);
 
-    dr_json_parse_stack_init(&ctx->m_typeStacks[0], meta, p);
+    dr_json_parse_stack_init(&ctx->m_typeStacks[0], meta, p, dr_meta_size(meta));
 
     ctx->m_stackPos = -1;
     ctx->m_em = em;
 }
 
-void dr_json_read_i(
+int dr_json_read_i(
     struct mem_buffer * result, 
     const char * input,
     LPDRMETA meta,
@@ -265,19 +268,21 @@ void dr_json_read_i(
     hand = yajl_alloc(&g_dr_json_callbacks, NULL, (void *)&ctx);
     if (hand == NULL) {
         CPE_ERROR_EX(em, CPE_DR_ERROR_NO_MEMORY, "can`t alloc memory for json parser");
-        return;
+        return 0;
     }
 
     stat = yajl_parse(hand, (const unsigned char *)input, strlen(input));
     if (stat != yajl_status_ok) {  
         yajl_free(hand);
-        return;
+        return 0;
     }
 
     yajl_free(hand);
+
+    return 0;
 }
 
-int dr_json_read(
+int dr_json_read_to_buffer(
     struct mem_buffer * result, 
     const char * input,
     LPDRMETA meta,

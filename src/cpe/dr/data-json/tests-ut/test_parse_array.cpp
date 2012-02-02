@@ -10,22 +10,15 @@ TEST_F(ParseTest, array_basic) {
         "	     <entry name='a1' type='int16'/>"
         "    </struct>"
         "    <struct name='S2' version='1'>"
-        "	     <entry name='m_s' type='S'/>"
-        "	     <entry name='a2' type='int16'/>"
+        "	     <entry name='count' type='int16'/>"
+        "	     <entry name='data' type='S' count='16' refer='count'/>"
         "    </struct>"
         "</metalib>"
         );
 
-#pragma pack(push,1)
-    struct {
-        struct {
-            int16_t a1;
-        } m_s;
-        int16_t a2;
-    } expect = { { 12 }, 14  };
-#pragma pack(pop)
+    ASSERT_EQ(0, read("{ \"count\" : 2, \"data\" : [ { \"a1\" : 12 }, {\"a1\" : 14 } ] }", "S2"));
 
-    ASSERT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
-
-    ASSERT_JSON_READ_RESULT(expect);
+    EXPECT_EQ(2, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(12, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(14, dr_ctype_read_int16(result(4), CPE_DR_TYPE_INT16));
 }
