@@ -73,4 +73,12 @@ void Request::checkSize(size_t size) const {
     }
 }
 
+Request & Request::_cast(gd_dp_req_t req) {
+    if (req == NULL) {
+        throw ::std::runtime_error("input req is null");
+    }
+
+    return *(Request*)req;
+}
+
 }}
