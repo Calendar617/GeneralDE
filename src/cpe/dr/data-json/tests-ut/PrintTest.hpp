@@ -1,11 +1,14 @@
 #ifndef CPE_DR_DATAJSON_TEST_PRINTTEST_H
 #define CPE_DR_DATAJSON_TEST_PRINTTEST_H
 #include <string.h>
-#include "gtest/gtest.h"
-#include "cpe/utils/error_list.h"
+#include "cpe/utils/tests-env/test-fixture.hpp"
+#include "cpe/utils/tests-env/with_em.hpp"
 #include "cpe/dr/dr_json.h"
 
-class PrintTest : public ::testing::Test {
+typedef LOKI_TYPELIST_1(
+    utils::testenv::with_em) PrintTestBase;
+
+class PrintTest : public testenv::fixture<PrintTestBase> {
 public:
     PrintTest();
     virtual void SetUp();
