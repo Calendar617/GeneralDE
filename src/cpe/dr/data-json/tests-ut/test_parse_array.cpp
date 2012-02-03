@@ -9,15 +9,19 @@ TEST_F(ParseTest, array_basic) {
         "    <struct name='S2' version='1'>"
         "	     <entry name='count' type='int16'/>"
         "	     <entry name='data' type='int16' count='16' refer='count'/>"
+        "	     <entry name='last' type='int16'/>"
         "    </struct>"
         "</metalib>"
         );
 
-    ASSERT_EQ(0, read("{ \"count\": 2, \"data\" : [ 12 , 14 ] }", "S2"));
+    EXPECT_TRUE(t_em_no_error());
+
+    ASSERT_EQ(0, read("{ \"count\": 2, \"data\" : [ 12 , 14 ], \"last\": 33 }", "S2"));
 
     EXPECT_EQ(2, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
     EXPECT_EQ(12, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
     EXPECT_EQ(14, dr_ctype_read_int16(result(4), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(33, dr_ctype_read_int16(result(34), CPE_DR_TYPE_INT16));
 }
 
 TEST_F(ParseTest, array_auto_count) {
@@ -29,6 +33,8 @@ TEST_F(ParseTest, array_auto_count) {
         "    </struct>"
         "</metalib>"
         );
+
+    EXPECT_TRUE(t_em_no_error());
 
     ASSERT_EQ(0, read("{ \"data\" : [ 12, 14 ] }", "S2"));
 
@@ -44,14 +50,18 @@ TEST_F(ParseTest, array_struct_basic) {
         "    <struct name='S2' version='1'>"
         "	     <entry name='count' type='int16'/>"
         "	     <entry name='data' type='S' count='16' refer='count'/>"
+        "	     <entry name='last' type='int16'/>"
         "    </struct>"
         "</metalib>"
         );
 
-    ASSERT_EQ(0, read("{ \"count\": 2, \"data\" : [ { \"a1\" : 12 }, {\"a1\" : 14 } ] }", "S2"));
+    EXPECT_TRUE(t_em_no_error());
+
+    ASSERT_EQ(0, read("{ \"count\": 2, \"data\" : [ { \"a1\" : 12 }, {\"a1\" : 14 } ], \"last\": 33 }" , "S2"));
 
     EXPECT_EQ(2, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
     EXPECT_EQ(12, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
     EXPECT_EQ(14, dr_ctype_read_int16(result(4), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(33, dr_ctype_read_int16(result(34), CPE_DR_TYPE_INT16));
 }
 
