@@ -257,7 +257,7 @@ int dr_add_meta_entry_set_type_calc_align(LPDRMETA meta, LPDRMETAENTRY entry, er
             return -1;
         }
 
-        entry->m_unitsize = usedType->m_data_size;
+        entry->m_unitsize = usedType->m_data_size * (entry->m_array_count < 1 ? 1 : entry->m_array_count);
         entryAlign = usedType->m_align;
     }
     else { /* is basic type */

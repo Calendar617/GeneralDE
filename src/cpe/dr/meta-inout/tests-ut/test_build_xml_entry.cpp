@@ -26,6 +26,7 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
     EXPECT_EQ(1, dr_entry_version(e));
     EXPECT_EQ(CPE_DR_TYPE_INT16, dr_entry_type(e));
     EXPECT_EQ(NULL, dr_entry_dft_value(e));
+    EXPECT_EQ(2, (int)dr_entry_size(e));
 }
 
 TEST_F(BuildFromXmlEntryTest, no_name) {

@@ -81,7 +81,6 @@ static void dr_inbuild_build_calc_entry_composite_type(
     if (refMeta) {
         char * base = (char*)(createdMeta) - createdMeta->m_self_pos;
         entryEle->m_data.m_type = refMeta->m_type;
-        entryEle->m_data.m_unitsize = refMeta->m_data_size;
         entryEle->m_data.m_ref_type_pos = (char*)refMeta - (char*)base;
     }
     else {
@@ -261,7 +260,8 @@ static void dr_inbuild_build_calc_basic_type_and_size(struct DRInBuildMetaLib * 
             if (ctypeInfo) {
                 entryEle->m_data.m_type = ctypeInfo->m_id;
                 if ((int)ctypeInfo->m_size > 0) {
-                    entryEle->m_data.m_unitsize = ctypeInfo->m_size;
+                    entryEle->m_data.m_unitsize =
+                        ctypeInfo->m_size * ( entryEle->m_data.m_array_count < 1 ? 1 : entryEle->m_data.m_array_count);
                 }
                 else if (entryEle->m_data.m_unitsize <= 0) {
                     CPE_ERROR_EX(

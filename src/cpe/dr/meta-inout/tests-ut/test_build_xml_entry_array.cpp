@@ -18,6 +18,7 @@ TEST_F(BuildFromXmlEntryTest, array_count_basic) {
 
     LPDRMETAENTRY e = entry("PkgHead", "a1");
     EXPECT_EQ(16, e->m_array_count);
+    EXPECT_EQ(2 * 16, e->m_unitsize);
 }
 
 TEST_F(BuildFromXmlEntryTest, array_count_default) {
@@ -44,7 +45,7 @@ TEST_F(BuildFromXmlEntryTest, array_count_zero) {
 
     LPDRMETAENTRY e = entry("PkgHead", "a1");
     EXPECT_EQ(0, e->m_array_count);
-
+    EXPECT_EQ(2 * 1, e->m_unitsize);
 }
 
 TEST_F(BuildFromXmlEntryTest, array_count_negative) {
