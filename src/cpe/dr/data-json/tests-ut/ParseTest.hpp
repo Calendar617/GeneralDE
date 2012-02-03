@@ -1,11 +1,15 @@
 #ifndef CPE_DR_DATAJSON_TEST_PARSETEST_H
 #define CPE_DR_DATAJSON_TEST_PARSETEST_H
 #include <string.h>
-#include "gtest/gtest.h"
+#include "cpe/utils/tests-env/test-fixture.hpp"
+#include "cpe/utils/tests-env/with_em.hpp"
 #include "cpe/utils/error_list.h"
 #include "cpe/dr/dr_json.h"
 
-class ParseTest : public ::testing::Test {
+typedef LOKI_TYPELIST_1(
+    utils::testenv::with_em) ParseTestBase;
+
+class ParseTest : public testenv::fixture<ParseTestBase> {
 public:
     ParseTest();
     virtual void SetUp();
@@ -15,7 +19,6 @@ public:
     struct mem_buffer m_metaLib_buffer;
 
     struct mem_buffer m_buffer;
-    error_list_t m_errorList;
 
     void installMeta(const char * data);
     int read(const char * data, const char * typeName);

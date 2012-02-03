@@ -56,7 +56,7 @@ TEST_F(BuildFromXmlEntrySelectTest, union_id_min_bg_max) {
         "</metalib>"
         );
 
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE));
 }
 
 TEST_F(BuildFromXmlEntrySelectTest, union_id_min_no_max) {
@@ -68,7 +68,7 @@ TEST_F(BuildFromXmlEntrySelectTest, union_id_min_no_max) {
         "</metalib>"
         );
 
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE));
 }
 
 TEST_F(BuildFromXmlEntrySelectTest, union_id_max_no_min) {
@@ -80,7 +80,7 @@ TEST_F(BuildFromXmlEntrySelectTest, union_id_max_no_min) {
         "</metalib>"
         );
 
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE));
 }
 
 TEST_F(BuildFromXmlEntrySelectTest, select_default) {
@@ -102,6 +102,8 @@ TEST_F(BuildFromXmlEntrySelectTest, select_default) {
 }
 
 TEST_F(BuildFromXmlEntrySelectTest, select_basic) {
+    t_em_set_print();
+
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'>"
         "    <union name='U' version='1'>"
@@ -114,6 +116,8 @@ TEST_F(BuildFromXmlEntrySelectTest, select_basic) {
         "    </struct>"
         "</metalib>"
         );
+
+    ASSERT_TRUE(t_em_no_error());
 
     LPDRMETAENTRY refer = entry("S", "id");
     LPDRMETAENTRY e = entry("S", "u");
@@ -138,7 +142,7 @@ TEST_F(BuildFromXmlEntrySelectTest, select_path_not_exist) {
     LPDRMETAENTRY e = entry("S", "u");
     EXPECT_EQ(-1, e->m_select_data_start_pos);
     EXPECT_EQ(-1, e->m_select_entry_pos);
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_SELECT_VALUE));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_ENTRY_INVALID_SELECT_VALUE));
 }
 
 TEST_F(BuildFromXmlEntrySelectTest, select_select_after_curent) {
@@ -158,5 +162,5 @@ TEST_F(BuildFromXmlEntrySelectTest, select_select_after_curent) {
     LPDRMETAENTRY e = entry("S", "u");
     EXPECT_EQ(-1, e->m_select_data_start_pos);
     EXPECT_EQ(-1, e->m_select_entry_pos);
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_SELECT_VALUE));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_ENTRY_INVALID_SELECT_VALUE));
 }

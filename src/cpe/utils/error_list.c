@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_stdio.h"
 #include "cpe/pal/pal_queue.h"
@@ -30,16 +31,22 @@ error_list_t cpe_error_list_create(mem_allocrator_t alloc) {
     return el;
 }
 
-void cpe_error_list_free(error_list_t el) {
-    if (el == NULL) {
-        return;
-    }
+void cpe_error_list_clear(error_list_t el) {
+    assert(el);
 
     while(!TAILQ_EMPTY(&el->m_nodes)) {
         struct error_list_node * node = TAILQ_FIRST(&el->m_nodes);
         TAILQ_REMOVE(&el->m_nodes, node, m_next);
         mem_free(el->m_alloc, node);
     }
+}
+
+void cpe_error_list_free(error_list_t el) {
+    if (el == NULL) {
+        return;
+    }
+
+    cpe_error_list_clear(el);
 
     mem_free(el->m_alloc, el);
 }

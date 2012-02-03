@@ -29,5 +29,17 @@ int with_em::t_em_have_errno(int e) {
     return cpe_error_list_have_errno(m_el, e);
 }
 
+int with_em::t_em_error_count(void) {
+    return cpe_error_list_error_count(m_el);
+}
+
+int with_em::t_em_no_error(void) {
+    return t_em_error_count() == 0 ? 1 : 0;
+}
+
+void with_em::t_elist_clear(void) {
+    cpe_error_list_clear(m_el);
+}
+
 }}
 

@@ -7,7 +7,7 @@ TEST_F(BuildFromXmlTest, metalib_basic) {
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'/>");
 
-    ASSERT_EQ(0, errorCount());
+    ASSERT_TRUE(t_em_no_error());
 
     ASSERT_STREQ("net", dr_lib_name(m_metaLib));
     ASSERT_EQ(10, dr_lib_version(m_metaLib));
@@ -51,7 +51,7 @@ TEST_F(BuildFromXmlTest, metalib_name_not_exist) {
     parseMeta(
         "<metalib tagsetversion='1' version='1'/>");
 
-    ASSERT_TRUE(haveError(CPE_DR_ERROR_METALIB_ROOT_NO_NAME));
+    ASSERT_TRUE(t_em_have_errno(CPE_DR_ERROR_METALIB_ROOT_NO_NAME));
 }
 
 
@@ -59,7 +59,7 @@ TEST_F(BuildFromXmlTest, xml_format_error) {
     parseMeta(
         "<metalib tagsetversion='1'");
 
-    ASSERT_TRUE(haveError(CPE_DR_ERROR_XML_PARSE));
+    ASSERT_TRUE(t_em_have_errno(CPE_DR_ERROR_XML_PARSE));
 }
 
 TEST_F(BuildFromXmlTest, metalib_name_overflow) {
@@ -79,7 +79,7 @@ TEST_F(BuildFromXmlTest, metalib_name_overflow) {
         CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT,
         parseMeta(buf));
 
-    ASSERT_TRUE(haveError(CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT));
+    ASSERT_TRUE(t_em_have_errno(CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT));
 }
 
 TEST_F(BuildFromXmlTest, parse_no_em) {

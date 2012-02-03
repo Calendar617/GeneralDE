@@ -126,7 +126,7 @@ TEST_F(BuildFromXmlMetaTest, version_not_exist) {
         );
 
     EXPECT_FALSE(dr_lib_find_meta_by_name(m_metaLib, "A1"));
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_NO_VERSION));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_NO_VERSION));
 }
 
 TEST_F(BuildFromXmlMetaTest, version_bigger) {
@@ -137,7 +137,7 @@ TEST_F(BuildFromXmlMetaTest, version_bigger) {
         );
 
     EXPECT_FALSE(dr_lib_find_meta_by_name(m_metaLib, "A1"));
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_INVALID_VERSION));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_INVALID_VERSION));
 }
 
 TEST_F(BuildFromXmlMetaTest, no_id) {
@@ -187,7 +187,7 @@ TEST_F(BuildFromXmlMetaTest, duplicate_name) {
             ));
 
     EXPECT_TRUE(meta("A1"));
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_META_NAME_CONFLICT));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_META_NAME_CONFLICT));
 }
 
 TEST_F(BuildFromXmlMetaTest, duplicate_id) {
@@ -205,7 +205,7 @@ TEST_F(BuildFromXmlMetaTest, duplicate_id) {
             ));
 
     EXPECT_TRUE(dr_lib_find_meta_by_id(m_metaLib, 3));
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_META_ID_CONFLICT));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_META_ID_CONFLICT));
 }
 
 TEST_F(BuildFromXmlMetaTest, set_align) {
@@ -233,6 +233,8 @@ TEST_F(BuildFromXmlMetaTest, composite_basic) {
             "    </struct>"
             "</metalib>"
             ));
+
+    ASSERT_TRUE(t_em_no_error());
 
     LPDRMETA metaS = meta("S");
     ASSERT_TRUE(metaS);
