@@ -35,6 +35,7 @@ struct DRInBuildMetaEntry {
     char m_cname[CPE_DR_CHNAME_LEN];
     char * m_ref_type_name;
     char * m_selector_path;
+    char * m_refer_path;
     char * m_dft_value;
 };
 

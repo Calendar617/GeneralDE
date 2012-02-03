@@ -2,44 +2,29 @@
 #include "cpe/dr/dr_metalib_init.h"
 #include "BuildFromXmlTest.hpp"
 
-BuildFromXmlTest::BuildFromXmlTest() : m_metaLib(0), m_errorList(NULL) {
+BuildFromXmlTest::BuildFromXmlTest() : m_metaLib(0) {
 }
 
 void BuildFromXmlTest::SetUp() {
-    m_errorList = cpe_error_list_create(NULL);
-    ASSERT_TRUE(m_errorList);
-
+    Base::SetUp();
     mem_buffer_init(&m_buffer, NULL);
 }
 
 void BuildFromXmlTest::TearDown() {
     mem_buffer_clear(&m_buffer);
 
-    cpe_error_list_free(m_errorList);
-    m_errorList = NULL;
-
     m_metaLib = NULL;
-}
 
-int BuildFromXmlTest::errorCount(void) {
-    return cpe_error_list_error_count(m_errorList);
-}
-
-bool BuildFromXmlTest::haveError(int e) {
-    return cpe_error_list_have_errno(m_errorList, e);
+    Base::TearDown();
 }
 
 int BuildFromXmlTest::parseMeta(const char * def) {
     mem_buffer_clear(&m_buffer);
     m_metaLib = NULL;
 
-    cpe_error_list_free(m_errorList);
-    m_errorList = cpe_error_list_create(NULL);
+    t_elist_clear();
 
-    CPE_DEF_ERROR_MONITOR(em, cpe_error_list_collect, m_errorList);
-    //CPE_DEF_ERROR_MONITOR_ADD(printer, &em, cpe_error_log_to_consol, NULL);
-
-    int r = dr_create_lib_from_xml_ex(&m_buffer, def, strlen(def), &em);
+    int r = dr_create_lib_from_xml_ex(&m_buffer, def, strlen(def), t_em());
     m_metaLib = (LPDRMETALIB)mem_buffer_make_continuous(&m_buffer, 0);
 
     return r;

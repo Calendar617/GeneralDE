@@ -15,6 +15,10 @@ public:
     error_list_t t_elist();
     void t_em_set_print();
 
+    void t_elist_clear(void);
+
+    int t_em_no_error(void);
+    int t_em_error_count(void);
     int t_em_have_errno(int e);
 
 private:
