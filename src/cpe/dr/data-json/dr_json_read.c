@@ -30,7 +30,8 @@ struct dr_json_parse_stack_info {
     void * m_data;
     size_t m_capacity;
     LPDRMETAENTRY m_entry;
-
+    int m_in_array;
+    int m_array_count;
     enum dr_json_read_select_state m_select_state;
 
     int32_t m_select_data;
@@ -57,6 +58,8 @@ static void dr_json_parse_stack_init(
     stackInfo->m_data = data;
     stackInfo->m_capacity = capacity;
     stackInfo->m_entry = NULL;
+    stackInfo->m_in_array = 0;
+    stackInfo->m_array_count = 0;
     stackInfo->m_select_state = dr_json_read_select_not_use;
     stackInfo->m_select_data = 0;
 }
@@ -75,12 +78,45 @@ void dr_json_do_parse_from_string(
         return;
     }
 
+    char * writePos = (char*)parseType->m_data + parseType->m_entry->m_data_start_pos;
+
+    if (parseType->m_entry->m_array_count == 1) {
+        if (parseType->m_in_array) return;
+    }
+    else if (parseType->m_entry->m_array_count > 1) {
+        const struct tagDRCTypeInfo * typeInfo;
+
+        if (parseType->m_array_count >= parseType->m_entry->m_array_count) {
+            CPE_ERROR(
+                c->m_em,
+                "process %s.%s, array count overflow!",
+                dr_meta_name(parseType->m_meta), c->m_buf);
+            return;
+        }
+
+        typeInfo = dr_find_ctype_info_by_type(parseType->m_entry->m_type);
+        if (typeInfo == NULL) {
+            CPE_ERROR(
+                c->m_em, "process %s.%s, type %d is unknown!",
+                dr_meta_name(parseType->m_meta), c->m_buf,
+                (int)parseType->m_entry->m_type);
+            return;
+        }
+
+        if (typeInfo->m_size <= 0) {
+            CPE_ERROR(
+                c->m_em, "process %s.%s, type %d size is invalid!",
+                dr_meta_name(parseType->m_meta), c->m_buf,
+                (int)parseType->m_entry->m_type);
+            return;
+        }
+
+        writePos += typeInfo->m_size * parseType->m_array_count;
+        ++parseType->m_array_count;
+    }
+
     JSON_PARSE_CTX_COPY_STR_TMP(c, s, l);
-    dr_entry_set_from_string(
-        (char*)parseType->m_data + parseType->m_entry->m_data_start_pos,
-        c->m_buf,
-        parseType->m_entry,
-        c->m_em);
+    dr_entry_set_from_string(writePos, c->m_buf, parseType->m_entry, c->m_em);
 }
 
 static int dr_json_number(void * ctx, const char * s, size_t l) {
@@ -171,7 +207,7 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
             nestStackNode,
             refType,
             (char*)curStack->m_data + entry->m_data_start_pos,
-            refType->m_data_size);
+            entry->m_unitsize);
 
         selectEntry = dr_entry_select_entry(entry);
         if (selectEntry) {
@@ -209,12 +245,40 @@ static int dr_json_end_map(void * ctx) {
 }
 
 static int dr_json_start_array(void * ctx) {
-    //struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+
+    if (c->m_stackPos < 0 || c->m_stackPos >= CPE_DR_MAX_LEVEL) {
+        return 1;
+    }
+
+    c->m_typeStacks[c->m_stackPos].m_in_array = 1;
     return 1;
 }
 
 static int dr_json_end_array(void * ctx) {
-    //struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+    struct dr_json_parse_ctx * c = (struct dr_json_parse_ctx *) ctx;
+    struct dr_json_parse_stack_info * curStack;
+    LPDRMETAENTRY refer;
+
+    if (c->m_stackPos < 0 || c->m_stackPos >= CPE_DR_MAX_LEVEL) {
+        return 1;
+    }
+
+    curStack = &c->m_typeStacks[c->m_stackPos];
+
+    curStack->m_in_array = 0;
+
+    refer = dr_entry_array_refer_entry(curStack->m_entry);
+    if (refer) {
+        dr_entry_set_from_int32(
+            curStack->m_data + curStack->m_entry->m_array_refer_data_start_pos,
+            curStack->m_array_count,
+            refer,
+            c->m_em);
+    }
+
+    curStack->m_array_count = 0;
+
     return 1;
 }
 
