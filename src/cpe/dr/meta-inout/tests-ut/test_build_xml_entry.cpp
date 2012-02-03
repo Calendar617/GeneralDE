@@ -26,6 +26,7 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
     EXPECT_EQ(1, dr_entry_version(e));
     EXPECT_EQ(CPE_DR_TYPE_INT16, dr_entry_type(e));
     EXPECT_EQ(NULL, dr_entry_dft_value(e));
+    EXPECT_EQ(2, (int)dr_entry_size(e));
 }
 
 TEST_F(BuildFromXmlEntryTest, no_name) {
@@ -40,7 +41,7 @@ TEST_F(BuildFromXmlEntryTest, no_name) {
     LPDRMETA head = meta("PkgHead");
 
     EXPECT_EQ(0, dr_meta_entry_num(head));
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_META_NO_NAME));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_META_NO_NAME));
 }
 
 TEST_F(BuildFromXmlEntryTest, no_type) {
@@ -55,7 +56,7 @@ TEST_F(BuildFromXmlEntryTest, no_type) {
     LPDRMETA head = meta("PkgHead");
 
     EXPECT_EQ(0, dr_meta_entry_num(head));
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_NO_TYPE));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_ENTRY_NO_TYPE));
 }
 
 TEST_F(BuildFromXmlEntryTest, type_composite) {
@@ -105,7 +106,7 @@ TEST_F(BuildFromXmlEntryTest, version_bigger) {
     LPDRMETA head = meta("PkgHead");
 
     EXPECT_EQ(0, dr_meta_entry_num(head));
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_INVALID_VERSION));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_INVALID_VERSION));
 }
 
 TEST_F(BuildFromXmlEntryTest, size_for_string) {
@@ -161,7 +162,7 @@ TEST_F(BuildFromXmlEntryTest, string_no_size) {
     LPDRMETA head = meta("PkgHead");
 
     EXPECT_EQ(0, dr_meta_entry_num(head));
-    EXPECT_TRUE(haveError(CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE));
 }
 
 TEST_F(BuildFromXmlEntryTest, dftvalue_basic) {
@@ -172,6 +173,8 @@ TEST_F(BuildFromXmlEntryTest, dftvalue_basic) {
         "    </struct>"
         "</metalib>"
         );
+
+    ASSERT_TRUE(t_em_no_error());
 
     LPDRMETAENTRY e = entry("PkgHead", "a1");
     ASSERT_TRUE(e);

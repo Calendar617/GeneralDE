@@ -411,7 +411,7 @@ int dr_entry_array_count(LPDRMETAENTRY entry) {
 LPDRMETAENTRY
 dr_entry_array_refer_entry(LPDRMETAENTRY entry) {
     assert(entry);
-    if (entry->m_array_refer_entry_pos < 0) {
+    if (entry->m_array_count == 1 || entry->m_array_refer_entry_pos < 0) {
         return NULL;
     }
     else {

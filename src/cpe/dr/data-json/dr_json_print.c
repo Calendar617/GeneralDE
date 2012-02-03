@@ -4,6 +4,7 @@
 #include "cpe/utils/stream_mem.h"
 #include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/dr/dr_json.h"
+#include "cpe/dr/dr_data.h"
 #include "cpe/dr/dr_error.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_internal_types.h"
@@ -102,7 +103,7 @@ static void dr_print_print_basic_data(yajl_gen g, LPDRMETAENTRY entry, const voi
     }
 }
 
-static void dr_json_print_entry(
+static void dr_json_print_value(
     yajl_gen g,
     LPDRMETA meta,
     LPDRMETAENTRY entry,
@@ -110,8 +111,6 @@ static void dr_json_print_entry(
     error_monitor_t em,
     int level)
 {
-    JSON_PRINT_GEN_STRING(g, dr_entry_name(entry));
-
     if(entry->m_type <= CPE_DR_TYPE_COMPOSITE) {
         dr_json_print_composite_type(g, dr_entry_ref_meta(entry), entry, data, em, level + 1);
     }
@@ -120,12 +119,95 @@ static void dr_json_print_entry(
     }
 }
 
+static size_t dr_json_print_get_element_size(LPDRMETA meta, LPDRMETAENTRY entry, error_monitor_t em) {
+    if (entry->m_type <= CPE_DR_TYPE_COMPOSITE) {
+        LPDRMETA refMeta = dr_entry_ref_meta(entry);
+        if (refMeta == NULL) {
+            CPE_ERROR(
+                em, "process %s.%s, ref meta not exist!",
+                dr_meta_name(meta), dr_entry_name(entry));
+            return 0;
+        }
+
+        return dr_meta_size(refMeta);
+    }
+    else {
+        const struct tagDRCTypeInfo * typeInfo;
+        typeInfo = dr_find_ctype_info_by_type(entry->m_type);
+        if (typeInfo == NULL) {
+            CPE_ERROR(
+                em, "process %s.%s, type %d is unknown!",
+                dr_meta_name(meta), dr_entry_name(entry),
+                entry->m_type);
+            return 0;
+        }
+
+        if (typeInfo->m_size <= 0) {
+            CPE_ERROR(
+                em, "process %s.%s, type %d size is invalid!",
+                dr_meta_name(meta), dr_entry_name(entry),
+                entry->m_type);
+            return 0;
+        }
+
+        return typeInfo->m_size;
+    }
+}
+
+static void dr_json_print_entry(
+    yajl_gen g,
+    LPDRMETA meta,
+    LPDRMETAENTRY entry,
+    const char * alldata,
+    const void * data,
+    error_monitor_t em,
+    int level)
+{
+    JSON_PRINT_GEN_STRING(g, dr_entry_name(entry));
+
+    if (entry->m_array_count == 1) {
+        dr_json_print_value(g, meta, entry, data, em, level);
+    }
+    else {
+        LPDRMETAENTRY referEntry;
+        int32_t arrayCount;
+        int32_t i;
+        size_t elementSize;
+
+        referEntry = dr_entry_array_refer_entry(entry);
+        if (referEntry) {
+            if (dr_entry_try_read_int32(
+                    &arrayCount,
+                    (const char *)alldata + entry->m_array_refer_data_start_pos,
+                    entry,
+                    em) != 0)
+            {
+                arrayCount = 0;
+            }
+        }
+        else {
+            arrayCount = entry->m_array_count;
+        }
+
+        yajl_gen_array_open(g);
+
+        elementSize = dr_json_print_get_element_size(meta, entry, em);
+        if (elementSize > 0) {
+            for(i = 0; i < arrayCount; ++i) {
+                dr_json_print_value(
+                    g, meta, entry, (char *)data + elementSize * i, em, level);
+            }
+        }
+
+        yajl_gen_array_close(g);
+    }
+}
+
 static void dr_json_print_struct(yajl_gen g, LPDRMETA meta, const void * data, error_monitor_t em, int level) {
     int entryPos = 0;
     for(entryPos = 0; entryPos < meta->m_entry_count; ++entryPos) {
         LPDRMETAENTRY curEntry = dr_meta_entry_at(meta, entryPos);
-        const void * curData = (const char *)data + curEntry->m_data_start_pos;
-        dr_json_print_entry(g, meta, curEntry, curData, em, level);
+        dr_json_print_entry(g, meta, curEntry, data, (const char *)data + curEntry->m_data_start_pos, em, level);
     }
 }
 
@@ -165,7 +247,7 @@ static void dr_json_print_union(yajl_gen g, LPDRMETA meta, LPDRMETAENTRY parentE
 
     if (printEntry) {
         const void * curData = (const char *)data + printEntry->m_data_start_pos;
-        dr_json_print_entry(g, meta, printEntry, curData, em, level);
+        dr_json_print_entry(g, meta, printEntry, data, curData, em, level);
     }
 }
 

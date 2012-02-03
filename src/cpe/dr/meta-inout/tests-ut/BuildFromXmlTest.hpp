@@ -1,5 +1,7 @@
 #ifndef CPE_DR_METAINOUT_TEST_BUILDFROMXMLTEST_H
 #define CPE_DR_METAINOUT_TEST_BUILDFROMXMLTEST_H
+#include "cpe/utils/tests-env/test-fixture.hpp"
+#include "cpe/utils/tests-env/with_em.hpp"
 #include "gtest/gtest.h"
 #include "cpe/utils/error_list.h"
 #include "cpe/dr/dr_error.h"
@@ -7,7 +9,10 @@
 #include "cpe/dr/dr_metalib_xml.h"
 #include "../../dr_internal_types.h"
 
-class BuildFromXmlTest : public ::testing::Test {
+typedef LOKI_TYPELIST_1(
+    utils::testenv::with_em) BuildFromXmlTestBase;
+
+class BuildFromXmlTest : public testenv::fixture<BuildFromXmlTestBase> {
 public:
     BuildFromXmlTest();
     virtual void SetUp();
@@ -15,12 +20,8 @@ public:
 
     LPDRMETALIB m_metaLib;
     struct mem_buffer m_buffer;
-    error_list_t m_errorList;
 
     int parseMeta(const char * def);
-
-    int errorCount(void);
-    bool haveError(int error);
 
     LPDRMETA meta(const char * name);
     LPDRMETAENTRY entry(const char * metaName, const char * entryName);

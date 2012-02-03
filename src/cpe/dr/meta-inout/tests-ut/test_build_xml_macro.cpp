@@ -60,7 +60,7 @@ TEST_F(BuildFromXmlMacroTest, macro_no_value) {
         );
 
     ASSERT_EQ(0, dr_lib_macro_num(m_metaLib));
-    ASSERT_TRUE(haveError(CPE_DR_ERROR_MACRO_NO_VALUE));
+    ASSERT_TRUE(t_em_have_errno(CPE_DR_ERROR_MACRO_NO_VALUE));
 }
 
 TEST_F(BuildFromXmlMacroTest, macro_no_name) {
@@ -72,5 +72,5 @@ TEST_F(BuildFromXmlMacroTest, macro_no_name) {
         );
 
     ASSERT_EQ(0, dr_lib_macro_num(m_metaLib));
-    ASSERT_TRUE(haveError(CPE_DR_ERROR_MACRO_NO_NAME_ATTR));
+    ASSERT_TRUE(t_em_have_errno(CPE_DR_ERROR_MACRO_NO_NAME_ATTR));
 }

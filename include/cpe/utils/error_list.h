@@ -15,6 +15,8 @@ typedef struct error_list * error_list_t;
 error_list_t cpe_error_list_create(mem_allocrator_t alloc);
 void cpe_error_list_free(error_list_t el);
 
+void cpe_error_list_clear(error_list_t el);
+
 void cpe_error_list_visit(error_list_t el, void(*p)(void * ctx, struct error_info * info, const char * msg), void * ctx);
 int cpe_error_list_have_errno(error_list_t el, int e);
 int cpe_error_list_have_msg(error_list_t el, const char * partMsg);
