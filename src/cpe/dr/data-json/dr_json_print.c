@@ -179,7 +179,7 @@ static void dr_json_print_entry(
             if (dr_entry_try_read_int32(
                     &arrayCount,
                     (const char *)alldata + entry->m_array_refer_data_start_pos,
-                    entry,
+                    referEntry,
                     em) != 0)
             {
                 arrayCount = 0;
@@ -192,6 +192,7 @@ static void dr_json_print_entry(
         yajl_gen_array_open(g);
 
         elementSize = dr_json_print_get_element_size(meta, entry, em);
+
         if (elementSize > 0) {
             for(i = 0; i < arrayCount; ++i) {
                 dr_json_print_value(
