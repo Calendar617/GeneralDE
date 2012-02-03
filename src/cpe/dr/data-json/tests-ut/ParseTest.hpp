@@ -3,7 +3,6 @@
 #include <string.h>
 #include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
-#include "cpe/utils/error_list.h"
 #include "cpe/dr/dr_json.h"
 
 typedef LOKI_TYPELIST_1(
