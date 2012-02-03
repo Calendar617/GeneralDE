@@ -144,7 +144,7 @@ TEST_F(ParseTest, struct_ignore_overflow_level) {
 
     dataS << ", \"a2\": 14}";
 
-    ASSERT_EQ(-1, read(dataS.str().c_str(), "L33"));
+    EXPECT_EQ(-1, read(dataS.str().c_str(), "L33"));
 
     EXPECT_EQ(14, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
 }

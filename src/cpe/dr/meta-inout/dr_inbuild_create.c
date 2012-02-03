@@ -81,7 +81,6 @@ static void dr_inbuild_build_calc_entry_composite_type(
     if (refMeta) {
         char * base = (char*)(createdMeta) - createdMeta->m_self_pos;
         entryEle->m_data.m_type = refMeta->m_type;
-        entryEle->m_data.m_unitsize = refMeta->m_data_size;
         entryEle->m_data.m_ref_type_pos = (char*)refMeta - (char*)base;
     }
     else {
@@ -110,6 +109,34 @@ static void dr_inbuild_build_calc_entry_select(
     }
 }
 
+static void dr_inbuild_build_calc_array_refer(
+    struct DRInBuildCreateCtx * ctx, LPDRMETA createdMeta, struct DRInBuildMetaEntry * entryEle)
+{
+    LPDRMETAENTRY referEntry;
+
+    if (entryEle->m_refer_path == NULL) {
+        if (entryEle->m_data.m_array_count == 0) {
+            CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_VARIABLE_ARRAY_NO_REFER, "entry is dynamic array, but no reffer!");
+        }
+        return;
+    }
+
+    if (entryEle->m_data.m_array_count == 1) {
+        CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_REFER_VALUE, "entry is not array, but config a reffer!");
+        return;
+    }
+
+    referEntry = dr_meta_find_entry_by_path(createdMeta, entryEle->m_refer_path);
+    if (referEntry == NULL) {
+        CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_REFER_VALUE, "entry at %s not exist!", entryEle->m_refer_path);
+    }
+    else {
+        char * base = (char*)(createdMeta) - createdMeta->m_self_pos;
+        entryEle->m_data.m_array_refer_entry_pos = (int32_t)((char *)referEntry - base);
+        entryEle->m_data.m_array_refer_data_start_pos = dr_meta_path_to_off(createdMeta, entryEle->m_refer_path, NULL);
+    }
+}
+
 static void dr_inbuild_build_add_entry(
     struct DRInBuildCreateCtx * ctx,
     LPDRMETA createdMeta,
@@ -122,6 +149,7 @@ static void dr_inbuild_build_add_entry(
     dr_inbuild_build_calc_entry_defaultvalue(ctx, createdMeta, entryEle);
     dr_inbuild_build_calc_entry_composite_type(ctx, createdMeta, entryEle) ;
     dr_inbuild_build_calc_entry_select(ctx, createdMeta, entryEle);
+    dr_inbuild_build_calc_array_refer(ctx, createdMeta, entryEle);
 
     if (!entryEle->m_ignore) {
         dr_meta_add_entry(createdMeta, &entryEle->m_data, ctx->m_em);
@@ -232,7 +260,8 @@ static void dr_inbuild_build_calc_basic_type_and_size(struct DRInBuildMetaLib * 
             if (ctypeInfo) {
                 entryEle->m_data.m_type = ctypeInfo->m_id;
                 if ((int)ctypeInfo->m_size > 0) {
-                    entryEle->m_data.m_unitsize = ctypeInfo->m_size;
+                    entryEle->m_data.m_unitsize =
+                        ctypeInfo->m_size * ( entryEle->m_data.m_array_count < 1 ? 1 : entryEle->m_data.m_array_count);
                 }
                 else if (entryEle->m_data.m_unitsize <= 0) {
                     CPE_ERROR_EX(

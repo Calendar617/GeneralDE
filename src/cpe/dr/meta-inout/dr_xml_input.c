@@ -31,7 +31,12 @@ enum DRXmlParseState {
         return;                                                         \
     }                                                                   \
     DR_COPY_STR(buf, (char const *)valueBegin, len);                    \
-    sscanf(buf, "%d", &(__d))
+    { char * endptr = 0;                                                \
+        (__d) = strtol(buf, &endptr, 10);                               \
+        if ( !endptr || *endptr != 0) {                                 \
+            DR_NOTIFY_ERROR(ctx->m_em, (__e));                          \
+        }                                                               \
+    }
 
 #define DR_DO_DUP_STR(buf)                                              \
     buf =  mem_buffer_strdup_len(                                       \
@@ -403,6 +408,18 @@ static void dr_build_xml_process_entry(
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_DEFAULT_VALUE) == 0) {
             DR_DO_DUP_STR(newEntry->m_dft_value);
+        }
+        else if (strcmp((char const *)localname, CPE_DR_TAG_COUNT) == 0) {
+            DR_DO_READ_INT(newEntry->m_data.m_array_count, CPE_DR_ERROR_ENTRY_INVALID_COUNT_VALUE);
+            if(newEntry->m_data.m_array_count < 0) {
+                CPE_ERROR_EX(
+                    ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_COUNT_VALUE,
+                    "invalid ount value %d!",
+                    newEntry->m_data.m_array_count);
+            }
+        }
+        else if (strcmp((char const *)localname, CPE_DR_TAG_REFER) == 0) {
+            DR_DO_DUP_STR(newEntry->m_refer_path);
         }
         else {
         }

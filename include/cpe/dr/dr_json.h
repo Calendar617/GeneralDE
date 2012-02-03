@@ -14,6 +14,13 @@ extern "C" {
 #define DR_JSON_PRINT_VALIDATE_UTF8 0x10
 
 int dr_json_read(
+    void * result,
+    size_t capacity,
+    const char * input,
+    LPDRMETA meta,
+    error_monitor_t em);
+
+int dr_json_read_to_buffer(
     struct mem_buffer * result, 
     const char * input,
     LPDRMETA meta,

@@ -14,6 +14,8 @@ TEST_F(BuildFromXmlStructAlign, align1_basic) {
         "</metalib>"
         );
 
+    ASSERT_TRUE(t_em_no_error());
+
     EXPECT_EQ(1, dr_meta_align(meta("S1")));
     EXPECT_EQ((size_t)3, dr_meta_size(meta("S1")));
 }
