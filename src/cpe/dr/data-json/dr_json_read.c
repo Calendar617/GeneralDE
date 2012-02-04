@@ -134,9 +134,11 @@ void dr_json_do_parse_from_string(
     struct dr_json_parse_stack_info * parseType,
     const char * s, size_t l)
 {
+    char * writePos;
+
     if (parseType->m_entry == NULL) return;
 
-    char * writePos = dr_json_do_parse_calc_write_pos(c, parseType);
+    writePos = dr_json_do_parse_calc_write_pos(c, parseType);
     if (writePos == NULL) return;
 
     JSON_PARSE_CTX_COPY_STR_TMP(c, s, l);
@@ -312,7 +314,7 @@ static int dr_json_end_array(void * ctx) {
     refer = dr_entry_array_refer_entry(curStack->m_entry);
     if (refer) {
         dr_entry_set_from_int32(
-            curStack->m_data + curStack->m_entry->m_array_refer_data_start_pos,
+            (char *)curStack->m_data + curStack->m_entry->m_array_refer_data_start_pos,
             curStack->m_array_count,
             refer,
             c->m_em);
