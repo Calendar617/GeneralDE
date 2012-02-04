@@ -70,7 +70,12 @@ dir_visit_next_op_t cfg_read_dir_on_file(const char * full, const char * base, v
     if (readCtx->m_curent == NULL || cfg_is_value(readCtx->m_curent)) return dir_visit_next_ignore;
 
     fileSuffix = file_name_suffix(base);
-    if (strcmp(fileSuffix, "yml") != 0) return dir_visit_next_go;
+    if (strcmp(fileSuffix, "yml") != 0
+        && strcmp(fileSuffix, "yaml") != 0
+        )
+    {
+        return dir_visit_next_go;
+    }
 
     CPE_ERROR_SET_FILE(readCtx->m_em, full);
     fp = file_stream_open(full, "r", readCtx->m_em);
