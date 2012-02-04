@@ -61,7 +61,7 @@
     APP_CTX_CATCH_EXCEPTION_RETHROW(g_app_context, __format, __VA_ARGS__)
 
 #define APP_CATCH_EXCEPTION( __format, ...)       \
-    APP_CTX_CATCH_EXCEPTION_RETHROW(g_app_context, __format, __VA_ARGS__)
+    APP_CTX_CATCH_EXCEPTION(g_app_context, __format, __VA_ARGS__)
 
 
 #else /******************* for other(gcc) */
@@ -115,7 +115,7 @@
     APP_CTX_CATCH_EXCEPTION_RETHROW(g_app_context, __format, ##args)
 
 #define APP_CATCH_EXCEPTION( __format, args...)       \
-    APP_CTX_CATCH_EXCEPTION_RETHROW(g_app_context, __format, ##args)
+    APP_CTX_CATCH_EXCEPTION(g_app_context, __format, ##args)
 
 #endif
 
