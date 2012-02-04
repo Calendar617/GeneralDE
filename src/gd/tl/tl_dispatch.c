@@ -107,7 +107,7 @@ static int gd_tl_manage_dispatch_event(gd_tl_manage_t tm, int maxCount) {
     return rv == 0 ? count : rv;
 }
 
-int gd_tl_manage_tick(gd_tl_manage_t tm, int count) {
+ptr_int_t gd_tl_manage_tick(gd_tl_manage_t tm, ptr_int_t count) {
     int leftCount;
 
     if (tm == NULL || count == 0) return GD_TL_ERROR_BAD_ARG;

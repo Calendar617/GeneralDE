@@ -88,6 +88,7 @@ gd_app_context_create(
     }
 
     TAILQ_INIT(&context->m_runing_modules);
+    TAILQ_INIT(&context->m_tick_chain);
 
     return context;
 }
@@ -96,6 +97,7 @@ void gd_app_context_free(gd_app_context_t context) {
     if (context == NULL) return;
 
     gd_app_modules_unload(context);
+    gd_app_tick_chain_free(context);
 
     if (context->m_dp_mgr) {
         gd_dp_mgr_free(context->m_dp_mgr);

@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+/*tick operations*/
+void gd_app_tick_chain_free(gd_app_context_t context);
+
 /*lib operations*/
 struct gd_app_lib *
 gd_app_lib_open_for_module(

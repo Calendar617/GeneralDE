@@ -21,6 +21,14 @@ typedef TAILQ_HEAD(gd_app_module_list, gd_app_module) gd_app_module_list_t;
 struct gd_app_runing_module;
 typedef TAILQ_HEAD(gd_app_runing_module_list, gd_app_runing_module) gd_app_runing_module_list_t;
 
+struct gd_app_ticker {
+    gd_app_tick_fun m_tick;
+    void * m_ctx;
+    ptr_int_t m_arg;
+    TAILQ_ENTRY(gd_app_ticker) m_next;
+};
+typedef TAILQ_HEAD(gd_app_ticker_list, gd_app_ticker) gd_app_ticker_list_t;
+
 struct gd_app_context {
     gd_app_status_t m_state;
     int m_argc;
@@ -30,6 +38,8 @@ struct gd_app_context {
 
     error_monitor_t m_em;
     struct error_monitor m_em_print;
+
+    gd_app_ticker_list_t m_tick_chain;
 
     char * m_root;
     cfg_t m_cfg;

@@ -2,6 +2,7 @@
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/pal/pal_unistd.h"
+#include "gd/tl/tl_manage.h"
 #include "gd/app/app_context.h"
 #include "app_internal_ops.h"
 
@@ -34,6 +35,11 @@ int gd_app_run(gd_app_context_t context) {
     }
 
     if (gd_app_cfg_reload(context) != 0) {
+        g_app_context = NULL;
+        return -1;
+    }
+
+    if (gd_app_tick_add(context, (gd_app_tick_fun)gd_tl_manage_tick, context->m_tl_mgr, 500) != 0) {
         g_app_context = NULL;
         return -1;
     }

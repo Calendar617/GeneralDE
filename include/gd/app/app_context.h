@@ -45,6 +45,11 @@ void * gd_app_user_data(gd_app_context_t context);
 void gd_app_set_state(gd_app_context_t context, gd_app_status_t state);
 gd_app_status_t gd_app_state(gd_app_context_t context);
 
+/*app tick function*/
+int gd_app_tick_add(gd_app_context_t context, gd_app_tick_fun tick, void * tick_ctx, ptr_int_t tick_arg);
+int gd_app_tick_remove(gd_app_context_t context, gd_app_tick_fun tick, void * tick_ctx);
+void gd_app_tick(gd_app_context_t context);
+ 
 /*the main*/
 int gd_app_run(gd_app_context_t context);
 

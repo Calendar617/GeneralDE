@@ -16,7 +16,7 @@ typedef enum gd_tl_manage_option {
 
 gd_tl_manage_t gd_tl_manage_create(mem_allocrator_t alloc);
 void gd_tl_manage_free(gd_tl_manage_t tm);
-int gd_tl_manage_tick(gd_tl_manage_t tm, int count);
+ptr_int_t gd_tl_manage_tick(gd_tl_manage_t tm, ptr_int_t count);
 int gd_tl_manage_set_opt(gd_tl_manage_t tm, gd_tl_manage_option_t opt,...);
 gd_tl_time_t gd_tl_manage_time(gd_tl_manage_t tm);
 

@@ -29,6 +29,8 @@ typedef void (*gd_app_module_app_fini)(gd_app_context_t context, gd_app_module_t
 typedef int (*gd_app_rsp_init_fun_t)(
     gd_dp_rsp_t rsp, gd_app_context_t context, gd_app_module_t module, cfg_t cfg);
 
+typedef ptr_int_t (*gd_app_tick_fun)(void * ctx, ptr_int_t arg);
+
 #ifdef __cplusplus
 }
 #endif
