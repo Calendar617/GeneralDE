@@ -59,6 +59,7 @@ int gd_app_run(gd_app_context_t context) {
     rv = context->m_main(context);
 
     gd_app_modules_unload(context);
+    gd_app_tick_chain_free(context);
     g_app_context = NULL;
 
     return rv;
