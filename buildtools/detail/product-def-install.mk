@@ -51,7 +51,7 @@ auto-build-dirs+=$(CPDE_OUTPUT_ROOT)/$3 \
 $(foreach f,$(if $(wildcard $(CPDE_ROOT)/$2),\
                  $(shell find $(CPDE_ROOT)/$2 -type f \
                               $(if $4, -o -name "*.$(word 1,$4)" $(foreach p,$(wordlist 2,$(words $4),$4), -o -name "*.$p")))),\
-    $(eval $(call install-def-rule-copy,$1,$f,$(subst $(CPDE_ROOT)/$2,$(CPDE_OUTPUT_ROOT)/$3,$f))) \
+    $(call install-def-rule-copy,$1,$f,$(subst $(CPDE_ROOT)/$2,$(CPDE_OUTPUT_ROOT)/$3,$f)) \
 )
 endef
 
@@ -83,7 +83,7 @@ $(call install-def-rule-one-dir,$1,$(word 1,$2),$(word 2,$2),$(word 3,$2))
 endef
 
 define product-def-rule-install-copy-dir-r
-$(call install-def-rule-one-dir,$1,$(word 1,$2),$(word 2,$2),$(word 3,$2))
+$(call install-def-rule-one-dir-r,$1,$(word 1,$2),$(word 2,$2),$(word 3,$2))
 endef
 
 define product-def-rule-install-cvt-file
@@ -105,7 +105,7 @@ define product-def-rule-install
 	$(foreach w,$(r.$1.install), \
         $(if $(filter install-def-sep,$w) \
             , $(if $(product-def-rule-install-tmp-name) \
-                  , $(eval $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args))) \
+                  , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args)) \
                     $(eval product-def-rule-install-tmp-name:=) \
                     $(eval product-def-rule-install-tmp-args:=)) \
             , $(if $(product-def-rule-install-tmp-name) \
@@ -113,7 +113,7 @@ define product-def-rule-install
                   , $(eval product-def-rule-install-tmp-name:=$w))))
 
     $(if $(product-def-rule-install-tmp-name) \
-        , $(eval $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args))))
+        , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args)))
 
 endef
 # }}}
