@@ -50,6 +50,7 @@ int cfg_read(cfg_t cfg, read_stream_t stream, cfg_policy_t policy, error_monitor
 int cfg_read_with_name(cfg_t cfg, const char * name, read_stream_t stream, cfg_policy_t policy, error_monitor_t em);
 int cfg_write(write_stream_t stream, cfg_t cfg, error_monitor_t em);
 int cfg_read_dir(cfg_t cfg, const char * path, cfg_policy_t policy, error_monitor_t em, mem_allocrator_t talloc);
+int cfg_merge(cfg_t cfg, cfg_t input, cfg_policy_t policy, error_monitor_t em);
 
 #ifdef __cplusplus
 }
