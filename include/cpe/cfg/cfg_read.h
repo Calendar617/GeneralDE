@@ -1,5 +1,6 @@
 #ifndef CPE_CFG_READ_H
 #define CPE_CFG_READ_H
+#include "cpe/utils/stream.h"
 #include "cfg_types.h"
 
 #ifdef __cplusplus
@@ -60,7 +61,11 @@ cfg_t cfg_struct_find_cfg(cfg_t cfg, const char * name);
 int cfg_seq_count(cfg_t cfg);
 cfg_t cfg_seq_at(cfg_t cfg, int pos);
 
+/*dump operations*/
+void cfg_dump(cfg_t cfg, write_stream_t stream, int ident, int level_ident);
+void cfg_dump_inline(cfg_t cfg, write_stream_t stream);
 
+/*child operations*/
 int cfg_child_count(cfg_t cfg);
 void cfg_it_init(cfg_it_t * it, cfg_t cfg);
 #define cfg_it_next(it) ((it)->next ? (it)->next(it) : NULL)

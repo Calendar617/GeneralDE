@@ -23,6 +23,9 @@ public:
     Node & operator[](const char * path) { return *((Node*)cfg_find_cfg(*this, path)); }
     Node const & operator[](const char * path) const { return *((Node*)cfg_find_cfg(*this, path)); }
 
+    Node & onlyChild(void);
+    Node const & onlyChild(void) const;
+
     size_t childCount(void) const { return (size_t)cfg_child_count(*this); }
 
     NodeConstIterator childs(void) const {
