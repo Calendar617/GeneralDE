@@ -6,6 +6,9 @@ product-def-all-items+=install
 #$(call def-copy-file,src-file,target-file)
 def-copy-file=install-def-sep copy-file $1 $2
 
+#$(call def-copy-file,src-file-list,target-dir)
+def-copy-file-list=install-def-sep copy-file-list $2 $1
+
 #$(call def-copy-dir,src-dir,target-dir,postfix-list)
 def-copy-dir=install-def-sep copy-dir $1 $2 $3
 
@@ -69,7 +72,7 @@ $(if $4,\
 
 endef
 
-# }}}
+# }}}	
 # {{{ 各种不同类型的安装函数入口,#$1是项目名，$2后续参数各自定义
 define product-def-rule-install-copy-file
 $(call install-def-rule-copy,\
@@ -78,12 +81,20 @@ $(call install-def-rule-copy,\
        $(CPDE_OUTPUT_ROOT)/$(word 2,$2))
 endef
 
+define product-def-rule-install-copy-file-list
+$(foreach f,$(wordlist 2,$(words $2), $2), \
+    $(call install-def-rule-copy,\
+         $1,\
+         $(CPDE_ROOT)/$f,\
+         $(CPDE_OUTPUT_ROOT)/$(word 1,$2)/$f))
+endef
+
 define product-def-rule-install-copy-dir
-$(call install-def-rule-one-dir,$1,$(word 1,$2),$(word 2,$2),$(word 3,$2))
+$(call install-def-rule-one-dir,$1,$(word 1,$2),$(word 2,$2),$(wordlist 3,$(words $2), $2))
 endef
 
 define product-def-rule-install-copy-dir-r
-$(call install-def-rule-one-dir-r,$1,$(word 1,$2),$(word 2,$2),$(word 3,$2))
+$(call install-def-rule-one-dir-r,$1,$(word 1,$2),$(word 2,$2),$(wordlist 3,$(words $2), $2))
 endef
 
 define product-def-rule-install-cvt-file
@@ -119,6 +130,7 @@ endef
 # }}}
 # {{{ 使用示例
 #$(product).install:= $(call def-copy-file,source-file, target-file) \
+#                     $(call def-copy-file-list,source-file-list, target-dir) \
 #                     $(call def-copy-dir-r,source-dir, target-dir, postfix-list) \
 #                     $(call def-copy-dir,source-dir, target-dir, postfix-list) \
 #                     $(call def-cvt-file,source-file, target-file)
