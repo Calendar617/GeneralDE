@@ -110,21 +110,22 @@ endef
 # }}}
 # {{{ 总入口函数
 define product-def-rule-install
-    $(eval product-def-rule-install-tmp-name:=)
-    $(eval product-def-rule-install-tmp-args:=)
 
-	$(foreach w,$(r.$1.install), \
-        $(if $(filter install-def-sep,$w) \
-            , $(if $(product-def-rule-install-tmp-name) \
-                  , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args)) \
-                    $(eval product-def-rule-install-tmp-name:=) \
-                    $(eval product-def-rule-install-tmp-args:=)) \
-            , $(if $(product-def-rule-install-tmp-name) \
-                  , $(eval product-def-rule-install-tmp-args+=$w) \
-                  , $(eval product-def-rule-install-tmp-name:=$w))))
+$(eval product-def-rule-install-tmp-name:=)
+$(eval product-def-rule-install-tmp-args:=)
 
-    $(if $(product-def-rule-install-tmp-name) \
-        , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args)))
+$(foreach w,$(r.$1.install), \
+    $(if $(filter install-def-sep,$w) \
+        , $(if $(product-def-rule-install-tmp-name) \
+              , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args)) \
+                $(eval product-def-rule-install-tmp-name:=) \
+                $(eval product-def-rule-install-tmp-args:=)) \
+        , $(if $(product-def-rule-install-tmp-name) \
+              , $(eval product-def-rule-install-tmp-args+=$w) \
+              , $(eval product-def-rule-install-tmp-name:=$w))))
+
+$(if $(product-def-rule-install-tmp-name) \
+    , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args)))
 
 endef
 # }}}
