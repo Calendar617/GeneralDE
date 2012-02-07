@@ -1,0 +1,85 @@
+#ifndef CPEPP_CFG_NODE_H
+#define CPEPP_CFG_NODE_H
+#include "cpepp/utils/ClassCategory.hpp"
+#include "cpepp/utils/CString.hpp"
+#include "cpe/cfg/cfg.h"
+#include "System.hpp"
+#include "NodeIterator.hpp"
+
+namespace Cpe { namespace Cfg {
+
+class Node : public Cpe::Utils::SimulateObject {
+public:
+    operator cfg_t (void) const { return (cfg_t)this; }
+    bool isValid(void) const { return this != NULL; }
+
+    Utils::CString const & name(void) const { return Utils::CString::_cast(cfg_name(*this)); }
+    bool isValue(void) const { return cfg_is_value(*this) ? true : false; }
+    int type(void) const { return cfg_type(*this); }
+
+    Node * parent(void) { return (Node *)cfg_parent(*this); }
+    Node const * parent(void) const { return (Node const *)cfg_parent(*this); }
+
+    Node & operator[](const char * path) { return *((Node*)cfg_find_cfg(*this, path)); }
+    Node const & operator[](const char * path) const { return *((Node*)cfg_find_cfg(*this, path)); }
+
+    size_t childCount(void) const { return (size_t)cfg_child_count(*this); }
+
+    NodeConstIterator childs(void) const {
+        NodeConstIterator r;
+        cfg_it_init(&r.m_it, *this);
+        return r;
+    }
+
+    NodeIterator childs(void) {
+        NodeIterator r;
+        cfg_it_init(&r.m_it, *this);
+        return r;
+    }
+
+    operator int8_t(void) const;
+    operator uint8_t(void) const;
+    operator int16_t(void) const;
+    operator uint16_t(void) const;
+    operator int32_t(void) const;
+    operator uint32_t(void) const;
+    operator int64_t(void) const;
+    operator uint64_t(void) const;
+    operator float(void) const;
+    operator double(void) const;
+    operator const char * (void) const;
+
+    int8_t dft(int8_t dft) const;
+    uint8_t dft(uint8_t dft) const;
+    int16_t dft(int16_t dft) const;
+    uint16_t dft(uint16_t dft) const;
+    int32_t dft(int32_t dft) const;
+    uint32_t dft(uint32_t dft) const;
+    int64_t dft(int64_t dft) const;
+    uint64_t dft(uint64_t dft) const;
+    float dft(float dft) const;
+    double dft(double dft) const;
+    const char * dft(const char * dft) const;
+
+    int8_t asInt8(void) const { return *this; }
+    uint8_t asUInt8(void) const { return *this; }
+    int16_t asInt16(void) const { return *this; }
+    uint16_t asUInt16(void) const { return *this; }
+    int32_t asInt32(void) const { return *this; }
+    uint32_t asUInt32(void) const { return *this; }
+    int64_t asInt64(void) const { return *this; }
+    uint64_t asUInt64(void) const { return *this; }
+    float asFloat(void) const { return *this; }
+    double asDouble(void) const { return *this; }
+    Utils::CString const & asString(void) const { 
+        return Utils::CString::_cast((const char *)(*this));
+    }
+
+    static Node const & invalid(void) { return *(Node const *)0; }
+
+    static Node & _cast(cfg_t cfg) { return  *(Node *)cfg; }
+};
+
+}}
+
+#endif
