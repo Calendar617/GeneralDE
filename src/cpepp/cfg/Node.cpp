@@ -54,4 +54,32 @@ NodeConstIterator::NodeConstIterator() {
     m_it.next = NULL;
 }
 
+Node & Node::onlyChild(void) {
+    NodeIterator childs = this->childs();
+    Node * r = childs.next();
+    if (r == 0)  {
+        throw ::std::runtime_error("Node::onlyChild no child");
+    }
+
+    if (childs.next()) {
+        throw ::std::runtime_error("Node::onlyChild too many child");
+    }
+
+    return *r;
+}
+
+Node const & Node::onlyChild(void) const {
+    NodeConstIterator childs = this->childs();
+    Node const * r = childs.next();
+    if (r == 0)  {
+        throw ::std::runtime_error("Node::onlyChild no child");
+    }
+
+    if (childs.next()) {
+        throw ::std::runtime_error("Node::onlyChild too many child");
+    }
+
+    return *r;
+}
+
 }}
