@@ -24,34 +24,32 @@ endef
 
 # $(call product-def,product-name,input-sources)
 define product-def
-  #verify must set variables
-  $(foreach cn,$(product-def-not-null-items),
-    $(if $($1.$(cn)),,$(error $(cn) of $1 not defined)))
 
-  #verify type support
-  $(foreach type,$($1.type), \
-      $(if $(filter $(type),$(product-support-types)),,
+#verify must set variables
+$(foreach cn,$(product-def-not-null-items),\
+  $(if $($1.$(cn)),,$(error $(cn) of $1 not defined)))
+
+#verify type support
+$(foreach type,$($1.type),\
+    $(if $(filter $(type),$(product-support-types)),,\
         $(error $1 use not support type $(type), supported types: $(product-support-types))))
 
-  #copy variables
-  $(foreach cn,$(product-def-all-items),
+#copy variables
+$(foreach cn,$(product-def-all-items),\
     $(eval r.$1.$(cn):=$($1.$(cn))))
 
-  $(eval $(call build-regular-path,r.$1.base,$(product-base)))
+$(eval $(call build-regular-path,r.$1.base,$(product-base)))
 
-  #add product to repository
-  project_repository+=$1
+#add product to repository
+project_repository+=$1
 
-  .PHONY: $1 $1.clean
+.PHONY: $1 $1.clean
 
-  ifneq ($(r.$1.depends),)
-  $1: $(foreach dep,$(r.$1.depends), $(dep) $$(r.$(dep).depends))
-  endif
+$(if $(r.$1.depends),$1: $(foreach dep,$(r.$1.depends), $(dep) $$(r.$(dep).depends)))
 
-  $(foreach type,$($1.type), \
-    $(call product-def-rule-$(type),$1))
+$(foreach type,$($1.type), $(call product-def-rule-$(type),$1))
 
-  $1.clean:
+$1.clean:
 	$(call with_message,cleaning...)$(RM) $(r.$1.cleanup)
 
 endef
