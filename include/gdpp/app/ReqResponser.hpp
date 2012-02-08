@@ -1,6 +1,7 @@
 #ifndef GDPP_APP_RESPONSER_H
 #define GDPP_APP_RESPONSER_H
 #include "gd/dp/dp_responser.h"
+#include "Log.hpp"
 #include "System.hpp"
 
 namespace Gd { namespace App {
@@ -16,34 +17,39 @@ public:
 
 }}
 
-#define GD_DP_RESPONSER_REG(__rsp_name, __rsp_type) \
-extern "C"                                          \
-int rsp_ ## __rsp_name ## _init(                    \
-    gd_dp_rsp_t rsp, gd_app_context_t context,      \
-    gd_app_module_t module,                         \
-    cfg_t cfg)                                      \
-{                                                   \
-    ::Gd::App::ReqResponser * processor =              \
-          new __rsp_type(                           \
-              *((::Gd::App::Application *)context), \
-              *((::Gd::App::Module*)module),        \
-              cfg);                                 \
-    if (processor == NULL) {return -1;}             \
-                                                    \
-    gd_dp_rsp_set_opt(                              \
-        rsp, gd_dp_rsp_set_processor,               \
-        &::Gd::App::ReqResponser::_process);           \
-                                                    \
-    gd_dp_rsp_set_opt(                              \
-        rsp, gd_dp_rsp_set_context,                 \
-        processor);                                 \
-                                                    \
-    gd_dp_rsp_set_opt(                              \
-        rsp, gd_dp_rsp_set_type,                    \
-        ::Gd::App::ReqResponser::_type);               \
-                                                    \
-    return 0;                                       \
-}
+#define GD_DP_RESPONSER_REG(__rsp_name, __rsp_type)         \
+    extern "C"                                              \
+    int rsp_ ## __rsp_name ## _init(                        \
+        gd_dp_rsp_t rsp, gd_app_context_t context,          \
+        gd_app_module_t module,                             \
+        cfg_t cfg)                                          \
+    {                                                       \
+        try {                                               \
+            ::Gd::App::ReqResponser * processor =           \
+                new __rsp_type(                             \
+                    *((::Gd::App::Application *)context),   \
+                    *((::Gd::App::Module*)module),          \
+                    *((::Cpe::Cfg::Node*)cfg));             \
+            if (processor == NULL) {return -1;}             \
+                                                            \
+            gd_dp_rsp_set_opt(                              \
+                rsp, gd_dp_rsp_set_processor,               \
+                &::Gd::App::ReqResponser::_process);        \
+                                                            \
+            gd_dp_rsp_set_opt(                              \
+                rsp, gd_dp_rsp_set_context,                 \
+                processor);                                 \
+                                                            \
+            gd_dp_rsp_set_opt(                              \
+                rsp, gd_dp_rsp_set_type,                    \
+                ::Gd::App::ReqResponser::_type);            \
+                                                            \
+            return 0;                                       \
+        }                                                   \
+        APP_CTX_CATCH_EXCEPTION(                            \
+            context, "create rsp " #__rsp_name ":");        \
+        return -1;                                          \
+    }
 
 #endif
 
