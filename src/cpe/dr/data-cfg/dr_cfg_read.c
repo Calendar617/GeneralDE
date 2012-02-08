@@ -93,6 +93,11 @@ int dr_cfg_read(
     int ret = 0;
     int size = 0;
 
+    if (cfg == NULL) {
+        CPE_ERROR(em, "dr_cfg_read: input cfg is null!");
+        return -1;
+    }
+
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
         size = dr_cfg_read_i((char *)buf, capacity, cfg, meta, em);
