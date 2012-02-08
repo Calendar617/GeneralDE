@@ -3,6 +3,7 @@
 #include "cpepp/utils/ClassCategory.hpp"
 #include "cpepp/utils/CString.hpp"
 #include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/cfg/cfg_types.h"
 #include "System.hpp"
 
 namespace Cpe { namespace Dr {
@@ -38,6 +39,13 @@ public:
 
     Entry const * findEntryByPath(const char * path) const { return (Entry const*)dr_meta_find_entry_by_path(*this, path); }
     Entry const & entryByPath(const char * path) const;
+
+    void load_from_cfg(void * data, size_t capacity, cfg_t cfg) const;
+
+    template<typename T>
+    void load_from_cfg(T & data, cfg_t cfg) const {
+        load_from_cfg(&data, sizeof(data), cfg);
+    }
 
     static Meta const & _cast(LPDRMETA meta);
 };

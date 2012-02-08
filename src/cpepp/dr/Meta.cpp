@@ -1,6 +1,8 @@
 #include <sstream>
 #include <stdexcept>
+#include "cpe/dr/dr_cfg.h"
 #include "cpepp/dr/Meta.hpp"
+#include "cpepp/utils/ErrorCollector.hpp"
 
 namespace Cpe { namespace Dr {
 
@@ -76,6 +78,13 @@ Meta const & Meta::_cast(LPDRMETA meta) {
         throw ::std::runtime_error("cast to Meta: input is NULL");
     }
     return *(Meta const *)meta;
+}
+
+void Meta::load_from_cfg(void * data, size_t capacity, cfg_t cfg) const {
+    Utils::ErrorCollector ec;
+    if (dr_cfg_read(data, capacity, cfg, *this, ec) != 0) {
+        ec.checkThrowWithMsg< ::std::runtime_error>();
+    }
 }
 
 }}
