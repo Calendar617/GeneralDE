@@ -87,4 +87,14 @@ void Meta::load_from_cfg(void * data, size_t capacity, cfg_t cfg) const {
     }
 }
 
+bool Meta::try_load_from_cfg(void * data, size_t capacity, cfg_t cfg) const {
+    if (dr_cfg_read(data, capacity, cfg, *this, 0) != 0) {
+        bzero(data, capacity);
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 }}

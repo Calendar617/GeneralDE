@@ -41,10 +41,16 @@ public:
     Entry const & entryByPath(const char * path) const;
 
     void load_from_cfg(void * data, size_t capacity, cfg_t cfg) const;
+    bool try_load_from_cfg(void * data, size_t capacity, cfg_t cfg) const;
 
     template<typename T>
     void load_from_cfg(T & data, cfg_t cfg) const {
         load_from_cfg(&data, sizeof(data), cfg);
+    }
+
+    template<typename T>
+    bool try_load_from_cfg(T & data, cfg_t cfg) const {
+        return try_load_from_cfg(&data, sizeof(data), cfg);
     }
 
     static Meta const & _cast(LPDRMETA meta);
