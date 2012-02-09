@@ -80,15 +80,15 @@ Meta const & Meta::_cast(LPDRMETA meta) {
     return *(Meta const *)meta;
 }
 
-void Meta::load_from_cfg(void * data, size_t capacity, cfg_t cfg) const {
+void Meta::load_from_cfg(void * data, size_t capacity, cfg_t cfg, int policy) const {
     Utils::ErrorCollector ec;
-    if (dr_cfg_read(data, capacity, cfg, *this, ec) <= 0) {
+    if (dr_cfg_read(data, capacity, cfg, *this, policy, ec) <= 0) {
         ec.checkThrowWithMsg< ::std::runtime_error>();
     }
 }
 
-bool Meta::try_load_from_cfg(void * data, size_t capacity, cfg_t cfg) const {
-    if (dr_cfg_read(data, capacity, cfg, *this, 0) <= 0) {
+bool Meta::try_load_from_cfg(void * data, size_t capacity, cfg_t cfg, error_monitor_t em, int policy) const {
+    if (dr_cfg_read(data, capacity, cfg, *this, policy, em) <= 0) {
         bzero(data, capacity);
         return false;
     }

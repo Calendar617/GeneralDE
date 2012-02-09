@@ -40,16 +40,16 @@ public:
     Entry const * findEntryByPath(const char * path) const { return (Entry const*)dr_meta_find_entry_by_path(*this, path); }
     Entry const & entryByPath(const char * path) const;
 
-    void load_from_cfg(void * data, size_t capacity, cfg_t cfg) const;
-    bool try_load_from_cfg(void * data, size_t capacity, cfg_t cfg) const;
+    void load_from_cfg(void * data, size_t capacity, cfg_t cfg, int policy = DR_CFG_READ_CHECK_NOT_EXIST_ATTR) const;
+    bool try_load_from_cfg(void * data, size_t capacity, cfg_t cfg, error_monitor_t em = 0, int policy = 0) const;
 
     template<typename T>
-    void load_from_cfg(T & data, cfg_t cfg) const {
+    void load_from_cfg(T & data, cfg_t cfg, int policy = DR_CFG_READ_CHECK_NOT_EXIST_ATTR) const {
         load_from_cfg(&data, sizeof(data), cfg);
     }
 
     template<typename T>
-    bool try_load_from_cfg(T & data, cfg_t cfg) const {
+    bool try_load_from_cfg(T & data, cfg_t cfg, error_monitor_t em = 0, int policy = 0) const {
         return try_load_from_cfg(&data, sizeof(data), cfg);
     }
 
