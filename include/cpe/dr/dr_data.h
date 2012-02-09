@@ -75,6 +75,8 @@ float dr_meta_read_float(const void * input, LPDRMETA meta, const char * entry);
 double dr_meta_read_double(const void * input, LPDRMETA meta, const char * entry);
 const char * dr_meta_read_string(const void * input, LPDRMETA meta, const char * entry);
 
+void dr_meta_copy_same_entry(void * desData, LPDRMETA desMeta, void const * srcData, LPDRMETA srcMeta, error_monitor_t em);
+
 #ifdef __cplusplus
 }
 #endif
