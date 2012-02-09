@@ -3,7 +3,7 @@
 #include "cpepp/utils/ClassCategory.hpp"
 #include "cpepp/utils/CString.hpp"
 #include "cpe/dr/dr_metalib_manage.h"
-#include "cpe/cfg/cfg_types.h"
+#include "cpe/dr/dr_cfg.h"
 #include "System.hpp"
 
 namespace Cpe { namespace Dr {
