@@ -18,6 +18,12 @@ int dr_cfg_read(
     int policy,
     error_monitor_t em);
 
+int dr_cfg_write(
+    cfg_t cfg,
+    void * data,
+    LPDRMETA meta,
+    error_monitor_t em);
+
 #ifdef __cplusplus
 }
 #endif
