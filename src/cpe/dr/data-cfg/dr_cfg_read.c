@@ -14,6 +14,7 @@ int dr_cfg_read_i(
     size_t capacity,
     cfg_t cfg,
     LPDRMETA meta,
+    int policy,
     error_monitor_t em)
 {
     cfg_it_t itemIt;
@@ -40,9 +41,11 @@ int dr_cfg_read_i(
     while((item = cfg_it_next(&itemIt))) {
         LPDRMETAENTRY entry = dr_meta_find_entry_by_name(meta, cfg_name(item));
         if (entry == NULL) {
-            CPE_WARNING(
-                em, "read from %s: %s have no entry %s, ignore!",
-                cfg_name(cfg), dr_meta_name(meta), cfg_name(item));
+            if (policy | DR_CFG_READ_CHECK_NOT_EXIST_ATTR) {
+                CPE_WARNING(
+                    em, "read from %s: %s have no entry %s, ignore!",
+                    cfg_name(cfg), dr_meta_name(meta), cfg_name(item));
+            }
             continue;
         }
 
@@ -64,6 +67,7 @@ int dr_cfg_read_i(
                 entry->m_unitsize,
                 item,
                 dr_entry_ref_meta(entry),
+                policy,
                 em);
 
             if (itemSize + entry->m_data_start_pos > size) {
@@ -88,6 +92,7 @@ int dr_cfg_read(
     size_t capacity,
     cfg_t cfg,
     LPDRMETA meta,
+    int policy,
     error_monitor_t em)
 {
     int ret = 0;
@@ -100,12 +105,12 @@ int dr_cfg_read(
 
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
-        size = dr_cfg_read_i((char *)buf, capacity, cfg, meta, em);
+        size = dr_cfg_read_i((char *)buf, capacity, cfg, meta, policy, em);
         CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
     }
     else {
         CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
-        size = dr_cfg_read_i((char *)buf, capacity, cfg, meta, &logError);
+        size = dr_cfg_read_i((char *)buf, capacity, cfg, meta, policy, &logError);
     }
 
     return ret ? ret : size;
