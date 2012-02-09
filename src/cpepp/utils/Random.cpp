@@ -14,7 +14,7 @@ uint32_t RandomAdapter::generate(uint32_t max) {
     return cpe_rand_ctx_generate(&m_ctx, max);
 }
 
-static RandomAdapter s_ins(g_cpe_rand_ctx_dft);
+static RandomAdapter s_ins(*cpe_rand_ctx_dft());
 
 Random &
 Random::dft(void) {
