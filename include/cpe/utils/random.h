@@ -6,7 +6,19 @@
 extern "C" {
 #endif
 
-uint32_t cpe_rand(uint32_t seed, uint32_t max);
+struct cpe_rand_ctx {
+    int32_t m_state_arr[624];
+    int m_index;
+};
+
+uint32_t cpe_rand(int32_t seed, uint32_t max);
+
+void cpe_rand_ctx_init(struct cpe_rand_ctx * ctx, int32_t seed);
+uint32_t cpe_rand_ctx_generate(struct cpe_rand_ctx * ctx, uint32_t max);
+
+extern struct cpe_rand_ctx g_cpe_rand_ctx_dft;
+
+#define cpe_rand_dft(max) cpe_rand_ctx_generate(&g_cpe_rand_ctx_dft, max)
 
 #ifdef __cplusplus
 }
