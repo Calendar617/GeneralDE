@@ -41,4 +41,14 @@ uint32_t cpe_rand_ctx_generate(struct cpe_rand_ctx * ctx, uint32_t max) {
     return r;
 }
 
+int g_cpe_rand_ctx_dft_init = 0;
 struct cpe_rand_ctx g_cpe_rand_ctx_dft;
+
+struct cpe_rand_ctx * cpe_rand_ctx_dft(void) {
+    if (!g_cpe_rand_ctx_dft_init) {
+        cpe_rand_ctx_init(&g_cpe_rand_ctx_dft, time(0));
+        g_cpe_rand_ctx_dft_init = 1;
+    }
+
+    return &g_cpe_rand_ctx_dft;
+}
