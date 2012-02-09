@@ -78,6 +78,20 @@ public:
         return Utils::CString::_cast((const char *)(*this));
     }
 
+    int8_t asInt8(int8_t v) const { return dft(v); }
+    uint8_t asUInt8(uint8_t v) const { return dft(v); }
+    int16_t asInt16(int16_t v) const { return dft(v); }
+    uint16_t asUInt16(uint16_t v) const { return dft(v); }
+    int32_t asInt32(int32_t v) const { return dft(v); }
+    uint32_t asUInt32(uint32_t v) const { return dft(v); }
+    int64_t asInt64(int64_t v) const { return dft(v); }
+    uint64_t asUInt64(uint64_t v) const { return dft(v); }
+    float asFloat(float v) const { return dft(v); }
+    double asDouble(double v) const { return dft(v); }
+    Utils::CString const & asString(const char * v) const { 
+        return Utils::CString::_cast((const char *)(dft(v)));
+    }
+
     static Node const & invalid(void) { return *(Node const *)0; }
 
     static Node & _cast(cfg_t cfg) { return  *(Node *)cfg; }
