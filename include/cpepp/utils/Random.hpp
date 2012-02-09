@@ -7,14 +7,19 @@ namespace Cpe { namespace Utils {
 
 class Random {
 public:
-    Random(int32_t seed);
-    void init(int32_t seed);
+    virtual uint32_t generate(uint32_t max) = 0;
+    virtual ~Random();
 
-    uint32_t generate(uint32_t max);
+    static Random & dft(void);
+};
+
+class RandomAdapter : public Random {
+public:
+    RandomAdapter(cpe_rand_ctx & ctx);
+    virtual uint32_t generate(uint32_t max);
 
 private:
-    int32_t m_state_arr[624];
-    int m_index;
+    cpe_rand_ctx & m_ctx;
 };
 
 }}
