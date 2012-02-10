@@ -1,6 +1,21 @@
 #include "cpe/dr/dr_ctypes_op.h"
 #include "SetDefaultsTest.hpp"
 
+TEST_F(SetDefaultsTest, multi_entry_basic) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net' version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='a1' type='int16' defaultvalue='23'/>"
+        "	     <entry name='a2' type='int16' defaultvalue='45'/>"
+        "    </struct>"
+        "</metalib>");
+
+    set_defaults("S");
+
+    EXPECT_EQ(23, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(45, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
+}
+
 TEST_F(SetDefaultsTest, numeric_basic) {
     installMeta(
         "<metalib tagsetversion='1' name='net' version='1'>"
