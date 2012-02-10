@@ -1,5 +1,6 @@
 #include <sstream>
 #include <stdexcept>
+#include "cpe/pal/pal_strings.h"
 #include "cpe/dr/dr_cfg.h"
 #include "cpe/dr/dr_data.h"
 #include "cpepp/dr/Meta.hpp"
