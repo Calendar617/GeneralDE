@@ -27,6 +27,19 @@ TEST_F(SetDefaultsTest, numeric_no_default) {
     EXPECT_EQ(0, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
 }
 
+TEST_F(SetDefaultsTest, numeric_no_default_ignore) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net' version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='a1' type='int16'/>"
+        "    </struct>"
+        "</metalib>");
+
+    set_defaults("S", DR_SET_DEFAULTS_POLICY_NO_DEFAULT_IGNORE);
+
+    EXPECT_NE(0, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
+}
+
 TEST_F(SetDefaultsTest, string_basic) {
     installMeta(
         "<metalib tagsetversion='1' name='net' version='1'>"

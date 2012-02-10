@@ -23,7 +23,7 @@ int dr_meta_copy_check_type_copyable(int desType, int srcType) {
     }
 }
 
-void dr_meta_copy_same_entry(void * desData, LPDRMETA desMeta, void const * srcData, LPDRMETA srcMeta, error_monitor_t em) {
+void dr_meta_copy_same_entry(void * desData, LPDRMETA desMeta, void const * srcData, LPDRMETA srcMeta, int policy, error_monitor_t em) {
     struct CopySameEntryProcessStack processStack[CPE_DR_MAX_LEVEL];
     int stackPos;
 

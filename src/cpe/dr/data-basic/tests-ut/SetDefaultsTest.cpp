@@ -1,7 +1,7 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "SetDefaultsTest.hpp"
 
-void SetDefaultsTest::set_defaults(const char * metaName, size_t capacity) {
+void SetDefaultsTest::set_defaults(const char * metaName, int policy, size_t capacity) {
     LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, metaName);
     EXPECT_TRUE(meta) << "get meta " << metaName << " error!";
     if (meta == 0) return;
@@ -16,5 +16,6 @@ void SetDefaultsTest::set_defaults(const char * metaName, size_t capacity) {
     t_elist_clear();
     dr_meta_set_defaults(
         mem_buffer_make_continuous(&m_buffer, 0),
-        meta);
+        meta,
+        policy);
 }

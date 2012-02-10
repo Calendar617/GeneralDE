@@ -4,7 +4,7 @@
 
 class SetDefaultsTest : public DataBasicTest {
 public:
-    void set_defaults(const char * metaName, size_t capacity = 0);
+    void set_defaults(const char * metaName, int policy = 0, size_t capacity = 0);
 };
 
 #endif
