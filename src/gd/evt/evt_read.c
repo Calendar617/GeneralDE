@@ -39,7 +39,7 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * ty
     evt->m_meta = meta;
     evt->m_data_capacity = data_capacity;
 
-    dr_meta_set_defaults(evt + 1, meta);
+    dr_meta_set_defaults(evt + 1, data_capacity, meta, 0);
 
     return evt;
 }
