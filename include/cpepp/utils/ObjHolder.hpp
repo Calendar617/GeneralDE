@@ -12,7 +12,7 @@ namespace Cpe { namespace Utils {
 template<
     typename T
     , typename _Copyer = CopyConstructCopyer<T>
-    , typename _Deletor = Deletor<T> >
+    , typename _Deletor = Deleter<T> >
 class ObjHolder: private _Copyer, private _Deletor {
 public:
     ObjHolder(_Copyer copyer = _Copyer(), _Deletor deletor = _Deletor())
