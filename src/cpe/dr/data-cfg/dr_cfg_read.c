@@ -57,12 +57,12 @@ void dr_cfg_read_array_set_dft(size_t count, size_t elementSize, char * buf, siz
     const void * dftValue;
     char * writePos;
 
-    if (count >= entry->m_array_count) return;
+    if (count >= (size_t)entry->m_array_count) return;
 
     writePos = buf + entry->m_data_start_pos + (count * elementSize);
     dftValue = dr_entry_dft_value(entry);
     if (dftValue) {
-        while(count < entry->m_array_count) {
+        while(count < (size_t)entry->m_array_count) {
             size_t requiredSize;
 
             requiredSize = (writePos - buf) + elementSize;
@@ -76,10 +76,11 @@ void dr_cfg_read_array_set_dft(size_t count, size_t elementSize, char * buf, siz
         }
     }
     else {
+        ssize_t writeSize;
         size_t totalSize = entry->m_array_count * elementSize;
         if (totalSize > capacity) totalSize = capacity;
 
-        ssize_t writeSize = ((ssize_t)totalSize) - ((size_t)(count * elementSize));
+        writeSize = (ssize_t)totalSize - (ssize_t)(count * elementSize);
 
         bzero(writePos, writeSize);
     }
@@ -92,7 +93,7 @@ int dr_cfg_read_entry(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, LPD
 
     assert(entry);
 
-    if (entry->m_data_start_pos + entry->m_unitsize > capacity) {
+    if ((size_t)(entry->m_data_start_pos + entry->m_unitsize) > capacity) {
         CPE_WARNING(
             em, "read from %s: read %s.%s, size overflow, require %d, but only %zd!",
             cfg_name(cfg),
@@ -192,7 +193,7 @@ int dr_cfg_read_struct(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, in
 
     cfg_it_init(&itemIt, cfg);
     while((item = cfg_it_next(&itemIt))) {
-        size_t itemSize;
+        int itemSize;
         LPDRMETAENTRY entry;
 
         entry = dr_meta_find_entry_by_name(meta, cfg_name(item));
