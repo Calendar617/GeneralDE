@@ -72,10 +72,14 @@ double dr_meta_read_double(const void * input, LPDRMETA meta, const char * entry
 const char * dr_meta_read_string(const void * input, LPDRMETA meta, const char * entry);
 
 #define DR_SET_DEFAULTS_POLICY_NO_DEFAULT_IGNORE 1
+int dr_entry_set_defaults(void * inout, size_t capacity, LPDRMETAENTRY entry, int policy);
+void dr_meta_set_defaults(void * inout, size_t capacity, LPDRMETA meta, int policy);
 
-int dr_entry_set_defaults(void * inout, LPDRMETAENTRY entry, int policy);
-void dr_meta_set_defaults(void * inout, LPDRMETA meta, int policy);
-void dr_meta_copy_same_entry(void * desData, LPDRMETA desMeta, void const * srcData, LPDRMETA srcMeta, int policy, error_monitor_t em);
+
+void dr_meta_copy_same_entry(
+    void * desData, size_t desCapacity, LPDRMETA desMeta,
+    void const * srcData, size_t srcCapacity, LPDRMETA srcMeta,
+    int policy, error_monitor_t em);
 
 #ifdef __cplusplus
 }

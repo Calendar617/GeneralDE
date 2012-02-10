@@ -22,6 +22,7 @@ void CopySameEntryTest::copy(const char * desMetaName, const char * srcMetaName,
     mem_buffer_alloc(&src_buffer, dr_meta_size(srcMeta));
     dr_meta_set_defaults(
         mem_buffer_make_continuous(&src_buffer, 0),
+        mem_buffer_size(&src_buffer),
         srcMeta,
         0);
     
@@ -29,13 +30,16 @@ void CopySameEntryTest::copy(const char * desMetaName, const char * srcMetaName,
 
     dr_meta_set_defaults(
         mem_buffer_make_continuous(&m_buffer, 0),
+        mem_buffer_size(&m_buffer),
         desMeta,
         0);
 
     dr_meta_copy_same_entry(
         mem_buffer_make_continuous(&m_buffer, 0),
+        mem_buffer_size(&m_buffer),
         desMeta,
         mem_buffer_make_continuous(&src_buffer, 0),
+        mem_buffer_size(&src_buffer),
         srcMeta,
         policy,
         t_em());

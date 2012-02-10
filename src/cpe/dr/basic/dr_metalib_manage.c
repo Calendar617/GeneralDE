@@ -219,6 +219,11 @@ int dr_meta_path_to_off(LPDRMETA meta, const char * path, LPDRMETAENTRY * entry)
     }
 }
 
+LPDRMETALIB dr_meta_owner_lib(LPDRMETA meta) {
+    char * base = (char *)(meta) - meta->m_self_pos;
+    return ((LPDRMETALIB)base) - 1;
+}
+
 LPDRMETAENTRY dr_meta_find_entry_by_name(LPDRMETA meta, const char* name) {
     int i;
     char * base = (char *)(meta) - meta->m_self_pos;

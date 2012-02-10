@@ -5,7 +5,7 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "../dr_internal_types.h"
 
-int dr_entry_set_defaults(void * inout, LPDRMETAENTRY entry, int policy) {
+int dr_entry_set_defaults(void * inout, size_t capacity, LPDRMETAENTRY entry, int policy) {
     const void * defaultValue = dr_entry_dft_value(entry);
     if (defaultValue) {
         memcpy(inout, defaultValue, entry->m_unitsize);
@@ -27,7 +27,7 @@ struct SetDefaultProcessStack{
     char * m_data;
 };
 
-void dr_meta_set_defaults(void * inout, LPDRMETA meta, int policy) {
+void dr_meta_set_defaults(void * inout, size_t capacity, LPDRMETA meta, int policy) {
     struct SetDefaultProcessStack processStack[CPE_DR_MAX_LEVEL];
     int stackPos;
 
@@ -87,7 +87,7 @@ void dr_meta_set_defaults(void * inout, LPDRMETA meta, int policy) {
                     }
                 }
                 else {
-                    dr_entry_set_defaults(entryData, curStack->m_entry, policy);
+                    dr_entry_set_defaults(entryData, 0, curStack->m_entry, policy);
                 }
             }
         }

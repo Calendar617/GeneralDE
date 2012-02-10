@@ -16,6 +16,7 @@ void SetDefaultsTest::set_defaults(const char * metaName, int policy, size_t cap
     t_elist_clear();
     dr_meta_set_defaults(
         mem_buffer_make_continuous(&m_buffer, 0),
+        mem_buffer_size(&m_buffer),
         meta,
         policy);
 }

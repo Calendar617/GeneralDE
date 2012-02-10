@@ -34,7 +34,11 @@ int dr_meta_copy_check_array_copyable(int desArrayCount, int srcArrayCount) {
         : 0;
 }
 
-void dr_meta_copy_same_entry(void * desData, LPDRMETA desMeta, void const * srcData, LPDRMETA srcMeta, int policy, error_monitor_t em) {
+void dr_meta_copy_same_entry(
+    void * desData, size_t desCapacity, LPDRMETA desMeta,
+    void const * srcData, size_t srcCapacity, LPDRMETA srcMeta, 
+    int policy, error_monitor_t em)
+{
     struct CopySameEntryProcessStack processStack[CPE_DR_MAX_LEVEL];
     int stackPos;
 
