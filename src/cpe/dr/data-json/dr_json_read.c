@@ -352,7 +352,6 @@ static void dr_json_parse_ctx_init(
     ctx->m_output = buffer;
 
     p = mem_buffer_alloc(buffer, dr_meta_size(meta));
-    dr_meta_set_defaults(p, meta);
 
     dr_json_parse_stack_init(&ctx->m_typeStacks[0], meta, p, dr_meta_size(meta));
 

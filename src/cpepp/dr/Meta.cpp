@@ -1,7 +1,9 @@
 #include <sstream>
 #include <stdexcept>
 #include "cpe/dr/dr_cfg.h"
+#include "cpe/dr/dr_data.h"
 #include "cpepp/dr/Meta.hpp"
+#include "cpepp/dr/MetaLib.hpp"
 #include "cpepp/utils/ErrorCollector.hpp"
 
 namespace Cpe { namespace Dr {
@@ -95,6 +97,29 @@ bool Meta::try_load_from_cfg(void * data, size_t capacity, cfg_t cfg, error_moni
     else {
         return true;
     }
+}
+
+void Meta::set_defaults(void * data, size_t capacity, int policy) const {
+    dr_meta_set_defaults(data, capacity, *this, policy);
+}
+
+void Meta::copy_same_entries(
+    void * data, size_t capacity,
+    const void * src, LPDRMETA srcMeta, size_t srcCapacity,
+    int policy, error_monitor_t em) const
+{
+    dr_meta_copy_same_entry(data, capacity, *this, src, srcCapacity, srcMeta, policy, em);
+}
+
+void Meta::copy_same_entries(
+    void * data, size_t capacity,
+    const void * srcData, const char * srcMeta, size_t srcCapacity,
+    int policy, error_monitor_t em) const
+{
+    copy_same_entries(
+        data, capacity,
+        srcData, MetaLib::_cast(dr_meta_owner_lib(*this)).meta(srcMeta), srcCapacity,
+        policy, em);
 }
 
 }}
