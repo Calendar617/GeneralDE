@@ -5,6 +5,7 @@
 #include "cpe/dr/dr_ctypes_info.h"
 #include "cpe/dr/dr_error.h"
 #include "../dr_internal_types.h"
+#include "../dr_ctype_ops.h"
 
 LPDRMETA dr_lib_find_meta_by_name(LPDRMETALIB metaLib, const char* name) {
     char * base;
@@ -406,6 +407,20 @@ int dr_entry_type(LPDRMETAENTRY entry) {
 
 int dr_entry_array_count(LPDRMETAENTRY entry) {
     return entry->m_array_count;
+}
+
+size_t dr_entry_element_size(LPDRMETAENTRY entry) {
+    if (entry->m_type <= CPE_DR_TYPE_COMPOSITE) {
+        LPDRMETA refMeta = dr_entry_ref_meta(entry);
+        if (refMeta == NULL) return 0;
+        return dr_meta_size(refMeta);
+    }
+    else {
+        const struct tagDRCTypeInfo * typeInfo;
+        typeInfo = dr_find_ctype_info_by_type(entry->m_type);
+        if (typeInfo == NULL) return 0;
+        return typeInfo->m_size;
+    }
 }
 
 LPDRMETAENTRY
