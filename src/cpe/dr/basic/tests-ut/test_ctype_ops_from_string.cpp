@@ -59,6 +59,11 @@ TEST_F(CtypeOpsFromStringTest, int8_min) {
     EXPECT_EQ(-128, as_int8());
 }
 
+TEST_F(CtypeOpsFromStringTest, int8_middle) {
+    EXPECT_EQ(0, parse("int8", "123"));
+    EXPECT_EQ(123, as_int8());
+}
+
 TEST_F(CtypeOpsFromStringTest, int8_max) {
     EXPECT_EQ(0, parse("int8", "127"));
     EXPECT_EQ(127, as_int8());

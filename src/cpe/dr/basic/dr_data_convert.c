@@ -323,7 +323,7 @@ struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
 
 #define CPE_READOPS_COUNT (sizeof(g_dr_ctype_read_ops) / sizeof(struct DRCtypeTypeReadOps))
 
-#define CPE_DEF_READ_FUN(__to)                                          \
+#define CPE_DEF_READ_FUN(__to, __to_type)                               \
     int dr_ctype_try_read_ ## __to(                                     \
         __to ## _t * result,                                            \
         const void * input, int type, error_monitor_t em)               \
@@ -331,6 +331,10 @@ struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
         if (type < 0 || type > CPE_READOPS_COUNT) {                     \
             CPE_ERROR(em, "read from %d, type is unknown", type);       \
             return -1;                                                  \
+        }                                                               \
+        else if (type == CPE_DR_TYPE_STRING) {                          \
+            return dr_ctype_set_from_string(                            \
+                result, __to_type, (const char * )input, em);           \
         }                                                               \
         else {                                                          \
             if (g_dr_ctype_read_ops[type].to_ ## __to) {                \
@@ -347,6 +351,12 @@ struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
     __to ## _t dr_ctype_read_ ## __to(const void * input, int type) {   \
         if (type < 0 || type > CPE_READOPS_COUNT) {                     \
             return (__to ## _t)0;                                       \
+        }                                                               \
+        else if (type == CPE_DR_TYPE_STRING) {                          \
+            __to ## _t tmp = 0;                                         \
+            dr_ctype_set_from_string(                                   \
+                &tmp, __to_type, (const char * )input, 0);              \
+            return tmp;                                                 \
         }                                                               \
         else {                                                          \
             if (g_dr_ctype_read_ops[type].to_ ## __to) {                \
@@ -372,6 +382,10 @@ struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
                       entry->m_type);                                   \
             return -1;                                                  \
         }                                                               \
+        else if (entry->m_type == CPE_DR_TYPE_STRING) {                 \
+            return dr_ctype_set_from_string(                            \
+                result, __to_type, (const char * )input, em);           \
+        }                                                               \
         else {                                                          \
             if (g_dr_ctype_read_ops[entry->m_type].to_ ## __to) {       \
                 return g_dr_ctype_read_ops[entry->m_type].to_ ## __to ( \
@@ -390,6 +404,12 @@ struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
         if (entry == NULL ||                                            \
             entry->m_type < 0 || entry->m_type > CPE_READOPS_COUNT) {   \
             return (__to ## _t)0;                                       \
+        }                                                               \
+        else if (entry->m_type == CPE_DR_TYPE_STRING) {                 \
+            __to ## _t tmp = 0;                                         \
+            dr_ctype_set_from_string(                                   \
+                &tmp, __to_type, (const char * )input, 0);              \
+            return tmp;                                                 \
         }                                                               \
         else {                                                          \
             if (g_dr_ctype_read_ops[entry->m_type].to_ ## __to) {       \
@@ -438,16 +458,16 @@ struct DRCtypeTypeReadOps g_dr_ctype_read_ops[] = {
 
 
 
-CPE_DEF_READ_FUN(int8);
-CPE_DEF_READ_FUN(uint8);
-CPE_DEF_READ_FUN(int16);
-CPE_DEF_READ_FUN(uint16);
-CPE_DEF_READ_FUN(int32);
-CPE_DEF_READ_FUN(uint32);
-CPE_DEF_READ_FUN(int64);
-CPE_DEF_READ_FUN(uint64);
-CPE_DEF_READ_FUN(float);
-CPE_DEF_READ_FUN(double);
+CPE_DEF_READ_FUN(int8, CPE_DR_TYPE_INT8);
+CPE_DEF_READ_FUN(uint8, CPE_DR_TYPE_UINT8);
+CPE_DEF_READ_FUN(int16, CPE_DR_TYPE_INT16);
+CPE_DEF_READ_FUN(uint16, CPE_DR_TYPE_UINT16);
+CPE_DEF_READ_FUN(int32, CPE_DR_TYPE_INT32);
+CPE_DEF_READ_FUN(uint32, CPE_DR_TYPE_UINT32);
+CPE_DEF_READ_FUN(int64, CPE_DR_TYPE_INT64);
+CPE_DEF_READ_FUN(uint64, CPE_DR_TYPE_UINT64);
+CPE_DEF_READ_FUN(float, CPE_DR_TYPE_FLOAT);
+CPE_DEF_READ_FUN(double, CPE_DR_TYPE_DOUBLE);
 
 const char * dr_entry_read_string(const void * input, LPDRMETAENTRY entry) {
     return entry ? (const char *)input : "";
