@@ -76,8 +76,11 @@ void cfg_it_init(cfg_it_t * it, cfg_t cfg);
 #define cfg_it_next(it) ((it)->next ? (it)->next(it) : NULL)
 
 /*compire operations*/
-int cfg_cmp(cfg_t l, cfg_t r, error_monitor_t em);
-int cfg_eq_part(cfg_t l, cfg_t r, error_monitor_t em);
+enum {
+    CFG_CMP_POLICY_L_STRUCT_LEAK = 1
+    , CFG_CMP_POLICY_R_STRUCT_LEAK = 3
+};
+int cfg_cmp(cfg_t l, cfg_t r, int policy, error_monitor_t em);
 
 #ifdef __cplusplus
 }

@@ -13,7 +13,7 @@ class CompaireTest
     : public testenv::fixture<CompaireTestBase>
 {
 public:
-    int compaire(const char * l, const char * r);
+    int compaire(const char * l, const char * r, int policy = 0);
 };
 
 #endif

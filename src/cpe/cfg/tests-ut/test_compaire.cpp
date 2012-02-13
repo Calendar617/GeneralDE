@@ -60,3 +60,24 @@ TEST_F(CompaireTest, seq_struct_eq_basic) {
             , "a: [a: 1, b: 2]"));
 }
 
+TEST_F(CompaireTest, struct_eq_policy_l_leak) {
+    EXPECT_EQ(
+        0,
+        compaire(
+            "a: 1\n"
+            ,
+            "a: 1\n"
+            "b: 2",
+            CFG_CMP_POLICY_L_STRUCT_LEAK));
+}
+
+TEST_F(CompaireTest, struct_eq_policy_r_leak) {
+    EXPECT_EQ(
+        0,
+        compaire(
+            "a: 1\n"
+            "b: 2"
+            ,
+            "a: 1",
+            CFG_CMP_POLICY_R_STRUCT_LEAK));
+}
