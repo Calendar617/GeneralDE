@@ -34,7 +34,7 @@ public:
 
     Entry const * findEntry(const char * name) const { return (Entry const *)dr_meta_find_entry_by_name(*this, name); }
     Entry const * findEntry(int id) const;
-    Entry const & entry(const char * name);
+    Entry const & entry(const char * name) const;
     Entry const & entry(int id) const;
 
     Entry const * findEntryByPath(const char * path) const { return (Entry const*)dr_meta_find_entry_by_path(*this, path); }

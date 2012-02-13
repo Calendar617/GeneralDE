@@ -45,7 +45,7 @@ Entry const * Meta::findEntry(int id) const {
     return pos < 0 ? NULL : (Entry const *)dr_meta_entry_at(*this, pos);
 }
 
-Entry const & Meta::entry(const char * name) {
+Entry const & Meta::entry(const char * name) const {
     Entry const * r = findEntry(name);
     if (r == NULL) {
         ::std::ostringstream os;
