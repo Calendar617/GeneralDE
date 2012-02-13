@@ -20,7 +20,7 @@ int dr_cfg_read(
 
 int dr_cfg_write(
     cfg_t cfg,
-    void * data,
+    const void * data,
     LPDRMETA meta,
     error_monitor_t em);
 
