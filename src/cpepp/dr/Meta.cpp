@@ -100,6 +100,17 @@ bool Meta::try_load_from_cfg(void * data, size_t capacity, cfg_t cfg, error_moni
     }
 }
 
+void Meta::write_to_cfg(cfg_t cfg, const void * data) const {
+    Utils::ErrorCollector ec;
+    if (dr_cfg_write(cfg, data, *this, ec) != 0) {
+        ec.checkThrowWithMsg< ::std::runtime_error>();
+    }
+}
+
+bool Meta::try_write_to_cfg(cfg_t cfg, const void * data,  error_monitor_t em) const {
+    return dr_cfg_write(cfg, data, *this, em) == 0 ? true : false;
+}
+
 void Meta::set_defaults(void * data, size_t capacity, int policy) const {
     dr_meta_set_defaults(data, capacity, *this, policy);
 }
