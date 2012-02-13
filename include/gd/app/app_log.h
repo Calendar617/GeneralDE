@@ -54,7 +54,7 @@
     } else printf(format, ##args)                                       \
 
 #define _GD_APP_DO_ERROR_NOTIFY(level, no, format, args...)             \
-    _GD_APP_CTX_DO_ERROR_NOTIFY(g_app_context, level, no, format, args)
+    _GD_APP_CTX_DO_ERROR_NOTIFY(g_app_context, level, no, format, ##args)
 
 /*use for log with app*/
 #define APP_CTX_INFO(ctx, format, args...)                      \
