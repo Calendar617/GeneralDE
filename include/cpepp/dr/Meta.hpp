@@ -51,9 +51,6 @@ public:
     void load_from_cfg(void * data, size_t capacity, cfg_t cfg, int policy = DR_CFG_READ_CHECK_NOT_EXIST_ATTR) const;
     bool try_load_from_cfg(void * data, size_t capacity, cfg_t cfg, error_monitor_t em = 0, int policy = 0) const;
 
-    void write_to_cfg(cfg_t cfg, const void * data) const;
-    bool try_write_to_cfg(cfg_t cfg, const void * data,  error_monitor_t em) const;
-
     template<typename T>
     void load_from_cfg(T & data, cfg_t cfg, int policy = DR_CFG_READ_CHECK_NOT_EXIST_ATTR) const {
         load_from_cfg(&data, sizeof(data), cfg);
@@ -62,6 +59,19 @@ public:
     template<typename T>
     bool try_load_from_cfg(T & data, cfg_t cfg, error_monitor_t em = 0, int policy = 0) const {
         return try_load_from_cfg(&data, sizeof(data), cfg);
+    }
+
+    void write_to_cfg(cfg_t cfg, const void * data) const;
+    bool try_write_to_cfg(cfg_t cfg, const void * data,  error_monitor_t em = 0) const;
+
+    template<typename T>
+    void write_to_cfg(cfg_t cfg, T const & data) const {
+        write_to_cfg(cfg, (const void *)&data);
+    }
+
+    template<typename T>
+    bool try_write_to_cfg(cfg_t cfg, T const & data, error_monitor_t em = 0) const {
+        return try_write_to_cfg(cfg, (const void *)&data, em);
     }
 
     static Meta const & _cast(LPDRMETA meta);

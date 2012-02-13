@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "cpe/pal/pal_string.h"
 #include "cpe/utils/error.h"
+#include "cpe/utils/stream_mem.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/dr/dr_ctypes_op.h"
@@ -26,25 +27,25 @@ static int cfg_cmp_struct(cfg_t l, cfg_t r, int policy, error_monitor_t em, cfg_
     while(l_child && r_child && (ret == 0 || em)) {
         int name_r = strcmp(cfg_name(l_child), cfg_name(r_child));
         if (name_r < 0) {
-            if (!(policy & CFG_CMP_POLICY_R_STRUCT_LEAK)) {
+            if ((policy & CFG_CMP_POLICY_R_STRUCT_LEAK) != CFG_CMP_POLICY_R_STRUCT_LEAK) {
                 mem_buffer_clear_data(buffer);
                 CPE_ERROR(
                     em, "%s: entry %s not exsit in right",
                     cfg_path(buffer, l, root),
                     cfg_name(l_child));
-                if (ret == 0) ret = -1;
+                if (ret == 0) ret = 1;
             }
 
             l_child = cfg_it_next(&l_it);
         }
         else if (name_r > 0) {
-            if (!(policy & CFG_CMP_POLICY_L_STRUCT_LEAK)) {
+            if ((policy & CFG_CMP_POLICY_L_STRUCT_LEAK) != CFG_CMP_POLICY_L_STRUCT_LEAK) {
                 mem_buffer_clear_data(buffer);
                 CPE_ERROR(
                     em, "%s: entry %s not exsit in left",
                     cfg_path(buffer, l, root),
                     cfg_name(r_child));
-                if (ret == 0) ret = 1;
+                if (ret == 0) ret = -1;
             }
             r_child = cfg_it_next(&r_it);
         }
@@ -57,26 +58,26 @@ static int cfg_cmp_struct(cfg_t l, cfg_t r, int policy, error_monitor_t em, cfg_
         }
     }
 
-    for(; l_child && (ret == 0 || em); l_child = cfg_it_next(&l_it)) {
-        if (!(policy & CFG_CMP_POLICY_R_STRUCT_LEAK)) {
+    if ((policy & CFG_CMP_POLICY_R_STRUCT_LEAK) != CFG_CMP_POLICY_R_STRUCT_LEAK) {
+        for(; l_child && (ret == 0 || em); l_child = cfg_it_next(&l_it)) {
             mem_buffer_clear_data(buffer);
             CPE_ERROR(
                 em, "%s: entry %s not exsit in right",
                 cfg_path(buffer, l, root),
                 cfg_name(l_child));
 
-            if (ret == 0) ret = -1;
+            if (ret == 0) ret = 1;
         }
     }
 
-    for(; r_child && (ret == 0 || em); r_child = cfg_it_next(&r_it)) {
-        if (!(policy & CFG_CMP_POLICY_L_STRUCT_LEAK)) {
+    if ((policy & CFG_CMP_POLICY_L_STRUCT_LEAK) != CFG_CMP_POLICY_L_STRUCT_LEAK) {
+        for(; r_child && (ret == 0 || em); r_child = cfg_it_next(&r_it)) {
             mem_buffer_clear_data(buffer);
             CPE_ERROR(
                 em, "%s: entry %s not exsit in left",
                 cfg_path(buffer, l, root),
                 cfg_name(r_child));
-            if (ret == 0) ret = 1;
+            if (ret == 0) ret = -1;
         }
     }
 
@@ -173,13 +174,26 @@ static int cfg_cmp_i(cfg_t l, cfg_t r, int policy, error_monitor_t em, cfg_t roo
         else {
             int ret = dr_ctype_cmp(cfg_data(l), l->m_type, cfg_data(r), r->m_type);
             if (ret != 0) {
+                char lValueBuf[128];
+                char rValueBuf[128];
+                struct write_stream_mem stream;
+                int pr;
+
+                write_stream_mem_init(&stream, lValueBuf, sizeof(lValueBuf));
+                pr = dr_ctype_print_to_stream((write_stream_t)&stream, cfg_data(l), l->m_type, 0);
+                lValueBuf[pr > 0 ? pr : 0] = 0;
+
+                write_stream_mem_init(&stream, rValueBuf, sizeof(rValueBuf));
+                pr = dr_ctype_print_to_stream((write_stream_t)&stream, cfg_data(r), r->m_type, 0);
+                rValueBuf[pr > 0 ? pr : 0] = 0;
+
                 mem_buffer_clear_data(buffer);
                 CPE_ERROR(
                     em, "%s: %s %s than %s",
                     cfg_path(buffer, l, root),
-                    dr_type_name(r->m_type),
+                    lValueBuf,
                     ret > 0 ? "bigger" : "smaller",
-                    dr_type_name(r->m_type));
+                    rValueBuf);
             }
             return ret;
         }
