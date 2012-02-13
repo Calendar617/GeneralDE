@@ -17,8 +17,6 @@ $(self-dev-env).default-lib-type:=static
 $(self-dev-env).make-static-lib-name=lib$1.a
 $(self-dev-env).make-dynamic-lib-name=lib$1.so
 $(self-dev-env).make-executable-name=$1
-
-dep.iconv?=system
 # }}}
 # {{{ validate
 $(call assert-not-null,PLATFORM_NAME)
