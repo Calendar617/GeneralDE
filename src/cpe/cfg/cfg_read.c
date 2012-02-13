@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/pal/pal_string.h"
+#include "cpe/utils/stream_buffer.h"
 #include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cfg_internal_types.h"
@@ -270,4 +271,43 @@ int cfg_child_count(cfg_t cfg) {
     default:
         return 0;
     }
+}
+
+int cfg_path_print(write_stream_t stream, cfg_t cfg, cfg_t to) {
+    int haveParent;
+    cfg_t parent;
+
+    if (cfg->m_parent == 0 || cfg == to) {
+        return -1;
+    }
+
+    assert(cfg->m_parent);
+    parent = cfg->m_parent;
+
+    haveParent = cfg_path_print(stream, parent, to) == 0 ? 1 : 0;
+
+    if (parent->m_type == CPE_CFG_TYPE_SEQUENCE) {
+        int i;
+        for(i = 0; i < cfg_seq_count(parent); ++i) {
+            if (cfg_seq_at(parent, i) == cfg) break;
+        }
+
+        stream_printf(stream, "[%d]", i);
+    }
+    else {
+        if (haveParent) stream_putc(stream, '.');
+
+        assert(cfg->m_parent->m_type == CPE_CFG_TYPE_STRUCT);
+        stream_printf(stream, "%s", cfg_name(cfg));
+    }
+
+    return 0;
+}
+
+const char * cfg_path(mem_buffer_t buffer, cfg_t cfg, cfg_t to) {
+    struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
+    mem_buffer_clear(buffer);
+    cfg_path_print((write_stream_t)&stream, cfg, to);
+    stream_putc((write_stream_t)&stream, 0);
+    return (const char *)mem_buffer_make_continuous(buffer, 0);
 }

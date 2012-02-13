@@ -164,6 +164,28 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(uint64, uint64);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint64, float, 0, 18446744073709551615ULL, "%f");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint64, double, 0, 18446744073709551615ULL, "%f");
 
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, int8);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, uint8);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, int16);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, uint16);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, int32);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, uint32);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, int64);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, uint64);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, float);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(float, double);
+
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, int8);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, uint8);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, int16);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, uint16);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, int32);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, uint32);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, int64);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, uint64);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, float);
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, double);
+
 struct DRCtypeTypeWriteOps g_dr_ctype_write_ops[] = {
      /*CPE_DR_TYPE_UNION*/
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
@@ -257,18 +279,18 @@ struct DRCtypeTypeWriteOps g_dr_ctype_write_ops[] = {
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
     }
     , /*CPE_DR_TYPE_FLOAT*/
-    { int8_from_int8, int8_from_uint8
-      , int8_from_int16, int8_from_uint16
-      , int8_from_int32, int8_from_uint32
-      , int8_from_int64, int8_from_uint64
-      , int8_from_float, int8_from_double
+    { float_from_int8, float_from_uint8
+      , float_from_int16, float_from_uint16
+      , float_from_int32, float_from_uint32
+      , float_from_int64, float_from_uint64
+      , float_from_float, float_from_double
     }
     , /*CPE_DR_TYPE_DOUBLE*/
-    { int8_from_int8, int8_from_uint8
-      , int8_from_int16, int8_from_uint16
-      , int8_from_int32, int8_from_uint32
-      , int8_from_int64, int8_from_uint64
-      , int8_from_float, int8_from_double
+    { double_from_int8, double_from_uint8
+      , double_from_int16, double_from_uint16
+      , double_from_int32, double_from_uint32
+      , double_from_int64, double_from_uint64
+      , double_from_float, double_from_double
     }
     , /*CPE_DR_TYPE_IP*/
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL

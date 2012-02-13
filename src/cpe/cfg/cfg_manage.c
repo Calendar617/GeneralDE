@@ -139,7 +139,7 @@ CPE_CFG_GEN_ADD_FUN_TYPE(uint64_t, uint64, CPE_CFG_TYPE_UINT64)
 CPE_CFG_GEN_ADD_FUN_TYPE(float, float, CPE_CFG_TYPE_FLOAT)
 CPE_CFG_GEN_ADD_FUN_TYPE(double, double, CPE_CFG_TYPE_DOUBLE)
 
-cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value) {
+cfg_t cfg_seq_add_value_from_string(cfg_t s, int typeId, const char * value) {
     int capacity;
 	cfg_t rv;
 
@@ -161,7 +161,56 @@ cfg_t cfg_seq_add_value(cfg_t s, int typeId, const char * value) {
     return rv;
 }
 
-cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * value, cfg_policy_t policy) {
+cfg_t cfg_seq_add_value_from_binary(cfg_t s, int typeId, const void * value) {
+    switch(typeId) {
+    case CPE_CFG_TYPE_STRUCT:
+        return cfg_seq_add_struct(s);
+    case CPE_CFG_TYPE_SEQUENCE:
+        return cfg_seq_add_seq(s);
+    case CPE_DR_TYPE_CHAR:
+        return cfg_seq_add_int8(s, * (const int8_t *)value);
+    case CPE_DR_TYPE_UCHAR:
+        return cfg_seq_add_int8(s, * (const int8_t *)value);
+    case CPE_DR_TYPE_INT8:
+        return cfg_seq_add_int8(s, * (const int8_t *)value);
+    case CPE_DR_TYPE_INT16:
+        return cfg_seq_add_int16(s, * (const int16_t *)value);
+    case CPE_DR_TYPE_UINT16:
+        return cfg_seq_add_int16(s, * (const int16_t *)value);
+    case CPE_DR_TYPE_INT32:
+        return cfg_seq_add_int32(s, * (const int32_t *)value);
+    case CPE_DR_TYPE_UINT32:
+        return cfg_seq_add_uint32(s, * (const uint32_t *)value);
+    case CPE_DR_TYPE_INT64:
+        return cfg_seq_add_int64(s, * (const int64_t *)value);
+    case CPE_DR_TYPE_UINT64:
+        return cfg_seq_add_uint64(s, * (const uint64_t *)value);
+    case CPE_DR_TYPE_DATE:
+        return NULL;
+    case CPE_DR_TYPE_TIME:
+        return NULL;
+    case CPE_DR_TYPE_DATETIME:
+        return NULL;
+    case CPE_DR_TYPE_MONEY:
+        return NULL;
+    case CPE_DR_TYPE_FLOAT:
+        return cfg_seq_add_float(s, * (const float *)value);
+    case CPE_DR_TYPE_DOUBLE:
+        return cfg_seq_add_double(s, * (const double *)value);
+    case CPE_DR_TYPE_IP:
+        return NULL;
+    case CPE_DR_TYPE_STRING:
+        return cfg_seq_add_string(s, (const char *)value);
+    case CPE_DR_TYPE_VOID:
+        return NULL;
+    case CPE_DR_TYPE_UINT8:
+        return cfg_seq_add_uint8(s, *(const uint8_t*)value);
+    default:
+        return NULL;
+    }
+}
+
+cfg_t cfg_struct_add_value_from_string(cfg_t s, const char * name, int typeId, const char * value, cfg_policy_t policy) {
     int capacity;
     cfg_t rv;
 
@@ -183,7 +232,56 @@ cfg_t cfg_struct_add_value(cfg_t s, const char * name, int typeId, const char * 
     return rv;
 }
 
-cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value, cfg_policy_t policy) {
+cfg_t cfg_struct_add_value_from_binary(cfg_t s, const char * name, int typeId, const void * value, cfg_policy_t policy) {
+    switch(typeId) {
+    case CPE_CFG_TYPE_STRUCT:
+        return cfg_struct_add_struct(s, name, policy);
+    case CPE_CFG_TYPE_SEQUENCE:
+        return cfg_struct_add_seq(s, name, policy);
+    case CPE_DR_TYPE_CHAR:
+        return cfg_struct_add_int8(s, name, * (const int8_t *)value, policy);
+    case CPE_DR_TYPE_UCHAR:
+        return cfg_struct_add_int8(s, name, * (const int8_t *)value, policy);
+    case CPE_DR_TYPE_INT8:
+        return cfg_struct_add_int8(s, name, * (const int8_t *)value, policy);
+    case CPE_DR_TYPE_INT16:
+        return cfg_struct_add_int16(s, name, * (const int16_t *)value, policy);
+    case CPE_DR_TYPE_UINT16:
+        return cfg_struct_add_int16(s, name, * (const int16_t *)value, policy);
+    case CPE_DR_TYPE_INT32:
+        return cfg_struct_add_int32(s, name, * (const int32_t *)value, policy);
+    case CPE_DR_TYPE_UINT32:
+        return cfg_struct_add_uint32(s, name, * (const uint32_t *)value, policy);
+    case CPE_DR_TYPE_INT64:
+        return cfg_struct_add_int64(s, name, * (const int64_t *)value, policy);
+    case CPE_DR_TYPE_UINT64:
+        return cfg_struct_add_uint64(s, name, * (const uint64_t *)value, policy);
+    case CPE_DR_TYPE_DATE:
+        return NULL;
+    case CPE_DR_TYPE_TIME:
+        return NULL;
+    case CPE_DR_TYPE_DATETIME:
+        return NULL;
+    case CPE_DR_TYPE_MONEY:
+        return NULL;
+    case CPE_DR_TYPE_FLOAT:
+        return cfg_struct_add_float(s, name, * (const float *)value, policy);
+    case CPE_DR_TYPE_DOUBLE:
+        return cfg_struct_add_double(s, name, * (const double *)value, policy);
+    case CPE_DR_TYPE_IP:
+        return NULL;
+    case CPE_DR_TYPE_STRING:
+        return cfg_struct_add_string(s, name, (const char *)value, policy);
+    case CPE_DR_TYPE_VOID:
+        return NULL;
+    case CPE_DR_TYPE_UINT8:
+        return cfg_struct_add_uint8(s, name, *(const uint8_t*)value, policy);
+    default:
+        return NULL;
+    }
+}
+
+cfg_t cfg_struct_add_value_from_string_auto(cfg_t s, const char * name, const char * value, cfg_policy_t policy) {
     float f;
     float d;
     int32_t v32;
@@ -208,7 +306,7 @@ cfg_t cfg_struct_add_value_auto(cfg_t s, const char * name, const char * value, 
     return cfg_struct_add_string(s, name, value, policy);
 }
 
-cfg_t cfg_seq_add_value_auto(cfg_t s, const char * value) {
+cfg_t cfg_seq_add_value_from_string_auto(cfg_t s, const char * value) {
     float f;
     float d;
     int32_t v32;

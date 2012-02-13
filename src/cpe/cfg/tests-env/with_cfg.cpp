@@ -5,6 +5,12 @@
 
 namespace cpe { namespace cfg { namespace testenv {
 
+cfg_t with_cfg::t_cfg_create(void) {
+    cfg_t cfg = cfg_create(t_tmp_allocrator());
+    EXPECT_TRUE(cfg) << "t_cfg_create: create cfg fail!";
+    return cfg;
+}
+
 cfg_t with_cfg::t_cfg_parse(const char * input) {
     EXPECT_TRUE(input) << "t_cfg_parse: input is null!";
     if (input == 0) return 0;
