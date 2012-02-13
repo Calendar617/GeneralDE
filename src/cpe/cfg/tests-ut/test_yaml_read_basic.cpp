@@ -398,4 +398,3 @@ TEST_F(ReadTest, seq_multi_document) {
         "...\n"
         , result(seq));
 }
-
