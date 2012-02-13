@@ -33,7 +33,7 @@ TEST_F(CompaireTest, struct_value_lt) {
 }
 
 TEST_F(CompaireTest, struct_name_lt) {
-    EXPECT_LT(compaire("a: 1", "b: 1"), 0);
+    EXPECT_GT(compaire("a: 1", "b: 1"), 0);
 }
 
 TEST_F(CompaireTest, seq_eq_basic) {
@@ -69,6 +69,15 @@ TEST_F(CompaireTest, struct_eq_policy_l_leak) {
             "a: 1\n"
             "b: 2",
             CFG_CMP_POLICY_L_STRUCT_LEAK));
+
+    EXPECT_GT(
+        compaire(
+            "a: 1\n"
+            "b: 2"
+            ,
+            "a: 1",
+            CFG_CMP_POLICY_L_STRUCT_LEAK),
+        0);
 }
 
 TEST_F(CompaireTest, struct_eq_policy_r_leak) {
@@ -80,4 +89,14 @@ TEST_F(CompaireTest, struct_eq_policy_r_leak) {
             ,
             "a: 1",
             CFG_CMP_POLICY_R_STRUCT_LEAK));
+
+    EXPECT_LT(
+        compaire(
+            "a: 1\n"
+            ,
+            "a: 1\n"
+            "b: 2"
+            ,
+            CFG_CMP_POLICY_R_STRUCT_LEAK),
+        0);
 }

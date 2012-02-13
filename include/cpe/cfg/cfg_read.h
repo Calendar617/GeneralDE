@@ -77,8 +77,8 @@ void cfg_it_init(cfg_it_t * it, cfg_t cfg);
 
 /*compire operations*/
 enum {
-    CFG_CMP_POLICY_L_STRUCT_LEAK = 1
-    , CFG_CMP_POLICY_R_STRUCT_LEAK = 3
+    CFG_CMP_POLICY_L_STRUCT_LEAK = 1 << 0
+    , CFG_CMP_POLICY_R_STRUCT_LEAK = 1 << 1
 };
 int cfg_cmp(cfg_t l, cfg_t r, int policy, error_monitor_t em);
 
