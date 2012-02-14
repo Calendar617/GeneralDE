@@ -40,13 +40,3 @@ void gd_net_socket_close(int * fd, error_monitor_t em) {
     }
     *fd = -1;
 }
-
-int gd_net_socket_open(int * fd, error_monitor_t em) {
-    *fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (*fd == -1) {
-        CPE_ERROR(em, "gd_net_socket_open: socket call fail, errno=%s!", strerror(errno));
-        return -1;
-    }
-
-    return 0;
-}

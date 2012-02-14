@@ -16,7 +16,6 @@ gd_net_ep_crate_i(
 void gd_net_ep_free_i(gd_net_ep_t ep);
 
 /*tcp ops*/
-int gd_net_socket_open(int * fd, error_monitor_t em);
 void gd_net_socket_close(int * fd, error_monitor_t em);
 int gd_net_socket_set_none_block(int fd, error_monitor_t em);
 

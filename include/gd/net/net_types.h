@@ -9,22 +9,11 @@ extern "C" {
 typedef struct gd_net_mgr * gd_net_mgr_t;
 typedef struct gd_net_chanel * gd_net_chanel_t;
 typedef struct gd_net_ep * gd_net_ep_t;
+typedef struct gd_net_listener * gd_net_listener_t;
+
+typedef int (*gd_net_accept_fun)(gd_net_listener_t listener, gd_net_ep_t ep);
 
 typedef void (*gd_net_svr_process_fun_t)(gd_net_ep_t svr);
-
-typedef enum gd_net_svr_state {
-    gd_net_svr_state_init
-    , gd_net_svr_state_starting
-    , gd_net_svr_state_runing
-    , gd_net_svr_state_shutingdown
-    , gd_net_svr_state_waiting
-} gd_net_svr_state_t;
-
-typedef enum gd_net_svr_close_op {
-    gd_net_svr_close_op_leave
-    , gd_net_svr_close_op_resterat
-    , gd_net_svr_close_op_free
-} gd_net_svr_close_op_t;
 
 #ifdef __cplusplus
 }

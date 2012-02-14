@@ -24,6 +24,14 @@ struct gd_net_mgr {
     struct ev_loop * m_ev_loop;
 };
 
+struct gd_net_listener {
+    gd_net_mgr_t m_mgr;
+    const char * m_name;
+    char m_addr[16]; /*sizeof(sockaddr)*/
+    int m_acceptQueueSize;
+    struct ev_io m_watcher;
+};
+
 struct gd_net_chanel {
     gd_net_mgr_t m_mgr;
     void * m_buf;
