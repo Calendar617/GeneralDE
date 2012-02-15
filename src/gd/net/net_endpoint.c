@@ -44,6 +44,10 @@ gd_net_ep_chanel_write(gd_net_ep_t ep) {
     return ep->m_chanel_write;
 }
 
+void gd_net_ep_free(gd_net_ep_t ep) {
+    gd_net_ep_free_i(ep);
+}
+
 int ge_net_ep_send(gd_net_ep_t ep, const void * buf, size_t size);
 int ge_net_ep_rece(gd_net_ep_t ep, void * buf, size_t * size);
 int ge_net_ep_peek(gd_net_ep_t ep, void * buf, size_t * size);

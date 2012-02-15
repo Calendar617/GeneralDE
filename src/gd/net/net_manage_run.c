@@ -37,3 +37,8 @@ static void gd_net_mgr_process_svrs_ops(gd_net_mgr_t nmgr) {
 int gd_net_mgr_tick(gd_net_mgr_t nmgr) {
     return 0;
 }
+
+int gd_net_mgr_run(gd_net_mgr_t nmgr) {
+    ev_run(nmgr->m_ev_loop, 0);
+    return 0;
+}
