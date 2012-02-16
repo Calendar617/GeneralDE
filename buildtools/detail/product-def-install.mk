@@ -1,4 +1,5 @@
 # {{{ 注册到product-def.mk中
+
 product-support-types+=install
 product-def-all-items+=install
 # }}}
@@ -15,8 +16,17 @@ def-copy-dir=install-def-sep copy-dir $1 $2 $3
 #$(call def-copy-dir-r,src-dir,target-dir,postfix-list)
 def-copy-dir-r=install-def-sep copy-dir-r $1 $2 $3
 
-#$(call def-cvt-file,src-file,target-file,def-file)
-def-cvt-file=install-def-sep cvt-file $1 $2 $3
+#$(call def-cvt-file,src-file,target-file,cvt-way,cvt-args)
+def-cvt-file=install-def-sep cvt-file $1 $2 replace $3
+def-cvt-file-ex=install-def-sep cvt-file $1 $2 $3 $4
+# }}}
+# {{{ 预定义的转换方法
+tools.cvt.replace.cmd=perl -w $$(CPDE_ROOT)/buildtools/tools/cvt-replace.pl \
+                          --input $$^ \
+                          --output $$@ \
+                          $$(addprefix --config $$(CPDE_ROOT)/,$1)
+tools.cvt.replace.dep=$(addprefix $$(CPDE_ROOT)/,$1)
+
 # }}}
 # {{{ 实现辅助函数
 
@@ -33,14 +43,15 @@ $(eval r.$1.cleanup += $3)
 
 endef
 
-# $(call install-def-rule-cvt,product-name,source,target,cvt-def)
+# $(call install-def-rule-cvt,product-name,source,target,cfg-way,cvt-arg)
 define install-def-rule-cvt
+$(if $(tools.cvt.$(strip $4).cmd),,$(warning cvt way '$(strip $4)' not support))
 
 $1: $3
 
-$3: $2 $4
+$3: $2 $(call tools.cvt.$(strip $4).dep,$5)
 	$(call with_message,convert $(subst $(CPDE_ROOT)/,,$2) to $(subst $(CPDE_ROOT)/,,$3) ...)\
-          cp $$< $$@
+          $(call tools.cvt.$(strip $4).cmd,$5)
 
 $(eval r.$1.cleanup += $3)
 
@@ -99,13 +110,13 @@ endef
 
 define product-def-rule-install-cvt-file
 $(if $(word 3,$2),,$(warning convert input file not set))
-$(call assert-file-exists,$(CPDE_ROOT)/$(word 3,$2))
 
 $(call install-def-rule-cvt,\
        $1,\
        $(CPDE_ROOT)/$(word 1,$2),\
        $(CPDE_OUTPUT_ROOT)/$(word 2,$2),\
-       $(CPDE_ROOT)/$(word 3,$2))
+       $(word 3,$2),\
+       $(wordlist 4,$(words $2),$2))
 endef
 # }}}
 # {{{ 总入口函数
