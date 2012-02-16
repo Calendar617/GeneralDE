@@ -8,5 +8,6 @@ $(product).c.sources:=$(wildcard $(product-base)/*.cc)
 $(product).c.includes:=3rdTools/gmock
 $(product).c.flags.ld:=-lpthread
 $(product).c.linker:=$(LINK.cc)
+$(product).product.c.libraries:=pthread
 
 $(eval $(call product-def,$(product)))
