@@ -1,8 +1,10 @@
 #include <sstream>
 #include <stdexcept>
 #include "cpe/pal/pal_strings.h"
+#include "cpe/utils/stream_buffer.h"
 #include "cpe/dr/dr_cfg.h"
 #include "cpe/dr/dr_data.h"
+#include "cpe/dr/dr_json.h"
 #include "cpepp/dr/Meta.hpp"
 #include "cpepp/dr/MetaLib.hpp"
 #include "cpepp/utils/ErrorCollector.hpp"
@@ -81,6 +83,23 @@ Meta const & Meta::_cast(LPDRMETA meta) {
         throw ::std::runtime_error("cast to Meta: input is NULL");
     }
     return *(Meta const *)meta;
+}
+
+const char * Meta::dump_data(mem_buffer_t buffer, const void * data) const {
+    write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
+
+    dump_data((write_stream_t)&stream, data);
+
+    return (const char *)mem_buffer_make_continuous(buffer, 0);
+}
+
+void Meta::dump_data(write_stream_t stream, const void * data) const {
+    dr_json_print(
+        stream,
+        data,
+        *this,
+        DR_JSON_PRINT_BEAUTIFY,
+        0);
 }
 
 void Meta::load_from_cfg(void * data, size_t capacity, cfg_t cfg, int policy) const {

@@ -1,5 +1,7 @@
 #ifndef CPEPP_DR_META_H
 #define CPEPP_DR_META_H
+#include "cpe/utils/stream.h"
+#include "cpe/utils/buffer.h"
 #include "cpepp/utils/ClassCategory.hpp"
 #include "cpepp/utils/CString.hpp"
 #include "cpe/dr/dr_metalib_manage.h"
@@ -39,6 +41,9 @@ public:
 
     Entry const * findEntryByPath(const char * path) const { return (Entry const*)dr_meta_find_entry_by_path(*this, path); }
     Entry const & entryByPath(const char * path) const;
+
+    void dump_data(write_stream_t stream, const void * data) const;
+    const char * dump_data(mem_buffer_t buffer, const void * data) const;
 
     void set_defaults(void * data, size_t capacity, int policy = 0) const;
     void copy_same_entries(
