@@ -1,6 +1,6 @@
-From: lokiwang <wangjian1009@gmail.com>
-Subject: [PATCH] t/3rdTools/libxml2
+From: Loki Wang <wangjian1009@gmail.com>
+Subject: [PATCH] t/3rdTools/igraph
 
-trace libxml2 in develop env 
+trace igraph in dev env
 
-Signed-off-by: lokiwang <wangjian1009@gmail.com>
+Signed-off-by: Loki Wang <wangjian1009@gmail.com>
