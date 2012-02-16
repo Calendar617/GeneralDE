@@ -7,6 +7,7 @@ class MemBuffer;
 class OpGuard;
 class CString;
 class RangeMgr;
+class Random;
 
 }}
 
