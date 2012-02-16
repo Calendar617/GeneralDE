@@ -7,6 +7,7 @@
 #include "gd/nm/nm_manage.h"
 #include "gd/dp/dp_manage.h"
 #include "gd/tl/tl_manage.h"
+#include "gd/net/net_manage.h"
 #include "app_internal_ops.h"
 
 static int gd_app_parse_args(gd_app_context_t context, int argc, char * argv[]) {
@@ -87,6 +88,12 @@ gd_app_context_create(
         return NULL;
     }
 
+    context->m_net_mgr = gd_net_mgr_create(alloc, context->m_em);
+    if (context->m_net_mgr == NULL) {
+        gd_app_context_free(context);
+        return NULL;
+    }
+
     TAILQ_INIT(&context->m_runing_modules);
     TAILQ_INIT(&context->m_tick_chain);
 
@@ -98,6 +105,11 @@ void gd_app_context_free(gd_app_context_t context) {
 
     gd_app_modules_unload(context);
     gd_app_tick_chain_free(context);
+
+    if (context->m_net_mgr) {
+        gd_net_mgr_free(context->m_net_mgr);
+        context->m_net_mgr = NULL;
+    }
 
     if (context->m_dp_mgr) {
         gd_dp_mgr_free(context->m_dp_mgr);

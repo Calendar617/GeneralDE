@@ -27,6 +27,8 @@ public:
     Tl::Manager & tlManager(void) { return *(Tl::Manager *)gd_app_tl_mgr(*this); }
     Tl::Manager const & tlManager(void) const { return *(Tl::Manager *)gd_app_tl_mgr(*this); }
 
+    void tick(void) { gd_app_tick(*this); }
+
     static Application & instance(void);
     static Application & _cast(gd_app_context_t ctx);
 };

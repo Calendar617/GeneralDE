@@ -27,6 +27,7 @@ gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
 
     TAILQ_INIT(&nmgr->m_chanels);
     TAILQ_INIT(&nmgr->m_endpoints);
+    TAILQ_INIT(&nmgr->m_listeners);
 
     return nmgr;
 }
