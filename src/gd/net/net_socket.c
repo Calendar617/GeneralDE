@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include "cpe/pal/pal_unistd.h"
 #include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_unistd.h"
 #include "net_internal_ops.h"

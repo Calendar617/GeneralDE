@@ -1,37 +1,52 @@
 #include <assert.h>
+#include <errno.h>
+#include "cpe/pal/pal_unistd.h"
 #include "cpe/pal/pal_string.h"
 #include "gd/net/net_endpoint.h"
+#include "gd/net/net_chanel.h"
+#include "gd/net/net_connector.h"
 #include "net_internal_ops.h"
 
 gd_net_ep_t
-gd_net_ep_crate_i(
-    gd_net_mgr_t nmgr,
-    gd_net_chanel_t readChanel,
-    gd_net_chanel_t writeChanel,
-    size_t total_capacity)
-{
+gd_net_ep_create(gd_net_mgr_t nmgr, gd_net_chanel_t chanel_r, gd_net_chanel_t chanel_w) {
     gd_net_ep_t ep;
-    char * buf;
 
     assert(nmgr);
 
-    buf = (char *)mem_alloc(nmgr->m_alloc, total_capacity);
-    if (buf == NULL) return NULL;
+    ep = gd_net_ep_pages_alloc_ep(nmgr);
+    if (ep == NULL) return NULL;
 
-    ep = (gd_net_ep_t)buf;
+    assert(ep->m_id != GD_NET_EP_INVALID_ID);
 
     ep->m_mgr = nmgr;
-    ep->m_chanel_read = readChanel;
-    ep->m_chanel_write = writeChanel;
-
-    TAILQ_INSERT_TAIL(&nmgr->m_endpoints, ep, m_ep_next);
+    ep->m_chanel_read = chanel_r;
+    ep->m_chanel_write = chanel_w;
+    ep->m_connector = NULL;
+    ep->m_fd = -1;
 
     return ep;
 }
 
-void gd_net_ep_free_i(gd_net_ep_t ep) {
-    TAILQ_REMOVE(&ep->m_mgr->m_endpoints, ep, m_ep_next);
-    mem_free(ep->m_mgr->m_alloc, ep);
+void gd_net_ep_free(gd_net_ep_t ep) {
+    if (ep->m_connector) {
+        gd_net_connector_unbind(ep->m_connector);
+    }
+
+    if (gd_net_ep_is_open(ep)) {
+        gd_net_ep_close(ep);
+    }
+
+    if (ep->m_chanel_write) {
+        gd_net_chanel_free(ep->m_chanel_write);
+        ep->m_chanel_write = NULL;
+    }
+
+    if (ep->m_chanel_read) {
+        gd_net_chanel_free(ep->m_chanel_read);
+        ep->m_chanel_read = NULL;
+    }
+
+    gd_net_ep_pages_free_ep(ep);
 }
 
 gd_net_chanel_t
@@ -44,8 +59,18 @@ gd_net_ep_chanel_write(gd_net_ep_t ep) {
     return ep->m_chanel_write;
 }
 
-void gd_net_ep_free(gd_net_ep_t ep) {
-    gd_net_ep_free_i(ep);
+int gd_net_ep_is_open(gd_net_ep_t ep) {
+    return ep->m_fd < 0 ? 0 : 1;
+}
+
+void gd_net_ep_close(gd_net_ep_t ep) {
+    if (ep->m_fd < 0) return;
+
+    if (close(ep->m_fd) != 0) {
+        CPE_ERROR(ep->m_mgr->m_em, "gd_net_ep_close: close fail, errno=%s", strerror(errno));
+    }
+
+    ep->m_fd = -1;
 }
 
 int ge_net_ep_send(gd_net_ep_t ep, const void * buf, size_t size);

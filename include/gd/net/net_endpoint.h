@@ -8,12 +8,20 @@ extern "C" {
 #endif
 
 /*服务管理接口*/
-gd_net_ep_t gd_net_ep_find(gd_net_mgr_t nmgr, const char * name);
+gd_net_ep_t
+gd_net_ep_create(gd_net_mgr_t nmgr, gd_net_chanel_t chanel_r, gd_net_chanel_t chanel_w);
 void gd_net_ep_free(gd_net_ep_t ep);
 
-const char * gd_net_ep_name(gd_net_ep_t ep);
+gd_net_ep_t gd_net_ep_find(gd_net_mgr_t nmgr, gd_net_ep_id_t id);
+
+gd_net_ep_id_t gd_net_ep_id(gd_net_ep_t ep);
+gd_net_ep_type_t gd_net_ep_type(gd_net_ep_t ep);
 gd_net_chanel_t gd_net_ep_chanel_read(gd_net_ep_t ep);
 gd_net_chanel_t gd_net_ep_chanel_write(gd_net_ep_t ep);
+void gd_net_ep_close(gd_net_ep_t ep);
+
+int gd_net_ep_is_open(gd_net_ep_t ep);
+gd_net_connector_t gd_net_ep_connector(gd_net_ep_t ep);
 
 /*服务读写接口*/
 int ge_net_ep_send(gd_net_ep_t ep, const void * buf, size_t size);
