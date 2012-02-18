@@ -5,6 +5,7 @@
 #include "cpe/utils/error.h"
 #include "cpe/utils/memory.h"
 #include "cpe/utils/range.h"
+#include "cpe/utils/hash.h"
 #include "gd/tl/tl_manage.h"
 #include "gd/net/net_types.h"
 
@@ -14,7 +15,6 @@ extern "C" {
 
 typedef TAILQ_HEAD(gd_net_chanel_list, gd_net_chanel) gd_net_chanel_list_t;
 typedef TAILQ_HEAD(gd_net_listener_list, gd_net_listener) gd_net_listener_list_t;
-typedef TAILQ_HEAD(gd_net_connector_list, gd_net_connector) gd_net_connector_list_t;
 
 #define GD_NET_EP_INVALID_ID ((gd_net_ep_id_t)-1)
 #define GD_NET_EP_COUNT_PER_PAGE (256)
@@ -31,7 +31,8 @@ struct gd_net_mgr {
 
     gd_net_chanel_list_t m_chanels;
     gd_net_listener_list_t m_listeners;
-    gd_net_connector_list_t m_connectors;
+
+    struct cpe_hash_table m_connectors;
 
     struct ev_loop * m_ev_loop;
 };
@@ -49,11 +50,11 @@ struct gd_net_listener {
 
 struct gd_net_connector {
     gd_net_mgr_t m_mgr;
-    char * m_name;
+    char const * m_name;
     char m_addr[16]; /*sizeof(sockaddr)*/
     gd_net_ep_t m_ep;
 
-    TAILQ_ENTRY(gd_net_connector) m_next;
+    struct cpe_hash_entry m_hh;
 };
 
 struct gd_net_chanel {

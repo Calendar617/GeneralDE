@@ -23,7 +23,7 @@ gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
 
     nmgr->m_ev_loop = ev_loop_new(EVFLAG_AUTO);
     if (!nmgr->m_ev_loop) {
-        CPE_ERROR(em, "create event loop fail!");
+        CPE_ERROR(em, "gd_net_mgr_create: create event loop fail!");
         cpe_range_mgr_fini(&nmgr->m_ep_ids);
         mem_free(alloc, nmgr);
         return NULL;
@@ -36,14 +36,32 @@ gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
 
     TAILQ_INIT(&nmgr->m_chanels);
     TAILQ_INIT(&nmgr->m_listeners);
-    TAILQ_INIT(&nmgr->m_connectors);
+
+    if (cpe_hash_table_init(
+            &nmgr->m_connectors,
+            alloc,
+            (cpe_hash_fun_t)gd_net_connector_hash,
+            (cpe_hash_cmp_t)gd_net_connector_cmp,
+            CPE_HASH_OBJ2ENTRY(gd_net_connector, m_hh),
+            256) != 0)
+    {
+        CPE_ERROR(em, "gd_net_mgr_create: init connector hash list fail!");
+        cpe_range_mgr_fini(&nmgr->m_ep_ids);
+        mem_free(alloc, nmgr);
+        return NULL;
+    }
 
     return nmgr;
 }
 
 void gd_net_mgr_free(gd_net_mgr_t nmgr) {
     gd_net_chanel_t chanel;
+
     assert(nmgr);
+
+    /*free connectors*/
+    gd_net_connectors_free(nmgr);
+    cpe_hash_table_fini(&nmgr->m_connectors);
 
     /*free eps*/
     gd_net_ep_pages_free(nmgr);
