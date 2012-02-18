@@ -65,9 +65,7 @@ gd_net_connector_create_with_ep(
     gd_net_mgr_t nmgr,
     const char * name,
     const char * ip,
-    short port,
-    gd_net_chanel_t chanel_r,
-    gd_net_chanel_t chanel_w)
+    short port)
 {
     gd_net_connector_t connector;
     gd_net_ep_t ep;
@@ -75,7 +73,7 @@ gd_net_connector_create_with_ep(
     connector = gd_net_connector_create(nmgr, name, ip, port);
     if (connector == NULL) return NULL;
 
-    ep = gd_net_ep_create(nmgr, chanel_r, chanel_w);
+    ep = gd_net_ep_create(nmgr);
     if (ep == NULL) {
         gd_net_connector_free(connector);
         return NULL;

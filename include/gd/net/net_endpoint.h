@@ -9,15 +9,18 @@ extern "C" {
 
 /*服务管理接口*/
 gd_net_ep_t
-gd_net_ep_create(gd_net_mgr_t nmgr, gd_net_chanel_t chanel_r, gd_net_chanel_t chanel_w);
+gd_net_ep_create(gd_net_mgr_t nmgr);
 void gd_net_ep_free(gd_net_ep_t ep);
 
 gd_net_ep_t gd_net_ep_find(gd_net_mgr_t nmgr, gd_net_ep_id_t id);
 
 gd_net_ep_id_t gd_net_ep_id(gd_net_ep_t ep);
 gd_net_ep_type_t gd_net_ep_type(gd_net_ep_t ep);
-gd_net_chanel_t gd_net_ep_chanel_read(gd_net_ep_t ep);
-gd_net_chanel_t gd_net_ep_chanel_write(gd_net_ep_t ep);
+gd_net_chanel_t gd_net_ep_chanel_r(gd_net_ep_t ep);
+gd_net_chanel_t gd_net_ep_chanel_w(gd_net_ep_t ep);
+void gd_net_ep_set_chanel_r(gd_net_ep_t ep, gd_net_chanel_t chanel);
+void gd_net_ep_set_chanel_w(gd_net_ep_t ep, gd_net_chanel_t chanel);
+
 void gd_net_ep_close(gd_net_ep_t ep);
 
 int gd_net_ep_is_open(gd_net_ep_t ep);

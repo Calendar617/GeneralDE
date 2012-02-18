@@ -35,7 +35,20 @@ gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
     nmgr->m_ep_pages = NULL;
 
     TAILQ_INIT(&nmgr->m_chanels);
-    TAILQ_INIT(&nmgr->m_listeners);
+
+    if (cpe_hash_table_init(
+            &nmgr->m_listeners,
+            alloc,
+            (cpe_hash_fun_t)gd_net_listener_hash,
+            (cpe_hash_cmp_t)gd_net_listener_cmp,
+            CPE_HASH_OBJ2ENTRY(gd_net_listener, m_hh),
+            256) != 0)
+    {
+        CPE_ERROR(em, "gd_net_mgr_create: init listener hash list fail!");
+        cpe_range_mgr_fini(&nmgr->m_ep_ids);
+        mem_free(alloc, nmgr);
+        return NULL;
+    }
 
     if (cpe_hash_table_init(
             &nmgr->m_connectors,
@@ -46,6 +59,7 @@ gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
             256) != 0)
     {
         CPE_ERROR(em, "gd_net_mgr_create: init connector hash list fail!");
+        cpe_hash_table_fini(&nmgr->m_listeners);
         cpe_range_mgr_fini(&nmgr->m_ep_ids);
         mem_free(alloc, nmgr);
         return NULL;
@@ -62,6 +76,10 @@ void gd_net_mgr_free(gd_net_mgr_t nmgr) {
     /*free connectors*/
     gd_net_connectors_free(nmgr);
     cpe_hash_table_fini(&nmgr->m_connectors);
+
+    /*free listeners*/
+    gd_net_listeners_free(nmgr);
+    cpe_hash_table_fini(&nmgr->m_listeners);
 
     /*free eps*/
     gd_net_ep_pages_free(nmgr);

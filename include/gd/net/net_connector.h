@@ -19,9 +19,7 @@ gd_net_connector_create_with_ep(
     gd_net_mgr_t nmgr,
     const char * name,
     const char * ip,
-    short port,
-    gd_net_chanel_t chanel_r,
-    gd_net_chanel_t chanel_w);
+    short port);
 
 void gd_net_connector_free(gd_net_connector_t connector);
 

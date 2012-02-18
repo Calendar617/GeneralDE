@@ -14,7 +14,6 @@ extern "C" {
 #endif
 
 typedef TAILQ_HEAD(gd_net_chanel_list, gd_net_chanel) gd_net_chanel_list_t;
-typedef TAILQ_HEAD(gd_net_listener_list, gd_net_listener) gd_net_listener_list_t;
 
 #define GD_NET_EP_INVALID_ID ((gd_net_ep_id_t)-1)
 #define GD_NET_EP_COUNT_PER_PAGE (256)
@@ -30,8 +29,8 @@ struct gd_net_mgr {
     struct gd_net_ep_page * * m_ep_pages;
 
     gd_net_chanel_list_t m_chanels;
-    gd_net_listener_list_t m_listeners;
 
+    struct cpe_hash_table m_listeners;
     struct cpe_hash_table m_connectors;
 
     struct ev_loop * m_ev_loop;
@@ -39,13 +38,13 @@ struct gd_net_mgr {
 
 struct gd_net_listener {
     gd_net_mgr_t m_mgr;
-    char * m_name;
+    char const * m_name;
     char m_addr[16]; /*sizeof(sockaddr)*/
     int m_acceptQueueSize;
     int m_fd;
     struct ev_io m_watcher;
 
-    TAILQ_ENTRY(gd_net_listener) m_next;
+    struct cpe_hash_entry m_hh;
 };
 
 struct gd_net_connector {
@@ -71,8 +70,8 @@ struct gd_net_chanel {
 struct gd_net_ep {
     gd_net_ep_id_t m_id;
     gd_net_mgr_t m_mgr;
-    struct gd_net_chanel * m_chanel_read;
-    struct gd_net_chanel * m_chanel_write;
+    struct gd_net_chanel * m_chanel_r;
+    struct gd_net_chanel * m_chanel_w;
     struct gd_net_connector * m_connector;
     int m_fd;
     struct ev_io m_watcher;

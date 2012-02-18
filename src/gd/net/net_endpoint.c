@@ -8,7 +8,7 @@
 #include "net_internal_ops.h"
 
 gd_net_ep_t
-gd_net_ep_create(gd_net_mgr_t nmgr, gd_net_chanel_t chanel_r, gd_net_chanel_t chanel_w) {
+gd_net_ep_create(gd_net_mgr_t nmgr) {
     gd_net_ep_t ep;
 
     assert(nmgr);
@@ -19,8 +19,8 @@ gd_net_ep_create(gd_net_mgr_t nmgr, gd_net_chanel_t chanel_r, gd_net_chanel_t ch
     assert(ep->m_id != GD_NET_EP_INVALID_ID);
 
     ep->m_mgr = nmgr;
-    ep->m_chanel_read = chanel_r;
-    ep->m_chanel_write = chanel_w;
+    ep->m_chanel_r = NULL;
+    ep->m_chanel_w = NULL;
     ep->m_connector = NULL;
     ep->m_fd = -1;
 
@@ -36,27 +36,43 @@ void gd_net_ep_free(gd_net_ep_t ep) {
         gd_net_ep_close(ep);
     }
 
-    if (ep->m_chanel_write) {
-        gd_net_chanel_free(ep->m_chanel_write);
-        ep->m_chanel_write = NULL;
+    if (ep->m_chanel_w) {
+        gd_net_chanel_free(ep->m_chanel_w);
+        ep->m_chanel_w = NULL;
     }
 
-    if (ep->m_chanel_read) {
-        gd_net_chanel_free(ep->m_chanel_read);
-        ep->m_chanel_read = NULL;
+    if (ep->m_chanel_r) {
+        gd_net_chanel_free(ep->m_chanel_r);
+        ep->m_chanel_r = NULL;
     }
 
     gd_net_ep_pages_free_ep(ep);
 }
 
 gd_net_chanel_t
-gd_net_ep_chanel_read(gd_net_ep_t ep) {
-    return ep->m_chanel_read;
+gd_net_ep_chanel_r(gd_net_ep_t ep) {
+    return ep->m_chanel_r;
+}
+
+void gd_net_ep_set_chanel_r(gd_net_ep_t ep, gd_net_chanel_t chanel) {
+    if (ep->m_chanel_r) {
+        gd_net_chanel_free(ep->m_chanel_r);
+    }
+
+    ep->m_chanel_r = chanel;
 }
 
 gd_net_chanel_t
-gd_net_ep_chanel_write(gd_net_ep_t ep) {
-    return ep->m_chanel_write;
+gd_net_ep_chanel_w(gd_net_ep_t ep) {
+    return ep->m_chanel_w;
+}
+
+void gd_net_ep_set_chanel_w(gd_net_ep_t ep, gd_net_chanel_t chanel) {
+    if (ep->m_chanel_w) {
+        gd_net_chanel_free(ep->m_chanel_w);
+    }
+
+    ep->m_chanel_w = chanel;
 }
 
 int gd_net_ep_is_open(gd_net_ep_t ep) {

@@ -18,7 +18,11 @@ gd_net_listener_create(
 
 void gd_net_listener_free(gd_net_listener_t listener);
 
+gd_net_listener_t
+gd_net_listener_find(gd_net_mgr_t nmgr, const char * name);
+
 const char * gd_net_listener_name(gd_net_listener_t listener);
+short gd_net_listener_using_port(gd_net_listener_t listener);
 
 #ifdef __cplusplus
 }
