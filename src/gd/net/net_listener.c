@@ -73,7 +73,10 @@ gd_net_listener_create(
     struct sockaddr_in * inetAddr = (struct sockaddr_in *)(&listener->m_addr);
     inetAddr->sin_family = AF_INET;
     inetAddr->sin_port = port;
-    inetAddr->sin_addr.s_addr = inet_addr(ip);
+    inetAddr->sin_addr.s_addr = 
+        strcmp(ip, "") == 0
+        ? INADDR_ANY
+        : inet_addr(ip);
     if (inetAddr->sin_addr.s_addr == INADDR_NONE) {
         CPE_ERROR(nmgr->m_em, "listener %s address %s format error!", name, ip);
         cpe_hash_table_remove_by_ins(&nmgr->m_listeners, listener);

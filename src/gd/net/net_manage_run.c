@@ -5,6 +5,7 @@
 #include "net_internal_ops.h"
 
 int gd_net_mgr_tick(gd_net_mgr_t nmgr) {
+    ev_run(nmgr->m_ev_loop, EVRUN_NOWAIT);
     return 0;
 }
 

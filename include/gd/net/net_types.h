@@ -11,6 +11,13 @@ typedef enum {
     , gd_net_ep_socket = 1
 } gd_net_ep_type_t;
 
+typedef enum {
+    gd_net_connector_state_disable = -1
+    , gd_net_connector_state_idle = 0
+    , gd_net_connector_state_connecting
+    , gd_net_connector_state_connected
+} gd_net_connector_state_t;
+
 typedef uint32_t gd_net_ep_id_t;
 
 typedef struct gd_net_mgr * gd_net_mgr_t;

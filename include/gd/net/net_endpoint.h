@@ -9,7 +9,7 @@ extern "C" {
 
 /*服务管理接口*/
 gd_net_ep_t
-gd_net_ep_create(gd_net_mgr_t nmgr);
+gd_net_ep_create(gd_net_mgr_t nmgr, gd_net_ep_type_t type);
 void gd_net_ep_free(gd_net_ep_t ep);
 
 gd_net_ep_t gd_net_ep_find(gd_net_mgr_t nmgr, gd_net_ep_id_t id);

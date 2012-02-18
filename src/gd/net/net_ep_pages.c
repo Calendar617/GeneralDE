@@ -116,3 +116,24 @@ void gd_net_ep_pages_free(gd_net_mgr_t nmgr) {
     nmgr->m_ep_pages = NULL;
     nmgr->m_ep_page_capacity = 0;
 }
+
+gd_net_ep_t gd_net_ep_find(gd_net_mgr_t nmgr, gd_net_ep_id_t id) {
+    int pagePos;
+    int posInPage;
+    struct gd_net_ep_page * page;
+    gd_net_ep_t ep;
+
+    pagePos = ((int)id) / GD_NET_EP_COUNT_PER_PAGE;
+    posInPage = ((int)id) % GD_NET_EP_COUNT_PER_PAGE;
+
+    if (pagePos >= nmgr->m_ep_page_capacity) return NULL;
+
+    page = nmgr->m_ep_pages[pagePos];
+    if (page == NULL) return NULL;
+
+    ep = &page->m_eps[posInPage];
+    if (ep->m_id == GD_NET_EP_INVALID_ID) return NULL;
+
+    assert(ep->m_id == id);
+    return ep;
+}

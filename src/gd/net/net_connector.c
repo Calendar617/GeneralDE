@@ -29,6 +29,7 @@ gd_net_connector_create(
 
     connector->m_mgr = nmgr;
     connector->m_name = buf;
+    connector->m_state = gd_net_connector_state_disable;
 
     /*设置客户端连接端口*/
     struct sockaddr_in * inetAddr = (struct sockaddr_in *)(&connector->m_addr);
@@ -73,7 +74,7 @@ gd_net_connector_create_with_ep(
     connector = gd_net_connector_create(nmgr, name, ip, port);
     if (connector == NULL) return NULL;
 
-    ep = gd_net_ep_create(nmgr);
+    ep = gd_net_ep_create(nmgr, gd_net_ep_socket);
     if (ep == NULL) {
         gd_net_connector_free(connector);
         return NULL;
@@ -101,10 +102,38 @@ const char * gd_net_connector_name(gd_net_connector_t connector) {
 }
 
 int gd_net_connector_bind(gd_net_connector_t connector, gd_net_ep_t ep) {
+    if (connector->m_ep) {
+        CPE_ERROR(connector->m_mgr->m_em, "connector %s already have ep!", connector->m_name);
+        return -1;
+    }
+
+    if (ep->m_connector) {
+        CPE_ERROR(connector->m_mgr->m_em, "endpoint %d already have connector!", ep->m_id);
+        return -1;
+    }
+
+    if (ep->m_connector) {
+        CPE_ERROR(connector->m_mgr->m_em, "endpoint %d already have connector!", ep->m_id);
+        return -1;
+    }
+
+    connector->m_ep = ep;
+    ep->m_connector = connector;
+
+    if (gd_net_ep_is_open(connector->m_ep)) {
+        gd_net_ep_close(connector->m_ep);
+    }
+
     return 0;
 }
 
 int gd_net_connector_unbind(gd_net_connector_t connector) {
+    if (connector->m_ep == NULL) return 0;
+
+    assert(connector->m_ep->m_connector == connector);
+    connector->m_ep->m_connector = NULL;
+    connector->m_ep = NULL;
+
     return 0;
 }
 

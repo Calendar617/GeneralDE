@@ -8,7 +8,7 @@
 #include "net_internal_ops.h"
 
 gd_net_ep_t
-gd_net_ep_create(gd_net_mgr_t nmgr) {
+gd_net_ep_create(gd_net_mgr_t nmgr, gd_net_ep_type_t type) {
     gd_net_ep_t ep;
 
     assert(nmgr);
@@ -19,6 +19,7 @@ gd_net_ep_create(gd_net_mgr_t nmgr) {
     assert(ep->m_id != GD_NET_EP_INVALID_ID);
 
     ep->m_mgr = nmgr;
+    ep->m_type = type;
     ep->m_chanel_r = NULL;
     ep->m_chanel_w = NULL;
     ep->m_connector = NULL;
@@ -47,6 +48,14 @@ void gd_net_ep_free(gd_net_ep_t ep) {
     }
 
     gd_net_ep_pages_free_ep(ep);
+}
+
+gd_net_ep_type_t gd_net_ep_type(gd_net_ep_t ep) {
+    return ep->m_type;
+}
+
+gd_net_ep_id_t gd_net_ep_id(gd_net_ep_t ep) {
+    return ep->m_id;
 }
 
 gd_net_chanel_t

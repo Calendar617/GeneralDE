@@ -27,8 +27,13 @@ gd_net_connector_t
 gd_net_connector_find(gd_net_mgr_t nmgr, const char * name);
 
 const char * gd_net_connector_name(gd_net_connector_t connector);
+gd_net_connector_state_t gd_net_connector_state(gd_net_connector_t connector);
+
 int gd_net_connector_bind(gd_net_connector_t connector, gd_net_ep_t ep);
 int gd_net_connector_unbind(gd_net_connector_t connector);
+
+int gd_net_connector_enable(gd_net_connector_t connector);
+int gd_net_connector_disable(gd_net_connector_t connector);
 
 #ifdef __cplusplus
 }

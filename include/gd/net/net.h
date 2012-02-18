@@ -5,5 +5,6 @@
 #include "net_chanel.h"
 #include "net_endpoint.h"
 #include "net_listener.h"
+#include "net_connector.h"
 
 #endif

@@ -52,7 +52,7 @@ struct gd_net_connector {
     char const * m_name;
     char m_addr[16]; /*sizeof(sockaddr)*/
     gd_net_ep_t m_ep;
-
+    gd_net_connector_state_t m_state;
     struct cpe_hash_entry m_hh;
 };
 
@@ -70,6 +70,7 @@ struct gd_net_chanel {
 struct gd_net_ep {
     gd_net_ep_id_t m_id;
     gd_net_mgr_t m_mgr;
+    gd_net_ep_type_t m_type;
     struct gd_net_chanel * m_chanel_r;
     struct gd_net_chanel * m_chanel_w;
     struct gd_net_connector * m_connector;
