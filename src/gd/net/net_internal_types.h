@@ -53,6 +53,7 @@ struct gd_net_connector {
     char m_addr[16]; /*sizeof(sockaddr)*/
     gd_net_ep_t m_ep;
     gd_net_connector_state_t m_state;
+    struct ev_timer m_timer;
     struct cpe_hash_entry m_hh;
 };
 

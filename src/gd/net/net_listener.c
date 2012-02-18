@@ -11,18 +11,18 @@ static
 int gd_net_listener_listen(gd_net_listener_t listener) {
     listener->m_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (listener->m_fd == -1) {
-        CPE_ERROR(listener->m_mgr->m_em, "listener %s: socket call fail, errno=%d(%s)!", listener->m_name, errno, strerror(errno));
+        CPE_ERROR(listener->m_mgr->m_em, "listener %s: socket call fail, errno=%d (%s)!", listener->m_name, errno, strerror(errno));
         return -1;
     }
 
     if(bind(listener->m_fd, (struct sockaddr *)&listener->m_addr, sizeof(listener->m_addr)) == -1 ) {
-        CPE_ERROR(listener->m_mgr->m_em, "listener %s: bind error, errno=%d(%s)", listener->m_name, errno, strerror(errno));
+        CPE_ERROR(listener->m_mgr->m_em, "listener %s: bind error, errno=%d (%s)", listener->m_name, errno, strerror(errno));
         gd_net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
     }
 
     if (listen(listener->m_fd, listener->m_acceptQueueSize) == -1) {
-        CPE_ERROR(listener->m_mgr->m_em, "listener %s: listen error, errno=%d(%s)", listener->m_name, errno, strerror(errno));
+        CPE_ERROR(listener->m_mgr->m_em, "listener %s: listen error, errno=%d (%s)", listener->m_name, errno, strerror(errno));
         gd_net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
     }

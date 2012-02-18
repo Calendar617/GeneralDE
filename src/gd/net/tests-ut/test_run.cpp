@@ -25,5 +25,7 @@ TEST_F(NetTest, run) {
             0);
     ASSERT_TRUE(connector);
 
+    gd_net_connector_enable(connector);
+
     t_net_tick();
 }

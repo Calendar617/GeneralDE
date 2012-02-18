@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include "cpe/utils/error.h"
 #include "cpe/pal/pal_string.h"
 #include "gd/net/net_connector.h"
 #include "gd/net/net_endpoint.h"
@@ -162,8 +163,80 @@ void gd_net_connectors_free(gd_net_mgr_t nmgr) {
     if (pre) gd_net_connector_free(pre);
 }
 
-static void gd_net_connector_do_connect(gd_net_connector_t connector) {
+static void gd_net_connector_do_connect_i(gd_net_connector_t connector) {
+    gd_net_ep_t ep;
+
+    assert(connector);
+
+    ep = connector->m_ep;
+    assert(ep);
+
+    ep->m_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (ep->m_fd == -1) {
+        CPE_ERROR(
+            connector->m_mgr->m_em,
+            "connector %s: create socket fail, errno=%d (%s)!",
+            connector->m_name, errno, strerror(errno));
+        connector->m_state = gd_net_connector_state_error;
+        return;
+    }
+
+    if (gd_net_socket_set_none_block(ep->m_fd, connector->m_mgr->m_em)) {
+        gd_net_socket_close(&ep->m_fd, connector->m_mgr->m_em);
+        connector->m_state = gd_net_connector_state_error;
+        return;
+    }
+
+    if (connect(ep->m_fd, (struct sockaddr *)&connector->m_addr, sizeof(connector->m_addr)) == -1) {
+        if (errno == EINPROGRESS) {
+            CPE_INFO(
+                connector->m_mgr->m_em,
+                "connector %s: connecting!",
+                connector->m_name);
+            connector->m_state = gd_net_connector_state_connecting;
+            return;
+        }
+        else {
+            CPE_ERROR(
+                connector->m_mgr->m_em,
+                "connector %s: connect error, errno=%d (%s)",
+                connector->m_name, errno, strerror(errno));
+            gd_net_socket_close(&ep->m_fd, connector->m_mgr->m_em);
+            connector->m_state = gd_net_connector_state_error;
+            return;
+        }
+    }
+    else {
+        CPE_INFO(
+            connector->m_mgr->m_em,
+            "connector %s: connected success!",
+            connector->m_name);
+        connector->m_state = gd_net_connector_state_connected;
+        return;
+    }
 };
+
+static void gd_net_connector_check_stop_timer(gd_net_connector_t connector) {
+    if (connector->m_state == gd_net_connector_state_connecting
+        || connector->m_state == gd_net_connector_state_error)
+    {
+        ev_timer_stop(connector->m_mgr->m_ev_loop, &connector->m_timer);
+    }
+}
+
+static void gd_net_connector_check_start_timer(gd_net_connector_t connector) {
+    if (connector->m_state == gd_net_connector_state_connecting
+        || connector->m_state == gd_net_connector_state_error)
+    {
+        //
+    }
+}
+
+static void gd_net_connector_do_connect(gd_net_connector_t connector) {
+    gd_net_connector_check_stop_timer(connector);
+    gd_net_connector_do_connect_i(connector);
+    gd_net_connector_check_start_timer(connector);
+}
 
 int gd_net_connector_enable(gd_net_connector_t connector) {
     assert(connector);

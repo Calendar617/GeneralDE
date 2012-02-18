@@ -16,6 +16,7 @@ typedef enum {
     , gd_net_connector_state_idle = 0
     , gd_net_connector_state_connecting
     , gd_net_connector_state_connected
+    , gd_net_connector_state_error
 } gd_net_connector_state_t;
 
 typedef uint32_t gd_net_ep_id_t;
