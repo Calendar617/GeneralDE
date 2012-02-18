@@ -23,6 +23,7 @@ TEST_F(NetTest, run) {
             "test-connector",
             "127.0.0.1",
             0);
+    ASSERT_TRUE(connector);
 
     t_net_tick();
 }

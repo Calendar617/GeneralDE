@@ -29,9 +29,9 @@ static void gd_net_ep_pages_inc(gd_net_mgr_t nmgr) {
 
     if (nmgr->m_ep_pages) {
         memcpy(next_ep_pages, nmgr->m_ep_pages, sizeof(struct gd_net_ep_page *) * nmgr->m_ep_page_capacity);
+        mem_free(nmgr->m_alloc, nmgr->m_ep_pages);
     }
 
-    mem_free(nmgr->m_alloc, nmgr->m_ep_pages);
     nmgr->m_ep_pages = next_ep_pages;
     nmgr->m_ep_page_capacity = next_ep_page_capacity;
     return;

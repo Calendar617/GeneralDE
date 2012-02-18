@@ -133,6 +133,7 @@ int gd_net_connector_unbind(gd_net_connector_t connector) {
     assert(connector->m_ep->m_connector == connector);
     connector->m_ep->m_connector = NULL;
     connector->m_ep = NULL;
+    connector->m_state = gd_net_connector_state_disable;
 
     return 0;
 }
@@ -159,4 +160,43 @@ void gd_net_connectors_free(gd_net_mgr_t nmgr) {
     }
 
     if (pre) gd_net_connector_free(pre);
+}
+
+static void gd_net_connector_do_connect(gd_net_connector_t connector) {
+};
+
+int gd_net_connector_enable(gd_net_connector_t connector) {
+    assert(connector);
+    if (connector->m_ep == NULL) {
+        CPE_ERROR(
+            connector->m_mgr->m_em,
+            "connector %s: can`t enable for no ep binded!",
+            connector->m_name);
+        return -1;
+    }
+
+    if (connector->m_state != gd_net_connector_state_disable) {
+        CPE_INFO(
+            connector->m_mgr->m_em,
+            "connector %s: already enable!",
+            connector->m_name);
+        return 0;
+    }
+
+    connector->m_state = gd_net_connector_state_idle;
+    gd_net_connector_do_connect(connector);
+
+    return 0;
+}
+
+void gd_net_connector_disable(gd_net_connector_t connector) {
+    if (connector->m_state == gd_net_connector_state_disable) return;
+
+    assert(connector->m_ep);
+
+    if (gd_net_ep_is_open(connector->m_ep)) {
+        gd_net_ep_close(connector->m_ep);
+    }
+
+    connector->m_state = gd_net_connector_state_disable;
 }
