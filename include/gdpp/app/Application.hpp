@@ -1,5 +1,5 @@
-#ifndef GDPP_APP_MODULE_H
-#define GDPP_APP_MODULE_H
+#ifndef GDPP_APP_APPLICATION_H
+#define GDPP_APP_APPLICATION_H
 #include "cpepp/utils/ClassCategory.hpp"
 #include "gd/app/app_context.h"
 #include "System.hpp"

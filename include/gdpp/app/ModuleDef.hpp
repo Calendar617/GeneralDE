@@ -1,5 +1,9 @@
 #ifndef GDPP_APP_MODULE_DEF_H
 #define GDPP_APP_MODULE_DEF_H
+#include "gdpp/nm/Manager.hpp"
+#include "Application.hpp"
+#include "Module.hpp"
+#include "Log.hpp"
 
 #define GDPP_APP_MODULE_DEF(__module_name, __module_impl)               \
     static cpe_hash_string_buf s_ ## __module_name ## _Name =           \
@@ -17,7 +21,7 @@
     {                                                                   \
         try {                                                           \
             new (app.nmManager(), cpe_hs_data(__module_name::NAME))     \
-                __module_impl(app, moduleCfg);                          \
+                __module_impl(app, module, moduleCfg);                  \
             return 0;                                                   \
         }                                                               \
         APP_CTX_CATCH_EXCEPTION(app, #__module_name " init:");          \

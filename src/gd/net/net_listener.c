@@ -89,6 +89,7 @@ gd_net_listener_create(
 
     listener->m_mgr = nmgr;
     listener->m_name = buf;
+    cpe_hash_entry_init(&listener->m_hh);
 
     if (cpe_hash_table_insert_unique(&nmgr->m_listeners, listener) != 0) {
         CPE_ERROR(nmgr->m_em, "listener %s is already exist!", name);
