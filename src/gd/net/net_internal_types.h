@@ -41,6 +41,8 @@ struct gd_net_listener {
     char const * m_name;
     char m_addr[16]; /*sizeof(sockaddr)*/
     int m_acceptQueueSize;
+    gd_net_accept_fun_t m_acceptor_fun;
+    void * m_acceptor_ctx;
     int m_fd;
     struct ev_io m_watcher;
 
@@ -53,6 +55,8 @@ struct gd_net_connector {
     char m_addr[16]; /*sizeof(sockaddr)*/
     gd_net_ep_t m_ep;
     gd_net_connector_state_t m_state;
+    gd_net_connector_state_monitor_fun_t m_monitor_fun;
+    void * m_monitor_ctx;
     struct ev_timer m_timer;
     struct cpe_hash_entry m_hh;
 };

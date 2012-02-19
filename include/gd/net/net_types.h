@@ -27,9 +27,9 @@ typedef struct gd_net_ep * gd_net_ep_t;
 typedef struct gd_net_listener * gd_net_listener_t;
 typedef struct gd_net_connector * gd_net_connector_t;
 
-typedef void (*gd_net_accept_fun)(gd_net_listener_t listener, gd_net_ep_t ep);
+typedef void (*gd_net_accept_fun_t)(gd_net_listener_t listener, gd_net_ep_t ep, void * ctx);
 
-typedef void (*gd_net_svr_process_fun_t)(gd_net_ep_t svr);
+typedef void (*gd_net_connector_state_monitor_fun_t)(gd_net_connector_t connector, void * ctx);
 
 #ifdef __cplusplus
 }

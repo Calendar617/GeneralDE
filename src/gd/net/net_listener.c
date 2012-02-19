@@ -5,6 +5,7 @@
 #include <errno.h>
 #include "cpe/pal/pal_string.h"
 #include "gd/net/net_listener.h"
+#include "gd/net/net_endpoint.h"
 #include "net_internal_ops.h"
 
 static
@@ -36,7 +37,32 @@ int gd_net_listener_listen(gd_net_listener_t listener) {
     return 0;
 }
 
-static void gd_net_listener_cb(EV_P_ ev_io *w, int revents) {
+static void gd_net_listener_cb_accept(EV_P_ ev_io *w, int revents) {
+    gd_net_listener_t listener;
+    gd_net_ep_t ep;
+    int new_fd;
+
+    listener = w->data;
+    assert(listener);
+
+    new_fd = accept(listener->m_fd, 0, 0);
+    if (new_fd == -1) {
+        CPE_ERROR(
+            listener->m_mgr->m_em,
+            "listener %s: accept error, errno=%d (%s)",
+            listener->m_name, errno, strerror(errno));
+        return;
+    }
+
+    ep = gd_net_ep_create(listener->m_mgr, gd_net_ep_socket);
+    if (ep == 0) {
+        gd_net_socket_close(&new_fd, listener->m_mgr->m_em);
+        return;
+    }
+
+    ep->m_fd = new_fd;
+
+    listener->m_acceptor_fun(listener, ep, listener->m_acceptor_ctx);
 }
 
 gd_net_listener_t
@@ -46,7 +72,8 @@ gd_net_listener_create(
     const char * ip,
     short port,
     int acceptQueueSize,
-    gd_net_accept_fun acceptor)
+    gd_net_accept_fun_t acceptor,
+    void * acceptor_ctx)
 {
     gd_net_listener_t listener;
     char * buf;
@@ -85,6 +112,8 @@ gd_net_listener_create(
     }
 
     listener->m_acceptQueueSize = acceptQueueSize;
+    listener->m_acceptor_fun = acceptor;
+    listener->m_acceptor_ctx = acceptor_ctx;
 
     if (gd_net_listener_listen(listener) != 0) {
         cpe_hash_table_remove_by_ins(&nmgr->m_listeners, listener);
@@ -92,7 +121,8 @@ gd_net_listener_create(
         return 0;
     }
 
-    ev_io_init(&listener->m_watcher, gd_net_listener_cb, listener->m_fd, EV_READ);
+    listener->m_watcher.data = listener;
+    ev_io_init(&listener->m_watcher, gd_net_listener_cb_accept, listener->m_fd, EV_READ);
     ev_io_start(nmgr->m_ev_loop, &listener->m_watcher);
 
     return listener;

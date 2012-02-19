@@ -32,6 +32,10 @@ with_net::t_net() {
     return m_net;
 }
 
+void with_net::t_net_break() {
+    gd_net_mgr_break(m_net);
+}
+
 void with_net::t_net_tick() {
     gd_net_mgr_tick(m_net);
 }

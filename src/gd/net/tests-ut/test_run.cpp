@@ -1,12 +1,24 @@
 #include "NetTest.hpp"
 
-void net_test_example_accept_fun(gd_net_listener_t listener, gd_net_ep_t ep) {
-    printf("accept: \n");
+class RunTest : public NetTest {
+};
+
+void run_test_example_accept_fun(gd_net_listener_t listener, gd_net_ep_t ep, void * ctx) {
 }
 
-TEST_F(NetTest, run) {
-    t_em_set_print();
+void run_test_connector_state_monitor(gd_net_connector_t connector, void * ctx) {
+    RunTest * runTest = (RunTest *)ctx;
 
+    gd_net_connector_state_t state = gd_net_connector_state(connector);
+
+    if (state == gd_net_connector_state_error
+        || state == gd_net_connector_state_connected)
+    {
+        runTest->t_net_break();
+    }
+}
+
+TEST_F(RunTest, run) {
     gd_net_listener_t listener =
         gd_net_listener_create(
             t_net(),
@@ -14,7 +26,8 @@ TEST_F(NetTest, run) {
             "",
             0,
             5,
-            net_test_example_accept_fun);
+            run_test_example_accept_fun,
+            this);
     ASSERT_TRUE(listener);
 
     gd_net_connector_t connector =
@@ -24,6 +37,9 @@ TEST_F(NetTest, run) {
             "127.0.0.1",
             gd_net_listener_using_port(listener));
     ASSERT_TRUE(connector);
+
+    gd_net_connector_set_monitor(
+        connector, run_test_connector_state_monitor, this);
 
     gd_net_connector_enable(connector);
 

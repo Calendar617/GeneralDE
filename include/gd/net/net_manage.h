@@ -12,7 +12,8 @@ gd_net_mgr_t gd_net_mgr_create(mem_allocrator_t alloc, error_monitor_t em);
 void gd_net_mgr_free(gd_net_mgr_t);
 
 error_monitor_t gd_net_mgr_em(gd_net_mgr_t nmgr);
-
+void gd_net_mgr_break(gd_net_mgr_t nmgr);
+void gd_net_mgr_stop(gd_net_mgr_t nmgr);
 int gd_net_mgr_tick(gd_net_mgr_t nmgr);
 int gd_net_mgr_run(gd_net_mgr_t nmgr);
 

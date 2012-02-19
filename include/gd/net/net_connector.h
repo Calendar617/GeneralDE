@@ -35,6 +35,10 @@ int gd_net_connector_unbind(gd_net_connector_t connector);
 int gd_net_connector_enable(gd_net_connector_t connector);
 void gd_net_connector_disable(gd_net_connector_t connector);
 
+void gd_net_connector_set_monitor(
+    gd_net_connector_t connector,
+    gd_net_connector_state_monitor_fun_t fun, void * ctx);
+
 #ifdef __cplusplus
 }
 #endif

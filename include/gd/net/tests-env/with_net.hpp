@@ -14,6 +14,7 @@ public:
 
     gd_net_mgr_t t_net();
 
+    void t_net_break();
     void t_net_tick();
     void t_net_run(void);
 private:

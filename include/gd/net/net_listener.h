@@ -14,7 +14,8 @@ gd_net_listener_create(
     const char * ip,
     short port,
     int acceptQueueSize,
-    gd_net_accept_fun acceptor);
+    gd_net_accept_fun_t acceptor,
+    void * acceptor_ctx);
 
 void gd_net_listener_free(gd_net_listener_t listener);
 

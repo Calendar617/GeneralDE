@@ -35,6 +35,8 @@ gd_net_connector_create(
     connector->m_mgr = nmgr;
     connector->m_name = buf;
     connector->m_state = gd_net_connector_state_disable;
+    connector->m_monitor_fun = NULL;
+    connector->m_monitor_ctx = NULL;
 
     /*设置客户端连接端口*/
     struct sockaddr_in * inetAddr = (struct sockaddr_in *)(&connector->m_addr);
@@ -104,6 +106,18 @@ gd_net_connector_find(gd_net_mgr_t nmgr, const char * name) {
 
 const char * gd_net_connector_name(gd_net_connector_t connector) {
     return connector->m_name;
+}
+
+gd_net_connector_state_t gd_net_connector_state(gd_net_connector_t connector) {
+    return connector->m_state;
+}
+
+void gd_net_connector_set_monitor(
+    gd_net_connector_t connector,
+    gd_net_connector_state_monitor_fun_t fun, void * ctx)
+{
+    connector->m_monitor_fun = fun;
+    connector->m_monitor_ctx = ctx;
 }
 
 int gd_net_connector_bind(gd_net_connector_t connector, gd_net_ep_t ep) {
@@ -267,9 +281,34 @@ static void gd_net_connector_io_cb_connect(EV_P_ ev_io *w, int revents) {
 
     gd_net_connector_check_connect_result(connector);
     gd_net_connector_cb_prepaire(connector);
+
+    if (connector->m_monitor_fun) {
+        connector->m_monitor_fun(connector, connector->m_monitor_ctx);
+    }
 }
 
 static void gd_net_connector_timer_cb_reconnect(EV_P_ ev_timer *w, int revents) {
+    gd_net_connector_t connector;
+
+    ev_timer_stop(EV_A_ w);
+    
+    connector = (gd_net_connector_t)w->data;
+    assert(connector);
+
+    connector->m_state = gd_net_connector_state_idle;
+    
+    gd_net_connector_do_connect_i(connector);
+
+    if (connector->m_state == gd_net_connector_state_connected) {
+        gd_net_connector_on_connected(connector);
+    }
+    else {
+        gd_net_connector_cb_prepaire(connector);
+    }
+
+    if (connector->m_monitor_fun) {
+        connector->m_monitor_fun(connector, connector->m_monitor_ctx);
+    }
 }
 
 static void gd_net_connector_cb_clear(gd_net_connector_t connector) {
@@ -308,6 +347,10 @@ static void gd_net_connector_do_connect(gd_net_connector_t connector) {
     else {
         gd_net_connector_cb_prepaire(connector);
     }
+
+    if (connector->m_monitor_fun) {
+        connector->m_monitor_fun(connector, connector->m_monitor_ctx);
+    }
 }
 
 int gd_net_connector_enable(gd_net_connector_t connector) {
@@ -344,4 +387,7 @@ void gd_net_connector_disable(gd_net_connector_t connector) {
     }
 
     connector->m_state = gd_net_connector_state_disable;
+    if (connector->m_monitor_fun) {
+        connector->m_monitor_fun(connector, connector->m_monitor_ctx);
+    }
 }
