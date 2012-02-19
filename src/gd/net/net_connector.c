@@ -9,6 +9,10 @@
 #include "gd/net/net_endpoint.h"
 #include "net_internal_ops.h"
 
+static void gd_net_connector_cb_clear(gd_net_connector_t connector);
+static void gd_net_connector_cb_prepaire(gd_net_connector_t connector);
+static void gd_net_connector_on_connected(gd_net_connector_t connector);
+
 gd_net_connector_t
 gd_net_connector_create(
     gd_net_mgr_t nmgr,
@@ -132,6 +136,9 @@ int gd_net_connector_unbind(gd_net_connector_t connector) {
     if (connector->m_ep == NULL) return 0;
 
     assert(connector->m_ep->m_connector == connector);
+
+    gd_net_connector_cb_clear(connector);
+
     connector->m_ep->m_connector = NULL;
     connector->m_ep = NULL;
     connector->m_state = gd_net_connector_state_disable;
@@ -216,26 +223,91 @@ static void gd_net_connector_do_connect_i(gd_net_connector_t connector) {
     }
 };
 
-static void gd_net_connector_check_stop_timer(gd_net_connector_t connector) {
-    if (connector->m_state == gd_net_connector_state_connecting
-        || connector->m_state == gd_net_connector_state_error)
-    {
-        ev_timer_stop(connector->m_mgr->m_ev_loop, &connector->m_timer);
+static void gd_net_connector_on_connected(gd_net_connector_t connector) {
+}
+
+static void gd_net_connector_check_connect_result(gd_net_connector_t connector) {
+    int err;
+    socklen_t err_len;
+
+    err_len = sizeof(err);
+
+    if (getsockopt(connector->m_ep->m_fd, SOL_SOCKET, SO_ERROR, &err, &err_len) == -1) {
+        CPE_ERROR(
+            connector->m_mgr->m_em,
+            "connector %s: check state, getsockopt error, errno=%d (%s)",
+            connector->m_name, errno, strerror(errno));
+        connector->m_state = gd_net_connector_state_error;
+    }
+    else {
+        if (err == 0) {
+            CPE_INFO(
+                connector->m_mgr->m_em,
+                "connector %s: connected success!",
+                connector->m_name);
+            connector->m_state = gd_net_connector_state_connected;
+        }
+        else {
+            CPE_ERROR(
+                connector->m_mgr->m_em,
+                "connector %s: connect error, errno=%d (%s)",
+                connector->m_name, err, strerror(err));
+            connector->m_state = gd_net_connector_state_error;
+        }
     }
 }
 
-static void gd_net_connector_check_start_timer(gd_net_connector_t connector) {
-    if (connector->m_state == gd_net_connector_state_connecting
-        || connector->m_state == gd_net_connector_state_error)
-    {
-        //
+static void gd_net_connector_io_cb_connect(EV_P_ ev_io *w, int revents) {
+    gd_net_connector_t connector;
+
+    ev_io_stop(EV_A_ w);
+
+    connector = (gd_net_connector_t)w->data;
+    assert(connector);
+
+    gd_net_connector_check_connect_result(connector);
+    gd_net_connector_cb_prepaire(connector);
+}
+
+static void gd_net_connector_timer_cb_reconnect(EV_P_ ev_timer *w, int revents) {
+}
+
+static void gd_net_connector_cb_clear(gd_net_connector_t connector) {
+    if (connector->m_state == gd_net_connector_state_connecting) {
+        ev_io_stop(connector->m_mgr->m_ev_loop, &connector->m_ep->m_watcher);
+        connector->m_state = gd_net_connector_state_idle;
+    }
+    else if (connector->m_state == gd_net_connector_state_error) {
+        ev_timer_stop(connector->m_mgr->m_ev_loop, &connector->m_timer);
+        connector->m_state = gd_net_connector_state_idle;
+    }
+}
+
+static void gd_net_connector_cb_prepaire(gd_net_connector_t connector) {
+    if (connector->m_state == gd_net_connector_state_connecting) {
+        connector->m_ep->m_watcher.data = connector;
+        ev_io_init(&connector->m_ep->m_watcher, gd_net_connector_io_cb_connect, connector->m_ep->m_fd, EV_WRITE);
+        ev_io_start(connector->m_mgr->m_ev_loop, &connector->m_ep->m_watcher);
+    }
+    else if (connector->m_state == gd_net_connector_state_error) {
+        connector->m_timer.data = connector;
+        ev_timer_init (&connector->m_timer, gd_net_connector_timer_cb_reconnect, 60., 0.);
+        ev_timer_start(connector->m_mgr->m_ev_loop, &connector->m_timer);
     }
 }
 
 static void gd_net_connector_do_connect(gd_net_connector_t connector) {
-    gd_net_connector_check_stop_timer(connector);
+    assert(connector->m_state != gd_net_connector_state_connected);
+
+    gd_net_connector_cb_clear(connector);
     gd_net_connector_do_connect_i(connector);
-    gd_net_connector_check_start_timer(connector);
+
+    if (connector->m_state == gd_net_connector_state_connected) {
+        gd_net_connector_on_connected(connector);
+    }
+    else {
+        gd_net_connector_cb_prepaire(connector);
+    }
 }
 
 int gd_net_connector_enable(gd_net_connector_t connector) {

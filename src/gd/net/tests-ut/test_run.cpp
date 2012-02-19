@@ -22,10 +22,10 @@ TEST_F(NetTest, run) {
             t_net(),
             "test-connector",
             "127.0.0.1",
-            0);
+            gd_net_listener_using_port(listener));
     ASSERT_TRUE(connector);
 
     gd_net_connector_enable(connector);
 
-    t_net_tick();
+    t_net_run();
 }

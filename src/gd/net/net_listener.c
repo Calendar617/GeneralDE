@@ -116,6 +116,28 @@ gd_net_listener_find(gd_net_mgr_t nmgr, const char * name) {
     return (gd_net_listener_t)cpe_hash_table_find(&nmgr->m_listeners, &key);
 }
 
+short gd_net_listener_using_port(gd_net_listener_t listener) {
+    struct sockaddr_in addr;
+    socklen_t len;
+
+    if (listener->m_fd < 0) return 0;
+
+    if (((struct sockaddr_in *)(&listener->m_addr))->sin_port != 0) {
+        return ((struct sockaddr_in *)(&listener->m_addr))->sin_port;
+    }
+
+    len = sizeof(addr);
+    if (getsockname(listener->m_fd, (struct sockaddr *)&addr, &len) == -1) {
+        CPE_ERROR(
+            listener->m_mgr->m_em,
+            "listener %s: getsockname fail, errno=%d (%s)!",
+            listener->m_name, errno, strerror(errno));
+        return 0;
+    }
+
+    return addr.sin_port;
+}
+
 uint32_t gd_net_listener_hash(gd_net_listener_t listener) {
     return cpe_hash_str(listener->m_name, strlen(listener->m_name));
 }

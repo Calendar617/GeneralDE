@@ -36,4 +36,8 @@ void with_net::t_net_tick() {
     gd_net_mgr_tick(m_net);
 }
 
+void with_net::t_net_run(void) {
+    gd_net_mgr_run(m_net);
+}
+
 }}}
