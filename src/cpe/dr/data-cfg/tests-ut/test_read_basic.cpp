@@ -21,7 +21,7 @@ TEST_F(ReadTest, struct_basic) {
     EXPECT_EQ(14, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
 }
 
-TEST_F(ReadTest, seq_size_basic) {
+TEST_F(ReadTest, seq_count_basic) {
     installMeta(
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='S' version='1'>"
@@ -43,7 +43,7 @@ TEST_F(ReadTest, seq_size_basic) {
     EXPECT_EQ(34, dr_ctype_read_int16(result(24), CPE_DR_TYPE_INT16));
 }
 
-TEST_F(ReadTest, seq_size_with_refer) {
+TEST_F(ReadTest, seq_count_with_refer) {
     installMeta(
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='S' version='1'>"
@@ -68,7 +68,7 @@ TEST_F(ReadTest, seq_size_with_refer) {
     EXPECT_EQ(34, dr_ctype_read_int16(result(26), CPE_DR_TYPE_INT16));
 }
 
-TEST_F(ReadTest, seq_size_dft_no_refer) {
+TEST_F(ReadTest, seq_count_dft_no_refer) {
     installMeta(
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='S' version='1'>"
@@ -94,6 +94,32 @@ TEST_F(ReadTest, seq_size_dft_no_refer) {
 
     EXPECT_EQ(34, dr_ctype_read_int16(result(24), CPE_DR_TYPE_INT16));
 }
+
+TEST_F(ReadTest, seq_count_dynamic_with_refer) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='count' type='int16'/>"
+        "	     <entry name='a1' type='int16' count='0' refer='count'/>"
+        "    </struct>"
+        "</metalib>");
+
+    EXPECT_EQ(
+        6,
+        read(
+            "a1: [12, 14]\n"
+            ,
+            "S"
+            ,
+            0
+            ,
+            128));
+
+    EXPECT_EQ(2, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(12, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(14, dr_ctype_read_int16(result(4), CPE_DR_TYPE_INT16));
+}
+
 
 TEST_F(ReadTest, int8_basic) {
     t_em_set_print();

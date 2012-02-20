@@ -3,6 +3,7 @@
 #include "cpe/pal/pal_stdio.h"
 #include "cpe/pal/pal_queue.h"
 #include "cpe/utils/error_list.h"
+#include "cpe/utils/stream_buffer.h"
 
 #define CPE_ERROR_LIST_MSG_MAX_LEN 128
 
@@ -103,4 +104,22 @@ void cpe_error_list_collect(struct error_info * info, void * context, const char
 
 int cpe_error_list_error_count(error_list_t el) {
     return el->m_count;
+}
+
+char * cpe_error_list_dump(error_list_t el, mem_buffer_t buffer, int ident) {
+    struct error_list_node * n;
+
+    struct write_stream_buffer stream =
+        CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
+
+    if (el) {
+        TAILQ_FOREACH(n, &el->m_nodes, m_next) {
+            stream_putc_count((write_stream_t)&stream, ' ', ident);
+            stream_printf((write_stream_t)&stream, "%s\n", n->m_msg);
+        }
+    }
+
+    stream_putc((write_stream_t)&stream, 0);
+
+    return (char *)mem_buffer_make_continuous(buffer, 0);
 }

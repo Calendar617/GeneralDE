@@ -1,5 +1,7 @@
 #ifndef CPE_CFT_TESTENV_WITH_CFG_H
 #define CPE_CFT_TESTENV_WITH_CFG_H
+#include "cpe/utils/error.h"
+#include "cpe/utils/error_list.h"
 #include "cpe/utils/tests-env/test-env.hpp"
 #include "../cfg.h"
 
@@ -14,5 +16,37 @@ public:
 };
 
 }}}
+
+#define EXPECT_CFG_DO_CMP(__expect, __cfg, __policy)                    \
+    do {                                                                \
+        cfg_t expectRoot = t_cfg_parse(__expect);                       \
+        cfg_t cmpRoot = (__cfg);                                        \
+        EXPECT_TRUE(expectRoot) << "parse expect cfg fail!";            \
+        EXPECT_TRUE(cmpRoot) << "cmp target is fail!";                  \
+        if (cmpRoot && expectRoot) {                                    \
+            error_list_t el =                                           \
+                cpe_error_list_create(t_tmp_allocrator());              \
+            struct error_monitor em =                                   \
+                CPE_DEF_ERROR_MONITOR_INITIALIZER(                      \
+                    cpe_error_list_collect, el);                        \
+            int cmp_result = cfg_cmp(                                   \
+                expectRoot, cmpRoot, __policy, &em);                    \
+            if (cmp_result != 0) {                                      \
+                struct mem_buffer buffer;                               \
+                mem_buffer_init(&buffer, t_tmp_allocrator());           \
+                EXPECT_EQ(0, cmp_result)                                \
+                    << "expect:\n" << t_cfg_dump(expectRoot, 4)         \
+                    << "\nactual:\n" << t_cfg_dump(cmpRoot, 4)          \
+                    << "\ndetails:\n" << cpe_error_list_dump(el, &buffer, 4); \
+            }                                                           \
+        }                                                               \
+    } while(0)
+
+#define EXPECT_CFG_EQ(__expect, __cfg)          \
+    EXPECT_CFG_DO_CMP(__expect, __cfg, 0)
+
+#define EXPECT_CFG_EQ_PART(__expect, __cfg)                             \
+    EXPECT_CFG_DO_CMP(__expect, __cfg,                                  \
+                      CFG_CMP_POLICY_L_STRUCT_LEAK)
 
 #endif
