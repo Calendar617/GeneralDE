@@ -16,6 +16,7 @@ public:
     ObjRef & operator=(T & obj) { m_obj = &obj; return *this; }
     ObjRef & operator=(T const & obj) { m_obj = &obj; return *this; }
 
+    T & get(void) const { assert(m_obj); return *m_obj; }
     operator T& () const { return toRef(m_obj); }
 
     bool valid(void) const { return m_obj != 0; }
