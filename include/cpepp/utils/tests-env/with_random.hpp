@@ -14,8 +14,13 @@ public:
     };
 
     RandomMock & t_random_mock(void);
-    void t_random_expect_once(uint32_t arg, uint32_t r);
-    void t_random_expect_once(uint32_t r);
+    void t_random_expect_gen_with_arg(uint32_t arg, uint32_t r);
+    void t_random_expect_gen_with_arg(uint32_t arg, uint32_t r, uint32_t r2);
+    void t_random_expect_gen_with_arg(uint32_t arg, uint32_t r, uint32_t r2, uint32_t r3);
+
+    void t_random_expect_gen(uint32_t r);
+    void t_random_expect_gen(uint32_t r1, uint32_t r2);
+    void t_random_expect_gen(uint32_t r1, uint32_t r2, uint32_t r3);
 
 private:
     RandomMock m_random_mock;
