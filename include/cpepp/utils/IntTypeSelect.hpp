@@ -22,13 +22,13 @@ struct IntTypeSelect<2> {
 template<>
 struct IntTypeSelect<4> {
     typedef uint32_t uint_type;
-    typedef int132_t int_type;
+    typedef int32_t int_type;
 };
 
 template<>
 struct IntTypeSelect<8> {
     typedef uint64_t uint_type;
-    typedef int164_t int_type;
+    typedef int64_t int_type;
 };
 
 }}
