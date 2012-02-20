@@ -60,17 +60,32 @@ void dr_cfg_write_i(
             )
         {
             size_t elementSize;
+            int32_t array_count;
+            LPDRMETAENTRY refer;
+
         LOOPENTRY:
 
             elementSize = dr_entry_element_size(curStack->m_entry);
             if (elementSize == 0) continue;
 
+            refer = NULL;
             if (curStack->m_entry->m_array_count != 1) {
                 curStack->m_des_seq =
                     cfg_struct_add_seq(curStack->m_des, dr_entry_name(curStack->m_entry), cfg_merge_use_exist);
+
+                refer = dr_entry_array_refer_entry(curStack->m_entry);
             }
 
-            for(; curStack->m_array_pos < curStack->m_entry->m_array_count; ++curStack->m_array_pos) {
+            array_count = curStack->m_entry->m_array_count;
+            if (refer) {
+                dr_entry_try_read_int32(
+                    &array_count,
+                    curStack->m_src_data + curStack->m_entry->m_array_refer_data_start_pos,
+                    refer,
+                    em);
+            }
+
+            for(; curStack->m_array_pos < array_count; ++curStack->m_array_pos) {
                 const char * entryData = curStack->m_src_data + curStack->m_entry->m_data_start_pos + (elementSize * curStack->m_array_pos);
 
                 if (curStack->m_entry->m_type <= CPE_DR_TYPE_COMPOSITE) {

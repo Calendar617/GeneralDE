@@ -37,7 +37,7 @@ int WriteTest::write(const char * data, const char * typeName) {
     EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
     if (meta == 0) return -1;
 
-    size_t capacity = dr_meta_size(meta);
+    size_t capacity = 1024;
 
     cfg_t input = t_cfg_parse(data);
     EXPECT_TRUE(input) << "parse input to cfg fail!";
@@ -46,6 +46,14 @@ int WriteTest::write(const char * data, const char * typeName) {
     struct mem_buffer m_src_buffer;
     mem_buffer_init(&m_src_buffer, t_tmp_allocrator());
     mem_buffer_alloc(&m_src_buffer, capacity);
+
+    dr_cfg_read(
+        mem_buffer_make_continuous(&m_src_buffer, 0),
+        capacity,
+        input,
+        meta,
+        0,
+        t_em());
 
     return dr_cfg_write(
         m_cfg,
