@@ -164,3 +164,28 @@ TEST_F(ReadTest, uint8_basic) {
     EXPECT_EQ(0, (int)dr_ctype_read_uint8(result(), CPE_DR_TYPE_UINT8));
     EXPECT_EQ(14, (int)dr_ctype_read_uint8(result(1), CPE_DR_TYPE_UINT8));
 }
+
+TEST_F(ReadTest, struct_not_enouth_data) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='a1' type='int16'/>"
+        "	     <entry name='a2' type='int16'/>"
+        "    </struct>"
+        "</metalib>");
+
+    EXPECT_EQ(
+        2,
+        read(
+            "a1: 12\n"
+            "a2: 14\n"
+            ,
+            "S"
+            ,
+            0
+            ,
+            2));
+
+    EXPECT_EQ(12, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
+}
+
