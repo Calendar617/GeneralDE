@@ -129,14 +129,18 @@ int dr_cfg_read_entry(
 
         refer = dr_entry_array_refer_entry(entry);
         if (refer) {
-            dr_entry_set_from_int32(
-                all_buf + entry->m_array_refer_data_start_pos,
-                count,
-                refer,
-                em);
+            size_t refer_element_size = dr_entry_element_size(refer);
+            if (entry->m_array_refer_data_start_pos + refer_element_size < all_capacity) {
+                dr_entry_set_from_int32(
+                    all_buf + entry->m_array_refer_data_start_pos,
+                    count,
+                    refer,
+                    em);
+            }
         }
         else {
             dr_cfg_read_array_set_dft(count, max_count, element_size, write_pos, meta, entry);
+            count = max_count;
         }
 
         return count * element_size;
@@ -152,20 +156,22 @@ int dr_cfg_read_union(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, int
 
 int dr_cfg_read_struct(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, int policy, error_monitor_t em) {
     cfg_it_t itemIt;
-    cfg_t item, next;
+    cfg_t item;
     int size;
-    size_t total_capacity;
-
+    LPDRMETAENTRY last_entry;
+    
     assert(cfg);
 
     size = 0;
 
     cfg_it_init(&itemIt, cfg);
 
-    for(item = cfg_it_next(&itemIt), next = cfg_it_next(&itemIt);
-        item && capacity > 0;
-        item = next, next = cfg_it_next(&itemIt))
-    {
+    last_entry = 0;
+    if (dr_meta_entry_num(meta) > 0) {
+        last_entry = dr_meta_entry_at(meta, dr_meta_entry_num(meta) - 1);
+    }
+
+    for(item = cfg_it_next(&itemIt); item; item = cfg_it_next(&itemIt)) {
         size_t entry_size;
         size_t entry_capacity;
         LPDRMETAENTRY entry;
@@ -180,11 +186,14 @@ int dr_cfg_read_struct(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, in
             continue;
         }
 
-        entry_capacity = entry->m_unitsize;
-        if (entry_capacity > capacity || next == 0) entry_capacity = capacity;
+        if (entry->m_data_start_pos >= capacity) continue;
 
-        entry_size = dr_cfg_read_entry(buf, total_capacity, buf + entry->m_data_start_pos, entry_capacity, item, meta, entry, policy, em);
-        capacity -= entry_capacity;
+        entry_capacity = entry->m_unitsize;
+        if (entry == last_entry || entry->m_data_start_pos + entry_capacity > capacity) {
+            entry_capacity = capacity - entry->m_data_start_pos;
+        }
+
+        entry_size = dr_cfg_read_entry(buf, capacity, buf + entry->m_data_start_pos, entry_capacity, item, meta, entry, policy, em);
         
         if (entry->m_data_start_pos + entry_size > size) {
             size = entry->m_data_start_pos + entry_size;
