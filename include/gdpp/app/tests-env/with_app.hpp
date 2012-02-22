@@ -2,6 +2,7 @@
 #define GDPP_APP_TESTENV_WITHAPPEX_H
 #include "gd/app/tests-env/with_app.hpp"
 #include "gdpp/nm/Object.hpp"
+#include "gdpp/nm/Manager.hpp"
 #include "../Application.hpp"
 
 namespace Gd { namespace App { namespace testenv {
@@ -41,6 +42,11 @@ public:
     T & installNamedObject(Arg1 arg1, Arg2 arg2, Arg3 arg3, Arg4 arg4) {
         return * new (gd_app_nm_mgr(t_app()), cpe_hs_data(T::NAME))
             T(arg1, arg2, arg3, arg4);
+    }
+
+    template<typename T>
+    void uninstallNamedObject(void) {
+        t_app_ex().nmManager().removeObject(T::NAME);
     }
 };
 

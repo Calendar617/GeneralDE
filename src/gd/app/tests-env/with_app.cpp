@@ -17,8 +17,11 @@ void with_app::SetUp() {
 }
 
 void with_app::TearDown() {
-    gd_app_context_free(m_app);
-    m_app = NULL;
+    if (m_app) {
+        gd_app_context_free(m_app);
+        m_app = NULL;
+    }
+
     Base::TearDown();
 }
 
