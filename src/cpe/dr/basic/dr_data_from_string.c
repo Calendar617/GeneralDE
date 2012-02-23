@@ -31,8 +31,8 @@ static int dr_set_string_from_string(void * output, LPDRMETAENTRY entry, const c
     }
 
     len = strlen(input);
-    if (len + 1 > (size_t)entry->m_unitsize) {
-        len = entry->m_unitsize - 1;
+    if (len + 1 > (size_t)entry->m_size) {
+        len = entry->m_size - 1;
     }
 
     memcpy(output, input, len);
