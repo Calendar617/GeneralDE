@@ -263,7 +263,11 @@ static void dr_inbuild_build_calc_basic_type_and_size(struct DRInBuildMetaLib * 
                     entryEle->m_data.m_unitsize =
                         ctypeInfo->m_size * ( entryEle->m_data.m_array_count < 1 ? 1 : entryEle->m_data.m_array_count);
                 }
-                else if (entryEle->m_data.m_unitsize <= 0) {
+                else if (entryEle->m_data.m_size > 0) {
+                    entryEle->m_data.m_unitsize =
+                        entryEle->m_data.m_size * ( entryEle->m_data.m_array_count < 1 ? 1 : entryEle->m_data.m_array_count);
+                }
+                else {
                     CPE_ERROR_EX(
                         em, CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE,
                         "%s.%s: no size of  type \"%s\" configured!",

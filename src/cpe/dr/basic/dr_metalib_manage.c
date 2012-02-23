@@ -421,7 +421,7 @@ size_t dr_entry_element_size(LPDRMETAENTRY entry) {
         return dr_meta_size(refMeta);
     }
     else if (entry->m_type == CPE_DR_TYPE_STRING) {
-        return entry->m_unitsize;
+        return entry->m_size;
     }
     else {
         const struct tagDRCTypeInfo * typeInfo;

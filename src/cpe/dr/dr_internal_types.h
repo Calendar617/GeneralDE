@@ -65,7 +65,8 @@ struct tagDRMetaEntry {
     /*008*/ int32_t m_type;
     /*012*/ int32_t m_name_pos;
     /*016*/ int32_t m_unitsize;
-    int8_t reserve_2[16];
+    int8_t reserve_2[12];
+    /*032*/ int32_t m_size;
     /*036*/ int32_t m_array_count;
     /*040*/ int32_t m_data_start_pos_3; /*same as start pos?*/
     /*044*/ int32_t m_data_start_pos;
