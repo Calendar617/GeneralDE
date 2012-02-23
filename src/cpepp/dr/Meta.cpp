@@ -139,7 +139,10 @@ void Meta::copy_same_entries(
     const void * src, LPDRMETA srcMeta, size_t srcCapacity,
     int policy, error_monitor_t em) const
 {
-    dr_meta_copy_same_entry(data, capacity, *this, src, srcCapacity, srcMeta, policy, em);
+    dr_meta_copy_same_entry(
+        data, capacity, *this,
+        src, (srcCapacity == 0 ? dr_meta_size(srcMeta) : srcCapacity), srcMeta,
+        policy, em);
 }
 
 void Meta::copy_same_entries(
