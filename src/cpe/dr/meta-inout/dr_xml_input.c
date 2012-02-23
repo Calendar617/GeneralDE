@@ -404,7 +404,7 @@ static void dr_build_xml_process_entry(
             DR_DO_DUP_STR(newEntry->m_selector_path);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_SIZE) == 0) {
-            DR_DO_READ_INT(newEntry->m_data.m_unitsize, CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE);
+            DR_DO_READ_INT(newEntry->m_data.m_size, CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_DEFAULT_VALUE) == 0) {
             DR_DO_DUP_STR(newEntry->m_dft_value);

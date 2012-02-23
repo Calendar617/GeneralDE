@@ -165,6 +165,25 @@ TEST_F(BuildFromXmlEntryTest, string_no_size) {
     EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE));
 }
 
+TEST_F(BuildFromXmlEntryTest, string_array) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <struct name='PkgHead' version='1'>"
+        "	     <entry name='a1' type='string' size='13' count='12'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    ASSERT_TRUE(t_em_no_error());
+
+    LPDRMETAENTRY e = entry("PkgHead", "a1");
+    ASSERT_TRUE(e);
+
+    EXPECT_EQ(dr_entry_array_count(e), 12);
+    EXPECT_EQ(dr_entry_element_size(e), (size_t)13);
+    EXPECT_EQ(dr_entry_size(e), (size_t)(12 * 13));
+}
+
 TEST_F(BuildFromXmlEntryTest, dftvalue_basic) {
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'>"
