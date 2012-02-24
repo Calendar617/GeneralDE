@@ -38,6 +38,11 @@ static cfg_t dump(cfg_t cfg, mem_allocrator_t alloc) {
     return root;
 }
 
+Tree::Tree(mem_allocrator_t alloc) 
+    : m_root(cfg_create(alloc))
+{
+}
+
 Tree::Tree(const char * def, mem_allocrator_t alloc)
     : m_root(parse(def, alloc))
 {
