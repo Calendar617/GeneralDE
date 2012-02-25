@@ -20,6 +20,7 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
 
     LPDRMETAENTRY e = entry("PkgHead", "a1");
 
+    EXPECT_EQ(12, dr_entry_id(e));
     EXPECT_STREQ("a1", dr_entry_name(e));
     EXPECT_STREQ("a1.desc", dr_entry_desc(e));
     EXPECT_STREQ("a1.cname", dr_entry_cname(e));
