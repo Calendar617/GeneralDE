@@ -132,3 +132,54 @@ TEST_F(SetDefaultsTest, sequence_struct_sequence) {
         EXPECT_EQ(23, dr_ctype_read_int16(result(i * 2), CPE_DR_TYPE_INT16));
     }
 }
+
+TEST_F(SetDefaultsTest, union_basic) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='A' version='1'>"
+        "	     <entry name='a1' type='int32' defaultvalue='9'/>"
+        "	     <entry name='a2' type='int16' defaultvalue='10'/>"
+        "    </struct>"
+        "    <struct name='B' version='1'>"
+        "	     <entry name='b1' type='int16' defaultvalue='11'/>"
+        "	     <entry name='b2' type='int16' defaultvalue='12'/>"
+        "    </struct>"
+        "    <union name='U' version='1'>"
+        "	     <entry name='u1' type='A' id='2'/>"
+        "	     <entry name='u2' type='B' id='3'/>"
+        "    </union>"
+        "</metalib>");
+
+    set_defaults("U");
+
+    EXPECT_EQ(11, dr_ctype_read_int16(result(0), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(12, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
+}
+
+TEST_F(SetDefaultsTest, union_with_selector) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='A' version='1'>"
+        "	     <entry name='a1' type='int32' defaultvalue='9'/>"
+        "	     <entry name='a2' type='int16' defaultvalue='10'/>"
+        "    </struct>"
+        "    <struct name='B' version='1'>"
+        "	     <entry name='b1' type='int16' defaultvalue='11'/>"
+        "	     <entry name='b2' type='int16' defaultvalue='12'/>"
+        "    </struct>"
+        "    <union name='U' version='1'>"
+        "	     <entry name='u1' type='A' id='2'/>"
+        "	     <entry name='u2' type='B' id='3'/>"
+        "    </union>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='type' type='int16' defaultvalue='2'/>"
+        "        <entry name='data' type='U' select='type'/>"
+        "    </struct>"
+        "</metalib>");
+
+    set_defaults("S");
+
+    EXPECT_EQ(2, dr_ctype_read_int16(result(0), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(9, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT32));
+    EXPECT_EQ(10, dr_ctype_read_int16(result(6), CPE_DR_TYPE_INT16));
+}

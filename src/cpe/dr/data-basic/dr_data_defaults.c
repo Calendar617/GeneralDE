@@ -29,6 +29,7 @@ struct SetDefaultProcessStack{
     LPDRMETA m_meta;
     LPDRMETAENTRY m_entry;
     int m_entry_pos;
+    int m_entry_count;
     int m_array_pos;
     char * m_data;
     size_t m_capacity;
@@ -44,6 +45,7 @@ void dr_meta_set_defaults(void * inout, size_t capacity, LPDRMETA meta, int poli
     processStack[0].m_meta = meta;
     processStack[0].m_entry = dr_meta_entry_at(meta, 0);
     processStack[0].m_entry_pos = 0;
+    processStack[0].m_entry_count = meta->m_entry_count;
     processStack[0].m_array_pos = 0;
     processStack[0].m_data = (char *)inout;
     processStack[0].m_capacity = capacity;
@@ -59,7 +61,7 @@ void dr_meta_set_defaults(void * inout, size_t capacity, LPDRMETA meta, int poli
             continue;
         }
 
-        for(; curStack->m_entry_pos < curStack->m_meta->m_entry_count
+        for(; curStack->m_entry_pos < curStack->m_entry_count
                 && curStack->m_entry;
             ++curStack->m_entry_pos
                 , curStack->m_array_pos = 0
@@ -92,24 +94,45 @@ void dr_meta_set_defaults(void * inout, size_t capacity, LPDRMETA meta, int poli
                 }
 
                 if (curStack->m_entry->m_type <= CPE_DR_TYPE_COMPOSITE) {
-                    if (stackPos + 1 < CPE_DR_MAX_LEVEL) {
-                        struct SetDefaultProcessStack * nextStack;
-                        nextStack = &processStack[stackPos + 1];
+                    if (stackPos + 1 >= CPE_DR_MAX_LEVEL) continue;
 
-                        nextStack->m_meta = dr_entry_ref_meta(curStack->m_entry);
-                        if (nextStack->m_meta == 0) break;
+                    struct SetDefaultProcessStack * nextStack;
+                    nextStack = &processStack[stackPos + 1];
 
-                        nextStack->m_entry = dr_meta_entry_at(nextStack->m_meta, 0);
-                        nextStack->m_data = entry_data;
-                        nextStack->m_capacity = entry_capacity;
-                        nextStack->m_entry_pos = 0;
-                        nextStack->m_array_pos = 0;
+                    nextStack->m_meta = dr_entry_ref_meta(curStack->m_entry);
+                    if (nextStack->m_meta == 0) break;
 
-                        ++curStack->m_array_pos;
-                        ++stackPos;
-                        curStack = nextStack;
-                        goto LOOPENTRY;
+                    nextStack->m_entry_pos = 0;
+                    nextStack->m_entry_count = nextStack->m_meta->m_entry_count;
+
+                    if (curStack->m_entry->m_type == CPE_DR_TYPE_UNION) {
+                        LPDRMETAENTRY select_entry;
+                        select_entry = dr_entry_select_entry(curStack->m_entry);
+                        if (select_entry) {
+                            int32_t union_entry_id;
+                            dr_entry_try_read_int32(
+                                &union_entry_id,
+                                curStack->m_data + curStack->m_entry->m_select_data_start_pos,
+                                select_entry,
+                                NULL);
+                                
+                            nextStack->m_entry_pos =
+                                dr_meta_find_entry_idx_by_id(nextStack->m_meta, union_entry_id);
+                            if (nextStack->m_entry_pos < 0) continue;
+
+                            nextStack->m_entry_count = nextStack->m_entry_pos + 1;
+                        }
                     }
+
+                    nextStack->m_entry = dr_meta_entry_at(nextStack->m_meta, nextStack->m_entry_pos);
+                    nextStack->m_data = entry_data;
+                    nextStack->m_capacity = entry_capacity;
+                    nextStack->m_array_pos = 0;
+
+                    ++curStack->m_array_pos;
+                    ++stackPos;
+                    curStack = nextStack;
+                    goto LOOPENTRY;
                 }
                 else {
                     if (entry_capacity >= element_size) {
