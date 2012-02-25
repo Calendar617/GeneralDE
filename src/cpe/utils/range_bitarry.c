@@ -9,7 +9,7 @@ int cpe_range_free_from_bitarray(
 {
     int32_t start;
     int32_t end;
-    int i;
+    size_t i;
 
     start = end = -1;
 
