@@ -218,3 +218,47 @@ TEST_F(CopySameEntryTest, struct_array_struct_basic) {
     EXPECT_EQ(67, dr_ctype_read_int16(result(8 * 2), CPE_DR_TYPE_INT16));
 }
 
+TEST_F(CopySameEntryTest, union_with_selector) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='A-i' version='1'>"
+        "	     <entry name='a1' type='int32' defaultvalue='9'/>"
+        "	     <entry name='a2' type='int16' defaultvalue='10'/>"
+        "    </struct>"
+        "    <struct name='B-i' version='1'>"
+        "	     <entry name='b1' type='int16' defaultvalue='11'/>"
+        "	     <entry name='b2' type='int16' defaultvalue='12'/>"
+        "    </struct>"
+        "    <union name='U-i' version='1'>"
+        "	     <entry name='u1' type='A-i' id='2'/>"
+        "	     <entry name='u2' type='B-i' id='3'/>"
+        "    </union>"
+        "    <struct name='S-i' version='1'>"
+        "	     <entry name='type' type='int16' defaultvalue='2'/>"
+        "        <entry name='data' type='U-i' select='type'/>"
+        "    </struct>"
+        "    <struct name='A-d' version='1'>"
+        "	     <entry name='a1' type='int16'/>"
+        "	     <entry name='a2' type='int32'/>"
+        "    </struct>"
+        "    <struct name='B-d' version='1'>"
+        "	     <entry name='b1' type='int32'/>"
+        "	     <entry name='b2' type='int32'/>"
+        "    </struct>"
+        "    <union name='U-d' version='1'>"
+        "	     <entry name='u1' type='A-d' id='20'/>"
+        "	     <entry name='u2' type='B-d' id='30'/>"
+        "    </union>"
+        "    <struct name='S-d' version='1'>"
+        "	     <entry name='type' type='int32'/>"
+        "        <entry name='data' type='U-d' select='type'/>"
+        "    </struct>"
+        "</metalib>");
+
+    copy("S-d", "S-i");
+
+    EXPECT_EQ(20, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT32));
+    EXPECT_EQ(9, dr_ctype_read_int16(result(4), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(10, dr_ctype_read_int16(result(6), CPE_DR_TYPE_INT16));
+}
+

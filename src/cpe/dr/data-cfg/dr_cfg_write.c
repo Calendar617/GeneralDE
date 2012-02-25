@@ -12,6 +12,7 @@ struct SetDefaultProcessStack{
     LPDRMETA m_meta;
     LPDRMETAENTRY m_entry;
     int m_entry_pos;
+    int m_entry_count;
     int m_array_pos;
     cfg_t m_des;
     cfg_t m_des_seq;
@@ -34,6 +35,7 @@ void dr_cfg_write_i(
     processStack[0].m_meta = meta;
     processStack[0].m_entry = dr_meta_entry_at(meta, 0);
     processStack[0].m_entry_pos = 0;
+    processStack[0].m_entry_count = meta->m_entry_count;
     processStack[0].m_array_pos = 0;
     processStack[0].m_des = cfg;
     processStack[0].m_des_seq = NULL;
@@ -50,7 +52,7 @@ void dr_cfg_write_i(
             continue;
         }
 
-        for(; curStack->m_entry_pos < curStack->m_meta->m_entry_count
+        for(; curStack->m_entry_pos < curStack->m_entry_count
                 && curStack->m_entry
                 && curStack->m_des;
             ++curStack->m_entry_pos
@@ -96,9 +98,31 @@ void dr_cfg_write_i(
                         nextStack->m_meta = dr_entry_ref_meta(curStack->m_entry);
                         if (nextStack->m_meta == 0) break;
 
-                        nextStack->m_entry = dr_meta_entry_at(nextStack->m_meta, 0);
                         nextStack->m_src_data = entryData;
                         nextStack->m_entry_pos = 0;
+                        nextStack->m_entry_count = nextStack->m_meta->m_entry_count;
+
+                        if (curStack->m_entry->m_type == CPE_DR_TYPE_UNION) {
+                            LPDRMETAENTRY select_entry;
+                            select_entry = dr_entry_select_entry(curStack->m_entry);
+                            if (select_entry) {
+                                int32_t union_entry_id;
+                                dr_entry_try_read_int32(
+                                    &union_entry_id,
+                                    curStack->m_src_data + curStack->m_entry->m_select_data_start_pos,
+                                    select_entry,
+                                    em);
+                                
+                                nextStack->m_entry_pos =
+                                    dr_meta_find_entry_idx_by_id(nextStack->m_meta, union_entry_id);
+                                if (nextStack->m_entry_pos < 0) continue;
+
+                                nextStack->m_entry_count = nextStack->m_entry_pos + 1;
+                            }
+                        }
+
+                        nextStack->m_entry = dr_meta_entry_at(nextStack->m_meta, nextStack->m_entry_pos);
+
                         nextStack->m_array_pos = 0;
                         nextStack->m_des =
                             curStack->m_des_seq
