@@ -54,7 +54,7 @@ void gd_dp_pbuf_remove_rsp(gd_dp_mgr_t dm, gd_dp_rsp_t rsp) {
     TAILQ_FOREACH(pbuf, &dm->m_processiong_rsps, m_sh_other) {
         struct gd_dp_processing_rsp_block * block;
         TAILQ_FOREACH(block, &pbuf->m_blocks, m_next) {
-            int i;
+            size_t i;
             for(i = block->m_read_pos; block && i < block->m_write_pos; ++i) {
                 if (block->m_rsps[i] == rsp) {
                     memmove(

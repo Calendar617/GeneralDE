@@ -290,7 +290,7 @@ int gd_om_class_add_old_page(
             theClass->m_object_per_page * theClass->m_page_array_size,
             theClass->m_object_per_page) != 0)
     {
-        int i;
+        size_t i;
         CPE_ERROR_EX(em, gd_om_no_memory, "alloc page range no memory!");
 
         cpe_range_mgr_clear(&theClass->m_range_alloc);
@@ -350,7 +350,7 @@ gd_om_class_alloc_object(struct gd_om_class * theClass) {
         int32_t pagePos;
 
         pagePos = (int32_t)(r / theClass->m_object_per_page);
-        assert(pagePos >= 0 && pagePos < theClass->m_page_array_size);
+        assert(pagePos >= 0 && (size_t)pagePos < theClass->m_page_array_size);
 
         alloc_arry = gd_om_class_ba_of_page(theClass->m_page_array[pagePos]);
 
@@ -367,7 +367,7 @@ void gd_om_class_free_object(struct gd_om_class * theClass, int32_t oid, error_m
 
     pagePos = (int32_t)(oid / theClass->m_object_per_page);
 
-    if(pagePos < 0 || pagePos >= theClass->m_page_array_size) {
+    if(pagePos < 0 || (size_t)pagePos >= theClass->m_page_array_size) {
         CPE_ERROR_EX(
             em, gd_om_invalid_oid, "class %s: page pos %d overflow, page count is %zu!", 
             cpe_hs_data(theClass->m_name), pagePos, theClass->m_page_array_size);
@@ -392,7 +392,7 @@ void * gd_om_class_get_object(struct gd_om_class * theClass, int32_t oid, error_
 
     pagePos = (int32_t)(oid / theClass->m_object_per_page);
 
-    if(pagePos < 0 || pagePos >= theClass->m_page_array_size) {
+    if(pagePos < 0 || (size_t)pagePos >= theClass->m_page_array_size) {
         CPE_ERROR_EX(
             em, gd_om_invalid_oid, "class %s: page pos %d overflow, page count is %zu!", 
             cpe_hs_data(theClass->m_name), pagePos, theClass->m_page_array_size);
@@ -420,7 +420,7 @@ int32_t gd_om_class_addr_2_object(struct gd_om_class *cls, void * page, void * a
 
     head = (struct gd_om_data_page_head *)page;
     if (head->m_page_idx < 0
-        || head->m_page_idx >= cls->m_page_array_size
+        || (size_t)head->m_page_idx >= cls->m_page_array_size
         || page != cls->m_page_array[head->m_page_idx])
         return -1;
 

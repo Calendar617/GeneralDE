@@ -21,7 +21,7 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * ty
     if (data_capacity < 0) {
         data_capacity = dr_meta_size(meta);
     }
-    else if (data_capacity < dr_meta_size(meta)) {
+    else if (data_capacity < (ssize_t)dr_meta_size(meta)) {
         CPE_ERROR(em, "data_capacity %zd is to small to contain type %s!", data_capacity, typeName);
         return NULL;
     }

@@ -90,7 +90,7 @@ gd_om_buffer_mgr_init_pages(struct gd_om_buffer_mgr * pgm, void * buf) {
     int leftSize = pgm->m_buf_size;
     char * b = (char *)buf;
 
-    while(leftSize > pgm->m_page_size) {
+    while(leftSize > (int)pgm->m_page_size) {
         gd_om_data_page_head_init(b);
         b += pgm->m_page_size;
         leftSize -= pgm->m_page_size;
@@ -213,7 +213,7 @@ int gd_om_buffer_mgr_attach_old_buffer(
     cpe_range_put_one(&pgm->m_buffer_ids, buf_id);
 
     for(leftSize = pgm->m_buf_size;
-        leftSize > pgm->m_page_size;
+        leftSize > (int)pgm->m_page_size;
         leftSize -= pgm->m_page_size, buf += pgm->m_page_size)
     {
         if (!gd_om_data_page_head_is_valid((struct gd_om_data_page_head*)buf)) {
@@ -243,7 +243,7 @@ void * gd_om_page_get(struct gd_om_buffer_mgr * pgm, error_monitor_t em) {
             continue;
         }
 
-        if (cpe_range_size(pageRange) < pgm->m_page_size) {
+        if (cpe_range_size(pageRange) < (int)pgm->m_page_size) {
             continue;
         }
 
