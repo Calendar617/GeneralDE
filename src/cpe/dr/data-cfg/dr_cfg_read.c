@@ -195,7 +195,7 @@ int dr_cfg_read_union(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, LPD
             continue;
         }
 
-        if (entry->m_data_start_pos >= capacity) continue;
+        if ((size_t)entry->m_data_start_pos >= capacity) continue;
 
         entry_capacity = capacity - entry->m_data_start_pos;
 
@@ -244,7 +244,7 @@ int dr_cfg_read_struct(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, in
             continue;
         }
 
-        if (entry->m_data_start_pos >= capacity) continue;
+        if ((size_t)entry->m_data_start_pos >= capacity) continue;
 
         entry_capacity = entry->m_unitsize;
         if (entry == last_entry || entry->m_data_start_pos + entry_capacity > capacity) {
@@ -253,7 +253,7 @@ int dr_cfg_read_struct(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, in
 
         entry_size = dr_cfg_read_entry(buf, capacity, buf + entry->m_data_start_pos, entry_capacity, item, meta, entry, policy, em);
         
-        if (entry->m_data_start_pos + entry_size > size) {
+        if ((int)(entry->m_data_start_pos + entry_size) > size) {
             size = entry->m_data_start_pos + entry_size;
         }
     }

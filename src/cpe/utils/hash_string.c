@@ -38,7 +38,7 @@ void cpe_hs_strcat(cpe_hash_string_t target, size_t capacity, const char * data)
     char * buf = (char *)(len + 1);
 
     ssize_t dataLen = (ssize_t)strlen(data);
-    if ((dataLen + *len) > capacity - 9) {
+    if ((size_t)(dataLen + *len) > capacity - 9) {
         dataLen = (*len) - (capacity - 9);
     }
 
@@ -56,7 +56,7 @@ void cpe_hs_init(cpe_hash_string_t target, size_t capacity, const char * source)
     char * data = (char *)(len + 1);
 
     *len = strlen(source);
-    if (*len > capacity - 9) {
+    if ((size_t)(*len) > capacity - 9) {
         *len = capacity - 9;
     }
 

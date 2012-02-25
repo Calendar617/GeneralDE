@@ -81,7 +81,7 @@ void dr_meta_set_defaults(void * inout, size_t capacity, LPDRMETA meta, int poli
                 size_t left_capacity;
 
                 entry_data = curStack->m_data + curStack->m_entry->m_data_start_pos + (element_size * curStack->m_array_pos);
-                if (entry_data - curStack->m_data >= curStack->m_capacity) continue;
+                if ((size_t)(entry_data - curStack->m_data) >= curStack->m_capacity) continue;
 
                 left_capacity = curStack->m_capacity - (entry_data - curStack->m_data);
                 entry_capacity = element_size;
@@ -94,9 +94,10 @@ void dr_meta_set_defaults(void * inout, size_t capacity, LPDRMETA meta, int poli
                 }
 
                 if (curStack->m_entry->m_type <= CPE_DR_TYPE_COMPOSITE) {
+                    struct SetDefaultProcessStack * nextStack;
+
                     if (stackPos + 1 >= CPE_DR_MAX_LEVEL) continue;
 
-                    struct SetDefaultProcessStack * nextStack;
                     nextStack = &processStack[stackPos + 1];
 
                     nextStack->m_meta = dr_entry_ref_meta(curStack->m_entry);

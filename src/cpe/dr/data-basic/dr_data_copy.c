@@ -9,8 +9,8 @@
 struct CopySameEntryProcessStack{
     LPDRMETA m_des_meta;
     LPDRMETAENTRY m_des_entry;
-    int m_des_entry_pos;
-    int m_des_entry_count;
+    int32_t m_des_entry_pos;
+    int32_t m_des_entry_count;
     char * m_des_data;
     size_t m_des_capacity;
 
@@ -114,7 +114,7 @@ void dr_meta_copy_same_entry(
         {
             size_t des_element_size, src_element_size;
             LPDRMETAENTRY src_entry;
-            size_t des_array_count_max, src_array_count_max;
+            int32_t des_array_count_max, src_array_count_max;
 
         LOOPENTRY:
             des_element_size = dr_entry_element_size(curStack->m_des_entry);
@@ -135,8 +135,8 @@ void dr_meta_copy_same_entry(
             if (src_array_count_max != 1) {
                 LPDRMETAENTRY srcRefer = dr_entry_array_refer_entry(src_entry);
                 if (srcRefer) {
-                    uint64_t readBuf;
-                    if (dr_ctype_try_read_uint64(
+                    int32_t readBuf;
+                    if (dr_ctype_try_read_int32(
                             &readBuf, 
                             curStack->m_src_data + src_entry->m_array_refer_data_start_pos,
                             src_entry->m_type,
@@ -156,7 +156,7 @@ void dr_meta_copy_same_entry(
                 size_t src_entry_capacity, src_left_capacity;
 
                 des_entry_data = curStack->m_des_data + curStack->m_des_entry->m_data_start_pos + (des_element_size * curStack->m_array_pos);
-                if (des_entry_data - curStack->m_des_data > curStack->m_des_capacity) continue;
+                if ((size_t)(des_entry_data - curStack->m_des_data) > curStack->m_des_capacity) continue;
 
                 des_left_capacity = curStack->m_des_capacity - (des_entry_data - curStack->m_des_data);
                 des_entry_capacity = des_element_size;
@@ -169,7 +169,7 @@ void dr_meta_copy_same_entry(
                 }
 
                 src_entry_data = curStack->m_src_data + src_entry->m_data_start_pos + (src_element_size * curStack->m_array_pos);
-                if (src_entry_data - curStack->m_src_data > curStack->m_src_capacity) continue;
+                if ((size_t)(src_entry_data - curStack->m_src_data) > curStack->m_src_capacity) continue;
 
                 src_left_capacity = curStack->m_src_capacity - (src_entry_data - curStack->m_src_data);
                 src_entry_capacity = src_element_size;
