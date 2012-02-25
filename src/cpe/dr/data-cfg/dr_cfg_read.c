@@ -58,7 +58,7 @@ int dr_cfg_read_entry_one(
             if (select_entry) {
                 size_t select_element_size;
                 select_element_size = dr_entry_element_size(select_entry);
-                if (entry->m_select_data_start_pos + select_element_size < all_capacity) {
+                if (entry->m_select_data_start_pos + select_element_size <= all_capacity) {
                     dr_entry_set_from_int32(
                         all_buf + entry->m_select_data_start_pos,
                         union_entry->m_id,
