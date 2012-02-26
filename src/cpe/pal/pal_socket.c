@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include "cpe/pal/pal_socket.h"
 
 int cpe_sock_set_block(int fd, int is_non_block) {
