@@ -1,12 +1,6 @@
 #include <assert.h>
-#ifdef _MSC_VER
-#include <WinSock.h>
-#else
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#endif
 #include <errno.h>
+#include "cpe/pal/pal_socket.h"
 #include "cpe/pal/pal_string.h"
 #include "gd/net/net_listener.h"
 #include "gd/net/net_endpoint.h"
@@ -82,6 +76,7 @@ gd_net_listener_create(
     gd_net_listener_t listener;
     char * buf;
     size_t nameLen;
+    struct sockaddr_in * inetAddr;
 
     nameLen = strlen(name);
 
@@ -101,8 +96,7 @@ gd_net_listener_create(
         return NULL;
     }
 
-    /*设置客户端连接端口*/
-    struct sockaddr_in * inetAddr = (struct sockaddr_in *)(&listener->m_addr);
+    inetAddr = (struct sockaddr_in *)(&listener->m_addr);
     inetAddr->sin_family = AF_INET;
     inetAddr->sin_port = port;
     inetAddr->sin_addr.s_addr = 

@@ -1,14 +1,8 @@
 #include <assert.h>
-#ifdef _MSC_VER
-#include <WinSock.h>
-#else
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#endif _MSC_VER
 #include <errno.h>
-#include "cpe/utils/error.h"
+#include "cpe/pal/pal_socket.h"
 #include "cpe/pal/pal_string.h"
+#include "cpe/utils/error.h"
 #include "gd/net/net_connector.h"
 #include "gd/net/net_endpoint.h"
 #include "net_internal_ops.h"
@@ -27,6 +21,7 @@ gd_net_connector_create(
     gd_net_connector_t connector;
     char * buf;
     size_t nameLen;
+    struct sockaddr_in * inetAddr;
 
     nameLen = strlen(name);
 
@@ -42,8 +37,7 @@ gd_net_connector_create(
     connector->m_monitor_fun = NULL;
     connector->m_monitor_ctx = NULL;
 
-    /*设置客户端连接端口*/
-    struct sockaddr_in * inetAddr = (struct sockaddr_in *)(&connector->m_addr);
+    inetAddr = (struct sockaddr_in *)(&connector->m_addr);
     inetAddr->sin_family = AF_INET;
     inetAddr->sin_port = port;
     inetAddr->sin_addr.s_addr = inet_addr(ip);
