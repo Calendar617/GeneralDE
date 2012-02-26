@@ -1,0 +1,30 @@
+#include <assert.h>
+#include <fcntl.h>
+#include <errno.h>
+#include "cpe/pal/pal_socket.h"
+#include "cpe/pal/pal_unistd.h"
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_unistd.h"
+#include "net_internal_ops.h"
+
+int gd_net_socket_set_none_block(int fd, error_monitor_t em) {
+    if (cpe_sock_set_non_block(fd, 1) != 0) {
+        CPE_ERROR(em,
+            "gd_net_tcp_set_none_block: set non block fail! errno=%d (%s)",
+            cpe_sock_errno(), cpe_sock_errstr());
+        return -1;
+    }
+    else {
+        return 0;
+    }
+}
+
+void gd_net_socket_close(int * fd, error_monitor_t em) {
+    if (*fd == -1) return;
+
+    if (cpe_sock_close(*fd) != 0) {
+        CPE_ERROR(em, "gd_net_socket_destory: close fail, errno=%d (%s)", cpe_sock_errno(), cpe_sock_errstr());
+    }
+
+    *fd = -1;
+}
