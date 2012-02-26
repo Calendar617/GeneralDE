@@ -1,6 +1,10 @@
 #ifndef CPE_PAL_SOCKET_H
 #define CPE_PAL_SOCKET_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef _MSC_VER
 
 #include <WinSock.h>
@@ -22,6 +26,10 @@
 
 #endif
 
-int cpe_sock_set_block(int fd, int is_non_block);
+int cpe_sock_set_none_block(int fd, int is_non_block);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
