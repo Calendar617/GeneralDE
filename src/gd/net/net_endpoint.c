@@ -91,9 +91,18 @@ int gd_net_ep_is_open(gd_net_ep_t ep) {
 void gd_net_ep_close(gd_net_ep_t ep) {
     if (ep->m_fd < 0) return;
 
+#ifdef _MSC_VER
+    if (ep->m_type = gd_net_ep_socket) {
+        gd_net_socket_close(&ep->m_fd, ep->m_mgr->m_em);
+    }
+    else {
+        CPE_ERROR(ep->m_mgr->m_em, "gd_net_ep_close: close fail, errno=%s", strerror(errno));
+    }
+#else
     if (close(ep->m_fd) != 0) {
         CPE_ERROR(ep->m_mgr->m_em, "gd_net_ep_close: close fail, errno=%s", strerror(errno));
     }
+#endif
 
     ep->m_fd = -1;
 }

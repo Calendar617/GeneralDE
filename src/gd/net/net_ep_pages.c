@@ -41,8 +41,8 @@ static void gd_net_ep_pages_inc(gd_net_mgr_t nmgr) {
 gd_net_ep_t
 gd_net_ep_pages_alloc_ep(gd_net_mgr_t nmgr) {
     ptr_int_t epPos;
-    int pagePos;
-    int posInPage;
+    size_t pagePos;
+    size_t posInPage;
     struct gd_net_ep_page * page;
     gd_net_ep_t ep;
 
@@ -56,8 +56,8 @@ gd_net_ep_pages_alloc_ep(gd_net_mgr_t nmgr) {
 
     if (epPos < 0) return NULL;
 
-    pagePos = ((int)epPos) / GD_NET_EP_COUNT_PER_PAGE;
-    posInPage = ((int)epPos) % GD_NET_EP_COUNT_PER_PAGE;
+    pagePos = ((size_t)epPos) / GD_NET_EP_COUNT_PER_PAGE;
+    posInPage = ((size_t)epPos) % GD_NET_EP_COUNT_PER_PAGE;
 
     assert(pagePos < nmgr->m_ep_page_capacity);
 
@@ -92,8 +92,8 @@ void gd_net_ep_pages_free_ep(gd_net_ep_t ep) {
 }
 
 void gd_net_ep_pages_free(gd_net_mgr_t nmgr) {
-    int pagePos;
-    int epPos;
+    size_t pagePos;
+    size_t epPos;
     assert(nmgr);
 
     if (nmgr->m_ep_pages == NULL) return;
@@ -119,8 +119,8 @@ void gd_net_ep_pages_free(gd_net_mgr_t nmgr) {
 }
 
 gd_net_ep_t gd_net_ep_find(gd_net_mgr_t nmgr, gd_net_ep_id_t id) {
-    int pagePos;
-    int posInPage;
+    size_t pagePos;
+    size_t posInPage;
     struct gd_net_ep_page * page;
     gd_net_ep_t ep;
 

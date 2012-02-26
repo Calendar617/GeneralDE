@@ -1,7 +1,11 @@
 #include <assert.h>
+#ifdef _MSC_VER
+#include <WinSock.h>
+#else
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#endif _MSC_VER
 #include <errno.h>
 #include "cpe/utils/error.h"
 #include "cpe/pal/pal_string.h"
