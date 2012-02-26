@@ -8,7 +8,7 @@
 #include "net_internal_ops.h"
 
 int gd_net_socket_set_none_block(int fd, error_monitor_t em) {
-    if (cpe_sock_set_non_block(fd, 1) != 0) {
+    if (cpe_sock_set_none_block(fd, 1) != 0) {
         CPE_ERROR(em,
             "gd_net_tcp_set_none_block: set non block fail! errno=%d (%s)",
             cpe_sock_errno(), cpe_sock_errstr());
