@@ -1,8 +1,10 @@
 #include <sstream>
 #include <stdexcept>
 #include "cpe/pal/pal_strings.h"
+#include "cpe/utils/stream_buffer.h"
 #include "cpe/dr/dr_cfg.h"
 #include "cpe/dr/dr_data.h"
+#include "cpe/dr/dr_json.h"
 #include "cpepp/dr/Meta.hpp"
 #include "cpepp/dr/MetaLib.hpp"
 #include "cpepp/utils/ErrorCollector.hpp"
@@ -45,7 +47,7 @@ Entry const * Meta::findEntry(int id) const {
     return pos < 0 ? NULL : (Entry const *)dr_meta_entry_at(*this, pos);
 }
 
-Entry const & Meta::entry(const char * name) {
+Entry const & Meta::entry(const char * name) const {
     Entry const * r = findEntry(name);
     if (r == NULL) {
         ::std::ostringstream os;
@@ -83,6 +85,23 @@ Meta const & Meta::_cast(LPDRMETA meta) {
     return *(Meta const *)meta;
 }
 
+const char * Meta::dump_data(mem_buffer_t buffer, const void * data) const {
+    write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
+
+    dump_data((write_stream_t)&stream, data);
+
+    return (const char *)mem_buffer_make_continuous(buffer, 0);
+}
+
+void Meta::dump_data(write_stream_t stream, const void * data) const {
+    dr_json_print(
+        stream,
+        data,
+        *this,
+        DR_JSON_PRINT_BEAUTIFY,
+        0);
+}
+
 void Meta::load_from_cfg(void * data, size_t capacity, cfg_t cfg, int policy) const {
     Utils::ErrorCollector ec;
     if (dr_cfg_read(data, capacity, cfg, *this, policy, ec) <= 0) {
@@ -100,6 +119,17 @@ bool Meta::try_load_from_cfg(void * data, size_t capacity, cfg_t cfg, error_moni
     }
 }
 
+void Meta::write_to_cfg(cfg_t cfg, const void * data) const {
+    Utils::ErrorCollector ec;
+    if (dr_cfg_write(cfg, data, *this, ec) != 0) {
+        ec.checkThrowWithMsg< ::std::runtime_error>();
+    }
+}
+
+bool Meta::try_write_to_cfg(cfg_t cfg, const void * data,  error_monitor_t em) const {
+    return dr_cfg_write(cfg, data, *this, em) == 0 ? true : false;
+}
+
 void Meta::set_defaults(void * data, size_t capacity, int policy) const {
     dr_meta_set_defaults(data, capacity, *this, policy);
 }
@@ -109,7 +139,10 @@ void Meta::copy_same_entries(
     const void * src, LPDRMETA srcMeta, size_t srcCapacity,
     int policy, error_monitor_t em) const
 {
-    dr_meta_copy_same_entry(data, capacity, *this, src, srcCapacity, srcMeta, policy, em);
+    dr_meta_copy_same_entry(
+        data, capacity, *this,
+        src, (srcCapacity == 0 ? dr_meta_size(srcMeta) : srcCapacity), srcMeta,
+        policy, em);
 }
 
 void Meta::copy_same_entries(

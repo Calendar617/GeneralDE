@@ -181,19 +181,19 @@ static void cfg_yaml_add_value(struct cfg_yaml_read_ctx * ctx, const char * valu
             return;
         }
         if (strcmp(tag, YAML_INT_TAG) == 0) {
-            cfg_yaml_do_add_value(value, ctx, CPE_CFG_TYPE_INT32, value);
+            cfg_yaml_do_add_value(value_from_string, ctx, CPE_CFG_TYPE_INT32, value);
             return;
         }
     }
     else {
         if (!ctx->m_input_event.data.scalar.quoted_implicit) {
-            cfg_yaml_do_add_value(value_auto, ctx, value);
+            cfg_yaml_do_add_value(value_from_string_auto, ctx, value);
             return;
         }
     }
 
     typeId = cfg_yaml_get_type_from_tag(ctx) ;
-    cfg_yaml_do_add_value(value, ctx, typeId, value);
+    cfg_yaml_do_add_value(value_from_string, ctx, typeId, value);
 }
 
 static void cfg_yaml_on_scalar(struct cfg_yaml_read_ctx * ctx) {

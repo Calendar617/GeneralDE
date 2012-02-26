@@ -1,5 +1,7 @@
 #ifndef CPEPP_DR_META_H
 #define CPEPP_DR_META_H
+#include "cpe/utils/stream.h"
+#include "cpe/utils/buffer.h"
 #include "cpepp/utils/ClassCategory.hpp"
 #include "cpepp/utils/CString.hpp"
 #include "cpe/dr/dr_metalib_manage.h"
@@ -34,11 +36,14 @@ public:
 
     Entry const * findEntry(const char * name) const { return (Entry const *)dr_meta_find_entry_by_name(*this, name); }
     Entry const * findEntry(int id) const;
-    Entry const & entry(const char * name);
+    Entry const & entry(const char * name) const;
     Entry const & entry(int id) const;
 
     Entry const * findEntryByPath(const char * path) const { return (Entry const*)dr_meta_find_entry_by_path(*this, path); }
     Entry const & entryByPath(const char * path) const;
+
+    void dump_data(write_stream_t stream, const void * data) const;
+    const char * dump_data(mem_buffer_t buffer, const void * data) const;
 
     void set_defaults(void * data, size_t capacity, int policy = 0) const;
     void copy_same_entries(
@@ -59,6 +64,19 @@ public:
     template<typename T>
     bool try_load_from_cfg(T & data, cfg_t cfg, error_monitor_t em = 0, int policy = 0) const {
         return try_load_from_cfg(&data, sizeof(data), cfg);
+    }
+
+    void write_to_cfg(cfg_t cfg, const void * data) const;
+    bool try_write_to_cfg(cfg_t cfg, const void * data,  error_monitor_t em = 0) const;
+
+    template<typename T>
+    void write_to_cfg(cfg_t cfg, T const & data) const {
+        write_to_cfg(cfg, (const void *)&data);
+    }
+
+    template<typename T>
+    bool try_write_to_cfg(cfg_t cfg, T const & data, error_monitor_t em = 0) const {
+        return try_write_to_cfg(cfg, (const void *)&data, em);
     }
 
     static Meta const & _cast(LPDRMETA meta);

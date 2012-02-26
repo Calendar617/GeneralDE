@@ -1,6 +1,8 @@
 #ifndef CPE_CFG_READ_H
 #define CPE_CFG_READ_H
 #include "cpe/utils/stream.h"
+#include "cpe/utils/error.h"
+#include "cpe/utils/buffer.h"
 #include "cfg_types.h"
 
 #ifdef __cplusplus
@@ -15,6 +17,9 @@ cfg_t cfg_parent(cfg_t cfg);
 int cfg_type_is_value(int type);
 int cfg_is_value(cfg_t cfg);
 cfg_t cfg_find_cfg(cfg_t cfg, const char * path);
+
+int cfg_path_print(write_stream_t stream, cfg_t cfg, cfg_t to);
+const char * cfg_path(mem_buffer_t buffer, cfg_t cfg, cfg_t to);
 
 /*get data operation*/
 int8_t cfg_as_int8(cfg_t cfg, int8_t dft);
@@ -69,6 +74,13 @@ void cfg_dump_inline(cfg_t cfg, write_stream_t stream);
 int cfg_child_count(cfg_t cfg);
 void cfg_it_init(cfg_it_t * it, cfg_t cfg);
 #define cfg_it_next(it) ((it)->next ? (it)->next(it) : NULL)
+
+/*compire operations*/
+enum {
+    CFG_CMP_POLICY_L_STRUCT_LEAK = 1 << 0
+    , CFG_CMP_POLICY_R_STRUCT_LEAK = 1 << 1
+};
+int cfg_cmp(cfg_t l, cfg_t r, int policy, error_monitor_t em);
 
 #ifdef __cplusplus
 }

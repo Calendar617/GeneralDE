@@ -9,6 +9,7 @@ class Tree : public Cpe::Utils::Noncopyable {
 public:
     operator cfg_t (void) const { return const_cast<cfg_t>(m_root); }
 
+    explicit Tree(mem_allocrator_t alloc = 0);
     explicit Tree(const char * def, mem_allocrator_t alloc = 0);
     explicit Tree(cfg_t cfg, mem_allocrator_t alloc = 0);
     ~Tree();

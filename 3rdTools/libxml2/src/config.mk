@@ -1,5 +1,6 @@
 product:=xml2
 $(product).type:=lib
+$(product).depends:=iconv
 $(product).version:=2.7.8
 $(product).product.c.includes:=3rdTools/libxml2/include
 
@@ -49,7 +50,8 @@ $(product).c.sources := $(addprefix $(product-base)/, \
                    schematron.c \
                  )
 
-$(product).c.libraries:=m z dl $(if $(dep.iconv),iconv)
+$(product).product.c.libraries:=z
+$(product).c.libraries:=m z dl
 $(product).c.includes:=3rdTools/libxml2/src/$(dev-env)
 $(product).c.flags.cpp:= -DHAVE_CONFIG_H -D_REENTRANT -Wno-format -Wno-unused
 $(product).c.flags.ld:=
