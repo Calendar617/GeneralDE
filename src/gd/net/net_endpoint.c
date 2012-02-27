@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <errno.h>
+#include "cpe/pal/pal_socket.h"
 #include "cpe/pal/pal_unistd.h"
 #include "cpe/pal/pal_string.h"
 #include "gd/net/net_endpoint.h"
@@ -96,11 +96,15 @@ void gd_net_ep_close(gd_net_ep_t ep) {
         gd_net_socket_close(&ep->m_fd, ep->m_mgr->m_em);
     }
     else {
-        CPE_ERROR(ep->m_mgr->m_em, "gd_net_ep_close: close fail, errno=%s", strerror(errno));
+        CPE_ERROR(
+            ep->m_mgr->m_em,
+            "gd_net_ep_close: close fail, errno=%d (%s)", cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
     }
 #else
     if (close(ep->m_fd) != 0) {
-        CPE_ERROR(ep->m_mgr->m_em, "gd_net_ep_close: close fail, errno=%s", strerror(errno));
+        CPE_ERROR(
+            ep->m_mgr->m_em,
+            "gd_net_ep_close: close fail, errno=%d (%s)", cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
     }
 #endif
 

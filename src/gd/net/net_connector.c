@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <errno.h>
 #include "cpe/pal/pal_socket.h"
 #include "cpe/pal/pal_string.h"
 #include "cpe/utils/error.h"
@@ -195,7 +194,7 @@ static void gd_net_connector_do_connect_i(gd_net_connector_t connector) {
         CPE_ERROR(
             connector->m_mgr->m_em,
             "connector %s: create socket fail, errno=%d (%s)!",
-            connector->m_name, errno, strerror(errno));
+            connector->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         connector->m_state = gd_net_connector_state_error;
         return;
     }
@@ -207,7 +206,7 @@ static void gd_net_connector_do_connect_i(gd_net_connector_t connector) {
     }
 
     if (connect(ep->m_fd, (struct sockaddr *)&connector->m_addr, sizeof(connector->m_addr)) == -1) {
-        if (errno == EINPROGRESS) {
+        if (cpe_sock_errno() == EINPROGRESS) {
             CPE_INFO(
                 connector->m_mgr->m_em,
                 "connector %s: connecting!",
@@ -219,7 +218,7 @@ static void gd_net_connector_do_connect_i(gd_net_connector_t connector) {
             CPE_ERROR(
                 connector->m_mgr->m_em,
                 "connector %s: connect error, errno=%d (%s)",
-                connector->m_name, errno, strerror(errno));
+                connector->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
             gd_net_socket_close(&ep->m_fd, connector->m_mgr->m_em);
             connector->m_state = gd_net_connector_state_error;
             return;
@@ -248,7 +247,7 @@ static void gd_net_connector_check_connect_result(gd_net_connector_t connector) 
         CPE_ERROR(
             connector->m_mgr->m_em,
             "connector %s: check state, getsockopt error, errno=%d (%s)",
-            connector->m_name, errno, strerror(errno));
+            connector->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         connector->m_state = gd_net_connector_state_error;
     }
     else {
@@ -263,7 +262,7 @@ static void gd_net_connector_check_connect_result(gd_net_connector_t connector) 
             CPE_ERROR(
                 connector->m_mgr->m_em,
                 "connector %s: connect error, errno=%d (%s)",
-                connector->m_name, err, strerror(err));
+                connector->m_name, err, cpe_sock_errstr(err));
             connector->m_state = gd_net_connector_state_error;
         }
     }

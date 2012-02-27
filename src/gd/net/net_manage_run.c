@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <errno.h>
 #include "cpe/pal/pal_string.h"
 #include "gd/net/net_manage.h"
 #include "net_internal_ops.h"
