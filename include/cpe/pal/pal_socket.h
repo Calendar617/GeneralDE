@@ -11,7 +11,7 @@ extern "C" {
 
 #define cpe_sock_close closesocket
 #define cpe_sock_errno() WSAGetLastError()
-#define cpe_sock_errstr() ""
+#define cpe_sock_errstr(n) ""
 
 #else
 
@@ -22,7 +22,7 @@ extern "C" {
 
 #define cpe_sock_close close
 #define cpe_sock_errno() errno
-#define cpe_sock_errstr() strerror(errno)
+#define cpe_sock_errstr(n) strerror(n)
 
 #endif
 
