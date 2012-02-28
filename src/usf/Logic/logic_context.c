@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "usf/logic/logic_context.h"
 #include "usf/logic/logic_require.h"
+#include "usf/logic/logic_data.h"
 #include "logic_internal_ops.h"
 
 logic_context_t
@@ -34,9 +35,35 @@ void logic_context_free(logic_context_t context) {
         logic_require_free(TAILQ_FIRST(&context->m_requires));
     }
 
+    while(!TAILQ_EMPTY(&context->m_datas)) {
+        logic_data_free(TAILQ_FIRST(&context->m_datas));
+    }
+
     cpe_hash_table_remove_by_ins(&context->m_mgr->m_contexts, context);
 
     mem_free(context->m_mgr->m_alloc, context);
+}
+
+void logic_context_free_all(logic_manage_t mgr) {
+    struct cpe_hash_it context_it;
+    logic_context_t context;
+
+    cpe_hash_it_init(&context_it, &mgr->m_contexts);
+
+    context = cpe_hash_it_next(&context_it);
+    do {
+        logic_context_t next = cpe_hash_it_next(&context_it);
+        logic_context_free(context);
+        context = next;
+    } while(context);
+}
+
+logic_context_t
+logic_context_find(logic_manage_t mgr, logic_context_id_t id) {
+    struct logic_context key;
+
+    key.m_id = id;
+    return (logic_context_t)cpe_hash_table_find(&mgr->m_contexts, &key);
 }
 
 logic_context_id_t

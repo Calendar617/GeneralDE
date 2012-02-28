@@ -45,6 +45,28 @@ void logic_require_free(logic_require_t require) {
     mem_free(require->m_ctx->m_mgr->m_alloc, require);
 }
 
+void logic_require_free_all(logic_manage_t mgr) {
+    struct cpe_hash_it require_it;
+    logic_require_t require;
+
+    cpe_hash_it_init(&require_it, &mgr->m_requires);
+
+    require = cpe_hash_it_next(&require_it);
+    do {
+        logic_require_t next = cpe_hash_it_next(&require_it);
+        logic_require_free(require);
+        require = next;
+    } while(require);
+}
+
+logic_require_t
+logic_require_find(logic_manage_t mgr, logic_require_id_t id) {
+    struct logic_require key;
+
+    key.m_id = id;
+    return (logic_require_t)cpe_hash_table_find(&mgr->m_requires, &key);
+}
+
 logic_require_state_t
 logic_require_state(logic_require_t require) {
     return require->m_state;

@@ -52,6 +52,20 @@ void logic_require_type_free(logic_require_type_t rt) {
     mem_free(rt->m_mgr->m_alloc, rt->m_name);
 }
 
+void logic_require_type_free_all(logic_manage_t mgr) {
+    struct cpe_hash_it require_type_it;
+    logic_require_type_t require_type;
+
+    cpe_hash_it_init(&require_type_it, &mgr->m_require_types);
+
+    require_type = cpe_hash_it_next(&require_type_it);
+    do {
+        logic_require_type_t next = cpe_hash_it_next(&require_type_it);
+        logic_require_type_free(require_type);
+        require_type = next;
+    } while(require_type);
+}
+
 logic_require_type_t
 logic_require_type_find(logic_manage_t mgr, cpe_hash_string_t type_name) {
     struct logic_require_type key;

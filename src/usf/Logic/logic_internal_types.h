@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 typedef TAILQ_HEAD(logic_require_list, logic_require) logic_require_list_t;
+typedef TAILQ_HEAD(logic_data_list, logic_data) logic_data_list_t;
 
 struct logic_manage {
     mem_allocrator_t m_alloc;
@@ -20,6 +21,7 @@ struct logic_manage {
 
     struct cpe_hash_table m_contexts;
     struct cpe_hash_table m_requires;
+    struct cpe_hash_table m_datas;
     struct cpe_hash_table m_require_types;
 };
 
@@ -27,7 +29,9 @@ struct logic_context {
     logic_manage_t m_mgr;
     logic_context_id_t m_id;
 
+    logic_data_list_t m_datas;
     logic_require_list_t m_requires;
+
     struct cpe_hash_entry m_hh;
 };
 
@@ -47,6 +51,17 @@ struct logic_require_type {
 
     struct cpe_hash_entry m_hh;
 };
+
+struct logic_data {
+    logic_context_t m_ctx;    
+    const char * m_name;
+    LPDRMETA m_meta;
+    size_t m_capacity;
+
+    TAILQ_ENTRY(logic_data) m_next;
+    struct cpe_hash_entry m_hh;
+};
+
 
 #ifdef __cplusplus
 }

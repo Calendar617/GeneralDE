@@ -39,6 +39,20 @@ logic_manage_create(mem_allocrator_t alloc) {
     }
 
     if (cpe_hash_table_init(
+            &mgr->m_datas,
+            alloc,
+            (cpe_hash_fun_t) logic_data_hash,
+            (cpe_hash_cmp_t) logic_data_cmp,
+            CPE_HASH_OBJ2ENTRY(logic_data, m_hh),
+            -1) != 0)
+    {
+        mem_free(alloc, mgr);
+        cpe_hash_table_fini(&mgr->m_require_types);
+        cpe_hash_table_fini(&mgr->m_requires);
+        return NULL;
+    }
+
+    if (cpe_hash_table_init(
             &mgr->m_contexts,
             alloc,
             (cpe_hash_fun_t) logic_context_hash,
@@ -49,6 +63,7 @@ logic_manage_create(mem_allocrator_t alloc) {
         mem_free(alloc, mgr);
         cpe_hash_table_fini(&mgr->m_require_types);
         cpe_hash_table_fini(&mgr->m_requires);
+        cpe_hash_table_fini(&mgr->m_datas);
         return NULL;
     }
 
@@ -58,8 +73,14 @@ logic_manage_create(mem_allocrator_t alloc) {
 void logic_manage_free(logic_manage_t mgr) {
     assert(mgr);
 
+    logic_require_free_all(mgr);
+    logic_data_free_all(mgr);
+    logic_context_free_all(mgr);
+    logic_require_type_free_all(mgr);
+
     cpe_hash_table_fini(&mgr->m_contexts);
     cpe_hash_table_fini(&mgr->m_requires);
+    cpe_hash_table_fini(&mgr->m_datas);
     cpe_hash_table_fini(&mgr->m_require_types);
 
     mem_free(mgr->m_alloc, mgr);
