@@ -7,12 +7,14 @@
 extern "C" {
 #endif
 
+#define INVALID_LOGIC_CONTEXT_ID ((logic_require_id_t)-1)
+
 typedef uint32_t logic_context_id_t;
 typedef uint32_t logic_require_id_t;
 
 typedef enum logic_context_state {
     logic_context_idle
-    , logic_context_pending
+    , logic_context_waiting
     , logic_context_error
 } logic_context_state_t;
 

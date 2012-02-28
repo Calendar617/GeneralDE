@@ -1,6 +1,5 @@
 #ifndef USF_LOGIC_REQUIRE_H
 #define USF_LOGIC_REQUIRE_H
-#include "cpe/utils/memory.h"
 #include "cpe/utils/hash_string.h"
 #include "logic_types.h"
 

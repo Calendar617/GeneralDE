@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-logic_context_t logic_context_create(logic_manage_t mgr);
+logic_context_t logic_context_create(logic_manage_t mgr, logic_require_id_t id);
 void logic_context_free(logic_context_t context);
 
 logic_context_id_t

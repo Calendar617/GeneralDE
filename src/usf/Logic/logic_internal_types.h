@@ -15,10 +15,11 @@ typedef TAILQ_HEAD(logic_require_list, logic_require) logic_require_list_t;
 struct logic_manage {
     mem_allocrator_t m_alloc;
 
+    uint32_t m_context_id;
+    uint32_t m_require_id;
+
     struct cpe_hash_table m_contexts;
-
     struct cpe_hash_table m_requires;
-
     struct cpe_hash_table m_require_types;
 };
 
