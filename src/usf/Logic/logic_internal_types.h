@@ -12,6 +12,7 @@ extern "C" {
 
 typedef TAILQ_HEAD(logic_require_list, logic_require) logic_require_list_t;
 typedef TAILQ_HEAD(logic_data_list, logic_data) logic_data_list_t;
+typedef TAILQ_HEAD(logic_executor_list, logic_executor) logic_executor_list_t;
 
 struct logic_manage {
     mem_allocrator_t m_alloc;
@@ -25,12 +26,28 @@ struct logic_manage {
     struct cpe_hash_table m_require_types;
 };
 
+struct logic_stack_item {
+    logic_executor_t m_executr;
+    int32_t m_group_pos;
+};
+
+struct logic_stack {
+    struct logic_stack_item m_inline_items[8];
+    struct logic_stack_item * m_extern_items;
+    int32_t m_extern_items_capacity;
+    int32_t m_item_pos; 
+};
+
 struct logic_context {
     logic_manage_t m_mgr;
     logic_context_id_t m_id;
+    logic_context_state_t m_state;
 
     logic_data_list_t m_datas;
     logic_require_list_t m_requires;
+
+    struct logic_stack m_stack;
+    int32_t m_errno;
 
     struct cpe_hash_entry m_hh;
 };
@@ -62,6 +79,33 @@ struct logic_data {
     struct cpe_hash_entry m_hh;
 };
 
+#define LOGIC_EXECUTOR_COMMON                   \
+    logic_manage_t m_mgr;                       \
+    TAILQ_ENTRY(logic_executor) m_next;         \
+    logic_executor_type_t m_type
+
+struct logic_executor {
+    LOGIC_EXECUTOR_COMMON;
+};
+
+struct logic_executor_basic {
+    LOGIC_EXECUTOR_COMMON;
+    logic_op_fun_t m_op;
+    void * m_ctx;
+    cfg_t m_args;
+};
+
+struct logic_executor_decorate {
+    LOGIC_EXECUTOR_COMMON;
+    logic_decorate_fun_t m_op;
+    void * m_ctx;
+    logic_executor_t m_inner;
+};
+
+struct logic_executor_group {
+    LOGIC_EXECUTOR_COMMON;
+    logic_executor_list_t m_members;
+};
 
 #ifdef __cplusplus
 }

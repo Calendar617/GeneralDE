@@ -2,12 +2,15 @@
 #include "usf/logic/logic_context.h"
 #include "usf/logic/logic_require.h"
 #include "usf/logic/logic_data.h"
+#include "usf/logic/logic_executor.h"
 #include "logic_internal_ops.h"
 
 logic_context_t
-logic_context_create(logic_manage_t mgr, logic_require_id_t id) {
+logic_context_create(logic_manage_t mgr, logic_require_id_t id, logic_executor_t executor) {
     char * buf;
     logic_context_t context;
+
+    if (executor == NULL) return NULL;
 
     buf = mem_alloc(mgr->m_alloc, sizeof(struct logic_context));
     if (buf == NULL) return NULL;
@@ -20,10 +23,31 @@ logic_context_create(logic_manage_t mgr, logic_require_id_t id) {
     TAILQ_INIT(&context->m_requires);
     cpe_hash_entry_init(&context->m_hh);
 
-    if (cpe_hash_table_insert_unique(&mgr->m_contexts, context) != 0) {
-        mem_free(mgr->m_alloc, buf);
-        return NULL;
+    if (id == INVALID_LOGIC_CONTEXT_ID) {
+        if (cpe_hash_table_insert_unique(&mgr->m_contexts, context) != 0) {
+            mem_free(mgr->m_alloc, buf);
+            return NULL;
+        }
     }
+    else {
+        int id_try_count;
+        for(id_try_count = 0; id_try_count < 2000; ++id_try_count) {
+            context->m_id = ++context->m_mgr->m_context_id;
+            if (cpe_hash_table_insert_unique(&mgr->m_contexts, context) == 0) {
+                break;
+            }
+        }
+
+        if (id_try_count >= 2000) {
+            mem_free(mgr->m_alloc, buf);
+            return NULL;
+        }
+    }
+
+    context->m_errno = 0;
+    context->m_state = logic_context_idle;
+    logic_stack_init(&context->m_stack);
+    logic_stack_push(&context->m_stack, context, executor);
 
     return context;
 }
@@ -38,6 +62,8 @@ void logic_context_free(logic_context_t context) {
     while(!TAILQ_EMPTY(&context->m_datas)) {
         logic_data_free(TAILQ_FIRST(&context->m_datas));
     }
+
+    logic_stack_fini(&context->m_stack, context);
 
     cpe_hash_table_remove_by_ins(&context->m_mgr->m_contexts, context);
 
@@ -71,29 +97,13 @@ logic_context_id(logic_context_t context) {
     return context->m_id;
 }
 
+int32_t logic_context_errno(logic_context_t context) {
+    return context->m_errno;
+}
+
 logic_context_state_t
 logic_context_state(logic_context_t context) {
-    logic_context_state_t state;
-    logic_require_t require;
-
-    assert(context);
-
-    state = logic_context_idle;
-
-    TAILQ_FOREACH(require, &context->m_requires, m_next) {
-        switch (require->m_state) {
-        case logic_require_error:
-            return logic_context_error;
-        case logic_require_waiting:
-            state = logic_context_waiting;
-            break;
-        default:
-            //DO NOTHING
-            break;
-        }
-    }
-
-    return state;
+    return context->m_state;
 }
 
 uint32_t logic_context_hash(const struct logic_context * context) {
@@ -102,5 +112,9 @@ uint32_t logic_context_hash(const struct logic_context * context) {
 
 int logic_context_cmp(const struct logic_context * l, const struct logic_context * r) {
     return l->m_id == r->m_id;
+}
+
+void logic_context_execute(logic_context_t context, gd_app_context_t app) {
+    logic_stack_exec(&context->m_stack, -1, app, context);
 }
 

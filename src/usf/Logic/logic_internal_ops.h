@@ -26,6 +26,15 @@ uint32_t logic_require_type_hash(const struct logic_require_type * require);
 int logic_require_type_cmp(const struct logic_require_type * l, const struct logic_require_type * r);
 void logic_require_type_free_all(logic_manage_t mgr);
 
+/*stack ops*/
+void logic_stack_init(struct logic_stack * stack);
+void logic_stack_fini(struct logic_stack * stack, logic_context_t context);
+void logic_stack_push(struct logic_stack * stack, logic_context_t context, logic_executor_t executor);
+    
+void logic_stack_exec(
+    struct logic_stack * stack, int32_t stop_stack_pos,
+    gd_app_context_t app, logic_context_t ctx);
+
 #ifdef __cplusplus
 }
 #endif

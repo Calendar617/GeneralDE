@@ -73,6 +73,27 @@ logic_require_state(logic_require_t require) {
 }
 
 void logic_require_set_done(logic_require_t require) {
+    /* logic_context_state_t state; */
+    /* logic_require_t require; */
+
+    /* assert(context); */
+
+    /* state = logic_context_idle; */
+
+    /* TAILQ_FOREACH(require, &context->m_requires, m_next) { */
+    /*     switch (require->m_state) { */
+    /*     case logic_require_error: */
+    /*         return logic_context_error; */
+    /*     case logic_require_waiting: */
+    /*         state = logic_context_waiting; */
+    /*         break; */
+    /*     default: */
+    /*         //DO NOTHING */
+    /*         break; */
+    /*     } */
+    /* } */
+
+    /* return state; */
 }
 
 void logic_require_set_error(logic_require_t require) {
