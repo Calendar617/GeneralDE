@@ -1,7 +1,7 @@
 #include "gdpp/nm/Manager.hpp"
 #include "gdpp/app/Log.hpp"
 #include "gdpp/app/Application.hpp"
-#include "usf/Logic/LogicOp.hpp"
+#include "usfpp/logic/LogicOp.hpp"
 
 namespace Usf { namespace Logic {
 

@@ -28,7 +28,6 @@ struct logic_manage {
 
 struct logic_stack_item {
     logic_executor_t m_executr;
-    int32_t m_group_pos;
 };
 
 struct logic_stack {

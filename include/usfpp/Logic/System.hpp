@@ -5,14 +5,14 @@
 #include "gdpp/app/System.hpp"
 #include "cpepp/cfg/System.hpp"
 #include "cpepp/utils/System.hpp"
+#include "usf/logic/logic_types.h"
 
 namespace Usf { namespace Logic {
 
 class LogicOpData;
-class LogicOpDataIterator;
 class LogicOpContext;
 
-typedef uint32_t LogicOpContextID;
+typedef logic_context_id_t LogicOpContextID;
 
 }}
 

@@ -54,7 +54,6 @@ REINTER:
 
     assert(stack_item);
     stack_item->m_executr = executor;
-    stack_item->m_group_pos = 0;
 
     if (executor->m_type == logic_executor_type_group) {
         struct logic_executor_group * group = (struct logic_executor_group *)executor;
@@ -70,21 +69,6 @@ REINTER:
      ? &stack->m_inline_items[(pos)]                                    \
      : &stack->m_extern_items[(pos) - LOGIC_STACK_INLINE_ITEM_COUNT])   \
 
-void logic_stack_pop(struct logic_stack * stack) {
-    --stack->m_item_pos;
-
-    if (stack->m_item_pos >= 0) {
-        struct logic_stack_item * stack_item = logic_stack_item_at(stack, stack->m_item_pos);
-        if (stack_item->m_executr->m_type == logic_executor_type_group) {
-            struct logic_stack_item * last_stack_item = logic_stack_item_at(stack, stack->m_item_pos + 1);
-            logic_executor_t next = TAILQ_NEXT(last_stack_item->m_executr, m_next);
-            if (next) {
-                last_stack_item->m_executr = next;
-            }
-        }
-    }
-}
-
 void logic_stack_exec(
     struct logic_stack * stack, int32_t stop_stack_pos,
     gd_app_context_t app, logic_context_t ctx)
@@ -97,19 +81,13 @@ void logic_stack_exec(
 
         rv = 0;
 
-        switch(stack_item->m_executr->m_type) {
-        case logic_executor_type_basic: {
+        if (stack_item->m_executr->m_type == logic_executor_type_basic) {
             struct logic_executor_basic * basic = (struct logic_executor_basic *)stack_item->m_executr;
             rv = basic->m_op(app, ctx, basic->m_ctx, basic->m_args);
-            break;
         }
-        case logic_executor_type_decorate: {
-            struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)stack_item->m_executr;
-            rv = decorator->m_op(app, ctx, stack_item->m_executr, decorator->m_ctx);
-            break;
-        }
-        default:
-            break;
+        else if (stack_item->m_executr->m_type == logic_executor_type_decorate) {
+            //struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)stack_item->m_executr;
+            //rv = decorator->m_op(app, ctx, stack_item->m_executr, decorator->m_ctx);
         }
 
         if (rv != 0) {
@@ -117,6 +95,20 @@ void logic_stack_exec(
             ctx->m_state = logic_context_error;
         }
 
-        logic_stack_pop(stack);
+        --stack->m_item_pos;
+
+        if (stack->m_item_pos >= 0) {
+            struct logic_stack_item * stack_item = logic_stack_item_at(stack, stack->m_item_pos);
+            if (stack_item->m_executr->m_type == logic_executor_type_group) {
+                struct logic_stack_item * last_stack_item = logic_stack_item_at(stack, stack->m_item_pos + 1);
+                logic_executor_t next = TAILQ_NEXT(last_stack_item->m_executr, m_next);
+                if (next) {
+                    last_stack_item->m_executr = next;
+                }
+            }
+            else if (stack_item->m_executr->m_type == logic_executor_type_decorate) {
+                
+            }
+        }
     }
 }
