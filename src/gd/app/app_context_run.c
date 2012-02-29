@@ -1,10 +1,10 @@
 #include <assert.h>
-#include "cpe/cfg/cfg_manage.h"
-#include "cpe/cfg/cfg_read.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/pal/pal_unistd.h"
+#include "cpe/cfg/cfg_manage.h"
+#include "cpe/cfg/cfg_read.h"
+#include "cpe/net/net_manage.h"
 #include "gd/tl/tl_manage.h"
-#include "gd/net/net_manage.h"
 #include "gd/app/app_context.h"
 #include "app_internal_ops.h"
 
@@ -68,7 +68,7 @@ static int gd_app_build_default_tickers(gd_app_context_t context) {
         else if (strcmp(ticker_name, "net") == 0) {
             if (gd_app_tick_add(
                     context,
-                    (gd_app_tick_fun)gd_net_mgr_tick,
+                    (gd_app_tick_fun)net_mgr_tick,
                     context->m_net_mgr,
                     0) != 0)
             {
