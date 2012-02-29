@@ -11,6 +11,7 @@ namespace Usf { namespace Logic {
 
 class LogicOpData;
 class LogicOpContext;
+class LogicOpManager;
 
 typedef logic_context_id_t LogicOpContextID;
 

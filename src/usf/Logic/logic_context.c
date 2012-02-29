@@ -101,6 +101,16 @@ int32_t logic_context_errno(logic_context_t context) {
     return context->m_errno;
 }
 
+logic_manage_t
+logic_context_mgr(logic_context_t context) {
+    return context->m_mgr;
+}
+
+gd_app_context_t
+logic_context_app(logic_context_t context) {
+    return context->m_mgr->m_app;
+}
+
 logic_context_state_t
 logic_context_state(logic_context_t context) {
     return context->m_state;

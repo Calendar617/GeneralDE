@@ -1,6 +1,7 @@
 #ifndef USF_LOGIC_OPCONTEXT_H
 #define USF_LOGIC_OPCONTEXT_H
 #include "cpepp/utils/ClassCategory.hpp"
+#include "gdpp/app/Application.hpp"
 #include "usf/logic/logic_context.h"
 #include "usf/logic/logic_data.h"
 #include "System.hpp"
@@ -13,6 +14,12 @@ public:
 
     LogicOpContextID id(void) const { return logic_context_id(*this); }
     bool debug(void) const;
+
+    LogicOpManager & mgr(void) { return *(LogicOpManager*)logic_context_mgr(*this); }
+    LogicOpManager const & mgr(void) const { return *(LogicOpManager*)logic_context_mgr(*this); }
+
+    Gd::App::Application & app(void) { return Gd::App::Application::_cast(logic_context_app(*this)); }
+    Gd::App::Application const & app(void) const { return Gd::App::Application::_cast(logic_context_app(*this)); }
 
     LogicOpData & data(const char * name);
     LogicOpData const & data(const char * name) const;

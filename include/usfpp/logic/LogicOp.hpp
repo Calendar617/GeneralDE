@@ -8,7 +8,6 @@ namespace Usf { namespace Logic {
 class LogicOp : public Gd::Nm::Object {
 public:
     virtual void execute(
-        Gd::App::Application & app,
         LogicOpContext & context,
         Cpe::Cfg::Node const & cfg,
         Cpe::Utils::Random & random) const = 0;
