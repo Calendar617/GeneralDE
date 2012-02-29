@@ -19,8 +19,7 @@ public:
 
     LogicOpData * findData(const char * name) { return (LogicOpData *)logic_data_find(*this, name); }
     LogicOpData const * findData(const char * name) const { return (LogicOpData *)logic_data_find(*this, name); }
-    LogicOpData & checkCreateData(const char * name, size_t capacity = 0);
-    LogicOpData & checkCreateData(Cpe::Dr::Meta const & meta, size_t capacity = 0);
+    LogicOpData & checkCreateData(LPDRMETA meta, size_t capacity = 0);
 
     void dump(cfg_t cfg) const;
 };

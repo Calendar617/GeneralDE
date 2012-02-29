@@ -16,6 +16,7 @@ typedef TAILQ_HEAD(logic_executor_list, logic_executor) logic_executor_list_t;
 
 struct logic_manage {
     mem_allocrator_t m_alloc;
+    gd_app_context_t m_app;
 
     uint32_t m_context_id;
     uint32_t m_require_id;

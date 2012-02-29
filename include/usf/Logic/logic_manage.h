@@ -1,6 +1,7 @@
 #ifndef USF_LOGIC_MANAGE_H
 #define USF_LOGIC_MANAGE_H
 #include "cpe/utils/memory.h"
+#include "cpe/utils/hash_string.h"
 #include "logic_types.h"
 
 #ifdef __cplusplus
@@ -8,9 +9,25 @@ extern "C" {
 #endif
 
 logic_manage_t
-logic_manage_create(mem_allocrator_t alloc);
+logic_manage_create(
+    const char * name,
+    gd_app_context_t app,
+    mem_allocrator_t alloc);
 
 void logic_manage_free(logic_manage_t mgr);
+
+logic_manage_t
+logic_manage_find(
+    gd_app_context_t app,
+    cpe_hash_string_t name);
+
+logic_manage_t
+logic_manage_default(
+    gd_app_context_t app);
+
+gd_app_context_t logic_manage_app(logic_manage_t mgr);
+const char * logic_manage_name(logic_manage_t mgr);
+cpe_hash_string_t logic_manage_name_hs(logic_manage_t mgr);
 
 #ifdef __cplusplus
 }
