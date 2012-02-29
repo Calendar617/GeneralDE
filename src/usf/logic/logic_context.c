@@ -6,20 +6,20 @@
 #include "logic_internal_ops.h"
 
 logic_context_t
-logic_context_create(logic_manage_t mgr, logic_require_id_t id, logic_executor_t executor) {
+logic_context_create(logic_manage_t mgr, logic_require_id_t id, logic_executor_t executor, size_t capacity) {
     char * buf;
     logic_context_t context;
 
     if (executor == NULL) return NULL;
 
-    buf = mem_alloc(mgr->m_alloc, sizeof(struct logic_context));
+    buf = mem_alloc(mgr->m_alloc, sizeof(struct logic_context) + capacity);
     if (buf == NULL) return NULL;
 
     context = (logic_context_t)buf;
 
     context->m_id = id == INVALID_LOGIC_CONTEXT_ID ? ++mgr->m_context_id : id;
     context->m_mgr = mgr;
-    
+
     TAILQ_INIT(&context->m_requires);
     cpe_hash_entry_init(&context->m_hh);
 
@@ -46,6 +46,8 @@ logic_context_create(logic_manage_t mgr, logic_require_id_t id, logic_executor_t
 
     context->m_errno = 0;
     context->m_state = logic_context_idle;
+    context->m_capacity = capacity;
+
     logic_stack_init(&context->m_stack);
     logic_stack_push(&context->m_stack, context, executor);
 
@@ -114,6 +116,14 @@ logic_context_app(logic_context_t context) {
 logic_context_state_t
 logic_context_state(logic_context_t context) {
     return context->m_state;
+}
+
+size_t logic_context_capacity(logic_context_t context) {
+    return context->m_capacity;
+}
+
+void * logic_context_data(logic_context_t context) {
+    return context + 1;
 }
 
 uint32_t logic_context_hash(const struct logic_context * context) {

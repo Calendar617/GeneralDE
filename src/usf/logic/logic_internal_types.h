@@ -42,6 +42,7 @@ struct logic_context {
     logic_manage_t m_mgr;
     logic_context_id_t m_id;
     logic_context_state_t m_state;
+    size_t m_capacity;
 
     logic_data_list_t m_datas;
     logic_require_list_t m_requires;
