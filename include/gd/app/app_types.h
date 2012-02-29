@@ -3,7 +3,7 @@
 #include "gd/dp/dp_types.h"
 #include "gd/nm/nm_types.h"
 #include "gd/tl/tl_types.h"
-#include "gd/net/net_types.h"
+#include "cpe/net/net_types.h"
 #include "cpe/cfg/cfg_types.h"
 
 #ifdef __cplusplus

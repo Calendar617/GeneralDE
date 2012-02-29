@@ -37,7 +37,7 @@ gd_nm_mgr_t gd_app_nm_mgr(gd_app_context_t context) {
     return context->m_nm_mgr;
 }
 
-gd_net_mgr_t gd_app_net_mgr(gd_app_context_t context) {
+net_mgr_t gd_app_net_mgr(gd_app_context_t context) {
     return context->m_net_mgr;
 }
 
