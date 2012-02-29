@@ -16,6 +16,10 @@ public:
     LogicOpContextID id(void) const { return logic_context_id(*this); }
     bool debug(void) const;
 
+    size_t capacity(void) const { return logic_context_capacity(*this); }
+    void * data(void) { return logic_context_data(*this); }
+    const void * data(void) const { return logic_context_data(*this); }
+
     LogicOpManager & mgr(void) { return *(LogicOpManager*)logic_context_mgr(*this); }
     LogicOpManager const & mgr(void) const { return *(LogicOpManager*)logic_context_mgr(*this); }
 
