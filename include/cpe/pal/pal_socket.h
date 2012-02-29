@@ -8,6 +8,11 @@ extern "C" {
 #ifdef _MSC_VER
 
 #include <WinSock.h>
+#include <errno.h>
+
+#ifndef EINPROGRESS
+#define EINPROGRESS WSAEINPROGRESS
+#endif
 
 #define cpe_sock_close closesocket
 #define cpe_sock_errno() WSAGetLastError()
