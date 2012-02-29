@@ -325,46 +325,6 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="net"
-				>
-				<File
-					RelativePath="..\..\include\gd\net\net.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\net\net_chanel.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\net\net_connector.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\net\net_endpoint.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\net\net_listener.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\net\net_manage.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\net\net_service_local.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\net\net_service_tcp.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\net\net_types.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -566,50 +526,6 @@
 				</File>
 				<File
 					RelativePath="..\..\src\gd\tl\tl_time.c"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="net"
-				>
-				<File
-					RelativePath="..\..\src\gd\net\net_chanel.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\net\net_connector.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\net\net_endpoint.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\net\net_ep_pages.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\net\net_internal_ops.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\net\net_internal_types.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\net\net_listener.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\net\net_manage.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\net\net_manage_run.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\net\net_socket.c"
 					>
 				</File>
 			</Filter>
