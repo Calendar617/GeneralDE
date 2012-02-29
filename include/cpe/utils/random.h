@@ -18,7 +18,7 @@ uint32_t cpe_rand_ctx_generate(struct cpe_rand_ctx * ctx, uint32_t max);
 
 struct cpe_rand_ctx * cpe_rand_ctx_dft(void);
 
-#define cpe_rand_dft(max) cpe_rand_ctx_generate(cpe_rand_ctx_dft());
+#define cpe_rand_dft(max) cpe_rand_ctx_generate(cpe_rand_ctx_dft(), max);
 
 #ifdef __cplusplus
 }
