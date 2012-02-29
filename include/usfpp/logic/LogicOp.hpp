@@ -1,5 +1,5 @@
-#ifndef USF_LOGIC_LOGICOP_H
-#define USF_LOGIC_LOGICOP_H
+#ifndef USFPP_LOGIC_LOGICOP_H
+#define USFPP_LOGIC_LOGICOP_H
 #include "gdpp/nm/Object.hpp"
 #include "System.hpp"
 

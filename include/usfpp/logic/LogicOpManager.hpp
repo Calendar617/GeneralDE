@@ -1,5 +1,5 @@
-#ifndef USF_LOGIC_OPMANAGER_H
-#define USF_LOGIC_OPMANAGER_H
+#ifndef USFPP_LOGIC_OPMANAGER_H
+#define USFPP_LOGIC_OPMANAGER_H
 #include "cpepp/utils/ClassCategory.hpp"
 #include "gdpp/app/Application.hpp"
 #include "usf/logic/logic_manage.h"

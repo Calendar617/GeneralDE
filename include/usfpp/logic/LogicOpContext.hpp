@@ -1,6 +1,7 @@
-#ifndef USF_LOGIC_OPCONTEXT_H
-#define USF_LOGIC_OPCONTEXT_H
+#ifndef USFPP_LOGIC_OPCONTEXT_H
+#define USFPP_LOGIC_OPCONTEXT_H
 #include "cpepp/utils/ClassCategory.hpp"
+#include "cpepp/dr/Meta.hpp"
 #include "gdpp/app/Application.hpp"
 #include "usf/logic/logic_context.h"
 #include "usf/logic/logic_data.h"

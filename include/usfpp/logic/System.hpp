@@ -1,5 +1,5 @@
-#ifndef USF_LOGIC_SYSTEM_H
-#define USF_LOGIC_SYSTEM_H
+#ifndef USFPP_LOGIC_SYSTEM_H
+#define USFPP_LOGIC_SYSTEM_H
 #include <memory>
 #include "cpe/pal/pal_types.h"
 #include "gdpp/app/System.hpp"
