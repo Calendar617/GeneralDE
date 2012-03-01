@@ -10,7 +10,6 @@ logic_context_t
 logic_context_create(
     logic_manage_t mgr,
     logic_require_id_t id,
-    logic_executor_t executor,
     size_t capacity);
 
 void logic_context_free(logic_context_t context);
@@ -33,6 +32,7 @@ int logic_context_flag_is_enable(logic_context_t context, logic_context_flag_t f
 
 void logic_context_data_dump_to_cfg(logic_context_t context, cfg_t cfg);
 
+int logic_context_bind(logic_context_t context, logic_executor_t executor);
 void logic_context_execute(logic_context_t context);
 
 #ifdef __cplusplus

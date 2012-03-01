@@ -9,11 +9,9 @@
 #include "logic_internal_ops.h"
 
 logic_context_t
-logic_context_create(logic_manage_t mgr, logic_require_id_t id, logic_executor_t executor, size_t capacity) {
+logic_context_create(logic_manage_t mgr, logic_context_id_t id, size_t capacity) {
     char * buf;
     logic_context_t context;
-
-    if (executor == NULL) return NULL;
 
     buf = mem_alloc(mgr->m_alloc, sizeof(struct logic_context) + capacity);
     if (buf == NULL) return NULL;
@@ -48,11 +46,10 @@ logic_context_create(logic_manage_t mgr, logic_require_id_t id, logic_executor_t
     }
 
     context->m_errno = 0;
-    context->m_state = logic_context_idle;
+    context->m_state = logic_context_init;
     context->m_capacity = capacity;
     context->m_flags = 0;
     logic_stack_init(&context->m_stack);
-    logic_stack_push(&context->m_stack, context, executor);
 
     return context;
 }
@@ -137,10 +134,6 @@ int logic_context_cmp(const struct logic_context * l, const struct logic_context
     return l->m_id == r->m_id;
 }
 
-void logic_context_execute(logic_context_t context) {
-    logic_stack_exec(&context->m_stack, -1, context);
-}
-
 uint32_t logic_context_flags(logic_context_t context) {
     return context->m_flags;
 }
@@ -170,4 +163,17 @@ void logic_context_data_dump_to_cfg(logic_context_t context, cfg_t cfg) {
 
         dr_cfg_write(data_node, logic_data_data(data), data->m_meta, NULL);
     }
+}
+
+void logic_context_execute(logic_context_t context) {
+    logic_stack_exec(&context->m_stack, -1, context);
+}
+
+int logic_context_bind(logic_context_t context, logic_executor_t executor) {
+   if (executor == NULL) return -1;
+   if (context->m_state != logic_context_init) return -1;
+
+   logic_stack_push(&context->m_stack, context, executor);
+   context->m_state = logic_context_idle;
+   return 0;
 }

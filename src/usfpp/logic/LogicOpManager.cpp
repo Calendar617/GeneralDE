@@ -43,11 +43,10 @@ LogicOpManager::find(gd_app_context_t app, cpe_hash_string_t name) {
 
 LogicOpContext &
 LogicOpManager::createContext(
-    logic_executor_t executor,
     size_t capacity, const void * data,
     logic_context_id_t id)
 {
-    logic_context_t ctx = logic_context_create(*this, id, executor, capacity);
+    logic_context_t ctx = logic_context_create(*this, id, capacity);
     if (ctx == 0) {
         APP_CTX_THROW_EXCEPTION(
             app(),
@@ -60,6 +59,25 @@ LogicOpManager::createContext(
     }
 
     return *(LogicOpContext*)ctx;
+}
+
+LogicOpManager &
+LogicOpManager::install(gd_app_context_t app, mem_allocrator_t alloc, const char * name) {
+    logic_manage_t manager = logic_manage_create(name, app, alloc);
+    if (manager == 0) {
+        APP_CTX_THROW_EXCEPTION(
+            app,
+            ::std::runtime_error,
+            "create Usf::Logic::LogicOpManager fail!");
+    }
+
+    return *(LogicOpManager*)manager;
+}
+
+void LogicOpManager::uninstall(gd_app_context_t app, cpe_hash_string_t name) {
+    if (LogicOpManager * opManager = find(app, name)) {
+        opManager->destory();
+    }
 }
 
 }}

@@ -23,6 +23,8 @@ logic_manage_create(
     logic_manage_t mgr;
     gd_nm_node_t mgr_node;
 
+    if (name == 0) name = "logic_manager";
+
     mgr_node = gd_nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct logic_manage));
     if (mgr_node == NULL) return NULL;
 

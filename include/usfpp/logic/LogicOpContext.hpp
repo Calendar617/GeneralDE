@@ -17,6 +17,8 @@ public:
 
     LogicOpContextID id(void) const { return logic_context_id(*this); }
 
+    logic_context_state_t state(void) const { return logic_context_state(*this); }
+
     size_t capacity(void) const { return logic_context_capacity(*this); }
     void * data(void) { return logic_context_data(*this); }
     const void * data(void) const { return logic_context_data(*this); }
@@ -34,7 +36,9 @@ public:
 
     Cpe::Utils::Random & random(cpe_hash_string_t name = 0);
 
+    void bind(logic_executor_t executor);
     void execute(void) { logic_context_execute(*this); }
+    void execute(logic_executor_t execute) { bind(execute); logic_context_execute(*this); }
 
     Gd::App::Application & app(void) { return Gd::App::Application::_cast(logic_context_app(*this)); }
     Gd::App::Application const & app(void) const { return Gd::App::Application::_cast(logic_context_app(*this)); }

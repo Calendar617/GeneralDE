@@ -52,4 +52,28 @@ LogicOpContext::random(cpe_hash_string_t name) {
         name == 0 ? Gd::App::Random::DEFAULT_NAME : name);
 }
 
+void LogicOpContext::bind(logic_executor_t executor) {
+    if (logic_context_bind(*this, executor) != 0) {
+        if (executor == NULL) {
+            APP_CTX_THROW_EXCEPTION(
+                app(),
+                ::std::runtime_error,
+                "context bind executor, input executor is null!");
+        }
+        else if (state() != logic_context_init) {
+            APP_CTX_THROW_EXCEPTION(
+                app(),
+                ::std::runtime_error,
+                "context bind executor, state(%d) error, only support state init!",
+                state());
+        }
+        else {
+            APP_CTX_THROW_EXCEPTION(
+                app(),
+                ::std::runtime_error,
+                "context bind executor, unknown error!");
+        }
+    }
+}
+
 }}

@@ -125,3 +125,6 @@ REENTER:
     }
     }
 }
+
+void logic_executor_dump(logic_executor_t executor, write_stream_t stream, int level) {
+}

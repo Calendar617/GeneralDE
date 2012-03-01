@@ -18,7 +18,6 @@ public:
     Gd::App::Application const & app(void) const { return Gd::App::Application::_cast(logic_manage_app(*this)); }
 
     LogicOpContext & createContext(
-        logic_executor_t executor,
         size_t capacity = 0,
         const void * data = 0,
         logic_context_id_t id = INVALID_LOGIC_CONTEXT_ID);
@@ -26,15 +25,19 @@ public:
     template<typename T>
     LogicOpContext &
     createContext(
-        logic_executor_t executor,
         T const & data,
         logic_context_id_t id = INVALID_LOGIC_CONTEXT_ID)
     {
-        return createContext(executor, sizeof(data), &data, id);
+        return createContext(sizeof(data), &data, id);
     }
+
+    void destory(void) { logic_manage_free(*this); }
 
     static LogicOpManager & instance(gd_app_context_t app = 0, cpe_hash_string_t name = 0);
     static LogicOpManager * find(gd_app_context_t app = 0, cpe_hash_string_t name = 0);
+
+    static LogicOpManager & install(gd_app_context_t app, mem_allocrator_t alloc = 0, const char * name = 0);
+    static void uninstall(gd_app_context_t app, cpe_hash_string_t name = 0);
 };
 
 }}

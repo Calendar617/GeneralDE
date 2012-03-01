@@ -18,7 +18,8 @@ typedef enum logic_context_flag {
 } logic_context_flag_t;
 
 typedef enum logic_context_state {
-    logic_context_idle
+    logic_context_init
+    , logic_context_idle
     , logic_context_waiting
     , logic_context_error
 } logic_context_state_t;
