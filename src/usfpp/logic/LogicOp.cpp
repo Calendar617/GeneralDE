@@ -54,6 +54,7 @@ LogicOp::create_executor(
     logic_executor_t executor =
         logic_executor_basic_create(
             mgr,
+            op.name(),
             logic_op_adapter,
             (void *)&op,
             args);
@@ -66,6 +67,24 @@ LogicOp::create_executor(
     }
 
     return executor;
+}
+
+logic_executor_t
+LogicOp::builder(logic_manage_t mgr, const char * name, void * ctx, cfg_t args, error_monitor_t em) {
+    try {
+        return create_executor(
+            mgr,
+            get(Gd::App::Application::_cast(logic_manage_app(mgr)), name),
+            args);
+    }
+    catch(::std::exception const & e) {
+        CPE_ERROR(em, "create logic_executor %s: %s", name, e.what());
+    }
+    catch(...) {
+        CPE_ERROR(em, "create logic_executor %s: unknown exception", name);
+    }
+
+    return 0;
 }
 
 }}

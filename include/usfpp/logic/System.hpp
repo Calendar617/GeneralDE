@@ -13,6 +13,7 @@ class LogicOpData;
 class LogicOpContext;
 class LogicOpManager;
 class LogicOpExecutor;
+class LogicOpBuilder;
 
 typedef logic_context_id_t LogicOpContextID;
 

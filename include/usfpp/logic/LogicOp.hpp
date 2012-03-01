@@ -17,6 +17,8 @@ public:
     static logic_executor_t
     create_executor(logic_manage_t mgr, LogicOp const & op, cfg_t args);
 
+    static logic_executor_t builder(logic_manage_t mgr, const char * name, void * ctx, cfg_t args, error_monitor_t em);
+
 private:
     execute_fun m_exec_fun;
 

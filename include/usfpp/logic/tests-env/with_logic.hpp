@@ -13,6 +13,10 @@ public:
     void SetUp();
     void TearDown();
 
+    using Base::t_logic_executor_build;
+    logic_executor_t t_logic_executor_build(cfg_t cfg, error_monitor_t em = 0);
+    logic_executor_t t_logic_executor_build(const char * cfg, error_monitor_t em = 0);
+
     LogicOpManager & t_logic_manager_ex(void) { return *(LogicOpManager*)t_logic_manager(); }
 };
 
