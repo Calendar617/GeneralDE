@@ -52,11 +52,11 @@ void logic_require_free_all(logic_manage_t mgr) {
     cpe_hash_it_init(&require_it, &mgr->m_requires);
 
     require = cpe_hash_it_next(&require_it);
-    do {
+    while(require) {
         logic_require_t next = cpe_hash_it_next(&require_it);
         logic_require_free(require);
         require = next;
-    } while(require);
+    }
 }
 
 logic_require_t

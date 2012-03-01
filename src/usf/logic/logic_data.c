@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/dr/dr_data.h"
 #include "usf/logic/logic_data.h"
 #include "logic_internal_ops.h"
 
@@ -8,6 +9,8 @@ logic_data_get_or_create(logic_context_t context, LPDRMETA meta, size_t capacity
     const char * name;
     logic_data_t old_data;
     logic_data_t new_data;
+
+    if (capacity == 0) capacity = dr_meta_size(meta);
 
     name = dr_meta_name(meta);
     old_data = logic_data_find(context, name);
@@ -22,7 +25,14 @@ logic_data_get_or_create(logic_context_t context, LPDRMETA meta, size_t capacity
     new_data->m_capacity = capacity;
     cpe_hash_entry_init(&new_data->m_hh);
 
-    if (old_data) logic_data_free(old_data);
+    if (old_data) {
+        memcpy(new_data + 1, old_data + 1, old_data->m_capacity);
+        logic_data_free(old_data);
+    }
+    else {
+        bzero(new_data + 1, capacity);
+        dr_meta_set_defaults(new_data + 1, capacity, meta, 0);
+    }
 
     if (cpe_hash_table_insert_unique(&context->m_mgr->m_datas, new_data) != 0) {
         mem_free(context->m_mgr->m_alloc, new_data);
@@ -48,11 +58,11 @@ void logic_data_free_all(logic_manage_t mgr) {
     cpe_hash_it_init(&data_it, &mgr->m_datas);
 
     data = cpe_hash_it_next(&data_it);
-    do {
+    while (data) {
         logic_data_t next = cpe_hash_it_next(&data_it);
         logic_data_free(data);
         data = next;
-    } while(data);
+    }
 }
 
 logic_data_t logic_data_find(logic_context_t context, const char * name) {

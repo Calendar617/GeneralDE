@@ -9,6 +9,8 @@
 
 static void logic_manage_clear(gd_nm_node_t node);
 
+static cpe_hash_string_buf s_logic_manager_default_name = CPE_HS_BUF_MAKE("logic_manager");
+
 struct gd_nm_node_type s_nm_node_type_logic_manage = {
     "usf_logic_manage",
     logic_manage_clear
@@ -23,7 +25,7 @@ logic_manage_create(
     logic_manage_t mgr;
     gd_nm_node_t mgr_node;
 
-    if (name == 0) name = "logic_manager";
+    if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_logic_manager_default_name);
 
     mgr_node = gd_nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct logic_manage));
     if (mgr_node == NULL) return NULL;
@@ -126,8 +128,6 @@ logic_manage_find(
     if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
     return (logic_manage_t)gd_nm_node_data(node);
 }
-
-static cpe_hash_string_buf s_logic_manager_default_name = CPE_HS_BUF_MAKE("logic_manager");
 
 logic_manage_t
 logic_manage_default(

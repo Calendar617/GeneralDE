@@ -50,6 +50,7 @@ logic_context_create(logic_manage_t mgr, logic_context_id_t id, size_t capacity)
     context->m_capacity = capacity;
     context->m_flags = 0;
     logic_stack_init(&context->m_stack);
+    TAILQ_INIT(&context->m_datas);
 
     return context;
 }
@@ -79,11 +80,11 @@ void logic_context_free_all(logic_manage_t mgr) {
     cpe_hash_it_init(&context_it, &mgr->m_contexts);
 
     context = cpe_hash_it_next(&context_it);
-    do {
+    while (context) {
         logic_context_t next = cpe_hash_it_next(&context_it);
         logic_context_free(context);
         context = next;
-    } while(context);
+    }
 }
 
 logic_context_t
