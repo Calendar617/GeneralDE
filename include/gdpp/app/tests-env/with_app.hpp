@@ -1,6 +1,8 @@
 #ifndef GDPP_APP_TESTENV_WITHAPPEX_H
 #define GDPP_APP_TESTENV_WITHAPPEX_H
+#include "cpe/utils/hash_string.h"
 #include "gd/app/tests-env/with_app.hpp"
+#include "cpepp/utils/System.hpp"
 #include "gdpp/nm/Object.hpp"
 #include "gdpp/nm/Manager.hpp"
 #include "../Application.hpp"
@@ -11,7 +13,13 @@ class with_app : public gd::app::testenv::with_app {
 public:
     with_app();
 
+    void SetUp();
+    void TearDown();
+
     Application & t_app_ex(void) { return Application::_cast(t_app()); }
+
+    void t_app_install_random(const char * name = 0);
+    void t_app_install_random(Cpe::Utils::Random & random, const char * name = 0);
 
     template<typename T>
     T & installNamedObject(void) {
