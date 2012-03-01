@@ -273,6 +273,16 @@ int cfg_child_count(cfg_t cfg) {
     }
 }
 
+cfg_t cfg_child_only(cfg_t cfg) {
+    struct cfg_it it;
+    cfg_t child;
+
+    cfg_it_init(&it, cfg);
+    child = cfg_it_next(&it);
+
+    return cfg_it_next(&it) ? NULL : child;
+}
+
 int cfg_path_print(write_stream_t stream, cfg_t cfg, cfg_t to) {
     int haveParent;
     cfg_t parent;
