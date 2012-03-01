@@ -72,6 +72,7 @@ void cfg_dump_inline(cfg_t cfg, write_stream_t stream);
 
 /*child operations*/
 int cfg_child_count(cfg_t cfg);
+cfg_t cfg_child_only(cfg_t cfg);
 void cfg_it_init(cfg_it_t * it, cfg_t cfg);
 #define cfg_it_next(it) ((it)->next ? (it)->next(it) : NULL)
 
