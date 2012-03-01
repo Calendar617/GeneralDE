@@ -3,6 +3,7 @@
 #include "cpepp/dr/Meta.hpp"
 #include "cpepp/dr/MetaLib.hpp"
 #include "gdpp/app/Log.hpp"
+#include "gdpp/app/Random.hpp"
 #include "usfpp/logic/LogicOpContext.hpp"
 
 namespace Usf { namespace Logic {
@@ -42,6 +43,13 @@ LogicOpContext::checkCreateData(LPDRMETA meta, size_t capacity) {
             dr_meta_name(meta));
     }
     return *(LogicOpData*)data;
+}
+
+Cpe::Utils::Random &
+LogicOpContext::random(cpe_hash_string_t name) {
+    return Gd::App::Random::instance(
+        app(),
+        name == 0 ? Gd::App::Random::DEFAULT_NAME : name);
 }
 
 }}

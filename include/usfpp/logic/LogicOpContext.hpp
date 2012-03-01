@@ -1,5 +1,7 @@
 #ifndef USFPP_LOGIC_OPCONTEXT_H
 #define USFPP_LOGIC_OPCONTEXT_H
+#include "cpe/utils/hash_string.h"
+#include "cpepp/utils/System.hpp"
 #include "cpepp/utils/ClassCategory.hpp"
 #include "cpepp/dr/Meta.hpp"
 #include "gdpp/app/Application.hpp"
@@ -22,6 +24,8 @@ public:
 
     LogicOpManager & mgr(void) { return *(LogicOpManager*)logic_context_mgr(*this); }
     LogicOpManager const & mgr(void) const { return *(LogicOpManager*)logic_context_mgr(*this); }
+
+    Cpe::Utils::Random & random(cpe_hash_string_t name = 0);
 
     Gd::App::Application & app(void) { return Gd::App::Application::_cast(logic_context_app(*this)); }
     Gd::App::Application const & app(void) const { return Gd::App::Application::_cast(logic_context_app(*this)); }
