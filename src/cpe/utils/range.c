@@ -37,7 +37,7 @@ int cpe_range_mgr_is_empty(cpe_range_mgr_t ra) {
 }
 
 void cpe_range_mgr_dump(write_stream_t stream, cpe_range_mgr_t ra) {
-    int i;
+    size_t i;
     for(i = 0; i < ra->m_range_count; ++i) {
         if (i > 0) stream_putc(stream, ',');
 
@@ -77,7 +77,7 @@ cpe_range_get_range(cpe_range_mgr_t ra, size_t capacity) {
         assert(allocFrom);
 
         r.m_start = allocFrom->m_start;
-        if (allocFrom->m_end > allocFrom->m_start + capacity) {
+        if (allocFrom->m_end > allocFrom->m_start + (ptr_int_t)capacity) {
             r.m_end = r.m_start + capacity;
             allocFrom->m_start += capacity;
         }
@@ -114,7 +114,7 @@ static void cpe_range_merge_neighbers(cpe_range_mgr_t ra, int beginPos) {
         }
     }
 
-    for(checkPos = beginPos + 1; checkPos < ra->m_range_count; ++checkPos, ++removeCount) {
+    for(checkPos = beginPos + 1; (size_t)checkPos < ra->m_range_count; ++checkPos, ++removeCount) {
         struct cpe_range * nextRange = ra->m_ranges + checkPos;
         if (nextRange->m_start <= curRange->m_end) {
             if (nextRange->m_end > curRange->m_end) {
@@ -158,7 +158,7 @@ static int cpe_range_find_next_pos(cpe_range_mgr_t ra, ptr_int_t start) {
         }
     }
 
-    return (curPos < ra->m_range_count) && (ra->m_ranges[curPos].m_start >= start)
+    return ((size_t)curPos < ra->m_range_count) && (ra->m_ranges[curPos].m_start >= start)
         ? curPos
         : ra->m_range_count;
 }
@@ -180,7 +180,7 @@ int cpe_range_put_range(cpe_range_mgr_t ra, ptr_int_t start, ptr_int_t end) {
     else {
         int insertPos = cpe_range_find_next_pos(ra, start);
 
-        if (insertPos < ra->m_range_count) {
+        if (insertPos < (int)ra->m_range_count) {
             struct cpe_range * curRange = ra->m_ranges + insertPos;
 
             assert(curRange->m_start >= start);
@@ -232,7 +232,7 @@ int cpe_range_put_range(cpe_range_mgr_t ra, ptr_int_t start, ptr_int_t end) {
 struct cpe_range
 cpe_range_find(cpe_range_mgr_t ra, ptr_int_t value) {
     int pos = cpe_range_find_next_pos(ra, value);
-    if (pos < ra->m_range_count && ra->m_ranges[pos].m_start == value) {
+    if (pos < (int)ra->m_range_count && ra->m_ranges[pos].m_start == value) {
         return ra->m_ranges[pos];
     }
 
@@ -299,7 +299,7 @@ struct cpe_range cpe_range_it_next(cpe_range_it_t it) {
     assert(it);
     if (it->m_mgr == NULL || it->m_mgr->m_ranges == NULL) return cpe_range_invalid;
 
-    if (it->m_pos < it->m_mgr->m_range_count) {
+    if (it->m_pos < (int)it->m_mgr->m_range_count) {
         return it->m_mgr->m_ranges[it->m_pos++];
     }
     else {

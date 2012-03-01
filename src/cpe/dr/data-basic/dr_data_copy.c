@@ -9,7 +9,8 @@
 struct CopySameEntryProcessStack{
     LPDRMETA m_des_meta;
     LPDRMETAENTRY m_des_entry;
-    int m_des_entry_pos;
+    int32_t m_des_entry_pos;
+    int32_t m_des_entry_count;
     char * m_des_data;
     size_t m_des_capacity;
 
@@ -36,6 +37,39 @@ int dr_meta_copy_check_array_copyable(int desArrayCount, int srcArrayCount) {
         : 0;
 }
 
+const char *
+dr_meta_copy_union_find_select_entry_name(
+    const char * src_data, size_t src_capacity, LPDRMETAENTRY src_entry, LPDRMETA src_meta) 
+{
+    LPDRMETAENTRY src_select_entry;
+    LPDRMETAENTRY src_union_entry;
+    int32_t src_union_entry_id;
+    int32_t src_union_entry_pos;
+
+    src_select_entry = dr_entry_select_entry(src_entry);
+    if (src_select_entry == 0) return NULL;
+
+    if (src_entry->m_select_data_start_pos + dr_entry_element_size(src_select_entry) > src_capacity) 
+        return NULL;
+
+    if (dr_entry_try_read_int32(
+            &src_union_entry_id,
+            src_data + src_entry->m_select_data_start_pos,
+            src_select_entry,
+            NULL) != 0)
+    {
+        return NULL;
+    }
+
+    src_union_entry_pos = dr_meta_find_entry_idx_by_id(src_meta, src_union_entry_id);
+    if (src_union_entry_pos < 0) return NULL;
+
+    src_union_entry = dr_meta_entry_at(src_meta, src_union_entry_pos);
+    if (src_union_entry == NULL) return NULL;
+
+    return dr_entry_name(src_union_entry);
+}
+
 void dr_meta_copy_same_entry(
     void * des_data, size_t des_capacity, LPDRMETA des_meta,
     void const * src_data, size_t src_capacity, LPDRMETA src_meta, 
@@ -52,6 +86,7 @@ void dr_meta_copy_same_entry(
     processStack[0].m_des_meta = des_meta;
     processStack[0].m_des_entry = dr_meta_entry_at(des_meta, 0);
     processStack[0].m_des_entry_pos = 0;
+    processStack[0].m_des_entry_count = des_meta->m_entry_count;
     processStack[0].m_array_pos = 0;
     processStack[0].m_des_data = (char *)des_data;
     processStack[0].m_des_capacity = des_capacity;
@@ -70,7 +105,7 @@ void dr_meta_copy_same_entry(
             continue;
         }
 
-        for(; curStack->m_des_entry_pos < curStack->m_des_meta->m_entry_count
+        for(; curStack->m_des_entry_pos < curStack->m_des_entry_count
                 && curStack->m_des_entry
                 ; ++curStack->m_des_entry_pos
                 , curStack->m_array_pos = 0
@@ -79,7 +114,7 @@ void dr_meta_copy_same_entry(
         {
             size_t des_element_size, src_element_size;
             LPDRMETAENTRY src_entry;
-            size_t des_array_count_max, src_array_count_max;
+            int32_t des_array_count_max, src_array_count_max;
 
         LOOPENTRY:
             des_element_size = dr_entry_element_size(curStack->m_des_entry);
@@ -100,8 +135,8 @@ void dr_meta_copy_same_entry(
             if (src_array_count_max != 1) {
                 LPDRMETAENTRY srcRefer = dr_entry_array_refer_entry(src_entry);
                 if (srcRefer) {
-                    uint64_t readBuf;
-                    if (dr_ctype_try_read_uint64(
+                    int32_t readBuf;
+                    if (dr_ctype_try_read_int32(
                             &readBuf, 
                             curStack->m_src_data + src_entry->m_array_refer_data_start_pos,
                             src_entry->m_type,
@@ -121,7 +156,7 @@ void dr_meta_copy_same_entry(
                 size_t src_entry_capacity, src_left_capacity;
 
                 des_entry_data = curStack->m_des_data + curStack->m_des_entry->m_data_start_pos + (des_element_size * curStack->m_array_pos);
-                if (des_entry_data - curStack->m_des_data > curStack->m_des_capacity) continue;
+                if ((size_t)(des_entry_data - curStack->m_des_data) > curStack->m_des_capacity) continue;
 
                 des_left_capacity = curStack->m_des_capacity - (des_entry_data - curStack->m_des_data);
                 des_entry_capacity = des_element_size;
@@ -134,7 +169,7 @@ void dr_meta_copy_same_entry(
                 }
 
                 src_entry_data = curStack->m_src_data + src_entry->m_data_start_pos + (src_element_size * curStack->m_array_pos);
-                if (src_entry_data - curStack->m_src_data > curStack->m_src_capacity) continue;
+                if ((size_t)(src_entry_data - curStack->m_src_data) > curStack->m_src_capacity) continue;
 
                 src_left_capacity = curStack->m_src_capacity - (src_entry_data - curStack->m_src_data);
                 src_entry_capacity = src_element_size;
@@ -147,28 +182,69 @@ void dr_meta_copy_same_entry(
                 }
 
                 if (curStack->m_des_entry->m_type <= CPE_DR_TYPE_COMPOSITE) {
-                    if (stackPos + 1 < CPE_DR_MAX_LEVEL) {
-                        struct CopySameEntryProcessStack * nextStack;
-                        nextStack = &processStack[stackPos + 1];
+                    struct CopySameEntryProcessStack * nextStack;
 
-                        nextStack->m_des_meta = dr_entry_ref_meta(curStack->m_des_entry);
-                        if (nextStack->m_des_meta == 0) break;
-                        nextStack->m_des_entry = dr_meta_entry_at(nextStack->m_des_meta, 0);
-                        nextStack->m_des_data = des_entry_data;
-                        nextStack->m_des_capacity = des_entry_capacity;
-                        nextStack->m_des_entry_pos = 0;
-                        nextStack->m_array_pos = 0;
+                    if (stackPos + 1 >= CPE_DR_MAX_LEVEL)  continue;
 
-                        nextStack->m_src_meta = dr_entry_ref_meta(src_entry);
-                        if (nextStack->m_src_meta == 0) break;
-                        nextStack->m_src_data = src_entry_data;
-                        nextStack->m_src_capacity = src_entry_capacity;
+                    nextStack = &processStack[stackPos + 1];
 
-                        ++curStack->m_array_pos;
-                        ++stackPos;
-                        curStack = nextStack;
-                        goto LOOPENTRY;
+                    nextStack->m_des_meta = dr_entry_ref_meta(curStack->m_des_entry);
+                    if (nextStack->m_des_meta == 0) continue;
+
+                    nextStack->m_src_meta = dr_entry_ref_meta(src_entry);
+                    if (nextStack->m_src_meta == 0) continue;
+
+                    nextStack->m_des_data = des_entry_data;
+                    nextStack->m_des_capacity = des_entry_capacity;
+                    nextStack->m_array_pos = 0;
+
+                    nextStack->m_src_data = src_entry_data;
+                    nextStack->m_src_capacity = src_entry_capacity;
+
+                    nextStack->m_des_entry_pos = 0;
+                    nextStack->m_des_entry_count = nextStack->m_des_meta->m_entry_count;
+                    nextStack->m_des_entry = dr_meta_entry_at(nextStack->m_des_meta, 0);
+
+                    if (curStack->m_des_entry->m_type == CPE_DR_TYPE_UNION) {
+                        const char * union_entry_name;
+                        union_entry_name =
+                            dr_meta_copy_union_find_select_entry_name(
+                                curStack->m_src_data,
+                                curStack->m_src_capacity,
+                                src_entry,
+                                nextStack->m_src_meta);
+
+                        if (union_entry_name) {
+                            nextStack->m_des_entry_pos = dr_meta_find_entry_idx_by_name(nextStack->m_des_meta, union_entry_name);
+                            if (nextStack->m_des_entry_pos < 0) continue;
+
+                            nextStack->m_des_entry = dr_meta_entry_at(nextStack->m_des_meta, nextStack->m_des_entry_pos);
+                            nextStack->m_des_entry_count = nextStack->m_des_entry_pos + 1;
+
+                            if (nextStack->m_des_entry->m_id != -1) {
+                                LPDRMETAENTRY des_select_entry;
+                                des_select_entry = dr_entry_select_entry(curStack->m_des_entry);
+                                if (des_select_entry) {
+                                    if (curStack->m_des_entry->m_select_data_start_pos + dr_entry_element_size(des_select_entry)
+                                        <= curStack->m_des_capacity)
+                                    {
+                                        dr_entry_set_from_int32(
+                                            curStack->m_des_data + curStack->m_des_entry->m_select_data_start_pos,
+                                            nextStack->m_des_entry->m_id,
+                                            des_select_entry, NULL);
+                                    }
+                                }
+                            }
+                        }
                     }
+
+                    if (nextStack->m_des_entry == 0) {
+                    }
+
+                    ++curStack->m_array_pos;
+                    ++stackPos;
+                    curStack = nextStack;
+                    goto LOOPENTRY;
                 }
                 else {
                     dr_entry_set_from_ctype(des_entry_data, src_entry_data, src_entry->m_type, curStack->m_des_entry, 0);

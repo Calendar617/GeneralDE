@@ -66,6 +66,8 @@ int stream_putc_count(struct write_stream * stream, char c, size_t n) {
     char buf[128];
     int rv;
 
+    rv = 0;
+
     memset(buf, c, 128);
     while(n > 0) {
         size_t curN = n > 128 ? 128 : n;

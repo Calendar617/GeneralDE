@@ -389,8 +389,9 @@ static void dr_build_xml_process_entry(
             DR_DO_READ_INT(version, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_ID) == 0) {
-            DR_DO_READ_INT(newEntry->m_data.m_select_range_min, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
-            newEntry->m_data.m_select_range_max = newEntry->m_data.m_select_range_min;
+            DR_DO_READ_INT(newEntry->m_data.m_id, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
+            newEntry->m_data.m_select_range_max = newEntry->m_data.m_id;
+            newEntry->m_data.m_select_range_min = newEntry->m_data.m_id;
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_MAXID) == 0) {
             haveMax = 1;

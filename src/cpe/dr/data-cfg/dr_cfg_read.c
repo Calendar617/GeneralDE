@@ -14,9 +14,13 @@ int dr_cfg_read_entry(
     cfg_t cfg, LPDRMETA meta, LPDRMETAENTRY entry, int policy, error_monitor_t em);
 
 int dr_cfg_read_struct(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, int policy, error_monitor_t em);
-int dr_cfg_read_union(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, int policy, error_monitor_t em);
+int dr_cfg_read_union(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, LPDRMETAENTRY * union_entry, int policy, error_monitor_t em);
 
-int dr_cfg_read_entry_one(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, LPDRMETAENTRY entry, int policy, error_monitor_t em) {
+int dr_cfg_read_entry_one(
+    char * all_buf, size_t all_capacity,
+    char * buf, size_t capacity,
+    cfg_t cfg, LPDRMETA meta, LPDRMETAENTRY entry, int policy, error_monitor_t em)
+{
     assert(entry);
 
     if (entry->m_type == CPE_DR_TYPE_STRUCT) {
@@ -34,6 +38,9 @@ int dr_cfg_read_entry_one(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta,
     }
     else if (entry->m_type == CPE_DR_TYPE_UNION) {
         LPDRMETA ref;
+        LPDRMETAENTRY union_entry;
+        int size;
+
         ref = dr_entry_ref_meta(entry);
         if (ref == NULL) {
             CPE_ERROR(
@@ -43,7 +50,24 @@ int dr_cfg_read_entry_one(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta,
             return -1;
         }
 
-        return dr_cfg_read_union(buf, capacity, cfg, ref, policy, em);
+        union_entry = NULL;
+        size = dr_cfg_read_union(buf, capacity, cfg, ref, &union_entry, policy, em);
+        if (size > 0 && union_entry && union_entry->m_id != -1) {
+            LPDRMETAENTRY select_entry;
+            select_entry = dr_entry_select_entry(entry);
+            if (select_entry) {
+                size_t select_element_size;
+                select_element_size = dr_entry_element_size(select_entry);
+                if (entry->m_select_data_start_pos + select_element_size <= all_capacity) {
+                    dr_entry_set_from_int32(
+                        all_buf + entry->m_select_data_start_pos,
+                        union_entry->m_id,
+                        select_entry, em);
+                }
+            }
+        }
+
+        return size;
     }
     else {
         dr_entry_set_from_ctype(
@@ -84,8 +108,8 @@ int dr_cfg_read_entry(
 
     if (entry->m_array_count == 1) {
         return dr_cfg_read_entry_one(
-            entry_buf,
-            entry_capacity,
+            all_buf, all_capacity,
+            entry_buf, entry_capacity,
             cfg, meta, entry, policy, em);
     }
     else {
@@ -122,7 +146,7 @@ int dr_cfg_read_entry(
 
         cfg_it_init(&itemIt, cfg);
         while((item = cfg_it_next(&itemIt)) && count < max_count) {
-            dr_cfg_read_entry_one(write_pos, element_size, item, meta, entry, policy, em);
+            dr_cfg_read_entry_one(all_buf, all_capacity, write_pos, element_size, item, meta, entry, policy, em);
             write_pos += element_size;
             ++count;
         }
@@ -147,11 +171,45 @@ int dr_cfg_read_entry(
     }
 }
 
-int dr_cfg_read_union(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, int policy, error_monitor_t em) {
-    CPE_ERROR(
-        em, "read from %s: %s is union, not support read union!",
-        cfg_name(cfg), dr_meta_name(meta));
-    return meta->m_data_size;
+int dr_cfg_read_union(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, LPDRMETAENTRY * union_entry, int policy, error_monitor_t em) {
+    cfg_it_t itemIt;
+    cfg_t item;
+    int size;
+
+    size = 0;
+
+    cfg_it_init(&itemIt, cfg);
+
+    for(item = cfg_it_next(&itemIt); item; item = cfg_it_next(&itemIt)) {
+        int entry_size;
+        size_t entry_capacity;
+        LPDRMETAENTRY entry;
+
+        entry = dr_meta_find_entry_by_name(meta, cfg_name(item));
+        if (entry == NULL) {
+            if (policy | DR_CFG_READ_CHECK_NOT_EXIST_ATTR) {
+                CPE_WARNING(
+                    em, "read from %s: %s have no entry %s, ignore!",
+                    cfg_name(cfg), dr_meta_name(meta), cfg_name(item));
+            }
+            continue;
+        }
+
+        if ((size_t)entry->m_data_start_pos >= capacity) continue;
+
+        entry_capacity = capacity - entry->m_data_start_pos;
+
+        entry_size = dr_cfg_read_entry(buf, capacity, buf + entry->m_data_start_pos, entry_capacity, item, meta, entry, policy, em);
+        if (entry_size < 0) continue;
+
+        if (union_entry) *union_entry = entry;
+
+        if (entry->m_data_start_pos + entry_size > size) {
+            size = entry->m_data_start_pos + entry_size;
+        }
+    }
+    
+    return size;
 }
 
 int dr_cfg_read_struct(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, int policy, error_monitor_t em) {
@@ -186,7 +244,7 @@ int dr_cfg_read_struct(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, in
             continue;
         }
 
-        if (entry->m_data_start_pos >= capacity) continue;
+        if ((size_t)entry->m_data_start_pos >= capacity) continue;
 
         entry_capacity = entry->m_unitsize;
         if (entry == last_entry || entry->m_data_start_pos + entry_capacity > capacity) {
@@ -195,7 +253,7 @@ int dr_cfg_read_struct(char * buf, size_t capacity, cfg_t cfg, LPDRMETA meta, in
 
         entry_size = dr_cfg_read_entry(buf, capacity, buf + entry->m_data_start_pos, entry_capacity, item, meta, entry, policy, em);
         
-        if (entry->m_data_start_pos + entry_size > size) {
+        if ((int)(entry->m_data_start_pos + entry_size) > size) {
             size = entry->m_data_start_pos + entry_size;
         }
     }
@@ -221,7 +279,7 @@ int dr_cfg_read_i(
     }
     else {
         assert(meta->m_type == CPE_DR_TYPE_UNION);
-        return dr_cfg_read_union(buf, capacity, cfg, meta, policy, em);
+        return dr_cfg_read_union(buf, capacity, cfg, meta, NULL, policy, em);
     }
 }
 
