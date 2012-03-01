@@ -83,6 +83,7 @@ struct logic_data {
 
 #define LOGIC_EXECUTOR_COMMON                   \
     logic_manage_t m_mgr;                       \
+    const char * m_name;                        \
     TAILQ_ENTRY(logic_executor) m_next;         \
     logic_executor_type_t m_type
 

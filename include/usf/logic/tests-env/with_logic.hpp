@@ -16,6 +16,11 @@ public:
 
     logic_manage_t t_logic_manager(void);
 
+    logic_executor_t t_logic_executor_build(cfg_t cfg, logic_executor_build_fun_t fun, void * ctx, error_monitor_t em = 0);
+    logic_executor_t t_logic_executor_build(const char * cfg, logic_executor_build_fun_t fun, void * ctx, error_monitor_t em = 0);
+
+    const char * t_logic_executor_dump(logic_executor_t executor);
+
 private:
     logic_manage_t m_logic_manager;
 };

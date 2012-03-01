@@ -1,5 +1,6 @@
 #ifndef USF_LOGIC_TYPES_H
 #define USF_LOGIC_TYPES_H
+#include "cpe/utils/error.h"
 #include "cpe/cfg/cfg_types.h"
 #include "gd/app/app_types.h"
 #include "cpe/dr/dr_types.h"
@@ -46,6 +47,11 @@ typedef struct logic_executor * logic_executor_t;
 
 typedef int32_t (*logic_op_fun_t) (logic_context_t ctx, void * user_data, cfg_t cfg);
 typedef int32_t (*logic_decorate_fun_t) (logic_context_t ctx, logic_executor_t self, void * user_data);
+
+typedef logic_executor_t (*logic_executor_build_fun_t) (
+    logic_manage_t mgr, const char * name, void * ctx,
+    cfg_t args,
+    error_monitor_t em);
 
 #ifdef __cplusplus
 }

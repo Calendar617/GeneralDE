@@ -1,3 +1,3 @@
 $(eval $(call gtest-def,usf_logic,\
-	gmock \
+    testenv.usf_logic \
 	))
