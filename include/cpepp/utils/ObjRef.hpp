@@ -2,6 +2,7 @@
 #define CPEPP_UTILS_OBJREF_H
 #include <typeinfo>
 #include <ostream>
+#include <cassert>
 #include "ToRef.hpp"
 
 namespace Cpe { namespace Utils {
