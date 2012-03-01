@@ -31,6 +31,8 @@ void logic_context_flag_enable(logic_context_t context, logic_context_flag_t fla
 void logic_context_flag_disable(logic_context_t context, logic_context_flag_t flag);
 int logic_context_flag_is_enable(logic_context_t context, logic_context_flag_t flag);
 
+void logic_context_data_dump_to_cfg(logic_context_t context, cfg_t cfg);
+
 void logic_context_execute(logic_context_t context);
 
 #ifdef __cplusplus

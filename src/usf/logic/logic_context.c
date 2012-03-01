@@ -1,4 +1,7 @@
 #include <assert.h>
+#include "cpe/cfg/cfg_manage.h"
+#include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/dr/dr_cfg.h"
 #include "usf/logic/logic_context.h"
 #include "usf/logic/logic_require.h"
 #include "usf/logic/logic_data.h"
@@ -156,4 +159,15 @@ void logic_context_flag_disable(logic_context_t context, logic_context_flag_t fl
 
 int logic_context_flag_is_enable(logic_context_t context, logic_context_flag_t flag) {
     return context->m_flags & flag;
+}
+
+void logic_context_data_dump_to_cfg(logic_context_t context, cfg_t cfg) {
+    logic_data_t data;
+
+    TAILQ_FOREACH(data, &context->m_datas, m_next) {
+        cfg_t data_node;
+        data_node = cfg_struct_add_struct(cfg, dr_meta_name(data->m_meta), cfg_replace);
+
+        dr_cfg_write(data_node, logic_data_data(data), data->m_meta, NULL);
+    }
 }

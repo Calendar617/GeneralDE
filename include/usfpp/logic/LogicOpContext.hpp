@@ -58,7 +58,7 @@ public:
     template<typename T>
     T const & data(const char * name) const { return data(name).as<T>(); }
 
-    void dump(cfg_t cfg) const;
+    void dump_data(cfg_t cfg) const { logic_context_data_dump_to_cfg(*this, cfg); }
 
     void destory(void) { logic_context_free(*this); }
 };
