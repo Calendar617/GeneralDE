@@ -1,8 +1,9 @@
-#include "LogicOpPlainTest.hpp"
-#include "../LogicOp.hpp"
-#include "../LogicOpPlain.hpp"
+#include "LogicTest.hpp"
 
-TEST_F(LogicOpPlainTest, basic_basic) {
+class ExecutorBuildTest : public LogicTest {
+};
+
+TEST_F(ExecutorBuildTest, basic_basic) {
     installLogicOpMock("Op1");
 
     ::std::auto_ptr<LogicOpPlain> plain =
@@ -13,7 +14,7 @@ TEST_F(LogicOpPlainTest, basic_basic) {
         dumpLogicOpPlain(*plain));
 }
 
-TEST_F(LogicOpPlainTest, basic_with_args) {
+TEST_F(ExecutorBuildTest, basic_with_args) {
     installLogicOpMock("Op1");
 
     ::std::auto_ptr<LogicOpPlain> plain =
@@ -24,7 +25,7 @@ TEST_F(LogicOpPlainTest, basic_with_args) {
         dumpLogicOpPlain(*plain));
 }
 
-TEST_F(LogicOpPlainTest, group_basic) {
+TEST_F(ExecutorBuildTest, group_basic) {
     installLogicOpMock("Op1");
     installLogicOpMock("Op2");
 
@@ -42,7 +43,7 @@ TEST_F(LogicOpPlainTest, group_basic) {
         dumpLogicOpPlain(*plain));
 }
 
-TEST_F(LogicOpPlainTest, group_group) {
+TEST_F(ExecutorBuildTest, group_group) {
     installLogicOpMock("Op1");
     installLogicOpMock("Op2");
 
@@ -63,7 +64,7 @@ TEST_F(LogicOpPlainTest, group_group) {
         dumpLogicOpPlain(*plain));
 }
 
-TEST_F(LogicOpPlainTest, protected_basic) {
+TEST_F(ExecutorBuildTest, protected_basic) {
     installLogicOpMock("Op1");
 
     ::std::auto_ptr<LogicOpPlain> plain =
@@ -75,7 +76,7 @@ TEST_F(LogicOpPlainTest, protected_basic) {
         dumpLogicOpPlain(*plain));
 }
 
-TEST_F(LogicOpPlainTest, protected_group) {
+TEST_F(ExecutorBuildTest, protected_group) {
     installLogicOpMock("Op1");
 
     ::std::auto_ptr<LogicOpPlain> plain =
