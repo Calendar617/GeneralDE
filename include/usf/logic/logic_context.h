@@ -25,7 +25,13 @@ int32_t logic_context_errno(logic_context_t context);
 size_t logic_context_capacity(logic_context_t context);
 void * logic_context_data(logic_context_t context);
 
-void logic_context_execute(logic_context_t context, gd_app_context_t app);
+uint32_t logic_context_flags(logic_context_t context);
+void logic_context_flags_set(logic_context_t context, uint32_t flag);
+void logic_context_flag_enable(logic_context_t context, logic_context_flag_t flag);
+void logic_context_flag_disable(logic_context_t context, logic_context_flag_t flag);
+int logic_context_flag_is_enable(logic_context_t context, logic_context_flag_t flag);
+
+void logic_context_execute(logic_context_t context);
 
 #ifdef __cplusplus
 }

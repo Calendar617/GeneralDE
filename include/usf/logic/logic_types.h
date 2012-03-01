@@ -13,6 +13,10 @@ extern "C" {
 typedef uint32_t logic_context_id_t;
 typedef uint32_t logic_require_id_t;
 
+typedef enum logic_context_flag {
+    logic_context_flag_debug = 1 << 0
+} logic_context_flag_t;
+
 typedef enum logic_context_state {
     logic_context_idle
     , logic_context_waiting
@@ -39,8 +43,8 @@ typedef struct logic_require_type * logic_require_type_t;
 
 typedef struct logic_executor * logic_executor_t;
 
-typedef int32_t (*logic_op_fun_t) (gd_app_context_t app, logic_context_t ctx, void * user_data, cfg_t cfg);
-typedef int32_t (*logic_decorate_fun_t) (gd_app_context_t app, logic_context_t ctx, logic_executor_t self, void * user_data);
+typedef int32_t (*logic_op_fun_t) (logic_context_t ctx, void * user_data, cfg_t cfg);
+typedef int32_t (*logic_decorate_fun_t) (logic_context_t ctx, logic_executor_t self, void * user_data);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,6 @@
 #include "gd/app/app_context.h"
 #include "gdpp/app/Log.hpp"
+#include "usf/logic/logic_context.h"
 #include "usfpp/logic/LogicOpManager.hpp"
 
 namespace Usf { namespace Logic {
@@ -38,6 +39,27 @@ LogicOpManager::find(gd_app_context_t app, cpe_hash_string_t name) {
         : logic_manage_find(app, name);
 
     return (LogicOpManager*)logic_manager;
+}
+
+LogicOpContext &
+LogicOpManager::createContext(
+    logic_executor_t executor,
+    size_t capacity, const void * data,
+    logic_context_id_t id)
+{
+    logic_context_t ctx = logic_context_create(*this, id, executor, capacity);
+    if (ctx == 0) {
+        APP_CTX_THROW_EXCEPTION(
+            app(),
+            ::std::runtime_error,
+            "create Usf::Logic::LogicOpContext fail!");
+    }
+
+    if (data && logic_context_capacity(ctx) > 0) {
+        memcpy(logic_context_data(ctx), data, logic_context_capacity(ctx));
+    }
+
+    return *(LogicOpContext*)ctx;
 }
 
 }}

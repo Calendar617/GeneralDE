@@ -69,10 +69,7 @@ REINTER:
      ? &stack->m_inline_items[(pos)]                                    \
      : &stack->m_extern_items[(pos) - LOGIC_STACK_INLINE_ITEM_COUNT])   \
 
-void logic_stack_exec(
-    struct logic_stack * stack, int32_t stop_stack_pos,
-    gd_app_context_t app, logic_context_t ctx)
-{
+void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_context_t ctx) {
     while(ctx->m_state == logic_context_idle
           && stack->m_item_pos > stop_stack_pos)
     {
@@ -83,7 +80,7 @@ void logic_stack_exec(
 
         if (stack_item->m_executr->m_type == logic_executor_type_basic) {
             struct logic_executor_basic * basic = (struct logic_executor_basic *)stack_item->m_executr;
-            rv = basic->m_op(app, ctx, basic->m_ctx, basic->m_args);
+            rv = basic->m_op(ctx, basic->m_ctx, basic->m_args);
         }
         else if (stack_item->m_executr->m_type == logic_executor_type_decorate) {
             //struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)stack_item->m_executr;

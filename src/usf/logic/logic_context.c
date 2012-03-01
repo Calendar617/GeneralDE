@@ -47,7 +47,7 @@ logic_context_create(logic_manage_t mgr, logic_require_id_t id, logic_executor_t
     context->m_errno = 0;
     context->m_state = logic_context_idle;
     context->m_capacity = capacity;
-
+    context->m_flags = 0;
     logic_stack_init(&context->m_stack);
     logic_stack_push(&context->m_stack, context, executor);
 
@@ -134,7 +134,26 @@ int logic_context_cmp(const struct logic_context * l, const struct logic_context
     return l->m_id == r->m_id;
 }
 
-void logic_context_execute(logic_context_t context, gd_app_context_t app) {
-    logic_stack_exec(&context->m_stack, -1, app, context);
+void logic_context_execute(logic_context_t context) {
+    logic_stack_exec(&context->m_stack, -1, context);
 }
 
+uint32_t logic_context_flags(logic_context_t context) {
+    return context->m_flags;
+}
+
+void logic_context_flags_set(logic_context_t context, uint32_t flag) {
+    context->m_flags = flag;
+}
+
+void logic_context_flag_enable(logic_context_t context, logic_context_flag_t flag) {
+    context->m_flags |= flag;
+}
+
+void logic_context_flag_disable(logic_context_t context, logic_context_flag_t flag) {
+    context->m_flags &= ~flag;
+}
+
+int logic_context_flag_is_enable(logic_context_t context, logic_context_flag_t flag) {
+    return context->m_flags & flag;
+}

@@ -70,7 +70,7 @@ logic_executor_decorate_create(logic_manage_t mgr, logic_decorate_fun_t op, void
     return NULL;
 }
 
-int logic_executor_decorate_exec_inner(logic_executor_t input_decorator, gd_app_context_t app, logic_context_t ctx) {
+int logic_executor_decorate_exec_inner(logic_executor_t input_decorator, logic_context_t ctx) {
     struct logic_executor_decorate * decorator;
     int32_t cur_stack_pos;
 
@@ -81,7 +81,7 @@ int logic_executor_decorate_exec_inner(logic_executor_t input_decorator, gd_app_
     cur_stack_pos = ctx->m_stack.m_item_pos;
     logic_stack_push(&ctx->m_stack, ctx, decorator->m_inner);
 
-    logic_stack_exec(&ctx->m_stack, cur_stack_pos, app, ctx);
+    logic_stack_exec(&ctx->m_stack, cur_stack_pos, ctx);
 
     return 0;
 }

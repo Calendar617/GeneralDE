@@ -31,9 +31,7 @@ void logic_stack_init(struct logic_stack * stack);
 void logic_stack_fini(struct logic_stack * stack, logic_context_t context);
 void logic_stack_push(struct logic_stack * stack, logic_context_t context, logic_executor_t executor);
     
-void logic_stack_exec(
-    struct logic_stack * stack, int32_t stop_stack_pos,
-    gd_app_context_t app, logic_context_t ctx);
+void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_context_t ctx);
 
 #ifdef __cplusplus
 }
