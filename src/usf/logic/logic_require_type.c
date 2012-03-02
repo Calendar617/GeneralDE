@@ -11,7 +11,7 @@ logic_require_type_create(logic_manage_t mgr, const char * name) {
 
     name_capacity = cpe_hs_len_to_binary_len(strlen(name));
 
-    buf =  (char *)mem_alloc(mgr->m_alloc, sizeof(struct logic_require_type));
+    buf =  (char *)mem_alloc(mgr->m_alloc, sizeof(struct logic_require_type) + name_capacity);
     if (buf == NULL) return NULL;
 
     cpe_hs_init((cpe_hash_string_t)buf, name_capacity, name);
@@ -37,8 +37,7 @@ void logic_require_type_free(logic_require_type_t rt) {
     cpe_hash_it_init(&require_it, &rt->m_mgr->m_requires);
 
     require = cpe_hash_it_next(&require_it);
-
-    do {
+    while (require) {
         logic_require_t next = cpe_hash_it_next(&require_it);
 
         if (require->m_type == rt) {
@@ -46,8 +45,8 @@ void logic_require_type_free(logic_require_type_t rt) {
         }
 
         require = next;
-    } while(require);
-    
+    };
+
     cpe_hash_table_remove_by_ins(&rt->m_mgr->m_require_types, rt);
     mem_free(rt->m_mgr->m_alloc, rt->m_name);
 }

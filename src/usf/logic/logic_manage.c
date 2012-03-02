@@ -99,9 +99,9 @@ static void logic_manage_clear(gd_nm_node_t node) {
     logic_manage_t mgr;
     mgr = (logic_manage_t)gd_nm_node_data(node);
 
+    logic_context_free_all(mgr);
     logic_require_free_all(mgr);
     logic_data_free_all(mgr);
-    logic_context_free_all(mgr);
     logic_require_type_free_all(mgr);
 
     cpe_hash_table_fini(&mgr->m_contexts);

@@ -28,9 +28,9 @@ typedef enum logic_context_state {
 } logic_context_state_t;
 
 typedef enum logic_require_state {
-    logic_require_waiting
-    , logic_require_error
-    , logic_require_done
+    logic_require_state_waiting
+    , logic_require_state_error
+    , logic_require_state_done
 } logic_require_state_t;
 
 typedef enum logic_executor_type {

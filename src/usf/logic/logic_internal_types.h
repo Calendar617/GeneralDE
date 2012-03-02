@@ -61,6 +61,7 @@ struct logic_require {
     logic_require_id_t m_id;
     logic_require_state_t m_state;
     logic_require_type_t m_type;
+    size_t m_capacity;
 
     TAILQ_ENTRY(logic_require) m_next;
     struct cpe_hash_entry m_hh;

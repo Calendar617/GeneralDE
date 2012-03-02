@@ -4,7 +4,7 @@
 #include "logic_internal_ops.h"
 
 logic_require_t
-logic_require_create(logic_context_t context, cpe_hash_string_t require_name) {
+logic_require_create(logic_context_t context, cpe_hash_string_t require_name, size_t capacity) {
     logic_require_type_t require_type;
     logic_require_t require;
     int id_try_count;
@@ -12,16 +12,17 @@ logic_require_create(logic_context_t context, cpe_hash_string_t require_name) {
     require_type = logic_require_type_find(context->m_mgr, require_name);
     if (require_type == NULL) return NULL;
 
-    require = mem_alloc(context->m_mgr->m_alloc, sizeof(struct logic_require));
+    require = mem_alloc(context->m_mgr->m_alloc, sizeof(struct logic_require) + capacity);
     if (require == NULL) return NULL;
 
     require->m_ctx = context;
-    require->m_state = logic_require_waiting;
+    require->m_state = logic_require_state_waiting;
     require->m_type = require_type;
-    
-    cpe_hash_entry_init(&context->m_hh);
+    require->m_capacity = capacity;
+
+    cpe_hash_entry_init(&require->m_hh);
     for(id_try_count = 0; id_try_count < 2000; ++id_try_count) {
-        require->m_id = ++context->m_mgr->m_require_id;
+        require->m_id = context->m_mgr->m_require_id++;
         if (cpe_hash_table_insert_unique(&context->m_mgr->m_requires, require) == 0) {
             break;
         }
@@ -67,9 +68,20 @@ logic_require_find(logic_manage_t mgr, logic_require_id_t id) {
     return (logic_require_t)cpe_hash_table_find(&mgr->m_requires, &key);
 }
 
-logic_require_state_t
-logic_require_state(logic_require_t require) {
+logic_require_id_t logic_require_id(logic_require_t require) {
+    return require->m_id;
+}
+
+logic_require_state_t logic_require_state(logic_require_t require) {
     return require->m_state;
+}
+
+size_t logic_require_capacity(logic_require_t require) {
+    return require->m_capacity;
+}
+
+void * logic_require_data(logic_require_t require) {
+    return require + 1;
 }
 
 void logic_require_set_done(logic_require_t require) {

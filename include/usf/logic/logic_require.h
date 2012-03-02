@@ -8,11 +8,17 @@ extern "C" {
 #endif
 
 logic_require_t
-logic_require_create(logic_context_t context, cpe_hash_string_t require_name);
+logic_require_create(logic_context_t context, cpe_hash_string_t require_name, size_t capacity);
 void logic_require_free(logic_require_t require);
 
 logic_require_t
 logic_require_find(logic_manage_t mgr, logic_require_id_t id);
+
+logic_require_id_t logic_require_id(logic_require_t require);
+size_t logic_require_capacity(logic_require_t require);
+void * logic_require_data(logic_require_t require);
+
+logic_require_state_t logic_require_state(logic_require_t require);
 
 logic_require_state_t
 logic_require_state(logic_require_t require);
