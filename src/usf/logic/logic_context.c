@@ -18,13 +18,13 @@ logic_context_create(logic_manage_t mgr, logic_context_id_t id, size_t capacity)
 
     context = (logic_context_t)buf;
 
-    context->m_id = id == INVALID_LOGIC_CONTEXT_ID ? ++mgr->m_context_id : id;
     context->m_mgr = mgr;
 
     TAILQ_INIT(&context->m_requires);
     cpe_hash_entry_init(&context->m_hh);
 
-    if (id == INVALID_LOGIC_CONTEXT_ID) {
+    if (id != INVALID_LOGIC_CONTEXT_ID) {
+        context->m_id = id;
         if (cpe_hash_table_insert_unique(&mgr->m_contexts, context) != 0) {
             mem_free(mgr->m_alloc, buf);
             return NULL;
@@ -33,7 +33,7 @@ logic_context_create(logic_manage_t mgr, logic_context_id_t id, size_t capacity)
     else {
         int id_try_count;
         for(id_try_count = 0; id_try_count < 2000; ++id_try_count) {
-            context->m_id = ++context->m_mgr->m_context_id;
+            context->m_id = context->m_mgr->m_context_id++;
             if (cpe_hash_table_insert_unique(&mgr->m_contexts, context) == 0) {
                 break;
             }
@@ -148,7 +148,7 @@ void logic_context_flag_enable(logic_context_t context, logic_context_flag_t fla
 }
 
 void logic_context_flag_disable(logic_context_t context, logic_context_flag_t flag) {
-    context->m_flags &= ~flag;
+    context->m_flags &= ~((uint32_t)flag);
 }
 
 int logic_context_flag_is_enable(logic_context_t context, logic_context_flag_t flag) {

@@ -2,23 +2,11 @@
 
 class ExecutorBuildTest : public LogicTest {
 public:
-    using Base::t_logic_executor_build;
-
-
-    static logic_executor_t build_fun(
-        logic_manage_t mgr, const char * name, void * ctx,
-        cfg_t args,
-        error_monitor_t em)
-    {
-        return logic_executor_basic_create(mgr, name, NULL, NULL, args);
-    }
-
-    logic_executor_t t_logic_executor_build(const char * cfg) {
-        return t_logic_executor_build(cfg, build_fun, NULL, NULL);
-    }
 };
 
 TEST_F(ExecutorBuildTest, basic_basic) {
+    installOp("Op1");
+
     logic_executor_t executor =
           t_logic_executor_build("Op1");
 
@@ -30,6 +18,8 @@ TEST_F(ExecutorBuildTest, basic_basic) {
 }
 
 TEST_F(ExecutorBuildTest, basic_with_args) {
+    installOp("Op1");
+
     logic_executor_t executor =
           t_logic_executor_build("Op1: { a1: 1, a2: 2}");
 
@@ -41,6 +31,9 @@ TEST_F(ExecutorBuildTest, basic_with_args) {
 }
 
 TEST_F(ExecutorBuildTest, group_basic) {
+    installOp("Op1");
+    installOp("Op2");
+
     logic_executor_t executor =
         t_logic_executor_build(
             "- Op1\n"
@@ -58,6 +51,9 @@ TEST_F(ExecutorBuildTest, group_basic) {
 }
 
 TEST_F(ExecutorBuildTest, group_group) {
+    installOp("Op1");
+    installOp("Op2");
+
     logic_executor_t executor =
         t_logic_executor_build(
             "- Op1\n"
@@ -77,6 +73,8 @@ TEST_F(ExecutorBuildTest, group_group) {
 }
 
 TEST_F(ExecutorBuildTest, protected_basic) {
+    installOp("Op1");
+
     logic_executor_t executor =
         t_logic_executor_build(
             "protect: Op1");
@@ -89,6 +87,8 @@ TEST_F(ExecutorBuildTest, protected_basic) {
 }
 
 TEST_F(ExecutorBuildTest, protected_group) {
+    installOp("Op1");
+
     logic_executor_t executor =
         t_logic_executor_build(
             "protect:\n"

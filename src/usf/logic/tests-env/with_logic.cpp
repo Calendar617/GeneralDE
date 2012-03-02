@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "cpe/utils/buffer.h"
 #include "cpe/utils/stream_buffer.h"
 #include "cpe/utils/tests-env/with_em.hpp"
@@ -31,6 +32,56 @@ logic_manage_t
 with_logic::t_logic_manager(void) {
     EXPECT_TRUE(m_logic_manager) << "logic_manager not create!";
     return m_logic_manager;
+}
+
+logic_context_t
+with_logic::t_logic_context_create(size_t capacity, logic_require_id_t id) {
+    logic_context_t ctx = logic_context_create(t_logic_manager(), id, capacity);
+    EXPECT_TRUE(ctx) << "create logic context fail, capacity=" << capacity << ", id=" << id << "!";
+    return ctx;
+}
+
+logic_context_t
+with_logic::t_logic_context_create(const char * cfg, size_t capacity, logic_require_id_t id) {
+    logic_context_t ctx = t_logic_context_create(capacity, id);
+    if (ctx) t_logic_context_install_data(ctx, cfg);
+    return ctx; 
+}
+
+logic_context_t
+with_logic::t_logic_context_create(cfg_t cfg, size_t capacity, logic_require_id_t id) {
+    logic_context_t ctx = t_logic_context_create(capacity, id);
+    if (ctx) t_logic_context_install_data(ctx, cfg);
+    return ctx; 
+}
+
+void with_logic::t_logic_context_install_data(logic_context_t context, const char * cfg) {
+    t_logic_context_install_data(context, envOf<cpe::cfg::testenv::with_cfg>().t_cfg_parse(cfg));
+}
+
+void with_logic::t_logic_context_install_data(logic_context_t context, cfg_t cfg) {
+}
+
+void with_logic::t_logic_execute(logic_context_t context, logic_executor_t executor) {
+    EXPECT_TRUE(context) << "context is null!";
+    EXPECT_TRUE(executor) << "executor is null!";
+    
+    EXPECT_EQ(0, logic_context_bind(context, executor)) << "context bind executor fail!";
+
+    logic_context_execute(context);
+}
+
+logic_context_t with_logic::t_logic_context_find(logic_context_id_t id) {
+    return logic_context_find(t_logic_manager(), id);
+}
+
+logic_context_t with_logic::t_logic_context(logic_context_id_t id) {
+    logic_context_t ctx = logic_context_find(t_logic_manager(), id);
+
+    EXPECT_TRUE(ctx) << "logic context " << id << " not exist!";
+    if (ctx == 0) throw ::std::runtime_error("logic context not exist!");
+
+    return ctx;
 }
 
 logic_executor_t
