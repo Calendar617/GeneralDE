@@ -104,6 +104,10 @@ int32_t logic_context_errno(logic_context_t context) {
     return context->m_errno;
 }
 
+void logic_context_errno_set(logic_context_t context, int32_t v) {
+    context->m_errno = v;
+}
+
 logic_manage_t
 logic_context_mgr(logic_context_t context) {
     return context->m_mgr;
@@ -116,6 +120,8 @@ logic_context_app(logic_context_t context) {
 
 logic_context_state_t
 logic_context_state(logic_context_t context) {
+    if (context->m_errno) return logic_context_error;
+
     return context->m_state;
 }
 

@@ -61,3 +61,13 @@ TEST_F(ContextBasicTest, id_auto_try_max) {
 
     EXPECT_TRUE(NULL == logic_context_create(t_logic_manager(), INVALID_LOGIC_CONTEXT_ID, 0));
 }
+
+TEST_F(ContextBasicTest, state_error_by_errno) {
+    logic_context_t context = t_logic_context_create();
+    
+    EXPECT_EQ(logic_context_init, logic_context_state(context));
+    logic_context_errno_set(context, -1);
+    EXPECT_EQ(logic_context_error, logic_context_state(context));
+    logic_context_errno_set(context, 0);
+    EXPECT_EQ(logic_context_init, logic_context_state(context));
+}

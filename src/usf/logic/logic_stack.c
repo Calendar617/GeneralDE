@@ -101,6 +101,7 @@ void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_
                 logic_executor_t next = TAILQ_NEXT(last_stack_item->m_executr, m_next);
                 if (next) {
                     last_stack_item->m_executr = next;
+                    ++stack->m_item_pos;
                 }
             }
             else if (stack_item->m_executr->m_type == logic_executor_type_decorate) {
