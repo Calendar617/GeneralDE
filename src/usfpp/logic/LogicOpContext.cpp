@@ -60,7 +60,7 @@ void LogicOpContext::bind(logic_executor_t executor) {
                 ::std::runtime_error,
                 "context bind executor, input executor is null!");
         }
-        else if (state() != logic_context_init) {
+        else if (state() != logic_context_state_init) {
             APP_CTX_THROW_EXCEPTION(
                 app(),
                 ::std::runtime_error,
