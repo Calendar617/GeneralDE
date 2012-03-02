@@ -2,6 +2,7 @@
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/cfg/cfg_read.h"
 #include "usf/logic/logic_executor.h"
+#include "usf/logic/logic_context.h"
 #include "logic_internal_ops.h"
 
 logic_executor_t
@@ -12,6 +13,11 @@ logic_executor_basic_create(
 {
     struct logic_executor_basic * executor;
     cfg_t executor_args;
+
+    assert(mgr);
+
+    if (name == NULL) return NULL;
+    if (op == NULL) return NULL;
 
     executor_args = NULL;
     if (args) {
@@ -45,6 +51,9 @@ logic_executor_t
 logic_executor_group_create(logic_manage_t mgr, const char * name) {
     struct logic_executor_group * executor;
 
+    assert(mgr);
+    if (name == NULL) return NULL;
+
     executor = (struct logic_executor_group *)mem_alloc(mgr->m_alloc, sizeof(struct logic_executor_group));
     if (executor == NULL) return NULL;
 
@@ -60,8 +69,7 @@ int logic_executor_group_add(logic_executor_t input_group, logic_executor_t memb
     struct logic_executor_group * group;
 
     assert(input_group);
-    assert(member);
-
+    if (member == NULL) return -1;
     if (input_group->m_type != logic_executor_type_group) return -1;
 
     group = (struct logic_executor_group *)input_group;
@@ -77,22 +85,30 @@ logic_executor_decorate_create(
     const char * name,
     logic_decorate_fun_t op, void * op_ctx, logic_executor_t inner)
 {
-    return NULL;
+    struct logic_executor_decorate * executor;
+
+    assert(mgr);
+    if (name == NULL) return NULL;
+    if (op == NULL) return NULL;
+    if (inner == NULL) return NULL;
+
+    executor = (struct logic_executor_decorate *)mem_alloc(mgr->m_alloc, sizeof(struct logic_executor_decorate));
+    if (executor == NULL) return NULL;
+
+    executor->m_mgr = mgr;
+    executor->m_type = logic_executor_type_decorate;
+    executor->m_name = name;
+    executor->m_op = op;
+    executor->m_ctx = op_ctx;
+    executor->m_inner = inner;
+
+    return (logic_executor_t)executor;
 }
 
-int logic_executor_decorate_exec_inner(logic_executor_t input_decorator, logic_context_t ctx) {
-    struct logic_executor_decorate * decorator;
-    int32_t cur_stack_pos;
+int32_t logic_executor_decorate_protect(logic_context_t ctx, logic_context_decorate_tag_t tag, void * user_data) {
+    if (tag == logic_context_decorate_begin) return 0;
 
-    if (input_decorator->m_type != logic_executor_type_decorate) return -1;
-
-    decorator = (struct logic_executor_decorate *)input_decorator;
-
-    cur_stack_pos = ctx->m_stack.m_item_pos;
-    logic_stack_push(&ctx->m_stack, ctx, decorator->m_inner);
-
-    logic_stack_exec(&ctx->m_stack, cur_stack_pos, ctx);
-
+    logic_context_errno_set(ctx, 0);
     return 0;
 }
 
@@ -162,7 +178,7 @@ void logic_executor_dump(logic_executor_t executor, write_stream_t stream, int l
     case logic_executor_type_decorate: {
         struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)executor;
         stream_putc_count(stream, ' ', level << 2);
-        stream_printf(stream, "%s: ", decorator->m_name);
+        stream_printf(stream, "%s:", decorator->m_name);
         stream_putc(stream, '\n');
         logic_executor_dump(decorator->m_inner, stream, level + 1);
         break;

@@ -46,7 +46,12 @@ typedef struct logic_require_type * logic_require_type_t;
 typedef struct logic_executor * logic_executor_t;
 
 typedef int32_t (*logic_op_fun_t) (logic_context_t ctx, void * user_data, cfg_t cfg);
-typedef int32_t (*logic_decorate_fun_t) (logic_context_t ctx, logic_executor_t self, void * user_data);
+
+typedef enum logic_context_decorate_tag {
+    logic_context_decorate_begin,
+    logic_context_decorate_end
+} logic_context_decorate_tag_t;
+typedef int32_t (*logic_decorate_fun_t) (logic_context_t ctx, logic_context_decorate_tag_t tag, void * user_data);
 
 typedef logic_executor_t (*logic_executor_build_fun_t) (
     logic_manage_t mgr, const char * name, void * ctx,

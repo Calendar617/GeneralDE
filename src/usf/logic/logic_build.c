@@ -34,7 +34,14 @@ logic_executor_build(
 
         
         if (strcmp(cfg_name(child), "protect") == 0) {
-            //return NULL; //TODO: not impl
+            logic_executor_t inner;
+            logic_executor_t protect;
+            inner = logic_executor_build(mgr, child, build_fun, build_ctx, em);
+            if (inner == NULL) return NULL;
+
+            protect = logic_executor_protect_create(mgr, "protect", inner);
+            if (protect == NULL) logic_executor_free(inner);
+            return protect;
         }
 
         CPE_ERROR(em, "not support logic_executor %s", cfg_name(child));

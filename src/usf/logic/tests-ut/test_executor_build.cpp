@@ -80,7 +80,8 @@ TEST_F(ExecutorBuildTest, protected_basic) {
             "protect: Op1");
 
     EXPECT_STREQ(
-        "protect: Op1",
+        "protect:\n"
+        "    Op1",
         t_logic_executor_dump(executor));
 
     logic_executor_free(executor);
@@ -95,9 +96,10 @@ TEST_F(ExecutorBuildTest, protected_group) {
             "    - Op1");
 
     EXPECT_STREQ(
-        "protect: {\n"
-        "    Op1\n"
-        "}",
+        "protect:\n"
+        "    group:\n"
+        "        Op1"
+        ,
         t_logic_executor_dump(executor));
 
     logic_executor_free(executor);

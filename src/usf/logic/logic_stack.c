@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "usf/logic/logic_context.h"
 #include "logic_internal_ops.h"
 
 #define LOGIC_STACK_INLINE_ITEM_COUNT \
@@ -83,30 +84,43 @@ void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_
             rv = basic->m_op(ctx, basic->m_ctx, basic->m_args);
         }
         else if (stack_item->m_executr->m_type == logic_executor_type_decorate) {
-            //struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)stack_item->m_executr;
-            //rv = decorator->m_op(app, ctx, stack_item->m_executr, decorator->m_ctx);
+            struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)stack_item->m_executr;
+            if (decorator->m_op(ctx, logic_context_decorate_begin, decorator->m_ctx) == 0) {
+                logic_stack_push(stack, ctx, decorator->m_inner);
+                continue;
+            }
         }
 
         if (rv != 0) {
-            ctx->m_errno = rv;
-            ctx->m_state = logic_context_error;
+            logic_context_errno_set(ctx, rv);
         }
 
         --stack->m_item_pos;
 
-        if (stack->m_item_pos >= 0) {
+        while(stack->m_item_pos > stop_stack_pos) {
             struct logic_stack_item * stack_item = logic_stack_item_at(stack, stack->m_item_pos);
             if (stack_item->m_executr->m_type == logic_executor_type_group) {
-                struct logic_stack_item * last_stack_item = logic_stack_item_at(stack, stack->m_item_pos + 1);
-                logic_executor_t next = TAILQ_NEXT(last_stack_item->m_executr, m_next);
-                if (next) {
-                    last_stack_item->m_executr = next;
-                    ++stack->m_item_pos;
+                if (ctx->m_errno) {
+                    --stack->m_item_pos;
+                    continue;
+                }
+                else {
+                    struct logic_stack_item * last_stack_item = logic_stack_item_at(stack, stack->m_item_pos + 1);
+                    logic_executor_t next = TAILQ_NEXT(last_stack_item->m_executr, m_next);
+                    if (next) {
+                        last_stack_item->m_executr = next;
+                        ++stack->m_item_pos;
+                    }
                 }
             }
             else if (stack_item->m_executr->m_type == logic_executor_type_decorate) {
-                
+                struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)stack_item->m_executr;
+                decorator->m_op(ctx, logic_context_decorate_end, decorator->m_ctx);
+                --stack->m_item_pos;
+                continue;
             }
+
+            break;
         }
     }
 }
