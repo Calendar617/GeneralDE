@@ -3,8 +3,11 @@
 #include "cpe/utils/stream_buffer.h"
 #include "cpe/utils/tests-env/with_em.hpp"
 #include "cpe/cfg/tests-env/with_cfg.hpp"
+#include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/dr/dr_cfg.h"
 #include "gd/app/tests-env/with_app.hpp"
 #include "usf/logic/logic_build.h"
+#include "usf/logic/logic_data.h"
 #include "usf/logic/tests-env/with_logic.hpp"
 
 namespace usf { namespace logic { namespace testenv {
@@ -42,24 +45,56 @@ with_logic::t_logic_context_create(size_t capacity, logic_require_id_t id) {
 }
 
 logic_context_t
-with_logic::t_logic_context_create(const char * cfg, size_t capacity, logic_require_id_t id) {
+with_logic::t_logic_context_create(const char * cfg, LPDRMETALIB metalib, size_t capacity, logic_require_id_t id) {
     logic_context_t ctx = t_logic_context_create(capacity, id);
-    if (ctx) t_logic_context_install_data(ctx, cfg);
+    if (ctx) t_logic_context_install_data(ctx, cfg, metalib);
     return ctx; 
 }
 
 logic_context_t
-with_logic::t_logic_context_create(cfg_t cfg, size_t capacity, logic_require_id_t id) {
+with_logic::t_logic_context_create(cfg_t cfg, LPDRMETALIB metalib, size_t capacity, logic_require_id_t id) {
     logic_context_t ctx = t_logic_context_create(capacity, id);
-    if (ctx) t_logic_context_install_data(ctx, cfg);
+    if (ctx) t_logic_context_install_data(ctx, cfg, metalib);
     return ctx; 
 }
 
-void with_logic::t_logic_context_install_data(logic_context_t context, const char * cfg) {
-    t_logic_context_install_data(context, envOf<cpe::cfg::testenv::with_cfg>().t_cfg_parse(cfg));
+void with_logic::t_logic_context_install_data(logic_context_t context, const char * cfg, LPDRMETALIB metalib) {
+    t_logic_context_install_data(context, envOf<cpe::cfg::testenv::with_cfg>().t_cfg_parse(cfg), metalib);
 }
 
-void with_logic::t_logic_context_install_data(logic_context_t context, cfg_t cfg) {
+void with_logic::t_logic_context_install_data(logic_context_t context, cfg_t cfg, LPDRMETALIB metalib) {
+    cfg_t child;
+    struct cfg_it data_it;
+    cfg_it_init(&data_it, cfg);
+
+    while((child = cfg_it_next(&data_it))) {
+        logic_data_t data;
+        LPDRMETA meta;
+        meta = dr_lib_find_meta_by_name(metalib, cfg_name(child));
+        EXPECT_TRUE(meta) << "t_logic_context_install_data: meta " << cfg_name(child) << " not exist!";
+        if (meta == 0) continue;
+
+        data = logic_data_get_or_create(context, meta, dr_meta_size(meta) + 1024);
+        EXPECT_TRUE(meta)
+            << "t_logic_context_install_data: meta "
+            << cfg_name(child) << ": data create fail, capacity is"
+            << (dr_meta_size(meta) + 1024)
+            << "!";
+        if (data == 0) continue;
+
+        EXPECT_GT(
+            dr_cfg_read(
+                logic_data_data(data),
+                logic_data_capacity(data),
+                child,
+                meta,
+                0,
+                NULL),
+            0)
+            << "t_logic_context_install_data: meta "
+            << cfg_name(child) << ": load data error!"
+            ;
+    }
 }
 
 void with_logic::t_logic_execute(logic_context_t context, logic_executor_t executor) {

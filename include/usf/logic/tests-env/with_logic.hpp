@@ -1,5 +1,6 @@
 #ifndef USF_LOGIC_TESTENV_WITH_LOGIC_H
 #define USF_LOGIC_TESTENV_WITH_LOGIC_H
+#include "cpe/dr/dr_types.h"
 #include "../logic_manage.h"
 #include "../logic_executor.h"
 #include "../logic_context.h"
@@ -17,15 +18,22 @@ public:
     logic_manage_t t_logic_manager(void);
 
 
-    logic_context_t t_logic_context_create(size_t capacity = 0, logic_require_id_t id = INVALID_LOGIC_CONTEXT_ID);
-    logic_context_t t_logic_context_create(const char * cfg, size_t capacity = 0, logic_require_id_t id = INVALID_LOGIC_CONTEXT_ID);
-    logic_context_t t_logic_context_create(cfg_t cfg, size_t capacity = 0, logic_require_id_t id = INVALID_LOGIC_CONTEXT_ID);
+    logic_context_t t_logic_context_create(
+        size_t capacity = 0, logic_require_id_t id = INVALID_LOGIC_CONTEXT_ID);
+
+    logic_context_t t_logic_context_create(
+        const char * cfg, LPDRMETALIB metalib,
+        size_t capacity = 0, logic_require_id_t id = INVALID_LOGIC_CONTEXT_ID);
+
+    logic_context_t t_logic_context_create(
+        cfg_t cfg, LPDRMETALIB metalib,
+        size_t capacity = 0, logic_require_id_t id = INVALID_LOGIC_CONTEXT_ID);
 
     logic_context_t t_logic_context_find(logic_context_id_t id);
     logic_context_t t_logic_context(logic_context_id_t id);
 
-    void t_logic_context_install_data(logic_context_t context, const char * cfg);
-    void t_logic_context_install_data(logic_context_t context, cfg_t cfg);
+    void t_logic_context_install_data(logic_context_t context, const char * cfg, LPDRMETALIB metalib);
+    void t_logic_context_install_data(logic_context_t context, cfg_t cfg, LPDRMETALIB metalib);
 
     void t_logic_execute(logic_context_t context, logic_executor_t executor);
 
