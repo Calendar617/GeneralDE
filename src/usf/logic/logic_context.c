@@ -46,9 +46,12 @@ logic_context_create(logic_manage_t mgr, logic_context_id_t id, size_t capacity)
     }
 
     context->m_errno = 0;
-    context->m_state = logic_context_init;
+    context->m_state = logic_context_state_init;
     context->m_capacity = capacity;
     context->m_flags = 0;
+    context->m_commit_op = NULL;
+    context->m_commit_ctx = NULL;
+
     logic_stack_init(&context->m_stack);
     TAILQ_INIT(&context->m_datas);
 
@@ -108,6 +111,15 @@ void logic_context_errno_set(logic_context_t context, int32_t v) {
     context->m_errno = v;
 }
 
+void logic_context_set_commit(
+    logic_context_t context,
+    logic_context_commit_fun_t op,
+    void * ctx)
+{
+    context->m_commit_op = op;
+    context->m_commit_ctx = ctx;
+}
+
 logic_manage_t
 logic_context_mgr(logic_context_t context) {
     return context->m_mgr;
@@ -120,9 +132,9 @@ logic_context_app(logic_context_t context) {
 
 logic_context_state_t
 logic_context_state(logic_context_t context) {
-    if (context->m_errno) return logic_context_error;
-
-    return context->m_state;
+    return context->m_errno
+        ? logic_context_state_error
+        : context->m_state;
 }
 
 size_t logic_context_capacity(logic_context_t context) {
@@ -173,14 +185,26 @@ void logic_context_data_dump_to_cfg(logic_context_t context, cfg_t cfg) {
 }
 
 void logic_context_execute(logic_context_t context) {
+    if (context->m_state != logic_context_state_idle) return;
+
     logic_stack_exec(&context->m_stack, -1, context);
+
+    if (context->m_errno == 0 && context->m_stack.m_item_pos == -1) {
+        context->m_state = logic_context_state_done; 
+    }
+
+    if (context->m_errno != 0 || context->m_state == logic_context_state_done) {
+        if (context->m_commit_op) {
+            context->m_commit_op(context, context->m_commit_ctx);
+        }
+    }
 }
 
 int logic_context_bind(logic_context_t context, logic_executor_t executor) {
    if (executor == NULL) return -1;
-   if (context->m_state != logic_context_init) return -1;
+   if (context->m_state != logic_context_state_init) return -1;
 
    logic_stack_push(&context->m_stack, context, executor);
-   context->m_state = logic_context_idle;
+   context->m_state = logic_context_state_idle;
    return 0;
 }

@@ -35,7 +35,7 @@ REINTER:
             new_buf = (struct logic_stack_item *)mem_alloc(context->m_mgr->m_alloc, sizeof(struct logic_stack_item) * new_capacity);
             if (new_buf == NULL) {
                 context->m_errno = -1;
-                context->m_state = logic_context_error;
+                context->m_state = logic_context_state_error;
                 return;
             }
 
@@ -71,7 +71,7 @@ REINTER:
      : &stack->m_extern_items[(pos) - LOGIC_STACK_INLINE_ITEM_COUNT])   \
 
 void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_context_t ctx) {
-    while(ctx->m_state == logic_context_idle
+    while(ctx->m_state == logic_context_state_idle
           && stack->m_item_pos > stop_stack_pos)
     {
         int32_t rv;

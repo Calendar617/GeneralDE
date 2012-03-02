@@ -10,7 +10,7 @@ TEST_F(ContextBasicTest, defaults) {
 
     EXPECT_EQ((uint32_t)0, logic_context_flags(context));
 
-    EXPECT_EQ(logic_context_init, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_init, logic_context_state(context));
     EXPECT_TRUE(logic_context_mgr(context) == t_logic_manager());
     EXPECT_TRUE(logic_context_app(context) == t_app());
     EXPECT_EQ((int32_t)0, logic_context_errno(context));
@@ -65,9 +65,9 @@ TEST_F(ContextBasicTest, id_auto_try_max) {
 TEST_F(ContextBasicTest, state_error_by_errno) {
     logic_context_t context = t_logic_context_create();
     
-    EXPECT_EQ(logic_context_init, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_init, logic_context_state(context));
     logic_context_errno_set(context, -1);
-    EXPECT_EQ(logic_context_error, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_error, logic_context_state(context));
     logic_context_errno_set(context, 0);
-    EXPECT_EQ(logic_context_init, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_init, logic_context_state(context));
 }

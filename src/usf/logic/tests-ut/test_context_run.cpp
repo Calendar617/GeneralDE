@@ -16,7 +16,7 @@ TEST_F(ContextRunTest, basic_success) {
 
     t_logic_execute(context, executor);
 
-    EXPECT_EQ(logic_context_idle, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_done, logic_context_state(context));
     EXPECT_EQ((int32_t)0, logic_context_errno(context));
 
     logic_executor_free(executor);
@@ -34,7 +34,7 @@ TEST_F(ContextRunTest, basic_fail) {
 
     t_logic_execute(context, executor);
 
-    EXPECT_EQ(logic_context_error, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_error, logic_context_state(context));
     EXPECT_EQ((int32_t)123, logic_context_errno(context));
 
     logic_executor_free(executor);
@@ -52,7 +52,7 @@ TEST_F(ContextRunTest, group_basic) {
 
     t_logic_execute(context, executor);
 
-    EXPECT_EQ(logic_context_idle, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_done, logic_context_state(context));
     EXPECT_EQ((int32_t)0, logic_context_errno(context));
 
     logic_executor_free(executor);
@@ -82,7 +82,7 @@ TEST_F(ContextRunTest, group_multi) {
 
     t_logic_execute(context, executor);
 
-    EXPECT_EQ(logic_context_idle, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_done, logic_context_state(context));
     EXPECT_EQ((int32_t)0, logic_context_errno(context));
 
     logic_executor_free(executor);
@@ -105,7 +105,7 @@ TEST_F(ContextRunTest, group_multi_error_break) {
 
     t_logic_execute(context, executor);
 
-    EXPECT_EQ(logic_context_error, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_error, logic_context_state(context));
     EXPECT_EQ((int32_t)123, logic_context_errno(context));
 
     logic_executor_free(executor);
@@ -134,7 +134,7 @@ TEST_F(ContextRunTest, group_multi_level_error_break) {
 
     t_logic_execute(context, executor);
 
-    EXPECT_EQ(logic_context_error, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_error, logic_context_state(context));
     EXPECT_EQ((int32_t)123, logic_context_errno(context));
 
     logic_executor_free(executor);
@@ -152,7 +152,7 @@ TEST_F(ContextRunTest, protected_basic) {
 
     t_logic_execute(context, executor);
 
-    EXPECT_EQ(logic_context_idle, logic_context_state(context));
+    EXPECT_EQ(logic_context_state_done, logic_context_state(context));
     EXPECT_EQ((int32_t)0, logic_context_errno(context));
 
     logic_executor_free(executor);

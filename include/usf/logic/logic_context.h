@@ -25,6 +25,8 @@ void logic_context_errno_set(logic_context_t context, int32_t v);
 size_t logic_context_capacity(logic_context_t context);
 void * logic_context_data(logic_context_t context);
 
+void logic_context_set_commit(logic_context_t context, logic_context_commit_fun_t op, void * ctx);
+
 uint32_t logic_context_flags(logic_context_t context);
 void logic_context_flags_set(logic_context_t context, uint32_t flag);
 void logic_context_flag_enable(logic_context_t context, logic_context_flag_t flag);

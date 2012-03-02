@@ -19,10 +19,12 @@ typedef enum logic_context_flag {
 } logic_context_flag_t;
 
 typedef enum logic_context_state {
-    logic_context_init
-    , logic_context_idle
-    , logic_context_waiting
-    , logic_context_error
+    logic_context_state_init
+    , logic_context_state_idle
+    , logic_context_state_waiting
+    , logic_context_state_error
+    , logic_context_state_done
+    , logic_context_state_timeout
 } logic_context_state_t;
 
 typedef enum logic_require_state {
@@ -57,6 +59,8 @@ typedef logic_executor_t (*logic_executor_build_fun_t) (
     logic_manage_t mgr, const char * name, void * ctx,
     cfg_t args,
     error_monitor_t em);
+
+typedef void (*logic_context_commit_fun_t) (logic_context_t ctx, void * user_data);
 
 #ifdef __cplusplus
 }

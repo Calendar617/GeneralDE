@@ -42,6 +42,8 @@ struct logic_context {
     logic_manage_t m_mgr;
     logic_context_id_t m_id;
     logic_context_state_t m_state;
+    logic_context_commit_fun_t m_commit_op;
+    void * m_commit_ctx;
     size_t m_capacity;
     uint32_t m_flags;
 
