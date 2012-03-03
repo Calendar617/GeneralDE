@@ -11,7 +11,8 @@ public:
     }
 
     void SetUp() {
-        Base::SetUp();
+        LogicTest::SetUp();
+
         m_context = t_logic_context_create();
         EXPECT_TRUE(m_context);
 
@@ -35,6 +36,8 @@ TEST_F(RequireBasicTest, basic) {
     EXPECT_EQ(logic_require_state_waiting, logic_require_state(require));
     EXPECT_EQ((size_t)123, logic_require_capacity(require));
     EXPECT_TRUE(logic_require_data(require));
+
+    EXPECT_EQ(logic_context_state_waiting, logic_context_state(m_context));
 }
 
 TEST_F(RequireBasicTest, create_no_type) {

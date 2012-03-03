@@ -62,3 +62,11 @@ LogicTest::op(const char * name) {
         return *pos->second;
     }
 }
+
+static void commit_to_mock(logic_context_t ctx, void * user_data) {
+    ((LogicTest::CommitMock *)user_data)->commit(ctx);
+}
+
+void LogicTest::set_commit(logic_context_t context, CommitMock & mock) {
+    logic_context_set_commit(context, commit_to_mock, &mock);
+}

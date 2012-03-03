@@ -72,7 +72,8 @@ REINTER:
 
 void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_context_t ctx) {
     while(ctx->m_state == logic_context_state_idle
-          && stack->m_item_pos > stop_stack_pos)
+          && stack->m_item_pos > stop_stack_pos
+          && ctx->m_require_waiting_count == 0)
     {
         int32_t rv;
         struct logic_stack_item * stack_item = logic_stack_item_at(stack, stack->m_item_pos);

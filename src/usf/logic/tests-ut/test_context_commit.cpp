@@ -2,18 +2,6 @@
 
 class ContextCommitTest : public LogicTest {
 public:
-    class CommitMock {
-    public:
-        MOCK_METHOD1(commit, void(logic_context_t ctx));
-    };
-
-    static void commit_to_mock(logic_context_t ctx, void * user_data) {
-        ((CommitMock *)user_data)->commit(ctx);
-    }
-
-    void set_commit(logic_context_t context, CommitMock & mock) {
-        logic_context_set_commit(context, commit_to_mock, &mock);
-    }
 };
 
 TEST_F(ContextCommitTest, commit_on_done) {

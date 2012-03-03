@@ -34,12 +34,17 @@ logic_require_create(logic_context_t context, cpe_hash_string_t require_name, si
     }
     
     TAILQ_INSERT_TAIL(&context->m_requires, require, m_next);
+    ++context->m_require_waiting_count;
 
     return require;
 }
 
 void logic_require_free(logic_require_t require) {
     assert(require);
+
+    if (require->m_state == logic_require_state_waiting) {
+        --require->m_ctx->m_require_waiting_count;
+    }
 
     TAILQ_REMOVE(&require->m_ctx->m_requires, require, m_next);
     cpe_hash_table_remove_by_ins(&require->m_ctx->m_mgr->m_requires, require);

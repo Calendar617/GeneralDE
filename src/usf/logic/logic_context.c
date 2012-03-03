@@ -51,6 +51,7 @@ logic_context_create(logic_manage_t mgr, logic_context_id_t id, size_t capacity)
     context->m_flags = 0;
     context->m_commit_op = NULL;
     context->m_commit_ctx = NULL;
+    context->m_require_waiting_count = 0;
 
     logic_stack_init(&context->m_stack);
     TAILQ_INIT(&context->m_datas);
@@ -134,7 +135,9 @@ logic_context_state_t
 logic_context_state(logic_context_t context) {
     return context->m_errno
         ? logic_context_state_error
-        : context->m_state;
+        : (context->m_require_waiting_count
+           ? logic_context_state_waiting
+           : context->m_state);
 }
 
 size_t logic_context_capacity(logic_context_t context) {

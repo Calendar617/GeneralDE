@@ -48,6 +48,7 @@ struct logic_context {
     uint32_t m_flags;
 
     logic_data_list_t m_datas;
+    uint32_t m_require_waiting_count;
     logic_require_list_t m_requires;
 
     struct logic_stack m_stack;

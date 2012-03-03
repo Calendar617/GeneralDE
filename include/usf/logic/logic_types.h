@@ -16,6 +16,7 @@ typedef uint32_t logic_require_id_t;
 
 typedef enum logic_context_flag {
     logic_context_flag_debug = 1 << 0
+    , logic_context_flag_execute_immediately = 1 << 1
 } logic_context_flag_t;
 
 typedef enum logic_context_state {

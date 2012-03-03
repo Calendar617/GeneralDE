@@ -22,6 +22,13 @@ public:
 
     typedef ::std::map< ::std::string, LogicOpMock *> LogicOpContainer;
 
+    class CommitMock {
+    public:
+        MOCK_METHOD1(commit, void(logic_context_t ctx));
+    };
+
+    void set_commit(logic_context_t context, CommitMock & mock);
+
     void SetUp();
     void TearDown();
 
