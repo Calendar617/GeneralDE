@@ -45,3 +45,117 @@ TEST_F(RequireBasicTest, create_no_type) {
     EXPECT_TRUE(require == NULL);
 }
 
+TEST_F(RequireBasicTest, require_set_done_release) {
+    logic_require_t require = create("t1");
+    ASSERT_TRUE(require);
+    EXPECT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+
+    EXPECT_EQ(logic_require_state_waiting, logic_require_state(require));
+
+    logic_require_set_done(require);
+
+    EXPECT_TRUE(NULL == logic_require_find(t_logic_manager(), 0));
+
+    EXPECT_NE(logic_context_state_waiting, logic_context_state(m_context));
+}
+
+TEST_F(RequireBasicTest, require_set_done_keep) {
+    logic_context_flag_enable(m_context, logic_context_flag_require_keep);
+
+    logic_require_t require = create("t1");
+    ASSERT_TRUE(require);
+    EXPECT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+
+    EXPECT_EQ(logic_require_state_waiting, logic_require_state(require));
+
+    logic_require_set_done(require);
+
+    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_EQ(logic_require_state_done, logic_require_state(require));
+
+    EXPECT_NE(logic_context_state_waiting, logic_context_state(m_context));
+}
+
+TEST_F(RequireBasicTest, require_set_done_from_error) {
+    logic_context_flag_enable(m_context, logic_context_flag_require_keep);
+
+    logic_require_t require = create("t1");
+    logic_require_set_error(require);
+
+    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_EQ(logic_require_state_error, logic_require_state(require));
+
+    logic_require_set_done(require);
+    EXPECT_EQ(logic_require_state_done, logic_require_state(require));
+}
+
+TEST_F(RequireBasicTest, require_set_done_from_done) {
+    logic_context_flag_enable(m_context, logic_context_flag_require_keep);
+
+    logic_require_t require = create("t1");
+    logic_require_set_done(require);
+
+    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_EQ(logic_require_state_done, logic_require_state(require));
+
+    logic_require_set_done(require);
+    EXPECT_EQ(logic_require_state_done, logic_require_state(require));
+}
+
+TEST_F(RequireBasicTest, require_set_error_release) {
+    logic_require_t require = create("t1");
+    ASSERT_TRUE(require);
+    EXPECT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+
+    EXPECT_EQ(logic_require_state_waiting, logic_require_state(require));
+
+    logic_require_set_error(require);
+
+    EXPECT_TRUE(NULL == logic_require_find(t_logic_manager(), 0));
+
+    EXPECT_NE(logic_context_state_waiting, logic_context_state(m_context));
+}
+
+TEST_F(RequireBasicTest, require_set_error_keep) {
+    logic_context_flag_enable(m_context, logic_context_flag_require_keep);
+
+    logic_require_t require = create("t1");
+    ASSERT_TRUE(require);
+    EXPECT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+
+    EXPECT_EQ(logic_require_state_waiting, logic_require_state(require));
+
+    logic_require_set_error(require);
+
+    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_EQ(logic_require_state_error, logic_require_state(require));
+
+    EXPECT_NE(logic_context_state_waiting, logic_context_state(m_context));
+}
+
+TEST_F(RequireBasicTest, require_set_error_from_error) {
+    logic_context_flag_enable(m_context, logic_context_flag_require_keep);
+
+    logic_require_t require = create("t1");
+    logic_require_set_error(require);
+
+    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_EQ(logic_require_state_error, logic_require_state(require));
+
+    logic_require_set_error(require);
+    EXPECT_EQ(logic_require_state_error, logic_require_state(require));
+}
+
+TEST_F(RequireBasicTest, require_set_error_from_done) {
+    logic_context_flag_enable(m_context, logic_context_flag_require_keep);
+
+    logic_require_t require = create("t1");
+    logic_require_set_done(require);
+
+    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_EQ(logic_require_state_done, logic_require_state(require));
+
+    logic_require_set_error(require);
+    EXPECT_EQ(logic_require_state_error, logic_require_state(require));
+}
+

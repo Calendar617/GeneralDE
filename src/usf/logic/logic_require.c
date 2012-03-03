@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "usf/logic/logic_context.h"
 #include "usf/logic/logic_require.h"
 #include "usf/logic/logic_require_type.h"
 #include "logic_internal_ops.h"
@@ -90,30 +91,49 @@ void * logic_require_data(logic_require_t require) {
 }
 
 void logic_require_set_done(logic_require_t require) {
-    /* logic_context_state_t state; */
-    /* logic_require_t require; */
+    logic_context_t ctx;
 
-    /* assert(context); */
+    if (require->m_state != logic_require_state_waiting) {
+        require->m_state = logic_require_state_done;
+        return;
+    }
 
-    /* state = logic_context_idle; */
+    ctx = require->m_ctx;
 
-    /* TAILQ_FOREACH(require, &context->m_requires, m_next) { */
-    /*     switch (require->m_state) { */
-    /*     case logic_require_error: */
-    /*         return logic_context_error; */
-    /*     case logic_require_waiting: */
-    /*         state = logic_context_waiting; */
-    /*         break; */
-    /*     default: */
-    /*         //DO NOTHING */
-    /*         break; */
-    /*     } */
-    /* } */
+    if (require->m_ctx->m_flags & logic_context_flag_require_keep) {
+        --ctx->m_require_waiting_count;
+        require->m_state = logic_require_state_done;
+    }
+    else {
+        logic_require_free(require);
+    }
 
-    /* return state; */
+    if (require->m_ctx->m_flags & logic_context_flag_execute_immediately) {
+        logic_context_execute(ctx);
+    }
 }
 
 void logic_require_set_error(logic_require_t require) {
+    logic_context_t ctx;
+
+    if (require->m_state != logic_require_state_waiting) {
+        require->m_state = logic_require_state_error;
+        return;
+    }
+
+    ctx = require->m_ctx;
+
+    if (require->m_ctx->m_flags & logic_context_flag_require_keep) {
+        --ctx->m_require_waiting_count;
+        require->m_state = logic_require_state_error;
+    }
+    else {
+        logic_require_free(require);
+    }
+
+    if (require->m_ctx->m_flags & logic_context_flag_execute_immediately) {
+        logic_context_execute(ctx);
+    }
 }
 
 uint32_t logic_require_hash(const struct logic_require * require) {
