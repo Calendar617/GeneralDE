@@ -17,6 +17,10 @@ public:
     void execute_again(void);
     void set_require_keep(void);
     void set_execute_immediately(void);
+
+    void cancel(void);
+    void timeout(void);
+
     logic_context_state_t state(void);
     int32_t rv(void);
 

@@ -15,11 +15,10 @@ void logic_context_do_state_change(logic_context_t context, logic_context_state_
 #define logic_context_state_i(context)                  \
     (context->m_errno                                   \
      ? logic_context_state_error                        \
-     : (context->m_state == logic_context_state_cancel  \
-        ? logic_context_state_cancel                    \
-        : (context->m_require_waiting_count             \
-           ? logic_context_state_waiting                \
-           : context->m_state)))
+     : ((context->m_state == logic_context_state_idle   \
+         && context->m_require_waiting_count)           \
+         ? logic_context_state_waiting                  \
+         : context->m_state))
 
 /*require ops*/
 uint32_t logic_require_hash(const struct logic_require * require);

@@ -71,3 +71,11 @@ RunTest::state(void) {
 int32_t RunTest::rv(void) {
     return logic_context_errno(m_context);
 }
+
+void RunTest::cancel(void) {
+    logic_context_cancel(m_context);
+}
+
+void RunTest::timeout(void) {
+    logic_context_timeout(m_context);
+}

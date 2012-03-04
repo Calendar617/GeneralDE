@@ -116,13 +116,11 @@ TEST_F(ContextRunTest, waiting_basic) {
         "- Op2\n"
         );
 
-    /*first execut should block*/
     EXPECT_EQ(logic_context_state_waiting, state());
     EXPECT_EQ((int32_t)0, rv());
 
     logic_require_free(logic_require_find(t_logic_manager(), 0));
 
-    /*retry*/
     expect_return(op2, 123);
     expect_commit();
     execute_again();
@@ -144,4 +142,46 @@ TEST_F(ContextRunTest, waiting_no_left_op) {
     /*retry*/
     expect_commit();
     execute_again();
+}
+
+TEST_F(ContextRunTest, cancel_in_wait) {
+    LogicOpMock & op1 = installOp("Op1");
+    installOp("Op2");
+
+    expect_create_require(op1);
+
+    execute(
+        "- Op1\n"
+        "- Op2\n"
+        );
+
+    /*first execut should block*/
+    EXPECT_EQ(logic_context_state_waiting, state());
+    EXPECT_EQ((int32_t)0, rv());
+
+    expect_commit();
+    cancel();
+
+    EXPECT_EQ(logic_context_state_cancel, state());
+}
+
+TEST_F(ContextRunTest, timeout_in_wait) {
+    LogicOpMock & op1 = installOp("Op1");
+    installOp("Op2");
+
+    expect_create_require(op1);
+
+    execute(
+        "- Op1\n"
+        "- Op2\n"
+        );
+
+    /*first execut should block*/
+    EXPECT_EQ(logic_context_state_waiting, state());
+    EXPECT_EQ((int32_t)0, rv());
+
+    expect_commit();
+    timeout();
+
+    EXPECT_EQ(logic_context_state_timeout, state());
 }
