@@ -4,6 +4,8 @@
 #include "usf/logic/logic_require_type.h"
 #include "logic_internal_ops.h"
 
+static void logic_require_do_cancel(logic_require_t require);
+
 logic_require_t
 logic_require_create(logic_context_t context, cpe_hash_string_t require_name, size_t capacity) {
     logic_require_type_t require_type;
@@ -44,7 +46,11 @@ void logic_require_free(logic_require_t require) {
     assert(require);
 
     if (require->m_state == logic_require_state_waiting) {
-        --require->m_ctx->m_require_waiting_count;
+        logic_require_do_cancel(require);
+    }
+
+    if (require->m_type->m_destory_op) {
+        require->m_type->m_destory_op(require, require->m_type->m_destory_ctx);
     }
 
     TAILQ_REMOVE(&require->m_ctx->m_requires, require, m_next);
@@ -90,6 +96,35 @@ void * logic_require_data(logic_require_t require) {
     return require + 1;
 }
 
+static void logic_require_do_cancel(logic_require_t require) {
+    logic_context_state_t old_state;
+
+    if (require->m_state != logic_require_state_waiting) return;
+
+    old_state = logic_context_state_i(require->m_ctx);
+
+    --require->m_ctx->m_require_waiting_count;
+    require->m_state = logic_require_state_canceling;
+
+    if (require->m_type->m_cancel_op) {
+        require->m_type->m_cancel_op(require, require->m_type->m_cancel_ctx);
+    }
+
+    if (require->m_state == logic_require_state_canceling) {
+        require->m_state = logic_require_state_canceled;
+    }
+
+    logic_context_do_state_change(require->m_ctx, old_state);
+}
+
+void logic_require_cancel(logic_require_t require) {
+    logic_require_do_cancel(require);
+
+    if (!(require->m_ctx->m_flags & logic_context_flag_require_keep)) {
+        logic_require_free(require);
+    }
+}
+
 void logic_require_set_done(logic_require_t require) {
     logic_context_t ctx;
     logic_context_state_t old_state;
@@ -124,11 +159,10 @@ void logic_require_set_error(logic_require_t require) {
     ctx = require->m_ctx;
     old_state = logic_context_state_i(ctx);
 
-    if (require->m_ctx->m_flags & logic_context_flag_require_keep) {
-        --ctx->m_require_waiting_count;
-        require->m_state = logic_require_state_error;
-    }
-    else {
+    --ctx->m_require_waiting_count;
+    require->m_state = logic_require_state_error;
+
+    if (!(require->m_ctx->m_flags & logic_context_flag_require_keep)) {
         logic_require_free(require);
     }
 

@@ -32,8 +32,10 @@ typedef enum logic_context_state {
 
 typedef enum logic_require_state {
     logic_require_state_waiting
+    , logic_require_state_canceling
     , logic_require_state_error
     , logic_require_state_done
+    , logic_require_state_canceled
 } logic_require_state_t;
 
 typedef enum logic_executor_type {
@@ -64,6 +66,8 @@ typedef logic_executor_t (*logic_executor_build_fun_t) (
     error_monitor_t em);
 
 typedef void (*logic_context_commit_fun_t) (logic_context_t ctx, void * user_data);
+
+typedef void (*logic_require_type_trigger_t) (logic_require_t require, void * user_data);
 
 #ifdef __cplusplus
 }

@@ -3,13 +3,13 @@
 
 class RequireRunTest : public RunTest {
 public:
-    void set_require_done(void) {
-        logic_require_set_done(logic_require_find(t_logic_manager(), 0));
+    logic_require_t require_find() {
+        return logic_require_find(t_logic_manager(), 0);
     }
 
-    void set_require_error(void) {
-        logic_require_set_error(logic_require_find(t_logic_manager(), 0));
-    }
+    void cancel_require(void) { logic_require_cancel(require_find()); }
+    void set_require_done(void) { logic_require_set_done(require_find()); }
+    void set_require_error(void) { logic_require_set_error(require_find()); }
 };
 
 TEST_F(RequireRunTest, auto_commit_require_done_release) {
@@ -23,6 +23,8 @@ TEST_F(RequireRunTest, auto_commit_require_done_release) {
 
     expect_commit();
     set_require_done();
+
+    EXPECT_TRUE(require_find() == NULL);
 }
 
 TEST_F(RequireRunTest, auto_commit_require_done_keep) {
@@ -39,6 +41,8 @@ TEST_F(RequireRunTest, auto_commit_require_done_keep) {
 
     expect_commit();
     set_require_done();
+
+    EXPECT_TRUE(require_find());
 }
 
 TEST_F(RequireRunTest, auto_commit_require_error_release) {
@@ -53,6 +57,8 @@ TEST_F(RequireRunTest, auto_commit_require_error_release) {
 
     expect_commit();
     set_require_error();
+
+    EXPECT_TRUE(require_find() == NULL);
 }
 
 TEST_F(RequireRunTest, auto_commit_require_error_keep) {
@@ -68,4 +74,53 @@ TEST_F(RequireRunTest, auto_commit_require_error_keep) {
 
     expect_commit();
     set_require_error();
+
+    EXPECT_TRUE(require_find());
 }
+
+TEST_F(RequireRunTest, auto_commit_for_free) {
+    LogicOpMock & op1 = installOp("Op1");
+    expect_create_require(op1);
+
+    set_execute_immediately();
+
+    execute("- Op1\n");
+    EXPECT_EQ(logic_context_state_waiting, state());
+
+    expect_commit();
+    logic_require_free(logic_require_find(t_logic_manager(), 0));
+}
+
+TEST_F(RequireRunTest, auto_commit_cancel_release) {
+    LogicOpMock & op1 = installOp("Op1");
+
+    expect_create_require(op1);
+
+    set_execute_immediately();
+
+    execute("- Op1\n");
+    EXPECT_EQ(logic_context_state_waiting, state());
+
+    expect_commit();
+    cancel_require();
+
+    EXPECT_TRUE(require_find() == NULL);
+}
+
+TEST_F(RequireRunTest, auto_commit_cancel_keep) {
+    LogicOpMock & op1 = installOp("Op1");
+
+    expect_create_require(op1);
+
+    set_require_keep();
+    set_execute_immediately();
+
+    execute("- Op1\n");
+    EXPECT_EQ(logic_context_state_waiting, state());
+
+    expect_commit();
+    cancel_require();
+
+    EXPECT_TRUE(require_find());
+}
+

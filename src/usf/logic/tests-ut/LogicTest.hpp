@@ -27,7 +27,11 @@ public:
         MOCK_METHOD1(commit, void(logic_context_t ctx));
     };
 
-    void set_commit(logic_context_t context, CommitMock & mock);
+    class RequireTypeMock {
+    public:
+        MOCK_METHOD1(cancel, void(logic_require_t require));
+        MOCK_METHOD1(destory, void(logic_require_t require));
+    };
 
     void SetUp();
     void TearDown();
@@ -37,6 +41,10 @@ public:
 
     LogicOpMock & installOp(const char * name);
     LogicOpMock & op(const char * name);
+
+    void set_commit(logic_context_t context, CommitMock & mock);
+    void set_destory(logic_require_type_t rt, RequireTypeMock & mock);
+    void set_cancel(logic_require_type_t rt, RequireTypeMock & mock);
 
 private:
     LogicOpContainer m_ops;

@@ -20,6 +20,12 @@ logic_require_type_create(logic_manage_t mgr, const char * name) {
     rt->m_mgr = mgr;
     rt->m_name = (cpe_hash_string_t)buf;
 
+    rt->m_cancel_op = NULL;
+    rt->m_cancel_ctx = NULL;
+
+    rt->m_destory_op = NULL;
+    rt->m_destory_ctx = NULL;
+
     cpe_hash_entry_init(&rt->m_hh);
     if (cpe_hash_table_insert_unique(&mgr->m_require_types, rt) != 0) {
         mem_free(mgr->m_alloc, buf);
@@ -79,4 +85,14 @@ uint32_t logic_require_type_hash(const struct logic_require_type * rt) {
 
 int logic_require_type_cmp(const struct logic_require_type * l, const struct logic_require_type * r) {
     return cpe_hs_cmp(l->m_name, r->m_name) == 0 ? 1 : 0;
+}
+
+void logic_require_type_set_destory(logic_require_type_t rt, logic_require_type_trigger_t op, void * user_data) {
+    rt->m_destory_op = op;
+    rt->m_destory_ctx = user_data;
+}
+
+void logic_require_type_set_cancel(logic_require_type_t rt, logic_require_type_trigger_t op, void * user_data) {
+    rt->m_cancel_op = op;
+    rt->m_cancel_ctx = user_data;
 }

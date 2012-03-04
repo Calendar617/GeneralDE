@@ -72,6 +72,12 @@ struct logic_require_type {
     logic_manage_t m_mgr;
     cpe_hash_string_t m_name;
 
+    logic_require_type_trigger_t m_destory_op;
+    void * m_destory_ctx;
+
+    logic_require_type_trigger_t m_cancel_op;
+    void * m_cancel_ctx;
+
     struct cpe_hash_entry m_hh;
 };
 

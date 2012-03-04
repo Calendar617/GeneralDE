@@ -25,6 +25,7 @@ logic_require_state(logic_require_t require);
 
 void logic_require_set_done(logic_require_t require);
 void logic_require_set_error(logic_require_t require);
+void logic_require_cancel(logic_require_t require);
 
 #ifdef __cplusplus
 }

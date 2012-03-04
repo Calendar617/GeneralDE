@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "usf/logic/logic_require_type.h"
 #include "LogicTest.hpp"
 
 void LogicTest::SetUp() {
@@ -69,4 +70,20 @@ static void commit_to_mock(logic_context_t ctx, void * user_data) {
 
 void LogicTest::set_commit(logic_context_t context, CommitMock & mock) {
     logic_context_set_commit(context, commit_to_mock, &mock);
+}
+
+static void rt_destory_to_mock(logic_require_t require, void * user_data) {
+    ((LogicTest::RequireTypeMock*)user_data)->destory(require);
+}
+
+void LogicTest::set_destory(logic_require_type_t rt, RequireTypeMock & mock) {
+    logic_require_type_set_destory(rt, rt_destory_to_mock, &mock);
+}
+
+static void rt_cancel_to_mock(logic_require_t require, void * user_data) {
+    ((LogicTest::RequireTypeMock*)user_data)->cancel(require);
+}
+
+void LogicTest::set_cancel(logic_require_type_t rt, RequireTypeMock & mock) {
+    logic_require_type_set_cancel(rt, rt_cancel_to_mock, &mock);
 }

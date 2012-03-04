@@ -159,3 +159,27 @@ TEST_F(RequireBasicTest, require_set_error_from_done) {
     EXPECT_EQ(logic_require_state_error, logic_require_state(require));
 }
 
+TEST_F(RequireBasicTest, require_destory) {
+    RequireTypeMock typeMock;
+    set_destory(m_require_type, typeMock);
+
+    EXPECT_CALL(typeMock, destory(::testing::_));
+
+    logic_require_t require = create("t1");
+    logic_require_free(require);
+}
+
+TEST_F(RequireBasicTest, require_cancel) {
+    logic_context_flag_enable(m_context, logic_context_flag_require_keep);
+
+    RequireTypeMock typeMock;
+    set_cancel(m_require_type, typeMock);
+
+    EXPECT_CALL(typeMock, cancel(::testing::_));
+
+    logic_require_t require = create("t1");
+    logic_require_cancel(require);
+
+    EXPECT_EQ(logic_require_state_canceled, logic_require_state(require));
+}
+
