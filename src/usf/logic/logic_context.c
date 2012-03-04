@@ -133,11 +133,7 @@ logic_context_app(logic_context_t context) {
 
 logic_context_state_t
 logic_context_state(logic_context_t context) {
-    return context->m_errno
-        ? logic_context_state_error
-        : (context->m_require_waiting_count
-           ? logic_context_state_waiting
-           : context->m_state);
+    return logic_context_state_i(context);
 }
 
 size_t logic_context_capacity(logic_context_t context) {
@@ -188,19 +184,18 @@ void logic_context_data_dump_to_cfg(logic_context_t context, cfg_t cfg) {
 }
 
 void logic_context_execute(logic_context_t context) {
+    logic_context_state_t old_state;
+
     if (context->m_state != logic_context_state_idle) return;
 
+    old_state = logic_context_state_i(context);
     logic_stack_exec(&context->m_stack, -1, context);
 
     if (context->m_errno == 0 && context->m_stack.m_item_pos == -1) {
         context->m_state = logic_context_state_done; 
     }
 
-    if (context->m_errno != 0 || context->m_state == logic_context_state_done) {
-        if (context->m_commit_op) {
-            context->m_commit_op(context, context->m_commit_ctx);
-        }
-    }
+    logic_context_do_state_change(context, old_state);
 }
 
 int logic_context_bind(logic_context_t context, logic_executor_t executor) {
@@ -210,4 +205,42 @@ int logic_context_bind(logic_context_t context, logic_executor_t executor) {
    logic_stack_push(&context->m_stack, context, executor);
    context->m_state = logic_context_state_idle;
    return 0;
+}
+
+void logic_context_cancel(logic_context_t context) {
+    logic_context_state_t old_state;
+
+    old_state = logic_context_state_i(context);
+    context->m_state = logic_context_state_cancel;
+
+    logic_context_do_state_change(context, old_state);
+}
+
+void logic_context_timeout(logic_context_t context) {
+    logic_context_state_t old_state;
+
+    old_state = logic_context_state_i(context);
+    context->m_state = logic_context_state_timeout;
+
+    logic_context_do_state_change(context, old_state);
+}
+
+void logic_context_do_state_change(logic_context_t context, logic_context_state_t old_sate) {
+    logic_context_state_t cur_state;
+
+    if (old_sate > logic_context_state_idle) return;
+
+    cur_state = logic_context_state_i(context);
+    if (cur_state < logic_context_state_idle) return;
+
+    if (cur_state == logic_context_state_idle) {
+        if (context->m_flags & logic_context_flag_execute_immediately) {
+            logic_context_execute(context);
+        }
+    }
+    else {
+        if (context->m_commit_op) {
+            context->m_commit_op(context, context->m_commit_ctx);
+        }
+    }
 }

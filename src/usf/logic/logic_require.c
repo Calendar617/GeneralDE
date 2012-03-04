@@ -92,6 +92,7 @@ void * logic_require_data(logic_require_t require) {
 
 void logic_require_set_done(logic_require_t require) {
     logic_context_t ctx;
+    logic_context_state_t old_state;
 
     if (require->m_state != logic_require_state_waiting) {
         require->m_state = logic_require_state_done;
@@ -99,22 +100,21 @@ void logic_require_set_done(logic_require_t require) {
     }
 
     ctx = require->m_ctx;
+    old_state = logic_context_state_i(ctx);
 
-    if (require->m_ctx->m_flags & logic_context_flag_require_keep) {
-        --ctx->m_require_waiting_count;
-        require->m_state = logic_require_state_done;
-    }
-    else {
+    --ctx->m_require_waiting_count;
+    require->m_state = logic_require_state_done;
+
+    if (!(require->m_ctx->m_flags & logic_context_flag_require_keep)) {
         logic_require_free(require);
     }
 
-    if (require->m_ctx->m_flags & logic_context_flag_execute_immediately) {
-        logic_context_execute(ctx);
-    }
+    logic_context_do_state_change(ctx, old_state);
 }
 
 void logic_require_set_error(logic_require_t require) {
     logic_context_t ctx;
+    logic_context_state_t old_state;
 
     if (require->m_state != logic_require_state_waiting) {
         require->m_state = logic_require_state_error;
@@ -122,6 +122,7 @@ void logic_require_set_error(logic_require_t require) {
     }
 
     ctx = require->m_ctx;
+    old_state = logic_context_state_i(ctx);
 
     if (require->m_ctx->m_flags & logic_context_flag_require_keep) {
         --ctx->m_require_waiting_count;
@@ -131,9 +132,7 @@ void logic_require_set_error(logic_require_t require) {
         logic_require_free(require);
     }
 
-    if (require->m_ctx->m_flags & logic_context_flag_execute_immediately) {
-        logic_context_execute(ctx);
-    }
+    logic_context_do_state_change(ctx, old_state);
 }
 
 uint32_t logic_require_hash(const struct logic_require * require) {

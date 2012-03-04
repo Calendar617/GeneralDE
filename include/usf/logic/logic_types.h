@@ -22,10 +22,11 @@ typedef enum logic_context_flag {
 
 typedef enum logic_context_state {
     logic_context_state_init
-    , logic_context_state_idle
     , logic_context_state_waiting
+    , logic_context_state_idle
     , logic_context_state_error
     , logic_context_state_done
+    , logic_context_state_cancel
     , logic_context_state_timeout
 } logic_context_state_t;
 

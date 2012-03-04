@@ -38,9 +38,11 @@ void logic_context_data_dump_to_cfg(logic_context_t context, cfg_t cfg);
 int logic_context_bind(logic_context_t context, logic_executor_t executor);
 void logic_context_execute(logic_context_t context);
 
+void logic_context_cancel(logic_context_t context);
+void logic_context_timeout(logic_context_t context);
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-
