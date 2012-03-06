@@ -66,6 +66,6 @@ project_repository+=$1
 $(if $2,$(call product-def-for-domain,$1,$2))
 
 $1.clean:
-	$(call with_message,cleaning...)$(RM) $(r.$1.cleanup)
+	$(call with_message,cleaning...)$(RM) $$(r.$1.cleanup)
 
 endef
