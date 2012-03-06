@@ -52,7 +52,7 @@ $(product).c.sources := $(addprefix $(product-base)/, \
 
 $(product).product.c.libraries:=z
 $(product).c.libraries:=m z dl
-$(product).c.includes:=3rdTools/libxml2/src/$(dev-env)
+$(product).c.env-includes:=3rdTools/libxml2/src
 $(product).c.flags.cpp:= -DHAVE_CONFIG_H -D_REENTRANT -Wno-format -Wno-unused
 $(product).c.flags.ld:=
 
