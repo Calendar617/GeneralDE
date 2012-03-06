@@ -10,6 +10,9 @@ include $(CPED_BUILD_DETAIL_DIR)/create-dirs.mk
 
 all: ut
 
-ut: $(target-product).run
+ut: $(foreach domain,$(sort $(domain-list)) \
+        , $(if $(filter 0,$($(domain).ut)) \
+            , \
+            , $(target-product).$(domain).run))
 
 clean: $(target-product).clean
