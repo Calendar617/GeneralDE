@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="GBK" standalone="yes" ?>
+<metalib tagsetversion="1" name="BASEPKG" version="1" >
+    <macro name="APPEND_INFO_MAX_COUNT" value='64'/>
+
+    <struct name="AppendInfo" version="1">
+        <entry name="id" type="uint32"/>
+        <entry name="size" type="uint16"/>
+        <entry name="originSize" type="uint16"/>
+    </struct>
+
+    <struct name="basepkg_head" version="1" >
+        <entry name="version" type="uint16" />
+        <entry name="cmd" type="uint16" />
+        <entry name="flags" type="uint16" />
+        <entry name="headlen" type="uint16" />
+        <entry name="roleId" type="uint64" />
+        <entry name="bodylen" type="smalluint" />
+        <entry name="originBodyLen" type="smalluint" />
+        <entry name="bodytotallen" type="smalluint" />
+        <entry name="appendInfoCount" type="smalluint"/>
+        <entry name="appendInfos"  type="AppendInfo" count="APPEND_INFO_MAX_COUNT" refer="appendInfoCount"/>
+    </struct>
+
+    <struct name="basepkg" version="1">
+        <entry name="head" type="basepkg_head" sizeinfo="head.headlen"/>
+        <entry name="body" type="int8" count="0" refer="head.bodytotallen"/>
+    </struct>
+</metalib>
