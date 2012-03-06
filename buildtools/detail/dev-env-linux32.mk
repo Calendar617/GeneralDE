@@ -1,19 +1,25 @@
-self-dev-env=linux32
+dev-env-list+=linux32
 
-GCC?=$(shell which gcc)
-CC=$(GCC)
+linux32.GCC?=$(shell which gcc)
+linux32.CC=$(linux32.GCC)
+linux32.CXX?=$(shell which g++)
 
-CFLAGS+=-Wall
-CXXFLAGS+=-Wall
+linux32.CFLAGS+=-Wall
+linux32.CXXFLAGS+=-Wall
+
+linux32.linker.c:=$(linux32.GCC)
+linux32.linker.cpp:=$(linux32.CXX)
+linux32.linker.obj-c:=$(linux32.GCC)
+linux32.linker.obj-cpp=$(linux32.CXX)
 
 ifneq ($(DEBUG),0)
-CFLAGS+=-ggdb
-CXXFLAGS+=-ggdb
+linux32.CFLAGS+=-ggdb
+linux32.CXXFLAGS+=-ggdb
 endif
 
-LDFLAGS.share:=--shared -z defs
+linux32.LDFLAGS.share:=--shared -z defs
 
-$(self-dev-env).default-lib-type:=dynamic
-$(self-dev-env).make-static-lib-name=lib$1.a
-$(self-dev-env).make-dynamic-lib-name=lib$1.so
-$(self-dev-env).make-executable-name=$1
+linux32.default-lib-type:=dynamic
+linux32.make-static-lib-name=lib$1.a
+linux32.make-dynamic-lib-name=lib$1.so
+linux32.make-executable-name=$1
