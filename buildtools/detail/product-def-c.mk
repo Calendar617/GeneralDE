@@ -5,7 +5,7 @@ product-def-c-env-items:= c.flags.cpp c.flags.ld c.sources c.includes \
 product-def-all-items+= c.libraries c.frameworks c.ldpathes c.linker    \
                         c.flags.lan c.flags.lan.c c.flags.lan.cc c.flags.lan.m c.flags.lan.mm c.lib.type c.env-includes \
                         product.c.frameworks product.c.env-includes \
-                        $(product-def-c-env-items) $(foreach e,$(dev-env-list),$(addprefix $e.,$($(product-def-c-env-items))))
+                        $(product-def-c-env-items) $(foreach e,$(dev-env-list),$(addprefix $e.,$(product-def-c-env-items)))
 
 c-source-dir-to-binary-dir = $(addprefix $(CPDE_OUTPUT_ROOT)/$($2.output)/obj,$(subst $(CPDE_ROOT),,$1))
 
