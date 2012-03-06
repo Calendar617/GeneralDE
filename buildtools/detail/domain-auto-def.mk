@@ -20,7 +20,9 @@ $(foreach domain,$(sort $(domain-list)),\
 $(if $(filter-out tools,$(domain-list))\
     , \
     , $(foreach p,$(project_repository),\
-          $(eval $(call product-def-for-domain,$p,default))))
+          $(eval $(call product-def-for-domain,$p,default))) \
+      $(eval $(call domain-target-def,default)) \
+	)
 
 $(foreach env,$(sort $(foreach domain,$(sort $(domain-list)),$($(domain).env))), \
     $(call $(env).check))
