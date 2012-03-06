@@ -27,10 +27,10 @@ int net_ep_is_open(net_ep_t ep);
 net_connector_t net_ep_connector(net_ep_t ep);
 
 /*服务读写接口*/
-int ge_net_ep_send(net_ep_t ep, const void * buf, size_t size);
-int ge_net_ep_rece(net_ep_t ep, void * buf, size_t * size);
-int ge_net_ep_peek(net_ep_t ep, void * buf, size_t * size);
-int ge_net_ep_erase(net_ep_t ep, size_t size);
+int net_ep_send(net_ep_t ep, const void * buf, size_t size);
+int net_ep_rece(net_ep_t ep, void * buf, size_t * size);
+int net_ep_peek(net_ep_t ep, void * buf, size_t * size);
+int net_ep_erase(net_ep_t ep, size_t size);
 
 #ifdef __cplusplus
 }
