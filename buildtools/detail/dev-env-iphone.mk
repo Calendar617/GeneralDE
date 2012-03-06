@@ -1,26 +1,35 @@
 # {{{ global settings
-self-dev-env:=iphone
+dev-env-list+=iphone
 
-CFLAGS+=-Wall
-CXXFLAGS+=-Wall
-MFLAGS+=-Wall -pipe -x objective-c
-MMFLAGS+=-Wall -pipe -x objective-c++
+iphone.CFLAGS+=-Wall
+iphone.CXXFLAGS+=-Wall
+iphone.MFLAGS+=-Wall -pipe -x objective-c
+iphone.MMFLAGS+=-Wall -pipe -x objective-c++
 
 ifneq ($(DEBUG),0)
-CFLAGS+=-ggdb
-CXXFLAGS+=-ggdb
+iphone.CFLAGS+=-ggdb
+iphone.CXXFLAGS+=-ggdb
 endif
 
-LDFLAGS.share:=--shared
+iphone.LDFLAGS.share:=--shared
 
-$(self-dev-env).default-lib-type:=static
-$(self-dev-env).make-static-lib-name=lib$1.a
-$(self-dev-env).make-dynamic-lib-name=lib$1.so
-$(self-dev-env).make-executable-name=$1
+iphone.default-lib-type:=static
+iphone.make-static-lib-name=lib$1.a
+iphone.make-dynamic-lib-name=lib$1.so
+iphone.make-executable-name=$1
+
 # }}}
 # {{{ validate
-$(call assert-not-null,PLATFORM_NAME)
-$(call assert-not-null,PLATFORM_VERSION)
+iphone.check=$(call assert-not-null,PLATFORM_NAME) \
+             $(call assert-not-null,PLATFORM_VERSION) \
+             $(call assert-not-null,$(PLATFORM_NAME).compiler) \
+             $(call assert-not-null,$(PLATFORM_NAME).CFLAGS) \
+             $(call assert-not-null,$(PLATFORM_NAME).CXXFLAGS) \
+             $(call assert-not-null,$(PLATFORM_NAME).MFLAGS) \
+             $(call assert-not-null,$(PLATFORM_NAME).MMFLAGS) \
+             $(call assert-not-null,$(PLATFORM_NAME).LDFLAGS) \
+             $(call assert-not-null,$(PLATFORM_NAME).TARGET_ARCH)
+
 # }}}
 # {{{ sdk iPhoneSimulator
 
@@ -79,46 +88,45 @@ PLATFORM_PREFIX:=/Developer/Platforms/$(PLATFORM_NAME).platform
 PLATFORM_BIN_PATH:=$(PLATFORM_PREFIX)/Developer/usr/bin
 SDK_PREFIX:=$(PLATFORM_PREFIX)/Developer/SDKs/$(PLATFORM_NAME)$(PLATFORM_VERSION).sdk
 
-$(call assert-not-null,$(PLATFORM_NAME).compiler)
-$(call assert-not-null,$(PLATFORM_NAME).CFLAGS)
-$(call assert-not-null,$(PLATFORM_NAME).CXXFLAGS)
-$(call assert-not-null,$(PLATFORM_NAME).MFLAGS)
-$(call assert-not-null,$(PLATFORM_NAME).MMFLAGS)
-$(call assert-not-null,$(PLATFORM_NAME).LDFLAGS)
-$(call assert-not-null,$(PLATFORM_NAME).TARGET_ARCH)
+iphone.GCC = $(PLATFORM_BIN_PATH)/$(call $(PLATFORM_NAME).compiler,gcc)
+iphone.CXX = $(PLATFORM_BIN_PATH)/$(call $(PLATFORM_NAME).compiler,g++)
+iphone.CC = $(iphone.GCC)
+iphone.LD = $(iphone.CC)
+iphone.AR = $(PLATFORM_BIN_PATH)/ar
+iphone.STRIP = $(PLATFORM_BIN_PATH)/strip
+iphone.OBJCOPY = $(PLATFORM_BIN_PATH)/objcopy
+iphone.IBTOOL = ibtool
 
-CC = $(GCC)
-GCC = $(PLATFORM_BIN_PATH)/$(call $(PLATFORM_NAME).compiler,gcc)
-CXX = $(PLATFORM_BIN_PATH)/$(call $(PLATFORM_NAME).compiler,g++)
-LD = $(CC)
-AR = $(PLATFORM_BIN_PATH)/ar
-STRIP = $(PLATFORM_BIN_PATH)/strip
-OBJCOPY = $(PLATFORM_BIN_PATH)/objcopy
-IBTOOL = ibtool
-
-IBFLAGS = --errors \
+iphone.IBFLAGS = \
+          --errors \
           --warnings \
           --notices \
           --output-format human-readable-text \
           --sdk $(SDK_PREFIX)
 
-CPPFLAGS+= -isysroot $(SDK_PREFIX) \
+iphone.CPPFLAGS+=\
+           -isysroot $(SDK_PREFIX) \
            -F$(SDK_PREFIX)/System/Library/Frameworks \
-           $(addprefix -I,$(sort $(dir $(sources)))) \
-           $(INCLUDES) \
            $($(PLATFORM_NAME).CPPFLAGS)
 
-CFLAGS += $($(PLATFORM_NAME).CFLAGS)
-CXXFLAGS += $($(PLATFORM_NAME).CXXFLAGS)
-MFLAGS += $($(PLATFORM_NAME).MFLAGS)
-MMFLAGS += $($(PLATFORM_NAME).MMFLAGS)
+iphone.CFLAGS += $($(PLATFORM_NAME).CFLAGS)
+iphone.CXXFLAGS += $($(PLATFORM_NAME).CXXFLAGS)
+iphone.MFLAGS += $($(PLATFORM_NAME).MFLAGS)
+iphone.MMFLAGS += $($(PLATFORM_NAME).MMFLAGS)
 
-TARGET_ARCH += $($(PLATFORM_NAME).TARGET_ARCH)
+iphone.TARGET_ARCH += $($(PLATFORM_NAME).TARGET_ARCH)
 
-LDFLAGS += -isysroot $(SDK_PREFIX) \
+iphone.LDFLAGS += \
+           -isysroot $(SDK_PREFIX) \
            $($(PLATFORM_NAME).LDFLAGS) \
            $(addprefix -L,$(sort $(dir $(libraries)))) \
 
-PLUTILFLAGS += -convert binary1
+iphone.PLUTILFLAGS += -convert binary1
+
+iphone.linker.c:=$(iphone.GCC)
+iphone.linker.cpp:=$(iphone.CXX)
+iphone.linker.obj-c:=$(iphone.GCC)
+iphone.linker.obj-cpp:=$(iphone.CXX)
+
 
 # }}}
