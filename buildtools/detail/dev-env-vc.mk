@@ -1,22 +1,22 @@
-self-dev-env=vc
+dev-env-list+=vc
 
-$(call assert-not-null,VC_HOME)
-$(call assert-file-exists,$(VC_HOME))
+vc.check=$(call assert-not-null,VC_HOME) \
+         $(call assert-file-exists,$(VC_HOME))
 
-GCC?=$(shell which gcc)
-CC=$(GCC)
+vc.GCC?=$(shell which gcc)
+vc.CC=$(vc.GCC)
 
-CFLAGS+=-Wall
-CXXFLAGS+=-Wall
+vc.CFLAGS+=-Wall
+vc.CXXFLAGS+=-Wall
 
 ifneq ($(DEBUG),0)
-CFLAGS+=-ggdb
-CXXFLAGS+=-ggdb
+vc.CFLAGS+=-ggdb
+vc.CXXFLAGS+=-ggdb
 endif
 
-LDFLAGS.share:=--shared
+vc.LDFLAGS.share:=--shared
 
-$(self-dev-env).default-lib-type:=dynamic
-$(self-dev-env).make-static-lib-name=$1.lib
-$(self-dev-env).make-dynamic-lib-name=$1.dll
-$(self-dev-env).make-executable-name=$1.exe
+vc.default-lib-type:=dynamic
+vc.make-static-lib-name=$1.lib
+vc.make-dynamic-lib-name=$1.dll
+vc.make-executable-name=$1.exe
