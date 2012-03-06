@@ -13,6 +13,6 @@ all: ut
 ut: $(foreach domain,$(sort $(domain-list)) \
         , $(if $(filter 0,$($(domain).ut)) \
             , \
-            , $(target-product).$(domain).run))
+            , $(domain).$(target-product).run))
 
 clean: $(target-product).clean
