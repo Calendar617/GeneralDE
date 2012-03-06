@@ -6,7 +6,7 @@ define product-def-rule-cpe-dr-c-module-h
   $(call assert-not-null,$1.cpe-dr.$2.h.output)
 
   $(eval r.$1.$3.cpe-dr.$2.h.output:=$($1.cpe-dr.$2.h.output))
-  $(eval r.$1.$3.cpe-dr.$2.h.output-dir:=$(call c-source-dir-to-binary-dir,$(product-base)/$(r.$1.$3.cpe-dr.$2.h.output),$3))
+  $(eval r.$1.$3.cpe-dr.$2.h.output-dir:=$(call c-source-dir-to-binary-dir,$(r.$1.base)/$(r.$1.$3.cpe-dr.$2.h.output),$3))
   $(eval r.$1.$3.cpe-dr.$2.generated.h:=\
       $(addprefix $(r.$1.$3.cpe-dr.$2.h.output-dir)/,\
             $(subst .xml,.h, $(notdir $(r.$1.$3.cpe-dr.$2.source)))))
@@ -14,9 +14,9 @@ define product-def-rule-cpe-dr-c-module-h
   auto-build-dirs += $(r.$1.$3.cpe-dr.$2.h.output-dir)
 
   $(eval r.$1.cleanup += $(r.$1.$3.cpe-dr.$2.generated.h))
-  $(eval r.$1.$3.c.includes+=$(subst $(CPDE_ROOT),,$(call c-source-dir-to-binary-dir,$(product-base),$3)))
+  $(eval r.$1.$3.c.includes+=$(subst $(CPDE_ROOT),,$(call c-source-dir-to-binary-dir,$(r.$1.base),$3)))
 
-  $(call c-source-to-object,$(r.$1.$3.c.sources)): $(r.$1.$3.cpe-dr.$2.generated.h)
+  $(call c-source-to-object,$(r.$1.c.sources),$3): $(r.$1.$3.cpe-dr.$2.generated.h)
 
   $(r.$1.$3.cpe-dr.$2.generated.h): $(cpe-dr-tool)
 
@@ -33,7 +33,7 @@ define product-def-rule-cpe-dr-c-module-c
   $(call assert-not-null,$1.cpe-dr.$2.c.output)
 
   $(eval r.$1.$3.cpe-dr.$2.c.output:=$($1.cpe-dr.$2.c.output))
-  $(eval r.$1.$3.cpe-dr.$2.c.output-dir:=$(call c-source-dir-to-binary-dir,$(product-base)/$(patsubst %/,%,$(dir $(r.$1.$3.cpe-dr.$2.c.output))),$3))
+  $(eval r.$1.$3.cpe-dr.$2.c.output-dir:=$(call c-source-dir-to-binary-dir,$(r.$1.base)/$(patsubst %/,%,$(dir $(r.$1.$3.cpe-dr.$2.c.output))),$3))
   $(eval r.$1.$3.cpe-dr.$2.generated.c:=$(r.$1.$3.cpe-dr.$2.c.output-dir)/$(notdir $($1.cpe-dr.$2.c.output)))
 
   auto-build-dirs += $(r.$1.$3.cpe-dr.$2.c.output-dir)
@@ -55,14 +55,16 @@ define product-def-rule-cpe-dr-c-module-bin
   $(call assert-not-null,$1.cpe-dr.$2.bin.output)
 
   $(eval r.$1.$3.cpe-dr.$2.bin.output:=$($1.cpe-dr.$2.bin.output))
-  $(eval r.$1.$3.cpe-dr.$2.bin.output-dir:=$(CPDE_OUTPUT_ROOT)/$(patsubst %/,%,$(dir $(r.$1.$3.cpe-dr.$2.bin.output))))
+  $(eval r.$1.$3.cpe-dr.$2.bin.output-dir:=$(CPDE_OUTPUT_ROOT)/$($3.output)/$(patsubst %/,%,$(dir $(r.$1.$3.cpe-dr.$2.bin.output))))
   $(eval r.$1.$3.cpe-dr.$2.generated.bin:=$(r.$1.$3.cpe-dr.$2.bin.output-dir)/$(notdir $($1.cpe-dr.$2.bin.output)))
 
   auto-build-dirs += $(r.$1.$3.cpe-dr.$2.bin.output-dir)
 
   $(eval r.$1.cleanup += $(r.$1.$3.cpe-dr.$2.generated.bin))
 
-  $1: $(r.$1.$3.cpe-dr.$2.generated.bin)
+  $1: $3.$1
+
+  $3.$1: $(r.$1.$3.cpe-dr.$2.generated.bin)
 
   $(r.$1.$3.cpe-dr.$2.generated.bin): $(cpe-dr-tool)
 

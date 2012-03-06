@@ -10,7 +10,7 @@ ut: $(if $($(target-product).ut) \
          , $(foreach domain,$(sort $(domain-list)) \
              , $(if $(filter 0,$($(domain).ut)) \
                    , \
-                   , $($(target-product).ut).$(domain).run)))
+                   , $(domain).$($(target-product).ut).run)))
 
 all: ut
 
