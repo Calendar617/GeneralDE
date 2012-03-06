@@ -3,6 +3,7 @@ dev-env-list+=linux32
 linux32.GCC?=$(shell which gcc)
 linux32.CC=$(linux32.GCC)
 linux32.CXX?=$(shell which g++)
+linux32.AR?=$(shell which ar)
 
 linux32.CFLAGS+=-Wall
 linux32.CXXFLAGS+=-Wall
