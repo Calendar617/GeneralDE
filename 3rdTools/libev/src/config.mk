@@ -8,7 +8,7 @@ $(product).c.sources := $(addprefix $(product-base)/, \
                        )
 
 $(product).product.c.includes:=3rdTools/libev/include
-$(product).c.includes:=3rdTools/libev/src/$(dev-env)
+$(product).c.env-includes:=3rdTools/libev/src
 $(product).c.flags.cpp:=-DHAVE_CONFIG_H -Wno-unused -Wno-parentheses
 $(product).c.flags.ld:=-lm
 
