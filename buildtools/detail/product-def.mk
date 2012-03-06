@@ -22,8 +22,26 @@ $(foreach dep,$(r.$1.depends),\
 	$(r.$(dep).$2) $(call product-gen-depend-value-list,$(dep),$2))
 endef
 
-# $(call product-def,product-name,input-sources)
+# $(call product-def-for-domain,product-name,domain)
+define product-def-for-domain
+
+$(eval domain-list+=$2)
+$(eval $2.product-list+=$1)
+
+.PHONY:$2.$1
+$1: $2.$1
+
+$(if $(r.$1.depends),$2.$1: $(addprefix $2.,$(r.$1.depends)))
+
+$(foreach type,$(if $($1.$2.type),$($1.$2.type),$($1.type)), $(call product-def-rule-$(type),$1,$2))
+
+endef
+
+# $(call product-def,product-name,domain)
 define product-def
+
+$(if $2,$(call assert-not-null,$2.output))
+$(if $2,$(eval $2.env?=$(OS_NAME)))
 
 #verify must set variables
 $(foreach cn,$(product-def-not-null-items),\
@@ -45,9 +63,7 @@ project_repository+=$1
 
 .PHONY: $1 $1.clean
 
-$(if $(r.$1.depends),$1: $(foreach dep,$(r.$1.depends), $(dep) $$(r.$(dep).depends)))
-
-$(foreach type,$($1.type), $(call product-def-rule-$(type),$1))
+$(if $2,$(call product-def-for-domain,$1,$2))
 
 $1.clean:
 	$(call with_message,cleaning...)$(RM) $(r.$1.cleanup)
