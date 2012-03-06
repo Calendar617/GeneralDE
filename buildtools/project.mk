@@ -15,5 +15,5 @@ ut: $(foreach domain,$(sort $(domain-list)) \
          , $(if $(filter 0,$($(domain).ut)) \
                 , \
                 , $(foreach product,$($(domain).product-list) \
-                            , $(if $($(product).ut),$($(product).ut).$(domain).run))))
+                            , $(if $($(product).ut),$(domain).$($(product).ut).run))))
 
