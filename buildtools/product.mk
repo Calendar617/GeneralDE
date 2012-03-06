@@ -4,7 +4,15 @@ endif
 
 $(call assert-not-null,target-product)
 
-all: $(target-product) $(if $($(target-product).ut),$($(target-product).ut).run)
+all: $(target-product)
+
+ut: $(if $($(target-product).ut) \
+         , $(foreach domain,$(sort $(domain-list)) \
+             , $(if $(filter 0,$($(domain).ut)) \
+                   , \
+                   , $($(target-product).ut).$(domain).run)))
+
+all: ut
 
 clean: $(target-product).clean
 
