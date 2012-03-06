@@ -2,7 +2,8 @@ product:=igraph
 $(product).type:=lib
 $(product).product.c.includes:=3rdTools/igraph/include
 
-$(product).c.sources:= basic_query.c games.c cocitation.c \
+$(product).c.sources:= $(addprefix $(product-base)/,\
+    basic_query.c games.c cocitation.c \
 	iterators.c structural_properties.c components.c layout.c \
 	structure_generators.c conversion.c measure_dynamics.c \
 	type_indexededgelist.c error.c interrupt.c other.c foreign.c \
@@ -55,11 +56,13 @@ $(product).c.sources:= basic_query.c games.c cocitation.c \
 	gengraph_graph_molloy_hash.cpp \
 	gengraph_graph_molloy_optimized.cpp gengraph_mr-connected.cpp \
 	gengraph_powerlaw.cpp gengraph_random.cpp bipartite.c \
-	drl_layout_3d.cpp drl_graph_3d.cpp DensityGrid_3d.cpp
+	drl_layout_3d.cpp drl_graph_3d.cpp DensityGrid_3d.cpp \
+    )
 
 $(product).c.includes:=3rdTools/igraph/include/igraph \
-                       3rdTools/igraph/src \
-                       3rdTools/igraph/src/$(dev-env)
+                       3rdTools/igraph/src
+
+$(product).c.env-includes:=3rdTools/igraph/src
 
 $(product).depends:=xml2
 $(product).c.flags.cpp:=-DHAVE_CONFIG_H
