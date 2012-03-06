@@ -3,7 +3,7 @@ dev-env-list+=cygwin
 cygwin.GCC?=$(shell which gcc)
 cygwin.CC?=$(shell which gcc)
 cygwin.CXX?=$(shell which g++)
-cygwin.AR?=$(shell which g++)
+cygwin.AR?=$(shell which ar)
 
 cygwin.CFLAGS+=-Wall
 cygwin.CXXFLAGS+=-Wall
