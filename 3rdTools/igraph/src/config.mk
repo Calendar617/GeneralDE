@@ -7,10 +7,8 @@ $(product).c.sources:= $(addprefix $(product-base)/,\
 	iterators.c structural_properties.c components.c layout.c \
 	structure_generators.c conversion.c measure_dynamics.c \
 	type_indexededgelist.c error.c interrupt.c other.c foreign.c \
-	random.c attributes.c memory.h random.h foreign-ncol-parser.y \
-	foreign-ncol-lexer.l foreign-lgl-parser.y foreign-lgl-lexer.l \
-	foreign-pajek-parser.y foreign-pajek-lexer.l \
-	foreign-gml-parser.y foreign-gml-lexer.l dqueue.c heap.c \
+	random.c attributes.c memory.h random.h \
+	dqueue.c heap.c \
 	igraph_heap.c igraph_stack.c igraph_strvector.c igraph_trie.c \
 	matrix.c vector.c vector_ptr.c memory.c adjlist.c visitors.c \
 	igraph_grid.c atlas.c topology.c motifs.c progress.c \
@@ -57,6 +55,10 @@ $(product).c.sources:= $(addprefix $(product-base)/,\
 	gengraph_graph_molloy_optimized.cpp gengraph_mr-connected.cpp \
 	gengraph_powerlaw.cpp gengraph_random.cpp bipartite.c \
 	drl_layout_3d.cpp drl_graph_3d.cpp DensityGrid_3d.cpp \
+    foreign-gml-lexer.c foreign-gml-parser.c \
+    foreign-lgl-lexer.c foreign-lgl-parser.c \
+    foreign-ncol-lexer.c foreign-ncol-parser.c \
+    foreign-pajek-lexer.c foreign-pajek-parser.c \
     )
 
 $(product).c.includes:=3rdTools/igraph/include/igraph \
@@ -65,7 +67,7 @@ $(product).c.includes:=3rdTools/igraph/include/igraph \
 $(product).c.env-includes:=3rdTools/igraph/src
 
 $(product).depends:=xml2
-$(product).c.flags.cpp:=-DHAVE_CONFIG_H
+$(product).c.flags.cpp:=-DHAVE_CONFIG_H -DINTERNAL_LAPACK
 $(product).c.flags.c:= -O2
 $(product).c.flags.ld:=
 
