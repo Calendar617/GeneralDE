@@ -1,21 +1,28 @@
-self-dev-env=mac
+dev-env-list+=mac
 
-GCC?=$(shell which gcc)
-CC=$(GCC)
+mac.GCC?=$(shell which gcc)
+mac.CC=$(mac.GCC)
+mac.CXX?=$(shell which g++)
+mac.AR?=$(shell which ar)
 
-CFLAGS+=-Wall
-CXXFLAGS+=-Wall
-MFLAGS+=-Wall -x objective-c -fobjc-abi-version=2 -fobjc-legacy-dispatch
-MMFLAGS+=-Wall -x objective-c++ -fobjc-abi-version=2 -fobjc-legacy-dispatch
+mac.CFLAGS+=-Wall
+mac.CXXFLAGS+=-Wall
+mac.MFLAGS+=-Wall -x objective-c -fobjc-abi-version=2 -fobjc-legacy-dispatch
+mac.MMFLAGS+=-Wall -x objective-c++ -fobjc-abi-version=2 -fobjc-legacy-dispatch
+
+mac.linker.c:=$(mac.GCC)
+mac.linker.cpp:=$(mac.CXX)
+mac.linker.obj-c:=$(mac.GCC)
+mac.linker.obj-cpp=$(mac.CXX)
 
 ifneq ($(DEBUG),0)
-CFLAGS+=-ggdb
-CXXFLAGS+=-ggdb
+mac.CFLAGS+=-ggdb
+mac.CXXFLAGS+=-ggdb
 endif
 
-LDFLAGS.share:=--shared
+mac.LDFLAGS.share:=--shared
 
-$(self-dev-env).default-lib-type:=dynamic
-$(self-dev-env).make-static-lib-name=lib$1.a
-$(self-dev-env).make-dynamic-lib-name=lib$1.so
-$(self-dev-env).make-executable-name=$1
+mac.default-lib-type:=dynamic
+mac.make-static-lib-name=lib$1.a
+mac.make-dynamic-lib-name=lib$1.so
+mac.make-executable-name=$1
