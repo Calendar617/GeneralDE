@@ -1,19 +1,26 @@
-self-dev-env=cygwin
+dev-env-list+=cygwin
 
-GCC?=$(shell which gcc)
-CC=$(GCC)
+cygwin.GCC?=$(shell which gcc)
+cygwin.CC?=$(shell which gcc)
+cygwin.CXX?=$(shell which g++)
+cygwin.AR?=$(shell which g++)
 
-CFLAGS+=-Wall
-CXXFLAGS+=-Wall
+cygwin.CFLAGS+=-Wall
+cygwin.CXXFLAGS+=-Wall
+
+cygwin.linker.c:=$(cygwin.GCC)
+cygwin.linker.cpp:=$(cygwin.CXX)
+cygwin.linker.obj-c:=$(cygwin.GCC)
+cygwin.linker.obj-cpp=$(cygwin.CXX)
 
 ifneq ($(DEBUG),0)
-CFLAGS+=-ggdb
-CXXFLAGS+=-ggdb
+cygwin.CFLAGS+=-ggdb
+cygwin.CXXFLAGS+=-ggdb
 endif
 
-LDFLAGS.share:=--shared -Xlinker --no-undefined
+cygwin.LDFLAGS.share:=--shared -Xlinker --no-undefined
 
-$(self-dev-env).default-lib-type:=static
-$(self-dev-env).make-static-lib-name=lib$1.a
-$(self-dev-env).make-dynamic-lib-name=$1.dll
-$(self-dev-env).make-executable-name=$1.exe
+cygwin.default-lib-type:=static
+cygwin.make-static-lib-name=lib$1.a
+cygwin.make-dynamic-lib-name=$1.dll
+cygwin.make-executable-name=$1.exe

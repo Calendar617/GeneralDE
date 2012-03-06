@@ -1,7 +1,7 @@
 # {{{ 注册到product-def.mk中
 
 product-support-types+=install
-product-def-all-items+=install
+product-def-all-items+=install $(foreach e,$(dev-env-list),$(addprefix $e.,install))
 # }}}
 # {{{ 给拥护使用的辅助函数，用于定义安装的目标
 #$(call def-copy-file,src-file,target-file)
@@ -57,7 +57,7 @@ $(eval r.$1.cleanup += $3)
 
 endef
 
-# $(call install-def-rule-copy,product-name,source-dir,target-dir,postfix-list)
+# $(call install-def-rule-one-dir-r,product-name,source-dir,target-dir,postfix-list)
 define install-def-rule-one-dir-r
 auto-build-dirs+=$(CPDE_OUTPUT_ROOT)/$3 \
                  $(subst $(CPDE_ROOT)/$2,$(CPDE_OUTPUT_ROOT)/$3,$(sort $(dir $(if $(wildcard $(CPDE_ROOT)/$2),$(shell find $(CPDE_ROOT)/$2 -type f)))))
@@ -84,39 +84,39 @@ $(if $4,\
 endef
 
 # }}}	
-# {{{ 各种不同类型的安装函数入口,#$1是项目名，$2后续参数各自定义
+# {{{ 各种不同类型的安装函数入口,#$1是项目名，$2是domain,$3后续参数各自定义
 define product-def-rule-install-copy-file
 $(call install-def-rule-copy,\
        $1,\
-       $(CPDE_ROOT)/$(word 1,$2),\
-       $(CPDE_OUTPUT_ROOT)/$(word 2,$2))
+       $(CPDE_ROOT)/$(word 1,$3),\
+       $(CPDE_OUTPUT_ROOT)/$($2.output)$(word 2,$3))
 endef
 
 define product-def-rule-install-copy-file-list
-$(foreach f,$(wordlist 2,$(words $2), $2), \
+$(foreach f,$(wordlist 2,$(words $3), $3), \
     $(call install-def-rule-copy,\
          $1,\
          $(CPDE_ROOT)/$f,\
-         $(CPDE_OUTPUT_ROOT)/$(word 1,$2)/$f))
+         $(CPDE_OUTPUT_ROOT)/$($2.output)$(word 1,$3)/$f))
 endef
 
 define product-def-rule-install-copy-dir
-$(call install-def-rule-one-dir,$1,$(word 1,$2),$(word 2,$2),$(wordlist 3,$(words $2), $2))
+$(call install-def-rule-one-dir,$1,$(word 1,$3),$($2.output)/$(word 2,$3),$(wordlist 3,$(words $3), $3))
 endef
 
 define product-def-rule-install-copy-dir-r
-$(call install-def-rule-one-dir-r,$1,$(word 1,$2),$(word 2,$2),$(wordlist 3,$(words $2), $2))
+$(call install-def-rule-one-dir-r,$1,$(word 1,$3),$($2.output)/$(word 2,$3),$(wordlist 3,$(words $3), $3))
 endef
 
 define product-def-rule-install-cvt-file
-$(if $(word 3,$2),,$(warning convert input file not set))
+$(if $(word 3,$3),,$(warning convert input file not set))
 
 $(call install-def-rule-cvt,\
        $1,\
-       $(CPDE_ROOT)/$(word 1,$2),\
-       $(CPDE_OUTPUT_ROOT)/$(word 2,$2),\
-       $(word 3,$2),\
-       $(wordlist 4,$(words $2),$2))
+       $(CPDE_ROOT)/$(word 1,$3),\
+       $(CPDE_OUTPUT_ROOT)/$($2.output)/$(word 2,$3),\
+       $(word 3,$3),\
+       $(wordlist 4,$(words $3),$3))
 endef
 # }}}
 # {{{ 总入口函数
@@ -125,10 +125,10 @@ define product-def-rule-install
 $(eval product-def-rule-install-tmp-name:=)
 $(eval product-def-rule-install-tmp-args:=)
 
-$(foreach w,$(r.$1.install), \
+$(foreach w,$(r.$1.install) $(r.$1.$2.install), \
     $(if $(filter install-def-sep,$w) \
         , $(if $(product-def-rule-install-tmp-name) \
-              , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args)) \
+              , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$2,$(product-def-rule-install-tmp-args)) \
                 $(eval product-def-rule-install-tmp-name:=) \
                 $(eval product-def-rule-install-tmp-args:=)) \
         , $(if $(product-def-rule-install-tmp-name) \
@@ -136,7 +136,7 @@ $(foreach w,$(r.$1.install), \
               , $(eval product-def-rule-install-tmp-name:=$w))))
 
 $(if $(product-def-rule-install-tmp-name) \
-    , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$(product-def-rule-install-tmp-args)))
+    , $(call product-def-rule-install-$(product-def-rule-install-tmp-name),$1,$2,$(product-def-rule-install-tmp-args)))
 
 endef
 # }}}
