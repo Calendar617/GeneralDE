@@ -4,12 +4,28 @@ define domain-target-def
 
 $1: $($1.product-list)
 
+$1.ut: $(if $(filter 0,$($1.ut)) \
+                , \
+                , $(foreach product,$($1.product-list) \
+                            , $(if $($(product).ut),$1.$($(product).ut).run)))
+
 endef
 
 define domain-auto-def-product
 $(foreach p,$(call product-gen-depend-list,$($1.product-list)), \
-	$(if $(filter $p,$($1.product-list)),,\
-		$(eval $(call product-def-for-domain,$p,$1))))
+	$(if $(filter $p,$($1.product-list)) \
+        ,\
+        , $(eval $(call product-def-for-domain,$p,$1))) \
+    )
+
+$(if $(filter 0,$($1.ut)) \
+    , \
+    , $(foreach p, $(foreach u,$($1.product-list), $($(u).ut)) \
+                   $(call product-gen-depend-list,$(foreach u,$($1.product-list), $($(u).ut))) \
+        , $(if $(filter $p,$($1.product-list)) \
+               , \
+               , $(eval $(call product-def-for-domain,$p,$1)))))
+
 endef
 
 $(foreach domain,$(sort $(domain-list)),\
