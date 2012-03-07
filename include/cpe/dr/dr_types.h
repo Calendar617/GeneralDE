@@ -48,6 +48,19 @@ struct tagDRLibParam
 	char szName[CPE_DR_NAME_LEN];
 };
 
+typedef enum dr_metalib_source_type {
+    dr_metalib_source_type_file
+    , dr_metalib_source_type_memory
+} dr_metalib_source_type_t;
+
+typedef enum dr_metalib_source_format {
+    dr_metalib_source_format_xml
+} dr_metalib_source_format_t;
+
+typedef struct dr_metalib_source * dr_metalib_source_t;
+typedef struct dr_metalib_builder * dr_metalib_builder_t;
+struct DRInBuildMetaLib;
+
 #ifdef __cplusplus
 }
 #endif

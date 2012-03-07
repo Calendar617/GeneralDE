@@ -9,8 +9,6 @@
 extern "C" {
 #endif
 
-struct DRInBuildMetaLib;
-
 struct DRInBuildMetaLib * dr_inbuild_create_lib(void);
 void dr_inbuild_free_lib(struct DRInBuildMetaLib * ctx);
 
