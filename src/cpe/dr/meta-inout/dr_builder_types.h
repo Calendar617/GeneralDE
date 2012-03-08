@@ -1,5 +1,5 @@
-#ifndef CPE_DR_METAINOUT_BUILDER_H
-#define CPE_DR_METAINOUT_BUILDER_H
+#ifndef CPE_DR_METAINOUT_BUILDER_TYPES_H
+#define CPE_DR_METAINOUT_BUILDER_TYPES_H
 #include "cpe/pal/pal_queue.h"
 #include "cpe/utils/hash.h"
 #include "cpe/utils/memory.h"
@@ -15,6 +15,7 @@ typedef TAILQ_HEAD(dr_metalib_source_relation_list, dr_metalib_source_relation) 
 
 struct dr_metalib_builder {
     mem_allocrator_t m_alloc;
+    error_monitor_t m_em;
     struct DRInBuildMetaLib * m_inbuild_lib;
     struct cpe_hash_table m_sources;
 };
@@ -22,6 +23,12 @@ struct dr_metalib_builder {
 struct dr_metalib_source {
     dr_metalib_builder_t m_builder;
     const char * m_name;
+    dr_metalib_source_type_t m_type;
+    dr_metalib_source_format_t m_format;
+    dr_metalib_source_from_t m_from;
+    dr_metalib_source_state_t m_state;
+    size_t m_capacity;
+
     dr_metalib_source_relation_list_t m_includes;
     dr_metalib_source_relation_list_t m_include_by;
 

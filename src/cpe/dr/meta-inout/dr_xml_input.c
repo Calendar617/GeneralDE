@@ -11,6 +11,7 @@
 #include "dr_inbuild.h"
 #include "dr_inbuild_error.h"
 #include "dr_XMLtags.h"
+#include "dr_builder_ops.h"
 
 enum DRXmlParseState {
     PS_Init
@@ -590,10 +591,6 @@ void dr_build_xml_parse_ctx_init(struct DRXmlParseCtx * ctx) {
 }
 
 void dr_build_xml_parse_ctx_clear(struct DRXmlParseCtx * ctx) {
-    if (ctx->m_metaLib) {
-        dr_inbuild_free_lib(ctx->m_metaLib);
-        ctx->m_metaLib = NULL;
-    }
 }
 
 int  dr_create_lib_from_xml(
@@ -607,23 +604,17 @@ int  dr_create_lib_from_xml(
     return dr_create_lib_from_xml_ex(buffer, buf, bufSize, &em);
 }
 
-void dr_create_lib_from_xml_ex_i(
-    mem_buffer_t buffer,
-    const char* buf,
+void dr_metalib_source_analize_xml(
+    dr_metalib_builder_t builder,
+    struct DRInBuildMetaLib * inbuild_lib,
+    const void * buf,
     int bufSize,
-    int * ret,
     error_monitor_t em)
 {
     xmlParserCtxtPtr parseCtx = NULL;
     struct DRXmlParseCtx ctx;
 
-    dr_build_xml_parse_ctx_init(&ctx);
-    ctx.m_metaLib = dr_inbuild_create_lib();
-    if (ctx.m_metaLib == NULL) {
-        *ret = -1;
-        return;
-    }
-
+    ctx.m_metaLib = inbuild_lib;
     ctx.m_em = em;
 
     parseCtx = xmlCreatePushParserCtxt(&g_dr_xml_handler, &ctx, buf, bufSize, NULL);
@@ -631,9 +622,29 @@ void dr_create_lib_from_xml_ex_i(
     xmlParseChunk(parseCtx, NULL, 0, 1);
     xmlFreeParserCtxt(parseCtx);
 
-    dr_inbuild_build_lib(buffer, ctx.m_metaLib, em);
-
     dr_build_xml_parse_ctx_clear(&ctx);
+}
+
+void dr_create_lib_from_xml_ex_i(
+    mem_buffer_t buffer,
+    const char* buf,
+    int bufSize,
+    int * ret,
+    error_monitor_t em)
+{
+    struct DRInBuildMetaLib * inbuild_lib;
+
+    inbuild_lib = dr_inbuild_create_lib();
+    if (inbuild_lib == NULL) {
+        *ret = -1;
+        return;
+    }
+
+    dr_metalib_source_analize_xml(NULL, inbuild_lib, buf, bufSize, em);
+
+    dr_inbuild_build_lib(buffer, inbuild_lib, em);
+
+    dr_inbuild_free_lib(inbuild_lib);
 }
 
 int dr_create_lib_from_xml_ex(
