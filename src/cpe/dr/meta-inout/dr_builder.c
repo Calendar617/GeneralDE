@@ -1,19 +1,13 @@
 #include <assert.h>
 #include "cpe/pal/pal_string.h"
+#include "cpe/utils/file.h"
+#include "cpe/utils/buffer.h"
 #include "cpe/dr/dr_metalib_builder.h"
 #include "cpe/dr/dr_metalib_build.h"
-#include "dr_builder_types.h"
-
-uint32_t dr_metalib_source_hash(dr_metalib_source_t source) {
-    return cpe_hash_str(source->m_name, strlen(source->m_name));
-}
-
-int dr_metalib_source_cmp(dr_metalib_source_t l, dr_metalib_source_t r) {
-    return strcmp(l->m_name, r->m_name) == 0;
-}
+#include "dr_builder_ops.h"
 
 dr_metalib_builder_t
-dr_metalib_builder_create(mem_allocrator_t alloc) {
+dr_metalib_builder_create(mem_allocrator_t alloc, error_monitor_t em) {
     dr_metalib_builder_t builder;
     builder = mem_alloc(alloc, sizeof(struct dr_metalib_builder));
     if (builder == NULL) return NULL;
@@ -25,6 +19,7 @@ dr_metalib_builder_create(mem_allocrator_t alloc) {
     }
 
     builder->m_alloc = alloc;
+    builder->m_em = em;
 
     if (cpe_hash_table_init(
             &builder->m_sources,
@@ -55,71 +50,39 @@ void dr_metalib_builder_free(dr_metalib_builder_t builder) {
     }
 
     dr_inbuild_free_lib(builder->m_inbuild_lib);
+    cpe_hash_table_fini(&builder->m_sources);
     mem_free(builder->m_alloc, builder);
 }
 
-dr_metalib_source_t
-dr_metalib_source_create(dr_metalib_builder_t builder, const char * name, size_t capacity) {
-    char * buf;
+void dr_metalib_builder_analize(dr_metalib_builder_t builder) {
+    struct cpe_hash_it sourceIt;
     dr_metalib_source_t source;
-    size_t name_len;
 
-    assert(builder);
-
-    name_len = strlen(name) + 1;
-
-    buf = mem_alloc(builder->m_alloc, sizeof(struct dr_metalib_source) + name_len);
-    if (buf == NULL) return NULL;
-
-    memcpy(buf, name, name_len);
-
-    source = (dr_metalib_source_t)(buf + name_len);
-    source->m_builder = builder;
-    source->m_name = buf;
-
-    TAILQ_INIT(&source->m_includes);
-    TAILQ_INIT(&source->m_include_by);
-
-    cpe_hash_entry_init(&source->m_hh);
-    if (cpe_hash_table_insert_unique(&builder->m_sources, builder) != 0) {
-        mem_free(builder->m_alloc, buf);
-        return NULL;
+    cpe_hash_it_init(&sourceIt, &builder->m_sources);
+    while((source = (dr_metalib_source_t)cpe_hash_it_next(&sourceIt))) {
+        dr_metalib_source_analize(source);
     }
-
-    return source;
 }
 
+static
 dr_metalib_source_t
-dr_metalib_builder_add_file(dr_metalib_builder_t builder, const char * file) {
-    dr_metalib_source_t source;
+dr_metalib_builder_source_next(struct dr_metalib_source_it * it) {
+    struct cpe_hash_it * sourceIt;
 
-    assert(builder);
-    assert(file);
+    assert(sizeof(it->m_data) >= sizeof(struct cpe_hash_it));
 
-    source = dr_metalib_source_create(builder, file, strlen(file) + 1);
+    sourceIt = (struct cpe_hash_it *)(&it->m_data);
 
-    return source;
+    return (dr_metalib_source_t)cpe_hash_it_next(sourceIt);
 }
 
-void dr_metalib_source_free(dr_metalib_source_t source) {
-    assert(source);
+void dr_metalib_builder_sources(dr_metalib_source_it_t it, dr_metalib_builder_t builder) {
+    struct cpe_hash_it * sourceIt;
 
-    cpe_hash_table_remove_by_ins(&source->m_builder->m_sources, source);
+    assert(sizeof(it->m_data) >= sizeof(struct cpe_hash_it));
 
-    mem_free(source->m_builder->m_alloc, source);
+    sourceIt = (struct cpe_hash_it *)(&it->m_data);
+
+    cpe_hash_it_init(sourceIt, &builder->m_sources);
+    it->next = dr_metalib_builder_source_next;
 }
-
-dr_metalib_source_t
-dr_metalib_source_find(dr_metalib_builder_t builder, const char * name) {
-    struct dr_metalib_source key;
-    key.m_name = name;
-
-    return (dr_metalib_source_t)cpe_hash_table_find(&builder->m_sources, &key);
-}
-
-int dr_metalib_source_add_include(dr_metalib_source_t user, dr_metalib_source_t using) {
-    assert(user);
-    assert(using);
-    return -1;
-}
-
