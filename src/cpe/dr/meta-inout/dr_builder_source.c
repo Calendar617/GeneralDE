@@ -1,0 +1,245 @@
+#include <assert.h>
+#include "cpe/pal/pal_string.h"
+#include "cpe/utils/file.h"
+#include "cpe/utils/buffer.h"
+#include "cpe/dr/dr_metalib_builder.h"
+#include "cpe/dr/dr_metalib_build.h"
+#include "dr_builder_ops.h"
+
+struct dr_metalib_source_relation *
+dr_metalib_source_relation_create(dr_metalib_source_t user, dr_metalib_source_t using);
+void dr_metalib_source_relation_free(struct dr_metalib_source_relation * relation);
+
+uint32_t dr_metalib_source_hash(dr_metalib_source_t source) {
+    return cpe_hash_str(source->m_name, strlen(source->m_name));
+}
+
+int dr_metalib_source_cmp(dr_metalib_source_t l, dr_metalib_source_t r) {
+    return strcmp(l->m_name, r->m_name) == 0;
+}
+
+static dr_metalib_source_t
+dr_metalib_source_create(
+    dr_metalib_builder_t builder, const char * name, size_t capacity,
+    dr_metalib_source_type_t type,
+    dr_metalib_source_format_t format,
+    dr_metalib_source_from_t from)
+{
+    char * buf;
+    dr_metalib_source_t source;
+    size_t name_len;
+
+    assert(builder);
+
+    name_len = strlen(name) + 1;
+
+    buf = mem_alloc(builder->m_alloc, name_len + sizeof(struct dr_metalib_source) + capacity);
+    if (buf == NULL) return NULL;
+
+    memcpy(buf, name, name_len);
+
+    source = (dr_metalib_source_t)(buf + name_len);
+    source->m_builder = builder;
+    source->m_name = buf;
+    source->m_type = type;
+    source->m_format = format;
+    source->m_from = from;
+    source->m_state = dr_metalib_source_state_not_analize;
+    source->m_capacity = capacity;
+
+    TAILQ_INIT(&source->m_includes);
+    TAILQ_INIT(&source->m_include_by);
+
+    cpe_hash_entry_init(&source->m_hh);
+    if (cpe_hash_table_insert_unique(&builder->m_sources, source) != 0) {
+        mem_free(builder->m_alloc, buf);
+        return NULL;
+    }
+
+    return source;
+}
+
+dr_metalib_source_t
+dr_metalib_builder_add_file(dr_metalib_builder_t builder, const char * file) {
+    dr_metalib_source_t source;
+    struct mem_buffer name_buffer;
+    const char * name;
+    size_t file_len;
+    const char * suffix;
+    dr_metalib_source_format_t format;
+
+    assert(builder);
+    assert(file);
+
+    suffix = file_name_suffix(file);
+    if (suffix == NULL) return 0;
+    if (strcmp(suffix, "xml") == 0) {
+        format = dr_metalib_source_format_xml;
+    }
+    else {
+        return NULL;
+    }
+
+    mem_buffer_init(&name_buffer, 0);
+    name = file_name_base(file, &name_buffer);
+    if (name == NULL) {
+        mem_buffer_clear(&name_buffer);
+        return NULL;
+    }
+
+    file_len = strlen(file) + 1;
+    source = dr_metalib_source_create(builder, name, file_len, dr_metalib_source_type_file, format, dr_metalib_source_from_user);
+    if (source == NULL) {
+        mem_buffer_clear(&name_buffer);
+        return NULL;
+    }
+
+    memcpy(source + 1, file, file_len);
+
+    return source;
+}
+
+void dr_metalib_source_free(dr_metalib_source_t source) {
+    assert(source);
+
+    while(!TAILQ_EMPTY(&source->m_includes)) {
+        dr_metalib_source_relation_free(TAILQ_FIRST(&source->m_includes));
+    }
+
+    while(!TAILQ_EMPTY(&source->m_include_by)) {
+        dr_metalib_source_relation_free(TAILQ_FIRST(&source->m_include_by));
+    }
+
+    cpe_hash_table_remove_by_ins(&source->m_builder->m_sources, source);
+
+    mem_free(source->m_builder->m_alloc, (void *)source->m_name);
+}
+
+dr_metalib_source_t
+dr_metalib_source_find(dr_metalib_builder_t builder, const char * name) {
+    struct dr_metalib_source key;
+    key.m_name = name;
+
+    return (dr_metalib_source_t)cpe_hash_table_find(&builder->m_sources, &key);
+}
+
+const char * dr_metalib_source_name(dr_metalib_source_t source) {
+    return source->m_name;
+}
+
+const char * dr_metalib_source_file(dr_metalib_source_t source) {
+    return source->m_type == dr_metalib_source_type_file
+        ? (const char *)(source + 1)
+        : NULL;
+}
+
+const void * dr_metalib_source_buf(dr_metalib_source_t source) {
+    return source->m_type == dr_metalib_source_type_memory
+        ? (const void *)(source + 1)
+        : NULL;
+}
+
+size_t dr_metalib_source_buf_capacity(dr_metalib_source_t source) {
+    return source->m_type == dr_metalib_source_type_memory
+        ? source->m_capacity
+        : 0;
+}
+
+int dr_metalib_source_add_include(dr_metalib_source_t user, dr_metalib_source_t using) {
+    assert(user);
+    assert(using);
+    return dr_metalib_source_relation_create(using, using) == NULL ? -1 : 0;
+}
+
+dr_metalib_source_type_t dr_metalib_source_type(dr_metalib_source_t source) {
+    return source->m_type;
+}
+
+dr_metalib_source_format_t dr_metalib_source_format(dr_metalib_source_t source) {
+    return source->m_format;
+}
+
+dr_metalib_source_from_t dr_metalib_source_from(dr_metalib_source_t source) {
+    return source->m_from;
+}
+
+dr_metalib_source_state_t dr_metalib_source_state(dr_metalib_source_t source) {
+    return source->m_state;
+}
+
+static void dr_metalib_source_do_analize(dr_metalib_source_t source, const void * buf, size_t bufSize) {
+    if(source->m_format == dr_metalib_source_format_xml) {
+        dr_metalib_source_analize_xml(
+            source->m_builder,
+            source->m_builder->m_inbuild_lib,
+            buf, bufSize,
+            source->m_builder->m_em);
+    }
+    else {
+        CPE_ERROR(source->m_builder->m_em, "not support source format %d", source->m_format);
+    }
+}
+
+void dr_metalib_source_analize(dr_metalib_source_t source) {
+    assert(source);
+    if (source->m_state != dr_metalib_source_state_not_analize) return;
+
+    source->m_state = dr_metalib_source_state_analizing;
+
+    if(source->m_type == dr_metalib_source_type_file) {
+        struct mem_buffer buffer;
+        FILE * file;
+        const char * file_name;
+
+        file_name = dr_metalib_source_file(source);
+        assert(file_name);
+
+        file = file_stream_open(file_name, "r", source->m_builder->m_em);
+        if (file) {
+            ssize_t file_size;
+            mem_buffer_init(&buffer, 0);
+            file_size = file_stream_load_to_buffer(&buffer, file, source->m_builder->m_em);
+            if (file_size > 0) {
+                CPE_ERROR_SET_FILE(source->m_builder->m_em, file_name);
+                dr_metalib_source_do_analize(source, mem_buffer_make_continuous(&buffer, 0), file_size);
+                CPE_ERROR_SET_FILE(source->m_builder->m_em, 0);
+            }
+            mem_buffer_clear(&buffer);
+            file_stream_close(file, source->m_builder->m_em);
+        }
+    }
+    else if (source->m_type == dr_metalib_source_type_memory) {
+        CPE_ERROR_SET_FILE(source->m_builder->m_em, source->m_name);
+        dr_metalib_source_do_analize(source, source + 1, source->m_capacity);
+        CPE_ERROR_SET_FILE(source->m_builder->m_em, 0);
+    }
+    else {
+        CPE_ERROR(source->m_builder->m_em, "%s: not support type %d", source->m_name, source->m_type);
+    }
+
+    source->m_state = dr_metalib_source_state_analized;
+}
+
+struct dr_metalib_source_relation *
+dr_metalib_source_relation_create(dr_metalib_source_t user, dr_metalib_source_t using) {
+    struct dr_metalib_source_relation * relation;
+    assert(using);
+    assert(user);
+
+    relation = mem_alloc(user->m_builder->m_alloc, sizeof(struct dr_metalib_source_relation));
+    if (relation == NULL) return NULL;
+
+    relation->m_user = user;
+    relation->m_using = using;
+
+    TAILQ_INSERT_TAIL(&user->m_includes, relation, m_next_for_includes);
+    TAILQ_INSERT_TAIL(&user->m_include_by, relation, m_next_for_include_by);
+
+    return relation;
+}
+
+void dr_metalib_source_relation_free(struct dr_metalib_source_relation * relation) {
+    TAILQ_REMOVE(&relation->m_user->m_includes, relation, m_next_for_includes);
+    TAILQ_REMOVE(&relation->m_using->m_include_by, relation, m_next_for_include_by);
+    mem_free(relation->m_using->m_builder->m_alloc, relation);
+}
