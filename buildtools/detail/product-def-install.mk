@@ -32,6 +32,7 @@ tools.cvt.replace.dep=$(addprefix $$(CPDE_ROOT)/,$1)
 
 # $(call install-def-rule-copy,product-name,source,target,domain)
 define install-def-rule-copy
+auto-build-dirs+=$(dir $3)                              
 
 $1: $4.$1
 
@@ -63,12 +64,12 @@ endef
 
 # $(call install-def-rule-one-dir-r,product-name,source-dir,target-dir,postfix-list,domain)
 define install-def-rule-one-dir-r
-auto-build-dirs+=$(CPDE_OUTPUT_ROOT)/$3 \
-                 $(subst $(CPDE_ROOT)/$2,$(CPDE_OUTPUT_ROOT)/$3,$(sort $(dir $(if $(wildcard $(CPDE_ROOT)/$2),$(shell find $(CPDE_ROOT)/$2 -type f)))))
+auto-build-dirs+=$(CPDE_OUTPUT_ROOT)/$3
 
 $(foreach f,$(if $(wildcard $(CPDE_ROOT)/$2),\
                  $(shell find $(CPDE_ROOT)/$2 -type f \
-                              $(if $4, -o -name "*.$(word 1,$4)" $(foreach p,$(wordlist 2,$(words $4),$4), -o -name "*.$p")))),\
+                              -not "(" -wholename "*/.svn/*" ")" \
+                              $(if $4, "(" -name "*.$(word 1,$4)" $(foreach p,$(wordlist 2,$(words $4),$4), -o -name "*.$p") ")" ))),\
     $(call install-def-rule-copy,$1,$f,$(subst $(CPDE_ROOT)/$2,$(CPDE_OUTPUT_ROOT)/$3,$f),$5) \
 )
 endef
@@ -87,7 +88,7 @@ $(if $4,\
 
 endef
 
-# }}}	
+# }}}
 # {{{ 各种不同类型的安装函数入口,#$1是项目名，$2是domain,$3后续参数各自定义
 
 define product-def-rule-install-copy-file
