@@ -73,7 +73,7 @@ typedef struct dr_metalib_builder * dr_metalib_builder_t;
 
 typedef struct dr_metalib_source_it {
     dr_metalib_source_t (*next)(struct dr_metalib_source_it * it);
-    char m_data[8];
+    char m_data[16];
 } * dr_metalib_source_it_t;
 
 struct DRInBuildMetaLib;

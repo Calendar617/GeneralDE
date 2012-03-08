@@ -14,8 +14,8 @@ void dr_metalib_builder_analize(dr_metalib_builder_t builder);
 
 void dr_metalib_builder_sources(struct dr_metalib_source_it * it, dr_metalib_builder_t builder);
 
-dr_metalib_source_t dr_metalib_builder_add_file(dr_metalib_builder_t builder, const char * file);
-dr_metalib_source_t dr_metalib_builder_add_buf(dr_metalib_builder_t builder, const char * name, dr_metalib_source_format_t, const void * buf);
+dr_metalib_source_t dr_metalib_builder_add_file(dr_metalib_builder_t builder, const char * name, const char * file);
+dr_metalib_source_t dr_metalib_builder_add_buf(dr_metalib_builder_t builder, const char * name, dr_metalib_source_format_t format, const char * buf);
 void dr_metalib_source_free(dr_metalib_source_t source);
 
 const char * dr_metalib_source_name(dr_metalib_source_t source);
@@ -28,9 +28,21 @@ dr_metalib_source_format_t dr_metalib_source_format(dr_metalib_source_t source);
 dr_metalib_source_from_t dr_metalib_source_from(dr_metalib_source_t source);
 dr_metalib_source_state_t dr_metalib_source_state(dr_metalib_source_t source);
 void dr_metalib_source_analize(dr_metalib_source_t source);
+void dr_metalib_source_includes(struct dr_metalib_source_it * it, dr_metalib_source_t source);
+void dr_metalib_source_include_by(struct dr_metalib_source_it * it, dr_metalib_source_t source);
 
 dr_metalib_source_t dr_metalib_source_find(dr_metalib_builder_t builder, const char * name);
+
 int dr_metalib_source_add_include(dr_metalib_source_t user_source, dr_metalib_source_t using_source);
+
+dr_metalib_source_t
+dr_metalib_source_add_include_file(
+    dr_metalib_source_t user_source,
+    const char * name, 
+    const char * file,
+    dr_metalib_source_from_t from);
+
+#define dr_metalib_source_next(it) ((it)->next ? (it)->next(it) : NULL)
 
 #ifdef __cplusplus
 }

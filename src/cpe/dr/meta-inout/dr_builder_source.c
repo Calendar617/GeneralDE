@@ -60,10 +60,9 @@ dr_metalib_source_create(
 }
 
 dr_metalib_source_t
-dr_metalib_builder_add_file(dr_metalib_builder_t builder, const char * file) {
+dr_metalib_builder_add_file(dr_metalib_builder_t builder, const char * name, const char * file) {
     dr_metalib_source_t source;
     struct mem_buffer name_buffer;
-    const char * name;
     size_t file_len;
     const char * suffix;
     dr_metalib_source_format_t format;
@@ -81,11 +80,15 @@ dr_metalib_builder_add_file(dr_metalib_builder_t builder, const char * file) {
     }
 
     mem_buffer_init(&name_buffer, 0);
-    name = file_name_base(file, &name_buffer);
     if (name == NULL) {
-        mem_buffer_clear(&name_buffer);
-        return NULL;
+        name = file_name_base(file, &name_buffer);
+        if (name == NULL) {
+            mem_buffer_clear(&name_buffer);
+            return NULL;
+        }
     }
+
+    assert(name);
 
     file_len = strlen(file) + 1;
     source = dr_metalib_source_create(builder, name, file_len, dr_metalib_source_type_file, format, dr_metalib_source_from_user);
@@ -95,6 +98,24 @@ dr_metalib_builder_add_file(dr_metalib_builder_t builder, const char * file) {
     }
 
     memcpy(source + 1, file, file_len);
+
+    mem_buffer_clear(&name_buffer);
+    return source;
+}
+
+dr_metalib_source_t
+dr_metalib_builder_add_buf(dr_metalib_builder_t builder, const char * name, dr_metalib_source_format_t format, const char * buf) {
+    dr_metalib_source_t source;
+    size_t buf_len;
+
+    assert(builder);
+    assert(buf);
+
+    buf_len = strlen(buf) + 1;
+    source = dr_metalib_source_create(builder, name, buf_len, dr_metalib_source_type_memory, format, dr_metalib_source_from_user);
+    if (source == NULL) return NULL;
+
+    memcpy(source + 1, buf, buf_len);
 
     return source;
 }
@@ -148,7 +169,45 @@ size_t dr_metalib_source_buf_capacity(dr_metalib_source_t source) {
 int dr_metalib_source_add_include(dr_metalib_source_t user, dr_metalib_source_t using) {
     assert(user);
     assert(using);
-    return dr_metalib_source_relation_create(using, using) == NULL ? -1 : 0;
+    return dr_metalib_source_relation_create(user, using) == NULL ? -1 : 0;
+}
+
+dr_metalib_source_t
+dr_metalib_source_add_include_file(dr_metalib_source_t user_source, const char * name, const char * file, dr_metalib_source_from_t from) {
+    struct mem_buffer name_buffer;
+    dr_metalib_source_t using;
+    
+    assert(user_source);
+    assert(file);
+    assert(user_source->m_builder);
+
+    mem_buffer_init(&name_buffer, 0);
+
+    if (name == NULL) {
+        name = file_name_base(file, &name_buffer);
+        if (name == NULL) {
+            mem_buffer_clear(&name_buffer);
+            return NULL;
+        }
+    }
+    assert(name);
+    
+    using = dr_metalib_source_find(user_source->m_builder, name);
+    if (using == NULL) {
+        using = dr_metalib_builder_add_file(user_source->m_builder, name, file);
+        if (using == NULL) {
+            mem_buffer_clear(&name_buffer);
+            return NULL;
+        }
+        using->m_from = from;
+    }
+    assert(using);
+
+    mem_buffer_clear(&name_buffer);
+
+    return dr_metalib_source_add_include(user_source, using) == 0
+        ? using
+        : NULL;
 }
 
 dr_metalib_source_type_t dr_metalib_source_type(dr_metalib_source_t source) {
@@ -233,7 +292,7 @@ dr_metalib_source_relation_create(dr_metalib_source_t user, dr_metalib_source_t 
     relation->m_using = using;
 
     TAILQ_INSERT_TAIL(&user->m_includes, relation, m_next_for_includes);
-    TAILQ_INSERT_TAIL(&user->m_include_by, relation, m_next_for_include_by);
+    TAILQ_INSERT_TAIL(&using->m_include_by, relation, m_next_for_include_by);
 
     return relation;
 }
@@ -242,4 +301,57 @@ void dr_metalib_source_relation_free(struct dr_metalib_source_relation * relatio
     TAILQ_REMOVE(&relation->m_user->m_includes, relation, m_next_for_includes);
     TAILQ_REMOVE(&relation->m_using->m_include_by, relation, m_next_for_include_by);
     mem_free(relation->m_using->m_builder->m_alloc, relation);
+}
+
+static
+dr_metalib_source_t
+dr_metalib_source_include_next(struct dr_metalib_source_it * it) {
+    struct dr_metalib_source_relation ** relation;
+    dr_metalib_source_t r;
+
+    relation = (struct dr_metalib_source_relation **)it->m_data;
+
+    if ((*relation) == NULL) return NULL;
+
+    r = (*relation)->m_using;
+    *relation = TAILQ_NEXT(*relation, m_next_for_includes);
+    return r;
+}
+
+void dr_metalib_source_includes(struct dr_metalib_source_it * it, dr_metalib_source_t source) {
+    struct dr_metalib_source_relation ** relation;
+
+    relation = (struct dr_metalib_source_relation **)it->m_data;
+
+    it->next = dr_metalib_source_include_next; 
+    *relation = TAILQ_EMPTY(&source->m_includes)
+        ? NULL
+        : TAILQ_FIRST(&source->m_includes);
+}
+
+static
+dr_metalib_source_t
+dr_metalib_source_include_by_next(struct dr_metalib_source_it * it) {
+    struct dr_metalib_source_relation ** relation;
+    dr_metalib_source_t r;
+
+    relation = (struct dr_metalib_source_relation **)it->m_data;
+
+    if ((*relation) == NULL) return NULL;
+
+    r = (*relation)->m_user;
+    *relation = TAILQ_NEXT(*relation, m_next_for_include_by);
+    return r;
+}
+
+
+void dr_metalib_source_include_by(struct dr_metalib_source_it * it, dr_metalib_source_t source) {
+    struct dr_metalib_source_relation ** relation;
+
+    relation = (struct dr_metalib_source_relation **)it->m_data;
+
+    it->next = dr_metalib_source_include_by_next; 
+    *relation = TAILQ_EMPTY(&source->m_include_by)
+        ? NULL
+        : TAILQ_FIRST(&source->m_include_by);
 }
