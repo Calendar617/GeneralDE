@@ -78,3 +78,21 @@ const char * GenerateTest::generate_h(const char * name) {
 
     return r;
 }
+
+const char * GenerateTest::generate_lib_c(const char * arg_name) {
+    prepare_ctx();
+    if (m_ctx.m_metalib == 0) return NULL;
+
+    mem_buffer buffer;
+    mem_buffer_init(&buffer, 0);
+
+    write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&buffer);
+
+    EXPECT_EQ(0, cpe_dr_generate_lib_c((write_stream_t)&stream, arg_name, &m_ctx));
+    stream_putc((write_stream_t)&stream, 0);
+    
+    char * r = t_tmp_strdup((char *)mem_buffer_make_continuous(&buffer, 0));
+    mem_buffer_clear(&buffer);
+
+    return r;
+}

@@ -15,6 +15,7 @@ typedef struct cpe_dr_generate_ctx {
 } * cpe_dr_generate_ctx_t;
 
 int cpe_dr_generate_h(write_stream_t stream, dr_metalib_source_t source, cpe_dr_generate_ctx_t ctx);
+int cpe_dr_generate_lib_c(write_stream_t stream, const char * arg_name, cpe_dr_generate_ctx_t ctx);
 
 #ifdef __cplusplus
 }
