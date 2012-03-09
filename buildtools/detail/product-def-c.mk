@@ -158,7 +158,7 @@ $3.$1: $(CPDE_OUTPUT_ROOT)/$(r.$1.$3.product)
 
 $(CPDE_OUTPUT_ROOT)/$(r.$1.$3.product): $(call c-source-to-object,$(r.$1.c.sources) $(r.$1.$($3.env).c.sources) $(r.$1.$3.c.sources),$3)
 	$$(call with_message,linking $(r.$1.$3.product) ...) \
-        $(call product-def-rule-c-link-cmd-$(if $(filter progn,$2),progn,lib-$(r.$1.$3.c.lib.type)),$1, $$^, $$@,$3)
+        $(call product-def-rule-c-link-cmd-$(if $(filter progn,$2),progn,lib-$(r.$1.$3.c.lib.type)),$1, $$(filter %.o,$$^), $$@,$3)
 
 $(foreach f,$(r.$1.c.sources) $(r.$1.$($3.env).c.sources) $(r.$1.$3.c.sources),$(call product-def-rule-c-compile-rule,$(call c-source-to-object,$f,$3),$f,$1,$3))
 
