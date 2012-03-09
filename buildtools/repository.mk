@@ -29,8 +29,9 @@ endif
 modules := $(subst /config.mk,,$(shell find $(CPDE_ROOT) -name config.mk))
 include $(addsuffix /config.mk,$(modules))
 
+include $(CPED_BUILD_DETAIL_DIR)/domain-auto-def.mk
+
 -include $(foreach p,$(project_repository), $(r.$p.makefile.include))
 
-include $(CPED_BUILD_DETAIL_DIR)/domain-auto-def.mk
 include $(CPED_BUILD_DETAIL_DIR)/create-dirs.mk
 
