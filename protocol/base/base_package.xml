@@ -14,11 +14,12 @@
         <entry name="flags" type="uint16" />
         <entry name="headlen" type="uint16" />
         <entry name="roleId" type="uint64" />
-        <entry name="bodylen" type="smalluint" />
-        <entry name="originBodyLen" type="smalluint" />
-        <entry name="bodytotallen" type="smalluint" />
-        <entry name="appendInfoCount" type="smalluint"/>
-        <entry name="appendInfos"  type="AppendInfo" count="APPEND_INFO_MAX_COUNT" refer="appendInfoCount"/>
+        <entry name="bodylen" type="uint16" />
+        <entry name="originBodyLen" type="uint16" />
+        <entry name="bodytotallen" type="uint16" />
+        <entry name="appendInfoCount" type="uint16"/>
+        <entry name="appendInfos"  type="AppendInfo" count="64" refer="appendInfoCount"/>
+        <!-- count="APPEND_INFO_MAX_COUNT" count use macro not support yet -->
     </struct>
 
     <struct name="basepkg" version="1">
