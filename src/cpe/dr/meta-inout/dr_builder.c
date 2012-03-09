@@ -34,10 +34,24 @@ dr_metalib_builder_create(mem_allocrator_t alloc, error_monitor_t em) {
         return NULL;
     }
 
+    if (cpe_hash_table_init(
+            &builder->m_elements,
+            alloc,
+            (cpe_hash_fun_t)dr_metalib_source_element_hash,
+            (cpe_hash_cmp_t)dr_metalib_source_element_cmp,
+            CPE_HASH_OBJ2ENTRY(dr_metalib_source_element, m_hh),
+            256) != 0)
+    {
+        cpe_hash_table_fini(&builder->m_sources);
+        dr_inbuild_free_lib(builder->m_inbuild_lib);
+        mem_free(alloc, builder);
+        return NULL;
+    }
+
     return builder;
 }
 
-void dr_metalib_builder_free(dr_metalib_builder_t builder) {
+void dr_metalib_builder_free_sources(dr_metalib_builder_t builder) {
     struct cpe_hash_it sourceIt;
     dr_metalib_source_t source;
 
@@ -49,8 +63,28 @@ void dr_metalib_builder_free(dr_metalib_builder_t builder) {
         source = next;
     }
 
-    dr_inbuild_free_lib(builder->m_inbuild_lib);
     cpe_hash_table_fini(&builder->m_sources);
+}
+
+void dr_metalib_builder_free_elements(dr_metalib_builder_t builder) {
+    struct cpe_hash_it elementIt;
+    dr_metalib_source_element_t element;
+
+    cpe_hash_it_init(&elementIt, &builder->m_elements);
+    element = cpe_hash_it_next(&elementIt);
+    while(element) {
+        dr_metalib_source_element_t next = cpe_hash_it_next(&elementIt);
+        dr_metalib_source_element_free(element);
+        element = next;
+    }
+
+    cpe_hash_table_fini(&builder->m_elements);
+}
+
+void dr_metalib_builder_free(dr_metalib_builder_t builder) {
+    dr_metalib_builder_free_sources(builder);
+    dr_metalib_builder_free_elements(builder);
+    dr_inbuild_free_lib(builder->m_inbuild_lib);
     mem_free(builder->m_alloc, builder);
 }
 
@@ -62,6 +96,10 @@ void dr_metalib_builder_analize(dr_metalib_builder_t builder) {
     while((source = (dr_metalib_source_t)cpe_hash_it_next(&sourceIt))) {
         dr_metalib_source_analize(source);
     }
+}
+
+struct DRInBuildMetaLib * dr_metalib_bilder_lib(dr_metalib_builder_t builder) {
+    return builder->m_inbuild_lib;
 }
 
 static

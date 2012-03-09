@@ -68,8 +68,20 @@ typedef enum dr_metalib_source_state {
     , dr_metalib_source_state_analizing
 } dr_metalib_source_state_t;
 
+typedef struct dr_metalib_source_element * dr_metalib_source_element_t;
 typedef struct dr_metalib_source * dr_metalib_source_t;
 typedef struct dr_metalib_builder * dr_metalib_builder_t;
+
+typedef enum dr_metalib_source_element_type {
+    dr_metalib_source_element_type_lib
+    , dr_metalib_source_element_type_macro
+    , dr_metalib_source_element_type_meta
+} dr_metalib_source_element_type_t;
+
+typedef struct dr_metalib_source_element_it {
+    dr_metalib_source_element_t (*next)(struct dr_metalib_source_element_it * it);
+    dr_metalib_source_element_t m_data;
+} * dr_metalib_source_element_it_t;
 
 typedef struct dr_metalib_source_it {
     dr_metalib_source_t (*next)(struct dr_metalib_source_it * it);

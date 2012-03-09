@@ -4,6 +4,20 @@
 #include "cpe/utils/error.h"
 #include "cpe/dr/dr_types.h"
 
-int cpe_dr_generate_h(write_stream_t stream, dr_metalib_source_t source, error_monitor_t em);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct cpe_dr_generate_ctx {
+    dr_metalib_builder_t m_builder;
+    LPDRMETALIB m_metalib;
+    error_monitor_t m_em;
+} * cpe_dr_generate_ctx_t;
+
+int cpe_dr_generate_h(write_stream_t stream, dr_metalib_source_t source, cpe_dr_generate_ctx_t ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
