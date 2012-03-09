@@ -46,6 +46,8 @@ void GenerateTest::prepare_ctx(void) {
     mem_buffer buffer;
     mem_buffer_init(&buffer, t_tmp_allocrator());
 
+    dr_metalib_builder_analize(m_ctx.m_builder);
+
     int r = dr_inbuild_build_lib(
         &buffer,
         dr_metalib_bilder_lib(m_ctx.m_builder),
