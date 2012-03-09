@@ -28,6 +28,10 @@ $(if $(filter 0,$($1.ut)) \
 
 endef
 
+domain-target-product-dep-def=\
+$(if $(r.$1.depends),$(if $(r.$1.$2.product),\
+$(addprefix $(CPDE_OUTPUT_ROOT)/,$(r.$1.$2.product)): $(foreach p,$(r.$1.depends),$(addprefix $(CPDE_OUTPUT_ROOT)/,$(r.$p.$2.product)))))
+
 $(foreach domain,$(sort $(domain-list)),\
     $(eval $(call domain-auto-def-product,$(domain))) \
 	$(eval $(call domain-target-def,$(domain)))\
@@ -42,3 +46,8 @@ $(if $(filter-out tools,$(domain-list))\
 
 $(foreach env,$(sort $(foreach domain,$(sort $(domain-list)),$($(domain).env))), \
     $(call $(env).check))
+
+$(foreach domain,$(sort $(domain-list)),\
+    $(foreach p,$($(domain).product-list),\
+	    $(eval $(call domain-target-product-dep-def,$p,$(domain)))\
+))
