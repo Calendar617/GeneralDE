@@ -24,6 +24,7 @@ static void cpe_dr_generate_h_metas(write_stream_t stream, dr_metalib_source_t s
 
         if (dr_meta_align(meta) != curent_pack) {
             stream_printf(stream, "\n#pragma pack(1)\n");
+            curent_pack = dr_meta_align(meta);
             packed = 1;
         }
 
@@ -53,6 +54,10 @@ static void cpe_dr_generate_h_metas(write_stream_t stream, dr_metalib_source_t s
                 stream_printf(stream, "%s_t %s", dr_type_name(dr_entry_type(entry)), dr_entry_name(entry));
                 break;
             }
+            }
+
+            if (dr_entry_array_count(entry) != 1) {
+                stream_printf(stream, "[%d]", dr_entry_array_count(entry) < 1 ? 1 : dr_entry_array_count(entry));
             }
 
             stream_printf(stream, ";");

@@ -66,19 +66,30 @@ void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor
 }
 
 void cpe_error_log_to_file(struct error_info * info, void * context, const char * fmt, va_list args) {
-    if (context == NULL) {
-        return;
-    }
+    if (context == NULL) return;
+
+    if (info->m_file) fprintf((FILE *)context, "%s:%d: ", info->m_file, info->m_line > 0 ? info->m_line : 0);
+    else if (info->m_line >= 0) fprintf((FILE *)context, "%d: ", info->m_line);
+
     vfprintf((FILE *)context, fmt, args);
 }
 
 void cpe_error_log_to_consol(struct error_info * info, void * context, const char * fmt, va_list args) {
 #if defined(_MSC_VER)
 	char buf[1024];
-	vsnprintf_s(buf, sizeof(buf), 128, fmt, args);
+    size_t s;
+    s = 0;
+
+    if (info->m_file) s += vsnprintf(buf, sizeof(buf), "%s:%d: ", info->m_file, info->m_line > 0 ? info->m_line : 0);
+    else if (info->m_line >= 0) s += vsnprintf(buf + s, sizeof(buf) - s, "%d: ", info->m_line);
+
+	vsnprintf(buf + s, sizeof(buf) - s, fmt, args);
 	OutputDebugStringA(buf);
 	OutputDebugStringA("\n");
 #endif
+    if (info->m_file) printf("%s:%d: ", info->m_file, info->m_line > 0 ? info->m_line : 0);
+    else if (info->m_line >= 0) printf("%d: ", info->m_line);
+
     vprintf(fmt, args);
     printf("\n");
 }

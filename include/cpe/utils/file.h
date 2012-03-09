@@ -40,6 +40,7 @@ ssize_t file_stream_load_to_stream(write_stream_t stream, FILE * fp, error_monit
 /*file name operations*/
 const char * file_name_suffix(const char * input);
 const char * file_name_base(const char * input, mem_buffer_t tbuf);
+const char * file_name_append_base(mem_buffer_t tbuf, const char * input);
 
 /*dir operations*/
 int dir_exist(const char * path, error_monitor_t em);
