@@ -128,6 +128,11 @@ static void dr_build_xml_process_metalib(
         DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_METALIB_ROOT_NO_NAME);
     }
 
+    if (ctx->m_source) {
+        dr_metalib_source_element_create(
+            ctx->m_source, dr_metalib_source_element_type_lib, ctx->m_metaLib->m_data.szName);
+    }
+
     ctx->m_state = PS_InMetaLib;
 }
 
@@ -624,8 +629,11 @@ void dr_metalib_source_analize_xml(
     xmlParserCtxtPtr parseCtx = NULL;
     struct DRXmlParseCtx ctx;
 
+    dr_build_xml_parse_ctx_init(&ctx);
+
     ctx.m_metaLib = inbuild_lib;
     ctx.m_em = em;
+    ctx.m_source = source;
 
     parseCtx = xmlCreatePushParserCtxt(&g_dr_xml_handler, &ctx, buf, bufSize, NULL);
 
