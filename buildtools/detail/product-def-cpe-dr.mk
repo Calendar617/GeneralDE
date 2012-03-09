@@ -31,6 +31,7 @@ define product-def-rule-cpe-dr-c-module-c
   $(call assert-not-null,$1.cpe-dr.$2.c.output)
 
   $(eval r.$1.$3.cpe-dr.$2.c.output:=$($1.cpe-dr.$2.c.output))
+  $(eval r.$1.$3.cpe-dr.$2.c.arg-name:=$($1.cpe-dr.$2.c.arg-name))
   $(eval r.$1.$3.cpe-dr.$2.c.output-dir:=$(call c-source-dir-to-binary-dir,$(r.$1.base)/$(patsubst %/,%,$(dir $(r.$1.$3.cpe-dr.$2.c.output))),$3))
   $(eval r.$1.$3.cpe-dr.$2.generated.c:=$(r.$1.$3.cpe-dr.$2.c.output-dir)/$(notdir $($1.cpe-dr.$2.c.output)))
 
@@ -39,10 +40,10 @@ define product-def-rule-cpe-dr-c-module-c
   $(eval r.$1.$3.c.sources += $(r.$1.$3.cpe-dr.$2.generated.c))
   $(eval r.$1.cleanup += $(r.$1.$3.cpe-dr.$2.generated.c))
 
-  $(r.$1.$3.cpe-dr.$2.generated.c): $(r.$1.$3.cpe-dr.$2.source) 
+  $(r.$1.$3.cpe-dr.$2.generated.c): $(r.$1.$3.cpe-dr.$2.source) $(cpe-dr-tool)
 	$$(call with_message,cpe-dr generaing lib-c to $(subst $(CPDE_ROOT)/,,$(r.$1.$3.cpe-dr.$2.generated.c)) ...) \
 	$(cpe-dr-tool) $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) \
-                   --output-lib-c $$@ 
+                   --output-lib-c $$@ --output-lib-c-arg $($1.cpe-dr.$2.c.arg-name)
 
 endef
 

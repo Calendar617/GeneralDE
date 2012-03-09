@@ -1,7 +1,7 @@
 #include "../generate_ops.h"
 #include "GenerateTest.hpp"
 
-TEST_F(GenerateTest, basic) {
+TEST_F(GenerateTest, h_basic) {
     add_buffer(
         "a",
         "<metalib tagsetversion='1' name='net'  version='10'>"
