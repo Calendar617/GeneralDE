@@ -44,6 +44,7 @@ enum DRXmlParseState {
         &ctx->m_metaLib->m_tmp_buf, (char const *)valueBegin, len);
 
 struct DRXmlParseCtx {
+    dr_metalib_source_t m_source;
     struct DRInBuildMetaLib * m_metaLib;
     struct DRInBuildMeta * m_curentMeta;
     enum DRXmlParseState m_state;
@@ -209,6 +210,11 @@ static void dr_build_xml_process_macro(
     if (haveError) {
         dr_inbuild_metalib_remove_macro(ctx->m_metaLib, newMacro);
     }
+    else {
+        if (ctx->m_source) {
+            dr_metalib_source_element_create(ctx->m_source, dr_metalib_source_element_type_macro, newMacro->m_name);
+        }
+    }
 }
 
 static void dr_build_xml_process_meta(
@@ -316,6 +322,10 @@ static void dr_build_xml_process_meta(
 
     ctx->m_state = PS_InMeta;
     ctx->m_curentMeta = newMeta;
+
+    if (ctx->m_source) {
+        dr_metalib_source_element_create(ctx->m_source, dr_metalib_source_element_type_meta, newMeta->m_name);
+    }
 }
 
 static void dr_build_xml_process_entry(
@@ -605,7 +615,7 @@ int  dr_create_lib_from_xml(
 }
 
 void dr_metalib_source_analize_xml(
-    dr_metalib_builder_t builder,
+    dr_metalib_source_t source,
     struct DRInBuildMetaLib * inbuild_lib,
     const void * buf,
     int bufSize,
