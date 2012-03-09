@@ -22,10 +22,8 @@ define product-def-rule-cpe-dr-c-module-h
 
   $(r.$1.$3.cpe-dr.$2.generated.h): $(r.$1.$3.cpe-dr.$2.source) 
 	$$(call with_message,cpe-dr generaing h to $(subst $(CPDE_ROOT)/,,$(r.$1.$3.cpe-dr.$2.h.output-dir)) ...) \
-	$(cpe-dr-tool) --xml2h --no_type_prefix --add_custom_prefix=""\
-        -O $(r.$1.$3.cpe-dr.$2.h.output-dir) \
-        $(r.$1.$3.cpe-dr.$2.source) \
-        $(if $(INSIDE_EMACS),2>&1 | iconv -f gb2312 -t utf-8)
+	$(cpe-dr-tool) $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) \
+                   --output-h $(r.$1.$3.cpe-dr.$2.h.output-dir)
 
 endef
 
@@ -43,10 +41,8 @@ define product-def-rule-cpe-dr-c-module-c
 
   $(r.$1.$3.cpe-dr.$2.generated.c): $(r.$1.$3.cpe-dr.$2.source) 
 	$$(call with_message,cpe-dr generaing lib-c to $(subst $(CPDE_ROOT)/,,$(r.$1.$3.cpe-dr.$2.generated.c)) ...) \
-	$(cpe-dr-tool) --xml2c \
-        -o $$@ \
-        $(r.$1.$3.cpe-dr.$2.source) \
-        $(if $(INSIDE_EMACS),2>&1 | iconv -f gb2312 -t utf-8)
+	$(cpe-dr-tool) $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) \
+                   --output-lib-c $$@ 
 
 endef
 
@@ -70,10 +66,8 @@ define product-def-rule-cpe-dr-c-module-bin
 
   $(r.$1.$3.cpe-dr.$2.generated.bin): $(r.$1.$3.cpe-dr.$2.source) 
 	$$(call with_message,cpe-dr generaing bin to $(subst $(CPDE_ROOT)/,,$(r.$1.$3.cpe-dr.$2.generated.bin)) ...) \
-	$(cpe-dr-tool) --xml2dr \
-        -o $$@ \
-        $(r.$1.$3.cpe-dr.$2.source) \
-        $(if $(INSIDE_EMACS),2>&1 | iconv -f gb2312 -t utf-8)
+	$(cpe-dr-tool) $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) \
+                   --output-lib-bin $$@ 
 
 endef
 
