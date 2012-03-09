@@ -19,6 +19,7 @@ public:
     void prepare_ctx(void);
 
     const char * generate_h(const char * name);
+    const char * generate_lib_c(const char * arg_name);
 
     cpe_dr_generate_ctx m_ctx;
 };
