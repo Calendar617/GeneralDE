@@ -1,6 +1,7 @@
 #ifndef CPE_DR_METAINOUT_BUILDER_TYPES_H
 #define CPE_DR_METAINOUT_BUILDER_TYPES_H
 #include "cpe/pal/pal_queue.h"
+#include "cpe/utils/error.h"
 #include "cpe/utils/hash.h"
 #include "cpe/utils/memory.h"
 #include "cpe/dr/dr_types.h"
@@ -12,12 +13,14 @@ extern "C" {
 struct dr_metalib_source_relation;
 typedef TAILQ_HEAD(dr_metalib_source_list, dr_metalib_source) dr_metalib_source_list_t;
 typedef TAILQ_HEAD(dr_metalib_source_relation_list, dr_metalib_source_relation) dr_metalib_source_relation_list_t;
+typedef TAILQ_HEAD(dr_metalib_source_element_list, dr_metalib_source_element) dr_metalib_source_element_list_t;
 
 struct dr_metalib_builder {
     mem_allocrator_t m_alloc;
     error_monitor_t m_em;
     struct DRInBuildMetaLib * m_inbuild_lib;
     struct cpe_hash_table m_sources;
+    struct cpe_hash_table m_elements;
 };
 
 struct dr_metalib_source {
@@ -31,6 +34,7 @@ struct dr_metalib_source {
 
     dr_metalib_source_relation_list_t m_includes;
     dr_metalib_source_relation_list_t m_include_by;
+    dr_metalib_source_element_list_t m_elements;
 
     struct cpe_hash_entry m_hh;
 };
@@ -40,6 +44,14 @@ struct dr_metalib_source_relation {
     dr_metalib_source_t m_using;
     TAILQ_ENTRY(dr_metalib_source_relation) m_next_for_includes;
     TAILQ_ENTRY(dr_metalib_source_relation) m_next_for_include_by;
+};
+
+struct dr_metalib_source_element {
+    dr_metalib_source_t m_source;
+    dr_metalib_source_element_type_t m_type;
+    TAILQ_ENTRY(dr_metalib_source_element) m_next;
+
+    struct cpe_hash_entry m_hh;
 };
 
 #ifdef __cplusplus
