@@ -49,6 +49,7 @@ dr_metalib_source_create(
 
     TAILQ_INIT(&source->m_includes);
     TAILQ_INIT(&source->m_include_by);
+    TAILQ_INIT(&source->m_elements);
 
     cpe_hash_entry_init(&source->m_hh);
     if (cpe_hash_table_insert_unique(&builder->m_sources, source) != 0) {
@@ -122,6 +123,10 @@ dr_metalib_builder_add_buf(dr_metalib_builder_t builder, const char * name, dr_m
 
 void dr_metalib_source_free(dr_metalib_source_t source) {
     assert(source);
+
+    while(!TAILQ_EMPTY(&source->m_elements)) {
+        dr_metalib_source_element_free(TAILQ_FIRST(&source->m_elements));
+    }
 
     while(!TAILQ_EMPTY(&source->m_includes)) {
         dr_metalib_source_relation_free(TAILQ_FIRST(&source->m_includes));
@@ -226,10 +231,22 @@ dr_metalib_source_state_t dr_metalib_source_state(dr_metalib_source_t source) {
     return source->m_state;
 }
 
+const char * dr_metalib_source_libname(dr_metalib_source_t source) {
+    dr_metalib_source_element_t e;
+
+    TAILQ_FOREACH(e, &source->m_elements, m_next) {
+        if (e->m_type == dr_metalib_source_element_type_lib) {
+            return dr_metalib_source_element_name(e);
+        }
+    }
+
+    return NULL;
+}
+
 static void dr_metalib_source_do_analize(dr_metalib_source_t source, const void * buf, size_t bufSize) {
     if(source->m_format == dr_metalib_source_format_xml) {
         dr_metalib_source_analize_xml(
-            source->m_builder,
+            source,
             source->m_builder->m_inbuild_lib,
             buf, bufSize,
             source->m_builder->m_em);

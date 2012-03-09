@@ -1,3 +1,4 @@
+#include "../dr_builder_ops.h"
 #include "BuilderTest.hpp"
 
 class SourceBasicTest : public BuilderTest {
@@ -34,7 +35,7 @@ TEST_F(SourceBasicTest, add_include_file_with_name) {
     EXPECT_STREQ("c", dr_metalib_source_name(using_source));
 }
 
-TEST_F(SourceBasicTest, id_includes_basic) {
+TEST_F(SourceBasicTest, it_includes_basic) {
     dr_metalib_source_t using1 =
         dr_metalib_source_add_include_file(m_source, "c", "b.xml", dr_metalib_source_from_depend);
     dr_metalib_source_t using2 =
@@ -48,13 +49,13 @@ TEST_F(SourceBasicTest, id_includes_basic) {
     EXPECT_TRUE(NULL == dr_metalib_source_next(&it));
 }
 
-TEST_F(SourceBasicTest, id_includes_empty) {
+TEST_F(SourceBasicTest, it_includes_empty) {
     struct dr_metalib_source_it it;
     dr_metalib_source_includes(&it, m_source);
     EXPECT_TRUE(NULL == dr_metalib_source_next(&it));
 }
 
-TEST_F(SourceBasicTest, id_include_by_basic) {
+TEST_F(SourceBasicTest, it_include_by_basic) {
 
     dr_metalib_source_t user1 = dr_metalib_builder_add_file(m_builder, NULL, "b.xml");
     dr_metalib_source_t user2 = dr_metalib_builder_add_file(m_builder, NULL, "c.xml");
@@ -70,8 +71,30 @@ TEST_F(SourceBasicTest, id_include_by_basic) {
     EXPECT_TRUE(NULL == dr_metalib_source_next(&it));
 }
 
-TEST_F(SourceBasicTest, id_include_by_empty) {
+TEST_F(SourceBasicTest, it_include_by_empty) {
     struct dr_metalib_source_it it;
     dr_metalib_source_include_by(&it, m_source);
+    EXPECT_TRUE(NULL == dr_metalib_source_next(&it));
+}
+
+TEST_F(SourceBasicTest, element_it_basic) {
+    struct dr_metalib_source_element_it it;
+
+    dr_metalib_source_element_t e1 =
+        dr_metalib_source_element_create(m_source, dr_metalib_source_element_type_macro, "b");
+    EXPECT_TRUE(e1);
+    dr_metalib_source_element_t e2 =
+        dr_metalib_source_element_create(m_source, dr_metalib_source_element_type_macro, "a");
+    EXPECT_TRUE(e2);
+
+    dr_metalib_source_elements(&it, m_source);
+    EXPECT_TRUE(e1 == dr_metalib_source_element_next(&it));
+    EXPECT_TRUE(e2 == dr_metalib_source_element_next(&it));
+    EXPECT_TRUE(NULL == dr_metalib_source_element_next(&it));
+}
+
+TEST_F(SourceBasicTest, element_it_empty) {
+    struct dr_metalib_source_element_it it;
+    dr_metalib_source_elements(&it, m_source);
     EXPECT_TRUE(NULL == dr_metalib_source_next(&it));
 }
