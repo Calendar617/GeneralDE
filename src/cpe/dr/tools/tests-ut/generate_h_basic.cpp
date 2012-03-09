@@ -11,12 +11,21 @@ TEST_F(GenerateTest, basic) {
         "</metalib>");
 
     EXPECT_STREQ(
-        "#ifndef DR_GENERATED_H_NET_A_INCLEDED\n"
-        "#define DR_GENERATED_H_NET_A_INCLEDED\n"
+        "#ifndef DR_GENERATED_H_net_a_INCLEDED\n"
+        "#define DR_GENERATED_H_net_a_INCLEDED\n"
+        "#include \"cpe/pal/pal_types.h\"\n"
         "\n"
         "#ifdef __cplusplus\n"
         "extern \"C\" {\n"
         "#endif\n"
+        "\n"
+        "#pragma pack(1)\n"
+        "\n"
+        "struct PkgHead {\n"
+        "    int8_t a1;\n"
+        "};\n"
+        "\n"
+        "#pragma pack()\n"
         "\n"
         "#ifdef __cplusplus\n"
         "}\n"
