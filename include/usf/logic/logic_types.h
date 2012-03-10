@@ -38,11 +38,11 @@ typedef enum logic_require_state {
     , logic_require_state_canceled
 } logic_require_state_t;
 
-typedef enum logic_executor_type {
-    logic_executor_type_basic
-    , logic_executor_type_group
-    , logic_executor_type_decorate
-} logic_executor_type_t;
+typedef enum logic_executor_category {
+    logic_executor_category_basic
+    , logic_executor_category_group
+    , logic_executor_category_decorate
+} logic_executor_category_t;
 
 typedef struct logic_manage * logic_manage_t;
 typedef struct logic_context * logic_context_t;
@@ -51,6 +51,8 @@ typedef struct logic_require * logic_require_t;
 typedef struct logic_require_type * logic_require_type_t;
 
 typedef struct logic_executor * logic_executor_t;
+typedef struct logic_executor_type * logic_executor_type_t;
+typedef struct logic_executor_type_group * logic_executor_type_group_t;
 
 typedef int32_t (*logic_op_fun_t) (logic_context_t ctx, void * user_data, cfg_t cfg);
 

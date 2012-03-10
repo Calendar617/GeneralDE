@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "cpe/pal/pal_string.h"
 #include "cpe/cfg/cfg_read.h"
-#include "usf/logic/logic_build.h"
+#include "usf/logic/logic_executor_build.h"
 #include "usf/logic/logic_executor.h"
 
 logic_executor_t

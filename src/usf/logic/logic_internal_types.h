@@ -95,7 +95,7 @@ struct logic_data {
     logic_manage_t m_mgr;                       \
     const char * m_name;                        \
     TAILQ_ENTRY(logic_executor) m_next;         \
-    logic_executor_type_t m_type
+    logic_executor_category_t m_category
 
 struct logic_executor {
     LOGIC_EXECUTOR_COMMON;
@@ -118,6 +118,15 @@ struct logic_executor_decorate {
 struct logic_executor_group {
     LOGIC_EXECUTOR_COMMON;
     logic_executor_list_t m_members;
+};
+
+struct logic_executor_type {
+    logic_executor_type_group_t m_group;
+};
+
+struct logic_executor_type_group {
+    mem_allocrator_t m_alloc;
+    gd_app_context_t m_app;
 };
 
 #ifdef __cplusplus

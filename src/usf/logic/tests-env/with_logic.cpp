@@ -6,7 +6,7 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cfg.h"
 #include "gd/app/tests-env/with_app.hpp"
-#include "usf/logic/logic_build.h"
+#include "usf/logic/logic_executor_build.h"
 #include "usf/logic/logic_data.h"
 #include "usf/logic/tests-env/with_logic.hpp"
 
