@@ -99,6 +99,10 @@ gd_nm_node_type_t gd_nm_node_type(gd_nm_node_t node) {
     return node->m_type;
 }
 
+const char * gd_nm_node_type_name(gd_nm_node_t node) {
+    return node->m_type ? node->m_type->name : NULL;
+}
+
 cpe_hash_string_t
 gd_nm_node_name_hs(gd_nm_node_t node) {
     return node->m_name;

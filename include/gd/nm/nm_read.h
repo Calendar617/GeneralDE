@@ -24,6 +24,9 @@ void * gd_nm_node_data(gd_nm_node_t node);
 int gd_nm_node_groups(gd_nm_node_it_t it, gd_nm_node_t node);
 gd_nm_node_t gd_nm_node_from_data(void * data);
 
+gd_nm_node_type_t gd_nm_node_type(gd_nm_node_t node);
+const char * gd_nm_node_type_name(gd_nm_node_t node);
+
 /*gruop operations*/
 int gd_nm_group_members(gd_nm_node_it_t it, gd_nm_node_t group);
 int gd_nm_group_member_count(gd_nm_node_t group);

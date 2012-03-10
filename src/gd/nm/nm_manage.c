@@ -84,3 +84,37 @@ int gd_nm_mgr_nodes(gd_nm_node_it_t it, gd_nm_mgr_t nmm) {
 
     return 0;
 }
+
+void gd_nm_mgr_free_nodes_with_type_name(gd_nm_mgr_t nmm, const char * type) {
+    struct gd_nm_node_it it;
+    gd_nm_node_t node;
+
+    gd_nm_mgr_nodes(&it, nmm);
+
+    while((node = gd_nm_node_next(&it))) {
+        gd_nm_node_t next = gd_nm_node_next(&it);;
+
+        if (strcmp(gd_nm_node_type_name(node), type) == 0) {
+            gd_nm_node_free(node);
+        }
+
+        node = next;
+    }
+}
+
+void gd_nm_mgr_free_nodes_with_type(gd_nm_mgr_t nmm, gd_nm_node_type_t type) {
+    struct gd_nm_node_it it;
+    gd_nm_node_t node;
+
+    gd_nm_mgr_nodes(&it, nmm);
+
+    while((node = gd_nm_node_next(&it))) {
+        gd_nm_node_t next = gd_nm_node_next(&it);;
+
+        if (node->m_type == type) {
+            gd_nm_node_free(node);
+        }
+
+        node = next;
+    }
+}
