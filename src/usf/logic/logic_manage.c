@@ -124,7 +124,21 @@ logic_manage_find(
     gd_app_context_t app,
     cpe_hash_string_t name)
 {
+    if (name == NULL) name = (cpe_hash_string_t)&s_logic_manager_default_name;
+
     gd_nm_node_t node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
+    return (logic_manage_t)gd_nm_node_data(node);
+}
+
+logic_manage_t
+logic_manage_find_nc(
+    gd_app_context_t app,
+    const char * name)
+{
+    if (name == NULL) return logic_manage_default(app);
+
+    gd_nm_node_t node = gd_nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
     if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
     return (logic_manage_t)gd_nm_node_data(node);
 }

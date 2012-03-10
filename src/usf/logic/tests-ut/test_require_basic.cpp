@@ -16,7 +16,7 @@ public:
         m_context = t_logic_context_create();
         EXPECT_TRUE(m_context);
 
-        m_require_type = logic_require_type_create(t_logic_manager(), "t1");
+        m_require_type = logic_require_type_create(t_logic_manage(), "t1");
         EXPECT_TRUE(m_require_type);
     }
 
@@ -48,13 +48,13 @@ TEST_F(RequireBasicTest, create_no_type) {
 TEST_F(RequireBasicTest, require_set_done_release) {
     logic_require_t require = create("t1");
     ASSERT_TRUE(require);
-    EXPECT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_TRUE(require == logic_require_find(t_logic_manage(), 0));
 
     EXPECT_EQ(logic_require_state_waiting, logic_require_state(require));
 
     logic_require_set_done(require);
 
-    EXPECT_TRUE(NULL == logic_require_find(t_logic_manager(), 0));
+    EXPECT_TRUE(NULL == logic_require_find(t_logic_manage(), 0));
 
     EXPECT_NE(logic_context_state_waiting, logic_context_state(m_context));
 }
@@ -64,13 +64,13 @@ TEST_F(RequireBasicTest, require_set_done_keep) {
 
     logic_require_t require = create("t1");
     ASSERT_TRUE(require);
-    EXPECT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_TRUE(require == logic_require_find(t_logic_manage(), 0));
 
     EXPECT_EQ(logic_require_state_waiting, logic_require_state(require));
 
     logic_require_set_done(require);
 
-    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    ASSERT_TRUE(require == logic_require_find(t_logic_manage(), 0));
     EXPECT_EQ(logic_require_state_done, logic_require_state(require));
 
     EXPECT_NE(logic_context_state_waiting, logic_context_state(m_context));
@@ -82,7 +82,7 @@ TEST_F(RequireBasicTest, require_set_done_from_error) {
     logic_require_t require = create("t1");
     logic_require_set_error(require);
 
-    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    ASSERT_TRUE(require == logic_require_find(t_logic_manage(), 0));
     EXPECT_EQ(logic_require_state_error, logic_require_state(require));
 
     logic_require_set_done(require);
@@ -95,7 +95,7 @@ TEST_F(RequireBasicTest, require_set_done_from_done) {
     logic_require_t require = create("t1");
     logic_require_set_done(require);
 
-    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    ASSERT_TRUE(require == logic_require_find(t_logic_manage(), 0));
     EXPECT_EQ(logic_require_state_done, logic_require_state(require));
 
     logic_require_set_done(require);
@@ -105,13 +105,13 @@ TEST_F(RequireBasicTest, require_set_done_from_done) {
 TEST_F(RequireBasicTest, require_set_error_release) {
     logic_require_t require = create("t1");
     ASSERT_TRUE(require);
-    EXPECT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_TRUE(require == logic_require_find(t_logic_manage(), 0));
 
     EXPECT_EQ(logic_require_state_waiting, logic_require_state(require));
 
     logic_require_set_error(require);
 
-    EXPECT_TRUE(NULL == logic_require_find(t_logic_manager(), 0));
+    EXPECT_TRUE(NULL == logic_require_find(t_logic_manage(), 0));
 
     EXPECT_NE(logic_context_state_waiting, logic_context_state(m_context));
 }
@@ -121,13 +121,13 @@ TEST_F(RequireBasicTest, require_set_error_keep) {
 
     logic_require_t require = create("t1");
     ASSERT_TRUE(require);
-    EXPECT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    EXPECT_TRUE(require == logic_require_find(t_logic_manage(), 0));
 
     EXPECT_EQ(logic_require_state_waiting, logic_require_state(require));
 
     logic_require_set_error(require);
 
-    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    ASSERT_TRUE(require == logic_require_find(t_logic_manage(), 0));
     EXPECT_EQ(logic_require_state_error, logic_require_state(require));
 
     EXPECT_NE(logic_context_state_waiting, logic_context_state(m_context));
@@ -139,7 +139,7 @@ TEST_F(RequireBasicTest, require_set_error_from_error) {
     logic_require_t require = create("t1");
     logic_require_set_error(require);
 
-    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    ASSERT_TRUE(require == logic_require_find(t_logic_manage(), 0));
     EXPECT_EQ(logic_require_state_error, logic_require_state(require));
 
     logic_require_set_error(require);
@@ -152,7 +152,7 @@ TEST_F(RequireBasicTest, require_set_error_from_done) {
     logic_require_t require = create("t1");
     logic_require_set_done(require);
 
-    ASSERT_TRUE(require == logic_require_find(t_logic_manager(), 0));
+    ASSERT_TRUE(require == logic_require_find(t_logic_manage(), 0));
     EXPECT_EQ(logic_require_state_done, logic_require_state(require));
 
     logic_require_set_error(require);

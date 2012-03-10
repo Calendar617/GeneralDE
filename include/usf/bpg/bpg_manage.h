@@ -16,13 +16,13 @@ bpg_manage_create(
 void bpg_manage_free(bpg_manage_t mgr);
 
 bpg_manage_t
-bpg_manage_find(
-    gd_app_context_t app,
-    cpe_hash_string_t name);
+bpg_manage_find(gd_app_context_t app, cpe_hash_string_t name);
 
 bpg_manage_t
-bpg_manage_default(
-    gd_app_context_t app);
+bpg_manage_find_nc(gd_app_context_t app, const char * name);
+
+bpg_manage_t
+bpg_manage_default(gd_app_context_t app);
 
 gd_app_context_t bpg_manage_app(bpg_manage_t mgr);
 const char * bpg_manage_name(bpg_manage_t mgr);

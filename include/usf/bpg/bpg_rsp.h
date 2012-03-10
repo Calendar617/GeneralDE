@@ -7,6 +7,7 @@ extern "C" {
 #endif
 
 bpg_rsp_t bpg_rsp_create(bpg_manage_t mgr, cfg_t cfg);
+void bpg_rsp_free(bpg_rsp_t rsp);
 
 const char * bpg_rsp_name(bpg_rsp_t rsp);
 cpe_hash_string_t bpg_rsp_name_hs(bpg_rsp_t rsp);

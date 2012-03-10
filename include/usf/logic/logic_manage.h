@@ -17,13 +17,13 @@ logic_manage_create(
 void logic_manage_free(logic_manage_t mgr);
 
 logic_manage_t
-logic_manage_find(
-    gd_app_context_t app,
-    cpe_hash_string_t name);
+logic_manage_find(gd_app_context_t app, cpe_hash_string_t name);
 
 logic_manage_t
-logic_manage_default(
-    gd_app_context_t app);
+logic_manage_find_nc(gd_app_context_t app, const char * name);
+
+logic_manage_t
+logic_manage_default(gd_app_context_t app);
 
 gd_app_context_t logic_manage_app(logic_manage_t mgr);
 const char * logic_manage_name(logic_manage_t mgr);

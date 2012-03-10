@@ -4,7 +4,7 @@
 class RequireRunTest : public RunTest {
 public:
     logic_require_t require_find() {
-        return logic_require_find(t_logic_manager(), 0);
+        return logic_require_find(t_logic_manage(), 0);
     }
 
     void cancel_require(void) { logic_require_cancel(require_find()); }
@@ -88,7 +88,7 @@ TEST_F(RequireRunTest, auto_commit_for_free) {
     EXPECT_EQ(logic_context_state_waiting, state());
 
     expect_commit();
-    logic_require_free(logic_require_find(t_logic_manager(), 0));
+    logic_require_free(logic_require_find(t_logic_manage(), 0));
 }
 
 TEST_F(RequireRunTest, auto_commit_cancel_release) {

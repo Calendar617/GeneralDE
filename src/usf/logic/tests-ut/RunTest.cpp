@@ -10,7 +10,7 @@ RunTest::RunTest()
 
 void RunTest::SetUp() {
     LogicTest::SetUp();
-    logic_require_type_create(t_logic_manager(), "r1");
+    logic_require_type_create(t_logic_manage(), "r1");
     m_context = t_logic_context_create();
     set_commit(m_context, m_commitMock);
 }

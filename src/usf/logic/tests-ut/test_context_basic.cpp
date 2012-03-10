@@ -11,7 +11,7 @@ TEST_F(ContextBasicTest, defaults) {
     EXPECT_EQ((uint32_t)0, logic_context_flags(context));
 
     EXPECT_EQ(logic_context_state_init, logic_context_state(context));
-    EXPECT_TRUE(logic_context_mgr(context) == t_logic_manager());
+    EXPECT_TRUE(logic_context_mgr(context) == t_logic_manage());
     EXPECT_TRUE(logic_context_app(context) == t_app());
     EXPECT_EQ((int32_t)0, logic_context_errno(context));
     EXPECT_EQ((size_t)123, logic_context_capacity(context));
@@ -51,7 +51,7 @@ TEST_F(ContextBasicTest, auto_id_basic) {
 
 TEST_F(ContextBasicTest, id_duplicate) {
     t_logic_context_create(0, (logic_context_id_t)0);
-    EXPECT_TRUE(NULL == logic_context_create(t_logic_manager(), 0, 0));
+    EXPECT_TRUE(NULL == logic_context_create(t_logic_manage(), 0, 0));
 }
 
 TEST_F(ContextBasicTest, id_auto_try_max) {
@@ -59,7 +59,7 @@ TEST_F(ContextBasicTest, id_auto_try_max) {
         t_logic_context_create(0, (logic_context_id_t)i);
     }
 
-    EXPECT_TRUE(NULL == logic_context_create(t_logic_manager(), INVALID_LOGIC_CONTEXT_ID, 0));
+    EXPECT_TRUE(NULL == logic_context_create(t_logic_manage(), INVALID_LOGIC_CONTEXT_ID, 0));
 }
 
 TEST_F(ContextBasicTest, state_error_by_errno) {

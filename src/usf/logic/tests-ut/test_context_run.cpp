@@ -119,7 +119,7 @@ TEST_F(ContextRunTest, waiting_basic) {
     EXPECT_EQ(logic_context_state_waiting, state());
     EXPECT_EQ((int32_t)0, rv());
 
-    logic_require_free(logic_require_find(t_logic_manager(), 0));
+    logic_require_free(logic_require_find(t_logic_manage(), 0));
 
     expect_return(op2, 123);
     expect_commit();
@@ -137,7 +137,7 @@ TEST_F(ContextRunTest, waiting_no_left_op) {
     EXPECT_EQ(logic_context_state_waiting, state());
     EXPECT_EQ((int32_t)0, rv());
 
-    logic_require_free(logic_require_find(t_logic_manager(), 0));
+    logic_require_free(logic_require_find(t_logic_manage(), 0));
 
     /*retry*/
     expect_commit();

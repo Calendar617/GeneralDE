@@ -63,19 +63,29 @@ void bpg_manage_free(bpg_manage_t mgr) {
 }
 
 bpg_manage_t
-bpg_manage_find(
-    gd_app_context_t app,
-    cpe_hash_string_t name)
-{
-    gd_nm_node_t node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
+bpg_manage_find(gd_app_context_t app, cpe_hash_string_t name) {
+    gd_nm_node_t node;
+
+    if (name == NULL) name = (cpe_hash_string_t)&s_bpg_manager_default_name;
+
+    node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
     if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_bpg_manage) return NULL;
     return (bpg_manage_t)gd_nm_node_data(node);
 }
 
 bpg_manage_t
-bpg_manage_default(
-    gd_app_context_t app)
-{
+bpg_manage_find_nc(gd_app_context_t app, const char * name) {
+    gd_nm_node_t node;
+
+    if (name == NULL) return bpg_manage_default(app);
+
+    node = gd_nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
+    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_bpg_manage) return NULL;
+    return (bpg_manage_t)gd_nm_node_data(node);
+}
+
+bpg_manage_t
+bpg_manage_default(gd_app_context_t app) {
     return bpg_manage_find(app, (cpe_hash_string_t)&s_bpg_manager_default_name);
 }
 

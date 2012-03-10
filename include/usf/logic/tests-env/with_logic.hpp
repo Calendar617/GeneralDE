@@ -15,8 +15,7 @@ public:
     void SetUp();
     void TearDown();
 
-    logic_manage_t t_logic_manager(void);
-
+    logic_manage_t t_logic_manage(const char * name = NULL);
 
     logic_context_t t_logic_context_create(
         size_t capacity = 0, logic_require_id_t id = INVALID_LOGIC_CONTEXT_ID);
@@ -43,9 +42,6 @@ public:
     logic_executor_t t_logic_executor_build(const char * cfg, const char * group_name = 0, error_monitor_t em = 0);
 
     const char * t_logic_executor_dump(logic_executor_t executor);
-
-private:
-    logic_manage_t m_logic_manager;
 };
 
 }}}

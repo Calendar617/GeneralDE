@@ -6,6 +6,8 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cfg.h"
 #include "gd/app/tests-env/with_app.hpp"
+#include "gd/nm/nm_read.h"
+#include "gd/nm/nm_manage.h"
 #include "usf/logic/logic_executor_build.h"
 #include "usf/logic/logic_executor_type.h"
 #include "usf/logic/logic_data.h"
@@ -13,34 +15,40 @@
 
 namespace usf { namespace logic { namespace testenv {
 
-with_logic::with_logic() : m_logic_manager(NULL) {
+with_logic::with_logic() {
 }
 
 void with_logic::SetUp() {
-    m_logic_manager =
-        logic_manage_create(
-            envOf<gd::app::testenv::with_app>().t_app(),
-            0,
-            t_allocrator());
-    EXPECT_TRUE(m_logic_manager) << "logic_manager create fail!";
 }
 
 void with_logic::TearDown() {
-    if (m_logic_manager) {
-        logic_manage_free(m_logic_manager);
-        m_logic_manager = 0;
-    }
+    gd_nm_mgr_free_nodes_with_type_name(
+        envOf<gd::app::testenv::with_app>().t_nm(),
+        "usf_logic_manage");
+
+    gd_nm_mgr_free_nodes_with_type_name(
+        envOf<gd::app::testenv::with_app>().t_nm(),
+        "usf_logic_executor_type_group");
 }
 
 logic_manage_t
-with_logic::t_logic_manager(void) {
-    EXPECT_TRUE(m_logic_manager) << "logic_manager not create!";
-    return m_logic_manager;
+with_logic::t_logic_manage(const char * name) {
+    logic_manage_t mgr = logic_manage_find_nc(envOf<gd::app::testenv::with_app>().t_app(), name);
+    if (mgr == NULL) {
+        mgr =
+            logic_manage_create(
+                envOf<gd::app::testenv::with_app>().t_app(),
+                name,
+                t_allocrator());
+        EXPECT_TRUE(mgr) << "logic_manager create fail!";
+    }
+
+    return mgr;
 }
 
 logic_context_t
 with_logic::t_logic_context_create(size_t capacity, logic_require_id_t id) {
-    logic_context_t ctx = logic_context_create(t_logic_manager(), id, capacity);
+    logic_context_t ctx = logic_context_create(t_logic_manage(), id, capacity);
     EXPECT_TRUE(ctx) << "create logic context fail, capacity=" << capacity << ", id=" << id << "!";
     return ctx;
 }
@@ -108,11 +116,11 @@ void with_logic::t_logic_execute(logic_context_t context, logic_executor_t execu
 }
 
 logic_context_t with_logic::t_logic_context_find(logic_context_id_t id) {
-    return logic_context_find(t_logic_manager(), id);
+    return logic_context_find(t_logic_manage(), id);
 }
 
 logic_context_t with_logic::t_logic_context(logic_context_id_t id) {
-    logic_context_t ctx = logic_context_find(t_logic_manager(), id);
+    logic_context_t ctx = logic_context_find(t_logic_manage(), id);
 
     EXPECT_TRUE(ctx) << "logic context " << id << " not exist!";
     if (ctx == 0) throw ::std::runtime_error("logic context not exist!");
@@ -147,7 +155,7 @@ with_logic::t_logic_executor_build(cfg_t cfg, const char * group_name, error_mon
         }
     }
 
-    return logic_executor_build(t_logic_manager(), cfg, t_logic_executor_type_group(group_name), em);
+    return logic_executor_build(t_logic_manage(), cfg, t_logic_executor_type_group(group_name), em);
 }
 
 logic_executor_t
