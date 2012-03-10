@@ -5,6 +5,7 @@
 #include "gd/app/app_context.h"
 #include "usf/logic/logic_executor.h"
 #include "usf/logic/logic_executor_build.h"
+#include "usf/logic/logic_executor_type.h"
 #include "usf/bpg/bpg_rsp.h"
 #include "usf/bpg/bpg_manage.h"
 #include "bpg_internal_ops.h"
@@ -21,6 +22,8 @@ bpg_rsp_t bpg_rsp_create(bpg_manage_t mgr, cfg_t cfg) {
     gd_nm_node_t rsp_node;
     const char * name;
     cfg_t cfg_executor;
+    const char * group_name;
+    logic_executor_type_group_t type_group;
 
     assert(mgr);
     if (cfg == 0) return NULL;
@@ -31,9 +34,18 @@ bpg_rsp_t bpg_rsp_create(bpg_manage_t mgr, cfg_t cfg) {
         return NULL;
     }
 
+    group_name = cfg_get_string(cfg, "operations-from", NULL);
+    type_group = logic_executor_type_group_find_nc(mgr->m_app, group_name);
+    if (type_group == NULL) {
+        CPE_ERROR(
+            mgr->m_em, "%s: create rsp %s: executor_type_group '%s' not exist! (read from operations-from)",
+            bpg_manage_name(mgr), name, (group_name ? group_name : "default")) ;
+        return NULL;
+    }
+
     cfg_executor = cfg_find_cfg(cfg, "operations");
     if (cfg_executor == NULL) {
-        CPE_ERROR(mgr->m_em, "%s: create rsp %s: no executor configured!", bpg_manage_name(mgr), name) ;
+        CPE_ERROR(mgr->m_em, "%s: create rsp %s: no executor configured! (read from operations)", bpg_manage_name(mgr), name) ;
         return NULL;
     }
 
@@ -47,7 +59,15 @@ bpg_rsp_t bpg_rsp_create(bpg_manage_t mgr, cfg_t cfg) {
     rsp->m_mgr = mgr;
     rsp->m_flags = 0;
 
-    rsp->m_executor = NULL;
+    rsp->m_executor = logic_executor_build(
+        mgr->m_logic_mgr,
+        cfg_executor,
+        type_group,
+        mgr->m_em);
+    if (rsp->m_executor == NULL) {
+        CPE_ERROR(mgr->m_em, "%s: create rsp %s: create executor fail!", bpg_manage_name(mgr), name) ;
+        return NULL;
+    }
 
     if (cfg_get_int32(cfg, "debug", 0)) bpg_rsp_flag_enable(rsp, bpg_rsp_flag_debug);
 

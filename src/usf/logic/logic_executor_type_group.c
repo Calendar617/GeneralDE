@@ -74,7 +74,22 @@ logic_executor_type_group_find(
     gd_app_context_t app,
     cpe_hash_string_t name)
 {
-    gd_nm_node_t node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    gd_nm_node_t node;
+
+    if (name == NULL) name = logic_executor_type_group_dft_name;
+
+    node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_executor_type_group) return NULL;
+    return (logic_executor_type_group_t)gd_nm_node_data(node);
+}
+
+logic_executor_type_group_t
+logic_executor_type_group_find_nc(gd_app_context_t app, const char * name) {
+    gd_nm_node_t node;
+
+    if (name == NULL) logic_executor_type_group_default(app);
+
+    node = gd_nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
     if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_executor_type_group) return NULL;
     return (logic_executor_type_group_t)gd_nm_node_data(node);
 }

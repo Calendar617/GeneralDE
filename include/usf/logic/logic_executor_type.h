@@ -18,9 +18,9 @@ logic_executor_type_group_create(
 void logic_executor_type_group_free(logic_executor_type_group_t group);
 
 logic_executor_type_group_t
-logic_executor_type_group_find(
-    gd_app_context_t app,
-    cpe_hash_string_t name);
+logic_executor_type_group_find(gd_app_context_t app, cpe_hash_string_t name);
+logic_executor_type_group_t
+logic_executor_type_group_find_nc(gd_app_context_t app, const char * name);
 
 logic_executor_type_group_t
 logic_executor_type_group_default(
