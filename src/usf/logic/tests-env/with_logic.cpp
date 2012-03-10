@@ -18,8 +18,8 @@ with_logic::with_logic() : m_logic_manager(NULL) {
 void with_logic::SetUp() {
     m_logic_manager =
         logic_manage_create(
-            0,
             envOf<gd::app::testenv::with_app>().t_app(),
+            0,
             t_allocrator());
     EXPECT_TRUE(m_logic_manager) << "logic_manager create fail!";
 }

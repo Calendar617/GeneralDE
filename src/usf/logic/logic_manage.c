@@ -18,8 +18,8 @@ struct gd_nm_node_type s_nm_node_type_logic_manage = {
 
 logic_manage_t
 logic_manage_create(
-    const char * name,
     gd_app_context_t app,
+    const char * name,
     mem_allocrator_t alloc)
 {
     logic_manage_t mgr;
@@ -153,7 +153,7 @@ EXPORT_DIRECTIVE
 int logic_manager_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
     logic_manage_t logic_manager;
 
-    logic_manager = logic_manage_create(gd_app_module_name(module), app, gd_app_alloc(app));
+    logic_manager = logic_manage_create(app, gd_app_module_name(module), gd_app_alloc(app));
     if (logic_manager == NULL) return -1;
 
     return 0;

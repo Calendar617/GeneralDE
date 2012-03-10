@@ -10,8 +10,8 @@ extern "C" {
 
 logic_manage_t
 logic_manage_create(
-    const char * name,
     gd_app_context_t app,
+    const char * name,
     mem_allocrator_t alloc);
 
 void logic_manage_free(logic_manage_t mgr);
