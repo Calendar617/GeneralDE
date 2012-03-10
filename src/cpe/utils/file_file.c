@@ -274,3 +274,13 @@ file_name_base(const char * input, mem_buffer_t tbuf) {
         return r;
     }
 }
+
+const char * file_name_append_base(mem_buffer_t tbuf, const char * input) {
+    if (mem_buffer_size(tbuf) == 0) {
+        return file_name_base(input, tbuf);
+    }
+    else {
+        mem_buffer_set_size(tbuf, mem_buffer_size(tbuf) - 1);
+        return file_name_base(input, tbuf);
+    }
+}

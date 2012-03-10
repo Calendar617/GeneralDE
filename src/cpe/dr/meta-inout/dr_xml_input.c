@@ -11,6 +11,7 @@
 #include "dr_inbuild.h"
 #include "dr_inbuild_error.h"
 #include "dr_XMLtags.h"
+#include "dr_builder_ops.h"
 
 enum DRXmlParseState {
     PS_Init
@@ -43,6 +44,7 @@ enum DRXmlParseState {
         &ctx->m_metaLib->m_tmp_buf, (char const *)valueBegin, len);
 
 struct DRXmlParseCtx {
+    dr_metalib_source_t m_source;
     struct DRInBuildMetaLib * m_metaLib;
     struct DRInBuildMeta * m_curentMeta;
     enum DRXmlParseState m_state;
@@ -126,6 +128,11 @@ static void dr_build_xml_process_metalib(
         DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_METALIB_ROOT_NO_NAME);
     }
 
+    if (ctx->m_source) {
+        dr_metalib_source_element_create(
+            ctx->m_source, dr_metalib_source_element_type_lib, ctx->m_metaLib->m_data.szName);
+    }
+
     ctx->m_state = PS_InMetaLib;
 }
 
@@ -207,6 +214,11 @@ static void dr_build_xml_process_macro(
 
     if (haveError) {
         dr_inbuild_metalib_remove_macro(ctx->m_metaLib, newMacro);
+    }
+    else {
+        if (ctx->m_source) {
+            dr_metalib_source_element_create(ctx->m_source, dr_metalib_source_element_type_macro, newMacro->m_name);
+        }
     }
 }
 
@@ -315,6 +327,10 @@ static void dr_build_xml_process_meta(
 
     ctx->m_state = PS_InMeta;
     ctx->m_curentMeta = newMeta;
+
+    if (ctx->m_source) {
+        dr_metalib_source_element_create(ctx->m_source, dr_metalib_source_element_type_meta, newMeta->m_name);
+    }
 }
 
 static void dr_build_xml_process_entry(
@@ -590,10 +606,6 @@ void dr_build_xml_parse_ctx_init(struct DRXmlParseCtx * ctx) {
 }
 
 void dr_build_xml_parse_ctx_clear(struct DRXmlParseCtx * ctx) {
-    if (ctx->m_metaLib) {
-        dr_inbuild_free_lib(ctx->m_metaLib);
-        ctx->m_metaLib = NULL;
-    }
 }
 
 int  dr_create_lib_from_xml(
@@ -607,6 +619,30 @@ int  dr_create_lib_from_xml(
     return dr_create_lib_from_xml_ex(buffer, buf, bufSize, &em);
 }
 
+void dr_metalib_source_analize_xml(
+    dr_metalib_source_t source,
+    struct DRInBuildMetaLib * inbuild_lib,
+    const void * buf,
+    int bufSize,
+    error_monitor_t em)
+{
+    xmlParserCtxtPtr parseCtx = NULL;
+    struct DRXmlParseCtx ctx;
+
+    dr_build_xml_parse_ctx_init(&ctx);
+
+    ctx.m_metaLib = inbuild_lib;
+    ctx.m_em = em;
+    ctx.m_source = source;
+
+    parseCtx = xmlCreatePushParserCtxt(&g_dr_xml_handler, &ctx, buf, bufSize, NULL);
+
+    xmlParseChunk(parseCtx, NULL, 0, 1);
+    xmlFreeParserCtxt(parseCtx);
+
+    dr_build_xml_parse_ctx_clear(&ctx);
+}
+
 void dr_create_lib_from_xml_ex_i(
     mem_buffer_t buffer,
     const char* buf,
@@ -614,26 +650,19 @@ void dr_create_lib_from_xml_ex_i(
     int * ret,
     error_monitor_t em)
 {
-    xmlParserCtxtPtr parseCtx = NULL;
-    struct DRXmlParseCtx ctx;
+    struct DRInBuildMetaLib * inbuild_lib;
 
-    dr_build_xml_parse_ctx_init(&ctx);
-    ctx.m_metaLib = dr_inbuild_create_lib();
-    if (ctx.m_metaLib == NULL) {
+    inbuild_lib = dr_inbuild_create_lib();
+    if (inbuild_lib == NULL) {
         *ret = -1;
         return;
     }
 
-    ctx.m_em = em;
+    dr_metalib_source_analize_xml(NULL, inbuild_lib, buf, bufSize, em);
 
-    parseCtx = xmlCreatePushParserCtxt(&g_dr_xml_handler, &ctx, buf, bufSize, NULL);
+    dr_inbuild_build_lib(buffer, inbuild_lib, em);
 
-    xmlParseChunk(parseCtx, NULL, 0, 1);
-    xmlFreeParserCtxt(parseCtx);
-
-    dr_inbuild_build_lib(buffer, ctx.m_metaLib, em);
-
-    dr_build_xml_parse_ctx_clear(&ctx);
+    dr_inbuild_free_lib(inbuild_lib);
 }
 
 int dr_create_lib_from_xml_ex(
