@@ -1,16 +1,21 @@
 #include <stdexcept>
 #include "usf/logic/logic_require_type.h"
+#include "usf/logic/logic_executor_type.h"
 #include "LogicTest.hpp"
 
 void LogicTest::SetUp() {
     Base::SetUp();
+    t_em_set_print();
 }
 
 void LogicTest::TearDown() {
-    for(LogicOpContainer::iterator it = m_ops.begin(); it != m_ops.end(); ++it) {
-        delete it->second;
+    logic_executor_type_it it;
+    logic_executor_type_group_types(&it, t_logic_executor_type_group(NULL));
+
+    while(logic_executor_type_t type = logic_executor_type_next(&it)) {
+        delete (LogicTest::LogicOpMock*)logic_executor_type_ctx(type);
+        logic_executor_type_bind_basic(type, NULL, NULL);
     }
-    m_ops.clear();
 
     Base::TearDown();
 }
@@ -20,48 +25,38 @@ static int32_t execute_fun (logic_context_t ctx, void * user_data, cfg_t cfg) {
     return op->execute(ctx);
 }
 
-static logic_executor_t build_fun(
-    logic_manage_t mgr, const char * name, void * ctx,
-    cfg_t args,
-    error_monitor_t em)
-{
-    LogicTest::LogicOpContainer * ops = (LogicTest::LogicOpContainer *)ctx;
-
-    LogicTest::LogicOpContainer::iterator pos = ops->find(name);
-    if (pos == ops->end()) return NULL;
-    
-    return logic_executor_basic_create(mgr, name, execute_fun, pos->second, args);
-}
-
-logic_executor_t
-LogicTest::t_logic_executor_build(const char * cfg) {
-    return t_logic_executor_build(cfg, build_fun, &m_ops, NULL);
-}
-
 LogicTest::LogicOpMock &
 LogicTest::installOp(const char * name) {
-    LogicOpContainer::iterator pos = m_ops.find(name);
+    logic_executor_type_group_t group = t_logic_executor_type_group(NULL);
 
-    EXPECT_TRUE(pos == m_ops.end()) << "logic op " << name << " already exist!";
-    if (pos != m_ops.end()) return *pos->second;
+    logic_executor_type_t type = logic_executor_type_find(group, name);
+    EXPECT_TRUE(type == NULL) << "logic op " << name << " already exist!";
+    if (type) {
+        return *(LogicTest::LogicOpMock*)logic_executor_type_ctx(type);
+    }
 
-    pos = m_ops.insert(LogicOpContainer::value_type(name, new LogicOpMock)).first;
+    type = logic_executor_type_create(group, name, logic_executor_category_basic);
+    EXPECT_TRUE(type != NULL) << "logic op " << name << " create fail";
+    if (type == NULL) {
+        throw ::std::runtime_error("logic op not exist!");
+    }
 
-    return *pos->second;
+    EXPECT_EQ(0, logic_executor_type_bind_basic(type, execute_fun, new LogicOpMock));
+
+    return *(LogicTest::LogicOpMock*)logic_executor_type_ctx(type);
 }
 
 LogicTest::LogicOpMock &
 LogicTest::op(const char * name) {
-    LogicOpContainer::iterator pos = m_ops.find(name);
+    logic_executor_type_group_t group = t_logic_executor_type_group(NULL);
 
-    EXPECT_TRUE(pos != m_ops.end()) << "logic op " << name << " not exist!";
-    
-    if (pos != m_ops.end()) {
+    logic_executor_type_t type = logic_executor_type_find(group, name);
+    EXPECT_TRUE(type) << "logic op " << name << " not exist!";
+    if (type == NULL) {
         throw ::std::runtime_error("logic op not exist!");
     }
-    else {
-        return *pos->second;
-    }
+
+    return *(LogicTest::LogicOpMock*)logic_executor_type_ctx(type);
 }
 
 static void commit_to_mock(logic_context_t ctx, void * user_data) {

@@ -42,6 +42,13 @@ void logic_stack_push(struct logic_stack * stack, logic_context_t context, logic
     
 void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_context_t ctx);
 
+/*executor type ops*/
+uint32_t logic_executor_type_hash(const struct logic_executor_type * type);
+int logic_executor_type_cmp(const struct logic_executor_type * l, const struct logic_executor_type * r);
+void logic_executor_type_free_all(logic_executor_type_group_t group);
+
+void logic_executor_type_init_defaults(logic_executor_type_group_t group);
+
 #ifdef __cplusplus
 }
 #endif

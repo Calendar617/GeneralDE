@@ -14,11 +14,6 @@ public:
     static LogicOp const & get(Gd::App::Application & app, cpe_hash_string_t name);
     static LogicOp const & get(Gd::App::Application & app, const char * name);
 
-    static logic_executor_t
-    create_executor(logic_manage_t mgr, LogicOp const & op, cfg_t args);
-
-    static logic_executor_t builder(logic_manage_t mgr, const char * name, void * ctx, cfg_t args, error_monitor_t em);
-
 private:
     execute_fun m_exec_fun;
 
@@ -29,6 +24,7 @@ template<typename OutT, typename ContextT>
 class LogicOpDef : public LogicOp {
 public:
     LogicOpDef() : LogicOp((execute_fun)&LogicOpDef::execute) {}
+    ~LogicOpDef();
 
     virtual void execute(
         ContextT & context,

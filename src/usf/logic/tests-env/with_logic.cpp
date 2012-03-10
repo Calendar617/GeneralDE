@@ -7,6 +7,7 @@
 #include "cpe/dr/dr_cfg.h"
 #include "gd/app/tests-env/with_app.hpp"
 #include "usf/logic/logic_executor_build.h"
+#include "usf/logic/logic_executor_type.h"
 #include "usf/logic/logic_data.h"
 #include "usf/logic/tests-env/with_logic.hpp"
 
@@ -119,21 +120,40 @@ logic_context_t with_logic::t_logic_context(logic_context_id_t id) {
     return ctx;
 }
 
+logic_executor_type_group_t
+with_logic::t_logic_executor_type_group(const char * group_name) {
+    logic_executor_type_group_t group = NULL;
+    if (group_name == 0) {
+        group = logic_executor_type_group_default(envOf<gd::app::testenv::with_app>().t_app());
+    }
+    else {
+        group = logic_executor_type_group_find(
+            envOf<gd::app::testenv::with_app>().t_app(),
+            cpe_hs_create(t_tmp_allocrator(), group_name));
+    }
+
+    if (group == NULL) {
+        group = logic_executor_type_group_create(envOf<gd::app::testenv::with_app>().t_app(), NULL, t_tmp_allocrator());
+    }
+
+    return group;
+}
+
 logic_executor_t
-with_logic::t_logic_executor_build(cfg_t cfg, logic_executor_build_fun_t fun, void * ctx, error_monitor_t em) {
+with_logic::t_logic_executor_build(cfg_t cfg, const char * group_name, error_monitor_t em) {
     if (em == 0) {
         if (utils::testenv::with_em * with_em = tryEnvOf<utils::testenv::with_em>()) {
             em = with_em->t_em();
         }
     }
 
-    return logic_executor_build(t_logic_manager(), cfg, fun, ctx, em);
+    return logic_executor_build(t_logic_manager(), cfg, t_logic_executor_type_group(group_name), em);
 }
 
 logic_executor_t
-with_logic::t_logic_executor_build(const char * cfg, logic_executor_build_fun_t fun, void * ctx, error_monitor_t em) {
+with_logic::t_logic_executor_build(const char * cfg, const char * group_name, error_monitor_t em) {
     return t_logic_executor_build(
-        envOf<cpe::cfg::testenv::with_cfg>().t_cfg_parse(cfg), fun, ctx, em);
+        envOf<cpe::cfg::testenv::with_cfg>().t_cfg_parse(cfg), group_name, em);
 }
 
 const char *

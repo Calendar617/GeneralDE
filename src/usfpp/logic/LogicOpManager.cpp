@@ -63,7 +63,7 @@ LogicOpManager::createContext(
 
 LogicOpManager &
 LogicOpManager::install(gd_app_context_t app, mem_allocrator_t alloc, const char * name) {
-    logic_manage_t manager = logic_manage_create(name, app, alloc);
+    logic_manage_t manager = logic_manage_create(app, name, alloc);
     if (manager == 0) {
         APP_CTX_THROW_EXCEPTION(
             app,

@@ -62,7 +62,7 @@ typedef enum logic_context_decorate_tag {
 } logic_context_decorate_tag_t;
 typedef int32_t (*logic_decorate_fun_t) (logic_context_t ctx, logic_context_decorate_tag_t tag, void * user_data);
 
-typedef logic_executor_t (*logic_executor_build_fun_t) (
+typedef logic_executor_t (*logic_executor_create_fun_t) (
     logic_manage_t mgr, const char * name, void * ctx,
     cfg_t args,
     error_monitor_t em);
@@ -70,6 +70,11 @@ typedef logic_executor_t (*logic_executor_build_fun_t) (
 typedef void (*logic_context_commit_fun_t) (logic_context_t ctx, void * user_data);
 
 typedef void (*logic_require_type_trigger_t) (logic_require_t require, void * user_data);
+
+typedef struct logic_executor_type_it {
+    logic_executor_type_t (*next)(struct logic_executor_type_it * it);
+    char m_data[16];
+} * logic_executor_type_it_t;
 
 #ifdef __cplusplus
 }

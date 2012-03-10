@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "gd/app/app_context.h"
 #include "usf/logic/logic_context.h"
 #include "logic_internal_ops.h"
 
@@ -56,7 +57,7 @@ REINTER:
     assert(stack_item);
     stack_item->m_executr = executor;
 
-    if (executor->m_category == logic_executor_category_group) {
+    if (executor->m_type->m_category == logic_executor_category_group) {
         struct logic_executor_group * group = (struct logic_executor_group *)executor;
         if (!TAILQ_EMPTY(&group->m_members)) {
             executor = TAILQ_FIRST(&group->m_members);
@@ -80,16 +81,32 @@ void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_
 
         rv = 0;
 
-        if (stack_item->m_executr->m_category == logic_executor_category_basic) {
-            struct logic_executor_basic * basic = (struct logic_executor_basic *)stack_item->m_executr;
-            rv = basic->m_op(ctx, basic->m_ctx, basic->m_args);
-        }
-        else if (stack_item->m_executr->m_category == logic_executor_category_decorate) {
-            struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)stack_item->m_executr;
-            if (decorator->m_op(ctx, logic_context_decorate_begin, decorator->m_ctx) == 0) {
-                logic_stack_push(stack, ctx, decorator->m_inner);
-                continue;
+        if (stack_item->m_executr) {
+            if (stack_item->m_executr->m_type->m_category == logic_executor_category_basic) {
+                struct logic_executor_basic * basic = (struct logic_executor_basic *)stack_item->m_executr;
+                if (basic->m_type->m_op) {
+                    rv = ((logic_op_fun_t)basic->m_type->m_op)(ctx, basic->m_type->m_ctx, basic->m_args);
+                }
+                else {
+                    CPE_ERROR(gd_app_em(ctx->m_mgr->m_app), "logic_stack_exec: basic logic op %s have no op!", basic->m_type->m_name);
+                }
             }
+            else if (stack_item->m_executr->m_type->m_category == logic_executor_category_decorate) {
+                struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)stack_item->m_executr;
+                if (decorator->m_type->m_op) {
+                    if (((logic_decorate_fun_t)decorator->m_type->m_op)(ctx, logic_context_decorate_begin, decorator->m_type->m_ctx) == 0) {
+                        logic_stack_push(stack, ctx, decorator->m_inner);
+                        continue;
+                    }
+                }
+                else {
+                    CPE_ERROR(gd_app_em(ctx->m_mgr->m_app), "logic_stack_exec: decorator logic op %s have no op!", decorator->m_type->m_name);
+                }
+            }
+        }
+        else {
+            CPE_ERROR(gd_app_em(ctx->m_mgr->m_app), "stack item have no executor!");
+            rv = -1;
         }
 
         if (rv != 0) {
@@ -100,7 +117,7 @@ void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_
 
         while(stack->m_item_pos > stop_stack_pos) {
             struct logic_stack_item * stack_item = logic_stack_item_at(stack, stack->m_item_pos);
-            if (stack_item->m_executr->m_category == logic_executor_category_group) {
+            if (stack_item->m_executr->m_type->m_category == logic_executor_category_group) {
                 if (ctx->m_errno) {
                     --stack->m_item_pos;
                     continue;
@@ -114,9 +131,11 @@ void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_
                     }
                 }
             }
-            else if (stack_item->m_executr->m_category == logic_executor_category_decorate) {
+            else if (stack_item->m_executr->m_type->m_category == logic_executor_category_decorate) {
                 struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)stack_item->m_executr;
-                decorator->m_op(ctx, logic_context_decorate_end, decorator->m_ctx);
+                if (decorator->m_type->m_op) {
+                    ((logic_decorate_fun_t)decorator->m_type->m_op)(ctx, logic_context_decorate_end, decorator->m_type->m_ctx);
+                }
                 --stack->m_item_pos;
                 continue;
             }

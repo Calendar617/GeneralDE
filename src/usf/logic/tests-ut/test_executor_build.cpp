@@ -9,6 +9,7 @@ TEST_F(ExecutorBuildTest, basic_basic) {
 
     logic_executor_t executor =
           t_logic_executor_build("Op1");
+    ASSERT_TRUE(executor);
 
     EXPECT_STREQ(
         "Op1",
@@ -22,6 +23,7 @@ TEST_F(ExecutorBuildTest, basic_with_args) {
 
     logic_executor_t executor =
           t_logic_executor_build("Op1: { a1: 1, a2: 2}");
+    ASSERT_TRUE(executor);
 
     EXPECT_STREQ(
         "Op1: { a1=1, a2=2 }",
@@ -39,6 +41,7 @@ TEST_F(ExecutorBuildTest, group_basic) {
             "- Op1\n"
             "- Op2: { a1: 1, a2: 2 }\n"
             );
+    ASSERT_TRUE(executor);
 
     EXPECT_STREQ(
         "group:\n"
@@ -60,6 +63,7 @@ TEST_F(ExecutorBuildTest, group_group) {
             "-\n"
             "    - Op2: { a1: 1, a2: 2 }\n"
             );
+    ASSERT_TRUE(executor);
 
     EXPECT_STREQ(
         "group:\n"
@@ -78,6 +82,7 @@ TEST_F(ExecutorBuildTest, protected_basic) {
     logic_executor_t executor =
         t_logic_executor_build(
             "protect: Op1");
+    ASSERT_TRUE(executor);
 
     EXPECT_STREQ(
         "protect:\n"
@@ -94,6 +99,7 @@ TEST_F(ExecutorBuildTest, protected_group) {
         t_logic_executor_build(
             "protect:\n"
             "    - Op1");
+    ASSERT_TRUE(executor);
 
     EXPECT_STREQ(
         "protect:\n"

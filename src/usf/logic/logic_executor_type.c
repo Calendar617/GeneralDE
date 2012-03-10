@@ -5,100 +5,113 @@
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/logic/logic_executor_type.h"
+#include "usf/logic/logic_executor.h"
 #include "logic_internal_ops.h"
 
-static void logic_executor_type_group_clear(gd_nm_node_t node);
-
-static cpe_hash_string_buf s_logic_executor_type_groupr_default_name = CPE_HS_BUF_MAKE("logic_executor_type_groupr");
-
-struct gd_nm_node_type s_nm_node_type_logic_executor_type_group = {
-    "usf_logic_executor_type_group",
-    logic_executor_type_group_clear
-};
-
-logic_executor_type_group_t
-logic_executor_type_group_create(
-    gd_app_context_t app,
+logic_executor_type_t
+logic_executor_type_create(
+    logic_executor_type_group_t group,
     const char * name,
-    mem_allocrator_t alloc)
+    logic_executor_category_t category)
 {
-    logic_executor_type_group_t group;
-    gd_nm_node_t group_node;
+    logic_executor_type_t type;
+    size_t name_len;
+    void * buf;
 
-    if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_logic_executor_type_groupr_default_name);
+    name_len = strlen(name) + 1;
 
-    group_node = gd_nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct logic_executor_type_group));
-    if (group_node == NULL) return NULL;
+    buf = mem_alloc(group->m_alloc, sizeof(struct logic_executor_type) + name_len);
+    if (buf == NULL) return NULL;
 
-    group = (logic_executor_type_group_t)gd_nm_node_data(group_node);
-    group->m_alloc = alloc;
-    group->m_app = app;
-    gd_nm_node_set_type(group_node, &s_nm_node_type_logic_executor_type_group);
+    memcpy(buf, name, name_len);
 
-    return group;
+    type = (logic_executor_type_t)(buf + name_len);
+    type->m_group = group;
+    type->m_name = (char *)buf;
+    type->m_category = category;
+    type->m_op = NULL;
+    type->m_ctx = NULL;
+
+    cpe_hash_entry_init(&type->m_hh);
+    if (cpe_hash_table_insert_unique(&group->m_types, type) != 0) {
+        mem_free(group->m_alloc, buf);
+        return NULL;
+    }
+
+    return type;
 }
 
-static void logic_executor_type_group_clear(gd_nm_node_t node) {
-    logic_executor_type_group_t group;
-    group = (logic_executor_type_group_t)gd_nm_node_data(node);
+void logic_executor_type_free(logic_executor_type_t t) {
+    cpe_hash_table_remove_by_ins(&t->m_group->m_types, t);
+    mem_free(t->m_group->m_alloc, t);
 }
 
-void logic_executor_type_group_free(logic_executor_type_group_t group) {
-    gd_nm_node_t group_node;
-    assert(group);
+void logic_executor_type_free_all(logic_executor_type_group_t group) {
+    struct cpe_hash_it type_it;
+    logic_executor_type_t type;
 
-    group_node = gd_nm_node_from_data(group);
-    if (gd_nm_node_type(group_node) != &s_nm_node_type_logic_executor_type_group) return;
-    gd_nm_node_free(group_node);
+    cpe_hash_it_init(&type_it, &group->m_types);
+
+    type = cpe_hash_it_next(&type_it);
+    while(type) {
+        logic_executor_type_t next = cpe_hash_it_next(&type_it);
+        logic_executor_type_free(type);
+        type = next;
+    }
 }
 
-logic_executor_type_group_t
-logic_executor_type_group_find(
-    gd_app_context_t app,
-    cpe_hash_string_t name)
+logic_executor_type_t
+logic_executor_type_find(
+    logic_executor_type_group_t group,
+    const char * name)
 {
-    gd_nm_node_t node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_executor_type_group) return NULL;
-    return (logic_executor_type_group_t)gd_nm_node_data(node);
+    struct logic_executor_type key;
+    key.m_name = (char*)name;
+
+    return (logic_executor_type_t)cpe_hash_table_find(&group->m_types, &key);
 }
 
-logic_executor_type_group_t
-logic_executor_type_group_default(
-    gd_app_context_t app)
-{
-    return logic_executor_type_group_find(app, (cpe_hash_string_t)&s_logic_executor_type_groupr_default_name);
+const char * logic_executor_type_name(logic_executor_type_t type) {
+    return type->m_name;
 }
 
-gd_app_context_t logic_executor_type_group_app(logic_executor_type_group_t group) {
-    return group->m_app;
+void * logic_executor_type_ctx(logic_executor_type_t type) {
+    return type->m_ctx;
 }
 
-const char * logic_executor_type_group_name(logic_executor_type_group_t group) {
-    return gd_nm_node_name(gd_nm_node_from_data(group));
-}
+int logic_executor_type_bind_basic(logic_executor_type_t type, logic_op_fun_t fun, void * ctx) {
+    assert(type);
+    if (type->m_category != logic_executor_category_basic) return -1;
 
-cpe_hash_string_t
-logic_executor_type_group_name_hs(logic_executor_type_group_t group) {
-    return gd_nm_node_name_hs(gd_nm_node_from_data(group));
-}
-
-EXPORT_DIRECTIVE
-int logic_executor_type_groupr_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
-    logic_executor_type_group_t logic_executor_type_groupr;
-
-    logic_executor_type_groupr = logic_executor_type_group_create(app, gd_app_module_name(module), gd_app_alloc(app));
-    if (logic_executor_type_groupr == NULL) return -1;
+    type->m_op = fun;
+    type->m_ctx = ctx;
 
     return 0;
 }
 
-EXPORT_DIRECTIVE
-void logic_executor_type_groupr_app_fini(gd_app_context_t app, gd_app_module_t module) {
-    logic_executor_type_group_t logic_executor_type_groupr;
+int logic_executor_type_bind_decorate(logic_executor_type_t type, logic_decorate_fun_t fun, void * ctx) {
+    assert(type);
+    if (type->m_category != logic_executor_category_decorate) return -1;
 
-    logic_executor_type_groupr = logic_executor_type_group_find(app, gd_app_module_name_hs(module));
-    if (logic_executor_type_groupr) {
-        logic_executor_type_group_free(logic_executor_type_groupr);
-    }
+    type->m_op = fun;
+    type->m_ctx = ctx;
+
+    return 0;
 }
 
+uint32_t logic_executor_type_hash(const struct logic_executor_type * type) {
+    return cpe_hash_str(type->m_name, strlen(type->m_name));
+}
+
+int logic_executor_type_cmp(const struct logic_executor_type * l, const struct logic_executor_type * r) {
+    return strcmp(l->m_name, r->m_name) == 0;
+}
+
+void logic_executor_type_init_defaults(logic_executor_type_group_t group) {
+    logic_executor_type_create(group, "group", logic_executor_category_group);
+
+    logic_executor_type_bind_decorate(
+        logic_executor_type_create(group, "protect", logic_executor_category_decorate),
+        logic_executor_decorate_protect,
+        NULL);
+}

@@ -44,6 +44,7 @@ void RunTest::expect_return(LogicOpMock & op, int32_t rv) {
 
 void RunTest::execute(const char * data) {
     m_executor = t_logic_executor_build(data);
+    ASSERT_TRUE(m_executor);
     t_logic_execute(m_context, m_executor);
 }
 

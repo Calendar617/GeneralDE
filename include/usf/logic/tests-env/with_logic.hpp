@@ -37,8 +37,10 @@ public:
 
     void t_logic_execute(logic_context_t context, logic_executor_t executor);
 
-    logic_executor_t t_logic_executor_build(cfg_t cfg, logic_executor_build_fun_t fun, void * ctx, error_monitor_t em = 0);
-    logic_executor_t t_logic_executor_build(const char * cfg, logic_executor_build_fun_t fun, void * ctx, error_monitor_t em = 0);
+    logic_executor_type_group_t t_logic_executor_type_group(const char * group_name = NULL);
+
+    logic_executor_t t_logic_executor_build(cfg_t cfg, const char * group_name = 0, error_monitor_t em = 0);
+    logic_executor_t t_logic_executor_build(const char * cfg, const char * group_name = 0, error_monitor_t em = 0);
 
     const char * t_logic_executor_dump(logic_executor_t executor);
 

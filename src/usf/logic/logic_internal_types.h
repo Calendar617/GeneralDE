@@ -93,9 +93,8 @@ struct logic_data {
 
 #define LOGIC_EXECUTOR_COMMON                   \
     logic_manage_t m_mgr;                       \
-    const char * m_name;                        \
-    TAILQ_ENTRY(logic_executor) m_next;         \
-    logic_executor_category_t m_category
+    logic_executor_type_t m_type;               \
+    TAILQ_ENTRY(logic_executor) m_next
 
 struct logic_executor {
     LOGIC_EXECUTOR_COMMON;
@@ -103,15 +102,11 @@ struct logic_executor {
 
 struct logic_executor_basic {
     LOGIC_EXECUTOR_COMMON;
-    logic_op_fun_t m_op;
-    void * m_ctx;
     cfg_t m_args;
 };
 
 struct logic_executor_decorate {
     LOGIC_EXECUTOR_COMMON;
-    logic_decorate_fun_t m_op;
-    void * m_ctx;
     logic_executor_t m_inner;
 };
 
@@ -122,11 +117,18 @@ struct logic_executor_group {
 
 struct logic_executor_type {
     logic_executor_type_group_t m_group;
+    logic_executor_category_t m_category;
+    char * m_name;
+    void * m_op;
+    void * m_ctx;
+
+    struct cpe_hash_entry m_hh;
 };
 
 struct logic_executor_type_group {
     mem_allocrator_t m_alloc;
     gd_app_context_t m_app;
+    struct cpe_hash_table m_types;
 };
 
 #ifdef __cplusplus

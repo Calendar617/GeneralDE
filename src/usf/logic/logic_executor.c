@@ -6,18 +6,13 @@
 #include "logic_internal_ops.h"
 
 logic_executor_t
-logic_executor_basic_create(
-    logic_manage_t mgr,
-    const char * name,
-    logic_op_fun_t op, void * op_ctx, cfg_t args)
-{
+logic_executor_basic_create(logic_manage_t mgr, logic_executor_type_t type, cfg_t args) {
     struct logic_executor_basic * executor;
     cfg_t executor_args;
 
     assert(mgr);
 
-    if (name == NULL) return NULL;
-    if (op == NULL) return NULL;
+    if (type == NULL || type->m_category != logic_executor_category_basic) return NULL;
 
     executor_args = NULL;
     if (args) {
@@ -38,28 +33,24 @@ logic_executor_basic_create(
     }
 
     executor->m_mgr = mgr;
-    executor->m_category = logic_executor_category_basic;
-    executor->m_name = name;
-    executor->m_op = op;
-    executor->m_ctx = op_ctx;
+    executor->m_type = type;
     executor->m_args = executor_args;
 
     return (logic_executor_t)executor;
 }
 
 logic_executor_t
-logic_executor_group_create(logic_manage_t mgr, const char * name) {
+logic_executor_group_create(logic_manage_t mgr, logic_executor_type_t type) {
     struct logic_executor_group * executor;
 
     assert(mgr);
-    if (name == NULL) return NULL;
+    if (type == NULL || type->m_category != logic_executor_category_group) return NULL;
 
     executor = (struct logic_executor_group *)mem_alloc(mgr->m_alloc, sizeof(struct logic_executor_group));
     if (executor == NULL) return NULL;
 
     executor->m_mgr = mgr;
-    executor->m_category = logic_executor_category_group;
-    executor->m_name = name;
+    executor->m_type = type;
     TAILQ_INIT(&executor->m_members);
 
     return (logic_executor_t)executor;
@@ -70,7 +61,7 @@ int logic_executor_group_add(logic_executor_t input_group, logic_executor_t memb
 
     assert(input_group);
     if (member == NULL) return -1;
-    if (input_group->m_category != logic_executor_category_group) return -1;
+    if (input_group->m_type->m_category != logic_executor_category_group) return -1;
 
     group = (struct logic_executor_group *)input_group;
 
@@ -80,26 +71,18 @@ int logic_executor_group_add(logic_executor_t input_group, logic_executor_t memb
 }
 
 logic_executor_t
-logic_executor_decorate_create(
-    logic_manage_t mgr,
-    const char * name,
-    logic_decorate_fun_t op, void * op_ctx, logic_executor_t inner)
-{
+logic_executor_decorate_create(logic_manage_t mgr, logic_executor_type_t type, logic_executor_t inner) {
     struct logic_executor_decorate * executor;
 
     assert(mgr);
-    if (name == NULL) return NULL;
-    if (op == NULL) return NULL;
+    if (type == NULL || type->m_category != logic_executor_category_decorate) return NULL;
     if (inner == NULL) return NULL;
 
     executor = (struct logic_executor_decorate *)mem_alloc(mgr->m_alloc, sizeof(struct logic_executor_decorate));
     if (executor == NULL) return NULL;
 
     executor->m_mgr = mgr;
-    executor->m_category = logic_executor_category_decorate;
-    executor->m_name = name;
-    executor->m_op = op;
-    executor->m_ctx = op_ctx;
+    executor->m_type = type;
     executor->m_inner = inner;
 
     return (logic_executor_t)executor;
@@ -115,7 +98,7 @@ int32_t logic_executor_decorate_protect(logic_context_t ctx, logic_context_decor
 void logic_executor_free(logic_executor_t executor) {
     if (executor == NULL) return;
 
-    switch(executor->m_category) {
+    switch(executor->m_type->m_category) {
     case logic_executor_category_basic: {
         struct logic_executor_basic * basic = (struct logic_executor_basic *)executor;
         if (basic->m_args) cfg_free(basic->m_args);
@@ -143,22 +126,22 @@ void logic_executor_free(logic_executor_t executor) {
 }
 
 const char * logic_executor_name(logic_executor_t executor) {
-    return executor->m_name;
+    return executor->m_type->m_name;
 }
 
 void logic_executor_dump(logic_executor_t executor, write_stream_t stream, int level) {
     if (executor == NULL) return;
 
-    switch(executor->m_category) {
+    switch(executor->m_type->m_category) {
     case logic_executor_category_basic: {
         struct logic_executor_basic * basic = (struct logic_executor_basic *)executor;
         stream_putc_count(stream, ' ', level << 2);
         if (basic->m_args) {
-            stream_printf(stream, "%s: ", basic->m_name);
+            stream_printf(stream, "%s: ", basic->m_type->m_name);
             cfg_dump_inline(basic->m_args, stream);
         }
         else {
-            stream_printf(stream, "%s", basic->m_name);
+            stream_printf(stream, "%s", basic->m_type->m_name);
         }
         break;
     }
@@ -166,7 +149,7 @@ void logic_executor_dump(logic_executor_t executor, write_stream_t stream, int l
         logic_executor_t member;
         struct logic_executor_group * group = (struct logic_executor_group *)executor;
         stream_putc_count(stream, ' ', level << 2);
-        stream_printf(stream, "%s:", group->m_name);
+        stream_printf(stream, "%s:", group->m_type->m_name);
 
         TAILQ_FOREACH(member, &group->m_members, m_next) {
             stream_putc(stream, '\n');
@@ -178,7 +161,7 @@ void logic_executor_dump(logic_executor_t executor, write_stream_t stream, int l
     case logic_executor_category_decorate: {
         struct logic_executor_decorate * decorator = (struct logic_executor_decorate *)executor;
         stream_putc_count(stream, ' ', level << 2);
-        stream_printf(stream, "%s:", decorator->m_name);
+        stream_printf(stream, "%s:", decorator->m_type->m_name);
         stream_putc(stream, '\n');
         logic_executor_dump(decorator->m_inner, stream, level + 1);
         break;

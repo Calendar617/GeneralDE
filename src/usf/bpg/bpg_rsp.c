@@ -4,7 +4,7 @@
 #include "gd/nm/nm_read.h"
 #include "gd/app/app_context.h"
 #include "usf/logic/logic_executor.h"
-#include "usf/logic/logic_build.h"
+#include "usf/logic/logic_executor_build.h"
 #include "usf/bpg/bpg_rsp.h"
 #include "usf/bpg/bpg_manage.h"
 #include "bpg_internal_ops.h"

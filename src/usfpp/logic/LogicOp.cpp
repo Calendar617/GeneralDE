@@ -45,46 +45,4 @@ int32_t LogicOp::logic_op_adapter(logic_context_t ctx, void * user_data, cfg_t c
     return -1;
 }
 
-logic_executor_t
-LogicOp::create_executor(
-    logic_manage_t mgr,
-    LogicOp const & op,
-    cfg_t args)
-{
-    logic_executor_t executor =
-        logic_executor_basic_create(
-            mgr,
-            op.name(),
-            logic_op_adapter,
-            (void *)&op,
-            args);
-
-    if (executor == 0) {
-        APP_CTX_THROW_EXCEPTION(
-            logic_manage_app(mgr),
-            ::std::runtime_error,
-            "create logic_executor from LogicOp fail!");
-    }
-
-    return executor;
-}
-
-logic_executor_t
-LogicOp::builder(logic_manage_t mgr, const char * name, void * ctx, cfg_t args, error_monitor_t em) {
-    try {
-        return create_executor(
-            mgr,
-            get(Gd::App::Application::_cast(logic_manage_app(mgr)), name),
-            args);
-    }
-    catch(::std::exception const & e) {
-        CPE_ERROR(em, "create logic_executor %s: %s", name, e.what());
-    }
-    catch(...) {
-        CPE_ERROR(em, "create logic_executor %s: unknown exception", name);
-    }
-
-    return 0;
-}
-
 }}
