@@ -12,8 +12,15 @@ typedef enum bpg_rsp_flag {
     bpg_rsp_flag_debug = 1 << 0
 } bpg_rsp_flag_t;
 
+typedef enum bpg_manage_flag {
+    bpg_manage_flag_sn_use_client = 1 << 0
+} bpg_manage_flag_t;
+
 typedef struct bpg_manage * bpg_manage_t;
 typedef struct bpg_rsp * bpg_rsp_t;
+
+typedef int (*bpg_logic_ctx_init_fun_t)(logic_context_t context, void * ctx);
+typedef void (*bpg_logic_ctx_fini_fun_t)(logic_context_t context, void * ctx);
 
 #ifdef __cplusplus
 }

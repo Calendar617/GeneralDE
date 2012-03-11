@@ -43,7 +43,7 @@ static void cpe_dr_generate_h_metas(write_stream_t stream, dr_metalib_source_t s
                 ref_meta = dr_entry_ref_meta(entry);
                 if (ref_meta == NULL) continue;
 
-                stream_printf(stream, "%s %s", dr_meta_name(ref_meta), dr_entry_name(entry));
+                stream_printf(stream, "%s %s %s", dr_type_name(dr_entry_type(entry)), dr_meta_name(ref_meta), dr_entry_name(entry));
                 break;
             }
             case CPE_DR_TYPE_STRING: {
