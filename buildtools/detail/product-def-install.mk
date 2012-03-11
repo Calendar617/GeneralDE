@@ -34,8 +34,6 @@ tools.cvt.replace.dep=$(addprefix $$(CPDE_ROOT)/,$1)
 define install-def-rule-copy
 auto-build-dirs+=$(dir $3)                              
 
-$1: $4.$1
-
 $4.$1: $3
 
 $3: $2
@@ -49,8 +47,6 @@ endef
 # $(call install-def-rule-cvt,product-name,source,target,cfg-way,cvt-arg,domain)
 define install-def-rule-cvt
 $(if $(tools.cvt.$(strip $4).cmd),,$(warning cvt way '$(strip $4)' not support))
-
-$1: $6.$1
 
 $6.$1: $3
 
@@ -118,13 +114,7 @@ endef
 define product-def-rule-install-cvt-file
 $(if $(word 3,$3),,$(warning convert input file not set))
 
-$(call install-def-rule-cvt,\
-       $1,\
-       $(CPDE_ROOT)/$(word 1,$3),\
-       $(CPDE_OUTPUT_ROOT)/$($2.output)/$(word 2,$3),\
-       $(word 3,$3),\
-       $(wordlist 4,$(words $3),$3), \
-	   $2)
+$(call install-def-rule-cvt,$1,$(CPDE_ROOT)/$(word 1,$3),$(CPDE_OUTPUT_ROOT)/$($2.output)/$(word 2,$3),$(word 3,$3),$(wordlist 4,$(words $3),$3),$2)
 endef
 
 # }}}
