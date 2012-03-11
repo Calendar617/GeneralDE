@@ -9,7 +9,7 @@ define product-def-rule-cpe-dr-c-module-h
   $(eval r.$1.$3.cpe-dr.$2.h.output-dir:=$(call c-source-dir-to-binary-dir,$(r.$1.base)/$(r.$1.$3.cpe-dr.$2.h.output),$3))
   $(eval r.$1.$3.cpe-dr.$2.generated.h:=\
       $(addprefix $(r.$1.$3.cpe-dr.$2.h.output-dir)/,\
-            $(subst .xml,.h, $(notdir $(r.$1.$3.cpe-dr.$2.source)))))
+            $(patsubst %.xml,%.h, $(notdir $(r.$1.$3.cpe-dr.$2.source)))))
 
   auto-build-dirs += $(r.$1.$3.cpe-dr.$2.h.output-dir)
 
@@ -18,7 +18,8 @@ define product-def-rule-cpe-dr-c-module-h
 
   $(call c-source-to-object,$(r.$1.c.sources),$3): $(r.$1.$3.cpe-dr.$2.generated.h)
 
-  $(r.$1.$3.cpe-dr.$2.generated.h): $(cpe-dr-tool)
+  $(foreach source,$(r.$1.$3.cpe-dr.$2.source),\
+      $(r.$1.$3.cpe-dr.$2.h.output-dir)/$(patsubst %.xml,%.h,$(notdir $(source))): $(source) $(cpe-dr-tool))
 
   $(r.$1.$3.cpe-dr.$2.generated.h): $(r.$1.$3.cpe-dr.$2.source) 
 	$$(call with_message,cpe-dr generaing h to $(subst $(CPDE_ROOT)/,,$(r.$1.$3.cpe-dr.$2.h.output-dir)) ...) \
