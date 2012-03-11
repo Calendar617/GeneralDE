@@ -15,6 +15,7 @@
         <entry name="version" type="uint16" />
         <entry name="sn" type="uint32" />
         <entry name="targetId" type="uint64" />
+        <entry name="errno" type="uint32" />
         <entry name="cmd" type="uint16" />
         <entry name="flags" type="uint16" />
         <entry name="headlen" type="uint16" />

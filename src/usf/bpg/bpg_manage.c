@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
+#include "cpe/dr/dr_metalib_manage.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "gd/app/app_context.h"
@@ -41,14 +42,26 @@ bpg_manage_create(
     mgr = (bpg_manage_t)gd_nm_node_data(mgr_node);
 
     mgr->m_app = app;
+    mgr->m_alloc = gd_app_alloc(app);
+    mgr->m_metalib = NULL;
     mgr->m_logic_mgr = logic_mgr;
     mgr->m_em = em;
     mgr->m_flags = 0;
+
+    mgr->m_request_meta_name[0] = 0;
+    mgr->m_request_meta = NULL;
+
+    mgr->m_response_meta_name[0] = 0;
+    mgr->m_response_meta = NULL;
 
     mgr->m_ctx_capacity = 0;
     mgr->m_ctx_init = NULL;
     mgr->m_ctx_fini = NULL;
     mgr->m_ctx_ctx = NULL;
+
+    mgr->m_cvt_encode = NULL;
+    mgr->m_cvt_decode = NULL;
+    mgr->m_cvt_ctx = NULL;
 
     gd_nm_node_set_type(mgr_node, &s_nm_node_type_bpg_manage);
 
@@ -107,6 +120,128 @@ const char * bpg_manage_name(bpg_manage_t mgr) {
 cpe_hash_string_t
 bpg_manage_name_hs(bpg_manage_t mgr) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
+}
+
+const char *
+bpg_manage_request_meta_name(bpg_manage_t mgr) {
+    return mgr->m_request_meta_name;
+}
+
+int bpg_manage_set_request_meta_name(bpg_manage_t mgr, const char * name) {
+    size_t name_len;
+    LPDRMETA meta;
+
+    name_len = strlen(name) + 1;
+    if (name_len > sizeof(mgr->m_request_meta_name)) {
+        CPE_ERROR(
+            mgr->m_em, "bpg_manage %s: set request meta name %s, name len overflow!", 
+            bpg_manage_name(mgr), name);
+        return -1;
+    }
+
+    meta = NULL;
+    if (mgr->m_metalib) {
+        meta = dr_lib_find_meta_by_name(mgr->m_metalib, name);
+        if (meta == NULL) {
+            CPE_ERROR(
+                mgr->m_em, "bpg_manage %s: set request meta name %s, meta not exist in metalib!", 
+                bpg_manage_name(mgr), name);
+            return -1;
+        }
+    }
+
+    memcpy(mgr->m_request_meta_name, name, name_len);
+    mgr->m_request_meta = meta;
+
+    return 0;
+}
+
+const char * bpg_manage_response_meta_name(bpg_manage_t mgr) {
+    return mgr->m_response_meta_name;
+}
+
+int bpg_manage_set_response_meta_name(bpg_manage_t mgr, const char * name) {
+    size_t name_len;
+    LPDRMETA meta;
+
+    name_len = strlen(name) + 1;
+    if (name_len > sizeof(mgr->m_response_meta_name)) {
+        CPE_ERROR(
+            mgr->m_em, "bpg_manage %s: set response meta name %s, name len overflow!", 
+            bpg_manage_name(mgr), name);
+        return -1;
+    }
+
+    meta = NULL;
+    if (mgr->m_metalib) {
+        meta = dr_lib_find_meta_by_name(mgr->m_metalib, name);
+        if (meta == NULL) {
+            CPE_ERROR(
+                mgr->m_em, "bpg_manage %s: set response meta name %s, meta not exist in metalib!", 
+                bpg_manage_name(mgr), name);
+            return -1;
+        }
+    }
+
+    memcpy(mgr->m_response_meta_name, name, name_len);
+    mgr->m_response_meta = meta;
+
+    return 0;
+}
+
+LPDRMETALIB bpg_manage_metalib(bpg_manage_t mgr) {
+    return mgr->m_metalib;
+}
+
+int bpg_manage_set_metalib(bpg_manage_t mgr, LPDRMETALIB metalib) {
+    LPDRMETA request_meta;
+    LPDRMETA response_meta;
+    int rv;
+
+    rv = 0;
+    request_meta = NULL;
+    response_meta = NULL;
+
+    if (metalib) {
+        if (mgr->m_request_meta_name[0]) {
+            request_meta = dr_lib_find_meta_by_name(metalib, mgr->m_request_meta_name);
+            if (request_meta == NULL) {
+                CPE_ERROR(
+                    mgr->m_em, "bpg_manage %s: set metalib, request meta %s not exist in metalib!", 
+                    bpg_manage_name(mgr), mgr->m_request_meta_name);
+                rv = -1;
+            }
+        }
+
+        if (mgr->m_response_meta_name[0]) {
+            response_meta = dr_lib_find_meta_by_name(metalib, mgr->m_response_meta_name);
+            if (response_meta == NULL) {
+                CPE_ERROR(
+                    mgr->m_em, "bpg_manage %s: set metalib, response meta %s not exist in metalib!", 
+                    bpg_manage_name(mgr), mgr->m_response_meta_name);
+                rv = -1;
+            }
+        }
+    }
+
+    if (rv == 0) {
+        mgr->m_metalib = metalib;
+        mgr->m_request_meta = request_meta;
+        mgr->m_response_meta = response_meta;
+    }
+
+    return rv;
+}
+
+void bpg_manage_set_convert(
+    bpg_manage_t mgr,
+    bpg_data_convert_fun_t encode,
+    bpg_data_convert_fun_t decode,
+    void * ctx)
+{
+    mgr->m_cvt_encode = encode;
+    mgr->m_cvt_decode = decode;
+    mgr->m_cvt_ctx = ctx;
 }
 
 uint32_t bpg_manage_flags(bpg_manage_t mgr) {

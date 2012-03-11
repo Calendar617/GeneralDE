@@ -2,6 +2,7 @@
 #define USF_BASEPKG_TYPES_H
 #include "cpe/utils/error.h"
 #include "cpe/cfg/cfg_types.h"
+#include "cpe/dr/dr_types.h"
 #include "usf/logic/logic_types.h"
 
 #ifdef __cplusplus
@@ -21,6 +22,12 @@ typedef struct bpg_rsp * bpg_rsp_t;
 
 typedef int (*bpg_logic_ctx_init_fun_t)(logic_context_t context, void * ctx);
 typedef void (*bpg_logic_ctx_fini_fun_t)(logic_context_t context, void * ctx);
+
+typedef int (*bpg_data_convert_fun_t)(
+    void * output, size_t output_capacity,
+    const void * input, size_t input_capacity,
+    void * ctx,
+    error_monitor_t em);
 
 #ifdef __cplusplus
 }

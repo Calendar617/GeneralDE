@@ -173,6 +173,8 @@ bpg_rsp_t bpg_rsp_create(bpg_manage_t mgr, cfg_t cfg) {
     rsp = (bpg_rsp_t)gd_nm_node_data(rsp_node);
     rsp->m_mgr = mgr;
     rsp->m_flags = 0;
+    TAILQ_INIT(&rsp->m_pdu_to_ctx);
+    TAILQ_INIT(&rsp->m_ctx_to_pdu);
 
     rsp->m_executor = logic_executor_build(
         mgr->m_logic_mgr,
@@ -240,6 +242,18 @@ static void bpg_rsp_clear(gd_nm_node_t node) {
     gd_dp_rsp_t dp_rsp;
 
     bpg_rsp = (bpg_rsp_t)gd_nm_node_data(node);
+
+    while(!TAILQ_EMPTY(&bpg_rsp->m_pdu_to_ctx)) {
+        struct bpg_rsp_copy_info * copy_info = TAILQ_FIRST(&bpg_rsp->m_pdu_to_ctx);
+        TAILQ_REMOVE(&bpg_rsp->m_pdu_to_ctx, copy_info, m_next);
+        bpg_rsp_copy_info_free(bpg_rsp->m_mgr, copy_info);
+    }
+
+    while(!TAILQ_EMPTY(&bpg_rsp->m_ctx_to_pdu)) {
+        struct bpg_rsp_copy_info * copy_info = TAILQ_FIRST(&bpg_rsp->m_ctx_to_pdu);
+        TAILQ_REMOVE(&bpg_rsp->m_ctx_to_pdu, copy_info, m_next);
+        bpg_rsp_copy_info_free(bpg_rsp->m_mgr, copy_info);
+    }
 
     if (bpg_rsp->m_executor) {
         logic_executor_free(bpg_rsp->m_executor);
