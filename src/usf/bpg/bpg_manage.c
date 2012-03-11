@@ -3,6 +3,7 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
+#include "gd/dp/dp_request.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/bpg/bpg_manage.h"
@@ -63,6 +64,9 @@ bpg_manage_create(
     mgr->m_cvt_decode = NULL;
     mgr->m_cvt_ctx = NULL;
 
+    mgr->m_rsp_size_max = 4 * 1024;
+    mgr->m_rsp_buf = NULL;
+
     gd_nm_node_set_type(mgr_node, &s_nm_node_type_bpg_manage);
 
     return mgr;
@@ -71,6 +75,11 @@ bpg_manage_create(
 static void bpg_manage_clear(gd_nm_node_t node) {
     bpg_manage_t mgr;
     mgr = (bpg_manage_t)gd_nm_node_data(node);
+
+    if (mgr->m_rsp_buf) {
+        gd_dp_req_free(mgr->m_rsp_buf);
+        mgr->m_rsp_buf = NULL;
+    }
 }
 
 void bpg_manage_free(bpg_manage_t mgr) {
@@ -120,6 +129,19 @@ const char * bpg_manage_name(bpg_manage_t mgr) {
 cpe_hash_string_t
 bpg_manage_name_hs(bpg_manage_t mgr) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
+}
+
+gd_dp_req_t
+bpg_manage_rsp_buf(bpg_manage_t mgr) {
+    if (mgr->m_rsp_buf == NULL) {
+        mgr->m_rsp_buf =
+            gd_dp_req_create(
+                gd_app_dp_mgr(mgr->m_app),
+                bpg_response_type_name,
+                mgr->m_rsp_size_max);
+    }
+
+    return mgr->m_rsp_buf;
 }
 
 const char *
@@ -276,6 +298,8 @@ void bpg_manage_set_context_op(
     mgr->m_ctx_fini = ctx_fini;
     mgr->m_ctx_ctx = ctx_ctx;
 }
+
+CPE_HS_DEF_VAR(bpg_response_type_name, "bpg_response_type");
 
 EXPORT_DIRECTIVE
 int bpg_manager_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {

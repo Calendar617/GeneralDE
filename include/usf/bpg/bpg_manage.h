@@ -50,6 +50,8 @@ void bpg_manage_set_convert(
     bpg_data_convert_fun_t decode,
     void * ctx);
 
+extern cpe_hash_string_t bpg_response_type_name;
+
 uint32_t bpg_manage_flags(bpg_manage_t mgr);
 void bpg_manage_flags_set(bpg_manage_t mgr, uint32_t flag);
 void bpg_manage_flag_enable(bpg_manage_t mgr, bpg_manage_flag_t flag);

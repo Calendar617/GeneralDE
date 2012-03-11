@@ -7,6 +7,10 @@
 extern "C" {
 #endif
 
+/*bpg_manage ops*/
+gd_dp_req_t bpg_manage_rsp_buf(bpg_manage_t mgr);
+
+/*bpg_rsp ops*/
 int bpg_rsp_execute(gd_dp_req_t req, void * ctx, error_monitor_t em);
 
 /*bpg_rsp_copy_info ops*/

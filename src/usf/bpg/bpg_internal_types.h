@@ -32,6 +32,9 @@ struct bpg_manage {
     bpg_data_convert_fun_t m_cvt_encode;
     bpg_data_convert_fun_t m_cvt_decode;
     void * m_cvt_ctx;
+
+    size_t m_rsp_size_max;
+    gd_dp_req_t m_rsp_buf;
 };
 
 struct bpg_rsp_copy_info {
