@@ -149,7 +149,7 @@ EXPORT_DIRECTIVE
 void logic_executor_type_group_app_fini(gd_app_context_t app, gd_app_module_t module) {
     logic_executor_type_group_t logic_executor_type_group;
 
-    logic_executor_type_group = logic_executor_type_group_find(app, gd_app_module_name_hs(module));
+    logic_executor_type_group = logic_executor_type_group_find_nc(app, gd_app_module_name(module));
     if (logic_executor_type_group) {
         logic_executor_type_group_free(logic_executor_type_group);
     }
