@@ -49,6 +49,9 @@ gd_app_module_create_i(
 
     memcpy(runing_module + 1, moduleName, name_len);
 
+    runing_module->m_alloc = context->m_alloc;
+    runing_module->m_type = module;
+
     moduleDataGroup = gd_app_module_data_load(context, moduleName);
     if (moduleDataGroup == NULL) {
         if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_type_free(module, context->m_em);
@@ -65,9 +68,6 @@ gd_app_module_create_i(
             return NULL;
         }
     }
-
-    runing_module->m_alloc = context->m_alloc;
-    runing_module->m_type = module;
 
     TAILQ_INSERT_TAIL(&context->m_runing_modules, runing_module, m_qh_for_app);
     TAILQ_INSERT_TAIL(&module->m_runing_modules, runing_module, m_qh_for_runing);
