@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="GBK" standalone="yes" ?>
+<metalib tagsetversion="1" name="BASEPKG" version="1" >
+    <macro name="APPEND_INFO_MAX_COUNT" value='64'/>
+
+    <macro name="BASEPKG_HEAD_MAGIC" value='894'/>
+
+    <struct name="AppendInfo" version="1">
+        <entry name="id" type="uint32"/>
+        <entry name="size" type="uint16"/>
+        <entry name="originSize" type="uint16"/>
+    </struct>
+
+    <struct name="basepkg_head" version="1" >
+        <entry name="magic" type="uint16" />
+        <entry name="version" type="uint16" />
+        <entry name="sn" type="uint32" />
+        <entry name="targetId" type="uint64" />
+        <entry name="errno" type="uint32" />
+        <entry name="cmd" type="uint16" />
+        <entry name="flags" type="uint16" />
+        <entry name="headlen" type="uint16" />
+        <entry name="bodylen" type="uint16" />
+        <entry name="originBodyLen" type="uint16" />
+        <entry name="bodytotallen" type="uint16" />
+        <entry name="appendInfoCount" type="uint16" />
+        <entry name="appendInfos"  type="AppendInfo" count="64" refer="appendInfoCount" />
+        <!-- count="APPEND_INFO_MAX_COUNT" count use macro not support yet -->
+    </struct>
+
+    <struct name="basepkg" version="1">
+        <entry name="head" type="basepkg_head" sizeinfo="head.headlen"/>
+        <entry name="body" type="int8" count="0" refer="head.bodytotallen"/>
+    </struct>
+</metalib>
