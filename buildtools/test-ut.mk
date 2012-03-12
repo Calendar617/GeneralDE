@@ -11,8 +11,7 @@ include $(CPED_BUILD_DETAIL_DIR)/create-dirs.mk
 all: ut
 
 ut: $(foreach domain,$(sort $(domain-list)) \
-        , $(if $(filter 0,$($(domain).ut)) \
-            , \
-            , $(target-product).$(domain).run))
+        , $(if $(filter $(target-product),$($(domain).product-list)) \
+            , $(domain).$(target-product).run))
 
 clean: $(target-product).clean

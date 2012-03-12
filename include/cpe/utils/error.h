@@ -86,10 +86,10 @@ void cpe_error_monitor_remove_node(error_monitor_t monitor, struct error_monitor
 #define CPE_DEF_ERROR_MONITOR_REMOVE(name, monitor)                     \
     cpe_error_monitor_remove_node(monitor, &name);
 
-#define CPE_ERROR_SET_LINE(monitor, line) monitor->m_curent_location.m_line = line
-#define CPE_ERROR_SET_FILE(monitor, file) monitor->m_curent_location.m_file = file
-#define CPE_ERROR_SET_ERRNO(monitor, e) monitor->m_curent_location.m_errno = e
-#define CPE_ERROR_SET_LEVEL(monitor, l) monitor->m_curent_location.m_level = l
+#define CPE_ERROR_SET_LINE(monitor, line) if (monitor) { monitor->m_curent_location.m_line = line; }
+#define CPE_ERROR_SET_FILE(monitor, file) if (monitor) { monitor->m_curent_location.m_file = file; }
+#define CPE_ERROR_SET_ERRNO(monitor, e) if (monitor) { monitor->m_curent_location.m_errno = e; }
+#define CPE_ERROR_SET_LEVEL(monitor, l) if (monitor) { monitor->m_curent_location.m_level = l; }
 
 #ifdef _MSC_VER //for msvc
 #define CPE_INFO(monitor, format, ...)                                  \

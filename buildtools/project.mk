@@ -11,9 +11,5 @@ clean: clean-gtags
 
 .PHONY: ut
 
-ut: $(foreach domain,$(sort $(domain-list)) \
-         , $(if $(filter 0,$($(domain).ut)) \
-                , \
-                , $(foreach product,$($(domain).product-list) \
-                            , $(if $($(product).ut),$($(product).ut).$(domain).run))))
+ut: $(foreach domain,$(sort $(domain-list)), $(domain).ut)
 

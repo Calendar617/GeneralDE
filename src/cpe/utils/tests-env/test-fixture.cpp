@@ -85,4 +85,10 @@ Test::t_tmp_strdup(const char * str) {
     return mem_buffer_strdup(&m_tmp_alloc_buf, str);
 }
 
+void * Test::t_tmp_memdup(void const * buf, size_t size) {
+    void * r = t_tmp_alloc(size);
+    memcpy(r, buf, size);
+    return r;
+}
+
 }

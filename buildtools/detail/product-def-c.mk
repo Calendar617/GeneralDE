@@ -5,7 +5,7 @@ product-def-c-env-items:= c.flags.cpp c.flags.ld c.sources c.includes \
 product-def-all-items+= c.libraries c.frameworks c.ldpathes c.linker    \
                         c.flags.lan c.flags.lan.c c.flags.lan.cc c.flags.lan.m c.flags.lan.mm c.lib.type c.env-includes \
                         product.c.frameworks product.c.env-includes \
-                        $(product-def-c-env-items) $(foreach e,$(dev-env-list),$(addprefix $e.,$($(product-def-c-env-items))))
+                        $(product-def-c-env-items) $(foreach e,$(dev-env-list),$(addprefix $e.,$(product-def-c-env-items)))
 
 c-source-dir-to-binary-dir = $(addprefix $(CPDE_OUTPUT_ROOT)/$($2.output)/obj,$(subst $(CPDE_ROOT),,$1))
 
@@ -158,11 +158,11 @@ $3.$1: $(CPDE_OUTPUT_ROOT)/$(r.$1.$3.product)
 
 $(CPDE_OUTPUT_ROOT)/$(r.$1.$3.product): $(call c-source-to-object,$(r.$1.c.sources) $(r.$1.$($3.env).c.sources) $(r.$1.$3.c.sources),$3)
 	$$(call with_message,linking $(r.$1.$3.product) ...) \
-        $(call product-def-rule-c-link-cmd-$(if $(filter progn,$2),progn,lib-$(r.$1.$3.c.lib.type)),$1, $$^, $$@,$3)
+        $(call product-def-rule-c-link-cmd-$(if $(filter progn,$2),progn,lib-$(r.$1.$3.c.lib.type)),$1, $$(filter %.o,$$^), $$@,$3)
 
 $(foreach f,$(r.$1.c.sources) $(r.$1.$($3.env).c.sources) $(r.$1.$3.c.sources),$(call product-def-rule-c-compile-rule,$(call c-source-to-object,$f,$3),$f,$1,$3))
 
-$(eval r.$1.makefile.include := $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources) $(r.$1.$($3.env).c.sources) $(r.$1.$3.c.sources),$3)))
+$(eval r.$1.makefile.include += $(patsubst %.o,%.d,$(call c-source-to-object,$(r.$1.c.sources) $(r.$1.$($3.env).c.sources) $(r.$1.$3.c.sources),$3)))
 
 ifeq ($(filter progn,$2),progn)
 $(eval r.$1.$3.run.libraries+=$(if $(r.$1.buildfor),$(CPDE_OUTPUT_ROOT)/$($3.output)/$(r.$1.buildfor)-lib,) $(CPDE_OUTPUT_ROOT)/$($3.output)/lib)

@@ -6,11 +6,9 @@ $(call assert-not-null,target-product)
 
 all: $(target-product)
 
-ut: $(if $($(target-product).ut) \
-         , $(foreach domain,$(sort $(domain-list)) \
-             , $(if $(filter 0,$($(domain).ut)) \
-                   , \
-                   , $($(target-product).ut).$(domain).run)))
+ut: $(foreach domain,$(sort $(domain-list)) \
+          , $(if $(filter $($(target-product).ut),$($(domain).product-list)) \
+                 , $(domain).$($(target-product).ut).run))
 
 all: ut
 
