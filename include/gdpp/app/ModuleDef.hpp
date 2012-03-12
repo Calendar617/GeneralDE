@@ -5,7 +5,9 @@
 #include "Module.hpp"
 #include "Log.hpp"
 
-#define GDPP_APP_MODULE_DEF(__module_name, __module_impl)               \
+#define GDPP_APP_MODULE_DEF_DUMMY_INIT(...)
+
+#define GDPP_APP_MODULE_DEF_EX(__module_name, __module_impl, __init)    \
     static cpe_hash_string_buf s_ ## __module_name ## _Name =           \
         CPE_HS_BUF_MAKE(#__module_name);                                \
                                                                         \
@@ -20,8 +22,11 @@
         Cpe::Cfg::Node & moduleCfg)                                     \
     {                                                                   \
         try {                                                           \
-            new (app.nmManager(), cpe_hs_data(__module_name::NAME))     \
+            __module_impl * product =                                   \
+                new (app.nmManager(), cpe_hs_data(__module_name::NAME)) \
                 __module_impl(app, module, moduleCfg);                  \
+            (void)product;                                              \
+            __init(product, app, module, moduleCfg);                    \
             return 0;                                                   \
         }                                                               \
         APP_CTX_CATCH_EXCEPTION(app, #__module_name " init:");          \
@@ -36,5 +41,9 @@
         app.nmManager().removeObject(__module_name::NAME);              \
     }                                                                   \
 
+
+#define GDPP_APP_MODULE_DEF(__module_name, __module_impl)               \
+    GDPP_APP_MODULE_DEF_EX(                                             \
+        __module_name, __module_impl, GDPP_APP_MODULE_DEF_DUMMY_INIT)
 
 #endif
