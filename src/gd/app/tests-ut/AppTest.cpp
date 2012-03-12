@@ -12,6 +12,6 @@ void AppTest::SetUp() {
 }
 
 gd_app_module_t
-AppTest::installTestModule(void) {
-    return t_app_install_module("test_module", NULL);
+AppTest::installTestModule(const char * name) {
+    return t_app_install_module(name, "test_module", NULL);
 }

@@ -8,7 +8,7 @@
 struct gd_app_lib {
     char * m_name;
     void * m_handler;
-    gd_app_module_list_t m_modules;
+    gd_app_module_type_list_t m_modules;
     TAILQ_ENTRY(gd_app_lib) m_next;
 };
 
@@ -84,7 +84,7 @@ gd_app_lib_find(const char * libName) {
 struct gd_app_lib *
 gd_app_lib_open_for_module(
     const char * libName,
-    struct gd_app_module * module,
+    struct gd_app_module_type * module,
     error_monitor_t em)
 {
     struct gd_app_lib * lib;
@@ -106,7 +106,7 @@ gd_app_lib_open_for_module(
 
 void gd_app_lib_close_for_module(
     struct gd_app_lib * lib,
-    struct gd_app_module * module,
+    struct gd_app_module_type * module,
     error_monitor_t em)
 {
     assert(lib);

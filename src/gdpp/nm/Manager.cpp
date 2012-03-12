@@ -82,6 +82,17 @@ bool Manager::removeObject(cpe_hash_string_t name) {
     }
 }
 
+bool Manager::removeObject(const char * name) {
+    gd_nm_node_t node = gd_nm_mgr_find_node_nc(*this, name);
+    if (node) {
+        gd_nm_node_free(node);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 Object const * Manager::findObjectNc(const char * name) const {
     gd_nm_node_t node = gd_nm_mgr_find_node_nc(*this, name);
     if (node == NULL
