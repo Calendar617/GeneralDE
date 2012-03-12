@@ -41,6 +41,9 @@ public:
     logic_executor_t t_logic_executor_build(cfg_t cfg, const char * group_name = 0, error_monitor_t em = 0);
     logic_executor_t t_logic_executor_build(const char * cfg, const char * group_name = 0, error_monitor_t em = 0);
 
+    logic_executor_t t_logic_executor_basic_create(const char * name, cfg_t args = 0, const char * group_name = 0);
+    logic_executor_t t_logic_executor_basic_create(const char * name, const char * args, const char * group_name = 0);
+
     const char * t_logic_executor_dump(logic_executor_t executor);
 };
 

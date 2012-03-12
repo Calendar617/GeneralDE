@@ -164,6 +164,26 @@ with_logic::t_logic_executor_build(const char * cfg, const char * group_name, er
         envOf<cpe::cfg::testenv::with_cfg>().t_cfg_parse(cfg), group_name, em);
 }
 
+logic_executor_t
+with_logic::t_logic_executor_basic_create(const char * name, cfg_t args, const char * group_name) {
+    logic_executor_type_t type = 
+        logic_executor_type_find(
+            t_logic_executor_type_group(group_name),
+            name);
+    EXPECT_TRUE(type) << "logic op type " << name << " not exist in " << group_name;
+
+    
+    return logic_executor_basic_create(
+        t_logic_manage(),
+        type,
+        args);
+}
+
+logic_executor_t
+with_logic::t_logic_executor_basic_create(const char * name, const char * args, const char * group_name) {
+    return t_logic_executor_basic_create(name, envOf<cpe::cfg::testenv::with_cfg>().t_cfg_parse(args), group_name);
+}
+
 const char *
 with_logic::t_logic_executor_dump(logic_executor_t executor) {
     struct mem_buffer buffer;

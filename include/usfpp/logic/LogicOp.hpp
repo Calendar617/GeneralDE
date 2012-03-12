@@ -11,8 +11,10 @@ public:
 
     LogicOp(execute_fun fun);
 
-    static LogicOp const & get(Gd::App::Application & app, cpe_hash_string_t name);
-    static LogicOp const & get(Gd::App::Application & app, const char * name);
+    void regist_to(logic_executor_type_group_t group);
+
+    static LogicOp & get(gd_app_context_t app, cpe_hash_string_t name);
+    static LogicOp & get(gd_app_context_t app, const char * name);
 
 private:
     execute_fun m_exec_fun;
@@ -24,19 +26,10 @@ template<typename OutT, typename ContextT>
 class LogicOpDef : public LogicOp {
 public:
     LogicOpDef() : LogicOp((execute_fun)&LogicOpDef::execute) {}
-    ~LogicOpDef();
 
     virtual void execute(
         ContextT & context,
         Cpe::Cfg::Node const & cfg) const = 0;
-
-    static OutT const & get(Gd::App::Application & app, cpe_hash_string_t name) {
-        return static_cast<OutT const &>(LogicOp::get(app, name));
-    }
-
-    static OutT const & get(Gd::App::Application & app, const char * name) {
-        return static_cast<OutT const &>(LogicOp::get(app, name));
-    }
 };
 
 }}

@@ -1,3 +1,4 @@
+#include "gd/app/tests-env/with_app.hpp"
 #include "usfpp/logic/LogicOp.hpp"
 #include "usfpp/logic/tests-env/with_logic.hpp"
 
@@ -14,14 +15,11 @@ void with_logic::TearDown() {
     Base::TearDown();
 }
 
-logic_executor_t
-with_logic::t_logic_executor_build(cfg_t cfg, error_monitor_t em) {
-    return t_logic_executor_build(cfg, LogicOp::builder, 0, em);
-}
+void with_logic::t_logic_op_regist(const char * name, const char * group_name) {
+    logic_executor_type_group_t group = t_logic_executor_type_group(group_name);
+    ASSERT_TRUE(group) << "logic executor type group " << group_name << " not exist!";
 
-logic_executor_t
-with_logic::t_logic_executor_build(const char * cfg, error_monitor_t em) {
-    return t_logic_executor_build(cfg, LogicOp::builder, 0, em);
+    LogicOp::get(envOf<gd::app::testenv::with_app>().t_app(), name).regist_to(group);
 }
 
 }}}

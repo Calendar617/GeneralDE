@@ -13,11 +13,9 @@ public:
     void SetUp();
     void TearDown();
 
-    using Base::t_logic_executor_build;
-    logic_executor_t t_logic_executor_build(cfg_t cfg, error_monitor_t em = 0);
-    logic_executor_t t_logic_executor_build(const char * cfg, error_monitor_t em = 0);
+    void t_logic_op_regist(const char * name, const char * group_name = 0);
 
-    LogicOpManager & t_logic_manager_ex(void) { return *(LogicOpManager*)t_logic_manager(); }
+    LogicOpManager & t_logic_manage_ex(const char * name = NULL) { return *(LogicOpManager*)t_logic_manage(name); }
 };
 
 }}}
