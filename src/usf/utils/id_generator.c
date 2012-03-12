@@ -214,7 +214,7 @@ EXPORT_DIRECTIVE
 void usf_id_generator_app_fini(gd_app_context_t app, gd_app_module_t module) {
     usf_id_generator_t usf_id_generator;
 
-    usf_id_generator = usf_id_generator_find(app, gd_app_module_name_hs(module));
+    usf_id_generator = usf_id_generator_find_nc(app, gd_app_module_name(module));
     if (usf_id_generator) {
         usf_id_generator_free(usf_id_generator);
     }
