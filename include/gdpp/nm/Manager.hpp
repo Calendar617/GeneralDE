@@ -25,6 +25,7 @@ public:
     Object & objectNc(const char * name);
 
     bool removeObject(cpe_hash_string_t name);
+    bool removeObject(const char * name);
 };
 
 }}

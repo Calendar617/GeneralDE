@@ -35,10 +35,7 @@ with_app::t_app() {
 }
 
 void with_app::t_app_create(size_t capacity, int argc, char ** argv) {
-    if (m_app) {
-        gd_app_context_free(m_app);
-        m_app = NULL;
-    }
+    t_app_free();
 
     m_app =
         gd_app_context_create(t_allocrator(), capacity, argc, argv);
@@ -51,9 +48,17 @@ void with_app::t_app_create(size_t capacity, int argc, char ** argv) {
     }
 }
 
+void with_app::t_app_free(void) {
+    if (m_app) {
+        gd_app_context_free(m_app);
+        m_app = NULL;
+    }
+}
+
 gd_app_module_t
 with_app::t_app_install_module(
     const char * name,
+    const char * type_name,
     const char * libName,
     const char * strCfg)
 {
@@ -70,7 +75,7 @@ with_app::t_app_install_module(
         EXPECT_EQ(0, cfg_read(cfg, (read_stream_t)&stream, cfg_replace, &em));
     }
 
-    gd_app_module_t m = gd_app_install_module(t_app(), name, libName, cfg);
+    gd_app_module_t m = gd_app_install_module(t_app(), name, type_name, libName, cfg);
 
     if (cfg) {
         cfg_free(cfg);
@@ -82,9 +87,10 @@ with_app::t_app_install_module(
 gd_app_module_t
 with_app::t_app_install_module(
     const char * name,
+    const char * type_name,
     const char * cfg)
 {
-    return t_app_install_module(name, NULL, cfg);
+    return t_app_install_module(name, type_name, NULL, cfg);
 }
 
 int with_app::t_app_uninstall_module(const char * name) {

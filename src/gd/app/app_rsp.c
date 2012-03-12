@@ -306,26 +306,26 @@ static int gd_app_rsp_create(struct gd_app_rsp_create_ctx * ctx, cfg_t cfgNode) 
 }
 
 static gd_nm_node_t
-gd_app_rsp_create_group_node(gd_app_context_t context, gd_app_module_t module) {
+gd_app_rsp_create_group_node(gd_app_context_t context, const char * moduleName) {
     gd_nm_node_t moduleNode;
     gd_nm_node_t rspNode;
 
-    moduleNode = gd_app_module_data(context, module);
+    moduleNode = gd_app_module_data(context, moduleName);
     if (moduleNode == NULL) {
-        APP_CTX_ERROR(context, "%s reading rsp: no module node!", gd_app_module_name(module));
+        APP_CTX_ERROR(context, "%s reading rsp: no module node!", moduleName);
         return NULL;
     }
 
     rspNode = gd_nm_instance_create(gd_app_nm_mgr(context), "rsps", sizeof(struct gd_app_rsp_mgr));
     if (rspNode == NULL) {
-        APP_CTX_ERROR(context, "%s reading rsp: create rsps node fail!", gd_app_module_name(module));
+        APP_CTX_ERROR(context, "%s reading rsp: create rsps node fail!", moduleName);
         return NULL;
     }
     gd_app_rsp_mgr_init(rspNode, context);
     gd_nm_node_set_type(rspNode, &g_module_rsp_mgr);
 
     if (gd_nm_group_add_member(moduleNode, rspNode) != 0) {
-        APP_CTX_ERROR(context, "create module %s: rsp node to module fail!", gd_app_module_name(module));
+        APP_CTX_ERROR(context, "create module %s: rsp node to module fail!", moduleName);
         gd_nm_node_free(rspNode);
         return NULL;
     }
@@ -386,7 +386,7 @@ int gd_app_rsp_load(
     assert(context);
     assert(module);
 
-    rspNode = gd_app_rsp_create_group_node(context, module);
+    rspNode = gd_app_rsp_create_group_node(context, gd_app_module_name(module));
     if (rspNode == NULL) return -1;
 
     ctx.m_context = context;

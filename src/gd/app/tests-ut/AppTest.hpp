@@ -14,7 +14,7 @@ class AppTest : public testenv::fixture<AppTestBase> {
 public:
     virtual void SetUp(void);
 
-    gd_app_module_t installTestModule(void);
+    gd_app_module_t installTestModule(const char * name);
 };
 
 #endif

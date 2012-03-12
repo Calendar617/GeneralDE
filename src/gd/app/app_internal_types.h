@@ -15,11 +15,11 @@ extern "C" {
 struct gd_app_lib;
 typedef TAILQ_HEAD(gd_app_lib_list, gd_app_lib) gd_app_lib_list_t;
 
+struct gd_app_module_type;
+typedef TAILQ_HEAD(gd_app_module_type_list, gd_app_module_type) gd_app_module_type_list_t;
+
 struct gd_app_module;
 typedef TAILQ_HEAD(gd_app_module_list, gd_app_module) gd_app_module_list_t;
-
-struct gd_app_runing_module;
-typedef TAILQ_HEAD(gd_app_runing_module_list, gd_app_runing_module) gd_app_runing_module_list_t;
 
 struct gd_app_ticker {
     gd_app_tick_fun m_tick;
@@ -49,10 +49,10 @@ struct gd_app_context {
     net_mgr_t m_net_mgr;
     gd_app_main m_main;
 
-    gd_app_runing_module_list_t m_runing_modules;
+    gd_app_module_list_t m_runing_modules;
 };
 
-struct gd_app_module {
+struct gd_app_module_type {
     cpe_hash_string_t m_name;
     struct gd_app_lib * m_lib;
     gd_app_module_global_init m_global_init;
@@ -60,13 +60,15 @@ struct gd_app_module {
     gd_app_module_app_init m_app_init;
     gd_app_module_app_fini m_app_fini;
 
-    TAILQ_ENTRY(gd_app_module) m_next;
-    TAILQ_ENTRY(gd_app_module) m_qh_for_lib;
+    TAILQ_ENTRY(gd_app_module_type) m_next;
+    TAILQ_ENTRY(gd_app_module_type) m_qh_for_lib;
 
-    gd_app_runing_module_list_t m_runing_modules;
+    gd_app_module_list_t m_runing_modules;
 };
 
-extern cpe_hash_string_t gd_app_module_root_group_name;
+typedef struct gd_app_module_type * gd_app_module_type_t;
+
+extern cpe_hash_string_t gd_app_module_type_root_group_name;
 
 #ifdef __cplusplus
 }
