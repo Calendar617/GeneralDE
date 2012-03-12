@@ -28,19 +28,12 @@ public:
 
     int t_alloc_count(void) const;
     int t_free_count(void) const;
-
-    struct mem_allocrator_count {
-        struct mem_allocrator m_alloc;
-        mem_allocrator_t m_parent_alloc;
-        int m_alloc_count;
-        int m_free_count;
-    };
+    const char * t_allocrator_alloc_info(void);
 
 private:
     struct mem_allocrator m_tmp_allocrator;
     struct mem_buffer m_tmp_alloc_buf;
-
-    struct mem_allocrator_count m_allocrator;
+    struct mem_allocrator * m_allocrator;
 };
 
 template <typename TList> struct fixture_gen;
@@ -129,8 +122,9 @@ public:
 
 }
 
-#define CHECK_NO_MEMLEAK()                                              \
-    EXPECT_EQ(this->t_alloc_count(), this->t_free_count())              \
-    << "allocrator use error!"
+#define CHECK_NO_MEMLEAK()                                      \
+    EXPECT_EQ(this->t_alloc_count(), this->t_free_count())      \
+    << "allocrator use error!\n"                                \
+    << this->t_allocrator_alloc_info();
 
 #endif
