@@ -15,16 +15,19 @@ public:
     gd_app_context_t t_app(void);
 
     void t_app_create(size_t capacity, int argc, char ** argv);
+    void t_app_free(void);
 
     gd_app_module_t
     t_app_install_module(
         const char * name,
+        const char * type_name,
         const char * libName,
         const char * cfg);
 
     gd_app_module_t
     t_app_install_module(
         const char * name,
+        const char * type_name,
         const char * cfg);
 
     int t_app_uninstall_module(

@@ -43,5 +43,5 @@ int AppRandom_app_init(Gd::App::Application & app, Gd::App::Module & module, Cpe
 extern "C"
 EXPORT_DIRECTIVE
 void AppRandom_app_fini(Gd::App::Application & app, Gd::App::Module & module) {
-    app.nmManager().removeObject(module.name_hs());
+    app.nmManager().removeObject(module.name());
 }
