@@ -23,6 +23,7 @@ define product-def-rule-cpe-dr-c-module-h
 
   $(r.$1.$3.cpe-dr.$2.generated.h): $(r.$1.$3.cpe-dr.$2.source) 
 	$$(call with_message,cpe-dr generaing h to $(subst $(CPDE_ROOT)/,,$(r.$1.$3.cpe-dr.$2.h.output-dir)) ...) \
+	LD_LIBRARY_PATH=$(CPDE_OUTPUT_ROOT)/$(tools.output)/lib:$$$$LD_LIBRARY_PATH \
 	$(cpe-dr-tool) $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) \
                    --output-h $(r.$1.$3.cpe-dr.$2.h.output-dir)
 
@@ -43,6 +44,7 @@ define product-def-rule-cpe-dr-c-module-c
 
   $(r.$1.$3.cpe-dr.$2.generated.c): $(r.$1.$3.cpe-dr.$2.source) $(cpe-dr-tool)
 	$$(call with_message,cpe-dr generaing lib-c to $(subst $(CPDE_ROOT)/,,$(r.$1.$3.cpe-dr.$2.generated.c)) ...) \
+	LD_LIBRARY_PATH=$(CPDE_OUTPUT_ROOT)/$(tools.output)/lib:$$$$LD_LIBRARY_PATH \
 	$(cpe-dr-tool) $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) \
                    --output-lib-c $$@ --output-lib-c-arg $($1.cpe-dr.$2.c.arg-name)
 
@@ -68,6 +70,7 @@ define product-def-rule-cpe-dr-c-module-bin
 
   $(r.$1.$3.cpe-dr.$2.generated.bin): $(r.$1.$3.cpe-dr.$2.source) 
 	$$(call with_message,cpe-dr generaing bin to $(subst $(CPDE_ROOT)/,,$(r.$1.$3.cpe-dr.$2.generated.bin)) ...) \
+	LD_LIBRARY_PATH=$(CPDE_OUTPUT_ROOT)/$(tools.output)/lib:$$$$LD_LIBRARY_PATH \
 	$(cpe-dr-tool) $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) \
                    --output-lib-bin $$@ 
 
