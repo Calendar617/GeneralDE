@@ -9,7 +9,7 @@
 
 static void logic_executor_type_group_clear(gd_nm_node_t node);
 
-CPE_HS_DEF_VAR(logic_executor_type_group_dft_name, "logic_executor_type_groupr");
+CPE_HS_DEF_VAR(logic_executor_type_group_dft_name, "logic_executor_type_group");
 
 struct gd_nm_node_type s_nm_node_type_logic_executor_type_group = {
     "usf_logic_executor_type_group",
@@ -136,22 +136,22 @@ logic_executor_type_group_name_hs(logic_executor_type_group_t group) {
 }
 
 EXPORT_DIRECTIVE
-int logic_executor_type_groupr_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
-    logic_executor_type_group_t logic_executor_type_groupr;
+int logic_executor_type_group_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
+    logic_executor_type_group_t logic_executor_type_group;
 
-    logic_executor_type_groupr = logic_executor_type_group_create(app, gd_app_module_name(module), gd_app_alloc(app));
-    if (logic_executor_type_groupr == NULL) return -1;
+    logic_executor_type_group = logic_executor_type_group_create(app, gd_app_module_name(module), gd_app_alloc(app));
+    if (logic_executor_type_group == NULL) return -1;
 
     return 0;
 }
 
 EXPORT_DIRECTIVE
-void logic_executor_type_groupr_app_fini(gd_app_context_t app, gd_app_module_t module) {
-    logic_executor_type_group_t logic_executor_type_groupr;
+void logic_executor_type_group_app_fini(gd_app_context_t app, gd_app_module_t module) {
+    logic_executor_type_group_t logic_executor_type_group;
 
-    logic_executor_type_groupr = logic_executor_type_group_find(app, gd_app_module_name_hs(module));
-    if (logic_executor_type_groupr) {
-        logic_executor_type_group_free(logic_executor_type_groupr);
+    logic_executor_type_group = logic_executor_type_group_find(app, gd_app_module_name_hs(module));
+    if (logic_executor_type_group) {
+        logic_executor_type_group_free(logic_executor_type_group);
     }
 }
 

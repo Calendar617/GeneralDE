@@ -9,7 +9,7 @@
 
 static void logic_manage_clear(gd_nm_node_t node);
 
-static cpe_hash_string_buf s_logic_manager_default_name = CPE_HS_BUF_MAKE("logic_manager");
+static cpe_hash_string_buf s_logic_manage_default_name = CPE_HS_BUF_MAKE("logic_manage");
 
 struct gd_nm_node_type s_nm_node_type_logic_manage = {
     "usf_logic_manage",
@@ -25,7 +25,7 @@ logic_manage_create(
     logic_manage_t mgr;
     gd_nm_node_t mgr_node;
 
-    if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_logic_manager_default_name);
+    if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_logic_manage_default_name);
 
     mgr_node = gd_nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct logic_manage));
     if (mgr_node == NULL) return NULL;
@@ -124,7 +124,7 @@ logic_manage_find(
     gd_app_context_t app,
     cpe_hash_string_t name)
 {
-    if (name == NULL) name = (cpe_hash_string_t)&s_logic_manager_default_name;
+    if (name == NULL) name = (cpe_hash_string_t)&s_logic_manage_default_name;
 
     gd_nm_node_t node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
     if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
@@ -147,7 +147,7 @@ logic_manage_t
 logic_manage_default(
     gd_app_context_t app)
 {
-    return logic_manage_find(app, (cpe_hash_string_t)&s_logic_manager_default_name);
+    return logic_manage_find(app, (cpe_hash_string_t)&s_logic_manage_default_name);
 }
 
 gd_app_context_t logic_manage_app(logic_manage_t mgr) {
@@ -164,22 +164,22 @@ logic_manage_name_hs(logic_manage_t mgr) {
 }
 
 EXPORT_DIRECTIVE
-int logic_manager_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
-    logic_manage_t logic_manager;
+int logic_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
+    logic_manage_t logic_manage;
 
-    logic_manager = logic_manage_create(app, gd_app_module_name(module), gd_app_alloc(app));
-    if (logic_manager == NULL) return -1;
+    logic_manage = logic_manage_create(app, gd_app_module_name(module), gd_app_alloc(app));
+    if (logic_manage == NULL) return -1;
 
     return 0;
 }
 
 EXPORT_DIRECTIVE
-void logic_manager_app_fini(gd_app_context_t app, gd_app_module_t module) {
-    logic_manage_t logic_manager;
+void logic_manage_app_fini(gd_app_context_t app, gd_app_module_t module) {
+    logic_manage_t logic_manage;
 
-    logic_manager = logic_manage_find(app, gd_app_module_name_hs(module));
-    if (logic_manager) {
-        logic_manage_free(logic_manager);
+    logic_manage = logic_manage_find(app, gd_app_module_name_hs(module));
+    if (logic_manage) {
+        logic_manage_free(logic_manage);
     }
 }
 
