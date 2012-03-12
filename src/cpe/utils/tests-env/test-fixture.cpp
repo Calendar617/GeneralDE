@@ -20,7 +20,7 @@ Test::Test() : m_allocrator(NULL) {
     m_tmp_allocrator.m_free = do_tmp_free;
     mem_buffer_init(&m_tmp_alloc_buf, NULL);
 
-    m_allocrator = mem_allocrator_debug_create(&m_tmp_allocrator, &g_test_fixture_em);
+    m_allocrator = mem_allocrator_debug_create(&m_tmp_allocrator, &m_tmp_allocrator, 10, &g_test_fixture_em);
 }
 
 Test::~Test() {
@@ -48,7 +48,7 @@ const char * Test::t_allocrator_alloc_info(void) {
     mem_buffer_init(&buffer, NULL);
 
     struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&buffer);
-    mem_allocrator_debug_dump((write_stream_t)&stream, m_allocrator);
+    mem_allocrator_debug_dump((write_stream_t)&stream, 4, m_allocrator);
     stream_putc((write_stream_t)&stream, 0);
 
     char * r = t_tmp_strdup((char *)mem_buffer_make_continuous(&buffer, 0));
