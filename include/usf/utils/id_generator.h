@@ -26,6 +26,12 @@ usf_id_generator_find(gd_app_context_t app, cpe_hash_string_t name);
 usf_id_generator_t
 usf_id_generator_find_nc(gd_app_context_t app, const char * name);
 
+int usf_id_generator_generate(usf_id_t * r, usf_id_generator_t generator);
+
+gd_app_context_t usf_id_generator_app(usf_id_generator_t generator);
+const char * usf_id_generator_name(usf_id_generator_t generator);
+cpe_hash_string_t usf_id_generator_name_hs(usf_id_generator_t generator);
+
 #ifdef __cplusplus
 }
 #endif
