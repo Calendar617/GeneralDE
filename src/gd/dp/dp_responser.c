@@ -55,36 +55,13 @@ const char * gd_dp_rsp_name(gd_dp_rsp_t rsp) {
     return rsp->m_name;
 }
 
-int gd_dp_rsp_set_opt(gd_dp_rsp_t rsp, gd_dp_rsp_opt_t opt, ...) {
-    int rv = -1;
-    va_list ap;
-    va_start(ap, opt);
+void gd_dp_rsp_set_processor(gd_dp_rsp_t rsp, gd_dp_rsp_process_fun_t process, void * ctx) {
+    rsp->m_processor = process;
+    rsp->m_context = ctx;
+}
 
-    switch(opt) {
-    case gd_dp_rsp_set_processor: {
-        rsp->m_processor = va_arg(ap, gd_dp_rsp_process_fun_t);
-        rv = 0;
-        break;
-    }
-    case gd_dp_rsp_set_type: {
-        rsp->m_type = va_arg(ap, gd_dp_rsp_type_t);
-        rv = 0;
-        break;
-    }
-    case gd_dp_rsp_set_context: {
-        rsp->m_context = va_arg(ap, void*);
-        rv = 0;
-        break;
-    }
-    default:
-        rv = -1;
-        break;
-    }
-
-    va_end(ap);
-
-    return rv;
-    
+void gd_dp_rsp_set_type(gd_dp_rsp_t rsp, gd_dp_rsp_type_t type) {
+    rsp->m_type = type;
 }
 
 gd_dp_rsp_process_fun_t gd_dp_rsp_processor(gd_dp_rsp_t rsp) {

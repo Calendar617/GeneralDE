@@ -22,6 +22,9 @@ vnet_manage_find(
     cpe_hash_string_t name);
 
 vnet_manage_t
+vnet_manage_find_nc(gd_app_context_t app, const char * name);
+
+vnet_manage_t
 vnet_manage_default(
     gd_app_context_t app);
 

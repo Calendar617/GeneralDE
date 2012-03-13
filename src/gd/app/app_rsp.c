@@ -206,8 +206,7 @@ int gd_app_rsp_init(
             return -1;
         }
 
-        gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_processor, processor);
-        gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_context, ctx->m_context);
+        gd_dp_rsp_set_processor(rsp, processor, ctx->m_context);
         return 0;
     }
 
@@ -240,8 +239,7 @@ int gd_app_rsp_init(
     processor = (gd_dp_rsp_process_fun_t)
         gd_app_lib_sym(gd_app_module_lib(ctx->m_module), processorSymName, NULL);
     if (processor) {
-        gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_processor, processor);
-        gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_context, ctx->m_context);
+        gd_dp_rsp_set_processor(rsp, processor, ctx->m_context);
         return 0;
     }
 

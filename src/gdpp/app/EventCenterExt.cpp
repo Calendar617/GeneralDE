@@ -129,8 +129,7 @@ public:
             try {
                 Gd::Dp::Responser & rsp = _app.dpManager().createResponser(rspNameBuf);
 
-                rsp.setProcessor(apply_evt);
-                rsp.setContext(newProcessorData);
+                rsp.setProcessor(apply_evt, newProcessorData);
 
                 _app.dpManager().bind(rsp, oid);
             }
