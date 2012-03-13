@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include "gd/nm/nm_manage.h"
+#include "gd/nm/nm_read.h"
 #include "nm_internal_ops.h"
 
 gd_nm_node_t
@@ -34,7 +35,31 @@ gd_nm_node_alloc(
     node->m_type = NULL;
 
     TAILQ_INIT(&node->m_to_group_bindings);
+
     cpe_hash_entry_init(&node->m_hh_for_mgr);
+    if (cpe_hash_table_insert_unique(&nmm->m_nodes, node) != 0) {
+        mem_free(nmm->m_alloc, buf);
+        return NULL;
+    }
+
+    if (node->m_category == gd_nm_node_group) {
+        struct gd_nm_group * group;
+
+        group = gd_nm_group_from_node(node);
+
+        if (cpe_hash_table_init(
+                &group->m_members,
+                nmm->m_alloc,
+                (cpe_hash_fun_t)gd_nm_binding_node_name_hash,
+                (cpe_hash_cmp_t)gd_nm_binding_node_name_cmp,
+                CPE_HASH_OBJ2ENTRY(gd_nm_binding, m_hh_for_group),
+                0) != 0)
+        {
+            cpe_hash_table_remove_by_ins(&nmm->m_nodes, node);
+            mem_free(nmm->m_alloc, buf);
+            return NULL;
+        }
+    }
 
     return node;
 }
@@ -44,28 +69,29 @@ void gd_nm_node_free(gd_nm_node_t node) {
     if (node->m_type && node->m_type->destruct) {
         node->m_type->destruct(node);
     }
-    cpe_hash_table_remove_by_ins(&node->m_mgr->m_nodes, node);
-}
-
-void gd_nm_node_free_from_mgr(gd_nm_node_t node) {
-    if (node->m_category == gd_nm_node_group) {
-        gd_nm_group_free_from_mgr(gd_nm_group_from_node(node));
-    }
-    else {
-        gd_nm_instance_free_from_mgr((struct gd_nm_instance *)node);
-    }
-}
-
-void gd_nm_node_free_from_mgr_base(gd_nm_node_t node) {
-    assert(node);
 
     while(!TAILQ_EMPTY(&node->m_to_group_bindings)) {
-        struct gd_nm_binding * binding = TAILQ_FIRST(&node->m_to_group_bindings);
-        
-        TAILQ_REMOVE(&node->m_to_group_bindings, binding, m_qh);
-
-        gd_nm_binding_free_from_node(binding);
+        gd_nm_binding_free(TAILQ_FIRST(&node->m_to_group_bindings));
     }
+
+    if (node->m_category == gd_nm_node_group) {
+        struct cpe_hash_it member_it;
+        struct gd_nm_binding * member;
+        struct gd_nm_group * group;
+        
+        group = gd_nm_group_from_node(node);
+
+        cpe_hash_it_init(&member_it, &group->m_members);
+        member = cpe_hash_it_next(&member_it);
+        while(member) {
+            struct gd_nm_binding * next = cpe_hash_it_next(&member_it);
+            gd_nm_binding_free(member);
+            member = next; 
+        }
+        cpe_hash_table_fini(&group->m_members);
+    }
+
+    cpe_hash_table_remove_by_ins(&node->m_mgr->m_nodes, node);
 
     mem_free(node->m_mgr->m_alloc, node->m_name);
 }

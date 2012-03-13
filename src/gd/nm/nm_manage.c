@@ -25,11 +25,6 @@ gd_nm_mgr_t gd_nm_mgr_create(mem_allocrator_t alloc) {
         return NULL;
     }
 
-    cpe_hash_table_set_destory_fun(
-        &nmm->m_nodes,
-        (cpe_hash_destory_t)gd_nm_node_free_from_mgr,
-        NULL);
-
     mem_buffer_init(&nmm->m_binding_buffer, alloc);
     TAILQ_INIT(&nmm->m_binding_free_list);
 
@@ -37,7 +32,18 @@ gd_nm_mgr_t gd_nm_mgr_create(mem_allocrator_t alloc) {
 }
 
 void gd_nm_mgr_free(gd_nm_mgr_t nmm) {
+    struct cpe_hash_it node_it;
+    gd_nm_node_t node;
+
     if (nmm == NULL) return;
+
+    cpe_hash_it_init(&node_it, &nmm->m_nodes);
+    node = cpe_hash_it_next(&node_it);
+    while(node) {
+        gd_nm_node_t next = cpe_hash_it_next(&node_it);
+        gd_nm_node_free(node);
+        node = next;
+    }
 
     cpe_hash_table_fini(&nmm->m_nodes);
 
