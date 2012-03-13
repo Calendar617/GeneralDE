@@ -11,7 +11,7 @@
 #include "protocol/base/base_package_internal.h"
 #include "bpg_internal_ops.h"
 
-static int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, struct basepkg * pkg, error_monitor_t em);
+static int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_req_t req, struct basepkg * pkg, error_monitor_t em);
 static int bpg_rsp_copy_req_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_req_t bpg_req, error_monitor_t em);
 static int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_req_t bpg_req, struct basepkg * pkg, error_monitor_t em);
 
@@ -66,7 +66,7 @@ int bpg_rsp_execute(gd_dp_req_t dp_req, void * ctx, error_monitor_t em) {
         return 0;
     }
 
-    if (bpg_rsp_copy_pkg_to_ctx(bpg_rsp, op_context, pkg, em) != 0) {
+    if (bpg_rsp_copy_pkg_to_ctx(bpg_rsp, op_context, req, pkg, em) != 0) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_execute: copy data from pdu to context!",
             bpg_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
@@ -99,7 +99,7 @@ int bpg_rsp_execute(gd_dp_req_t dp_req, void * ctx, error_monitor_t em) {
     return 0;
 }
 
-static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, struct basepkg * pkg, error_monitor_t em) {
+static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_req_t req, struct basepkg * pkg, error_monitor_t em) {
     int cmd_entry_idx;
     LPDRMETA data_meta;
     logic_data_t data;
@@ -116,6 +116,8 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, s
         }
     }
     else {
+        bpg_data_convert_fun_t decode;
+        
         data_meta = dr_entry_self_meta(dr_meta_entry_at(mgr->m_request_meta, cmd_entry_idx));
         if (data_meta == NULL) {
             CPE_ERROR(
@@ -133,10 +135,13 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, s
             return -1;
         }
 
-        if (mgr->m_cvt_decode(
+        decode = req->m_cvt_decode;
+        if (decode == NULL) decode = bpg_copy_convert;
+
+        if (decode(
                 logic_data_data(data), logic_data_capacity(data),
                 pkg->body, pkg->head.bodylen,
-                mgr->m_cvt_ctx, em) != 0)
+                req->m_cvt_ctx, em) != 0)
         {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: %s decode data fail, input len is %d, output len is %d!",
@@ -149,12 +154,14 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, s
     return 0;
 }
 
-static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, struct basepkg * pkg, error_monitor_t em) {
+static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_req_t req, struct basepkg * pkg, error_monitor_t em) {
     LPDRMETA data_meta;
     logic_data_t data;
     int i;
     int buf_begin;
     bpg_manage_t mgr;
+    bpg_data_convert_fun_t decode;
+
 
     mgr = rsp->m_mgr;
 
@@ -164,6 +171,9 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
             bpg_manage_name(mgr), bpg_rsp_name(rsp), pkg->head.appendInfoCount);
         return -1;
     }
+
+    decode = req->m_cvt_decode;
+    if (decode == NULL) decode = bpg_copy_convert;
 
     buf_begin =  pkg->head.bodylen;
     for(i = 0; i < pkg->head.appendInfoCount; ++i) {
@@ -193,10 +203,10 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
             return -1;
         }
 
-        if (mgr->m_cvt_decode(
+        if (decode(
                 logic_data_data(data), logic_data_capacity(data),
                 pkg->body, append->size,
-                mgr->m_cvt_ctx, em) != 0)
+                req->m_cvt_ctx, em) != 0)
         {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: append %d: %s decode data fail, input len is %d, output len is %d!",
@@ -210,7 +220,7 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
     return 0;
 }
 
-int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, struct basepkg * pkg, error_monitor_t em) {
+int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_req_t req, struct basepkg * pkg, error_monitor_t em) {
     bpg_manage_t mgr;
 
     mgr = rsp->m_mgr;
@@ -229,15 +239,8 @@ int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, struct ba
         return -1;
     }
 
-    if (mgr->m_cvt_decode == NULL) {
-        CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: decode is not set!",
-            bpg_manage_name(mgr), bpg_rsp_name(rsp));
-        return -1;
-    }
-
-    if (bpg_rsp_copy_main_to_ctx(rsp, op_context, pkg, em) != 0) return -1;
-    if (bpg_rsp_copy_append_to_ctx(rsp, op_context, pkg, em) != 0) return -1;
+    if (bpg_rsp_copy_main_to_ctx(rsp, op_context, req, pkg, em) != 0) return -1;
+    if (bpg_rsp_copy_append_to_ctx(rsp, op_context, req, pkg, em) != 0) return -1;
 
     return 0;
 }
@@ -290,6 +293,20 @@ int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context
     }
 
     buf = (struct bpg_carry_info *)logic_data_data(data);
+    buf->clientId = pkg->head.clientId;
+    buf->cmd = pkg->head.cmd;
+    buf->carry_data_size = bpg_req_carry_data_size(bpg_req);
+
+    if (bpg_req_carry_data_meta(bpg_req)) {
+        strncpy(buf->carry_meta_name, dr_meta_name(bpg_req_carry_data_meta(bpg_req)), sizeof(buf->carry_meta_name));
+    }
+    else {
+        buf->carry_meta_name[0] = 0;
+    }
+
+    buf->cvt_encode = (uint64_t)(ptr_int_t)(bpg_req->m_cvt_encode);
+    buf->cvt_decode = (uint64_t)(ptr_int_t)(bpg_req->m_cvt_decode);
+    buf->cvt_ctx = (uint64_t)(ptr_int_t)(bpg_req->m_cvt_ctx);
 
     return 0;
 }

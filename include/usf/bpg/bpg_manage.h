@@ -47,12 +47,6 @@ int bpg_manager_set_send_to(bpg_manage_t mgr, const char * name);
 LPDRMETALIB bpg_manage_metalib(bpg_manage_t mgr);
 int bpg_manage_set_metalib(bpg_manage_t mgr, LPDRMETALIB metalib);
 
-void bpg_manage_set_convert(
-    bpg_manage_t mgr,
-    bpg_data_convert_fun_t encode,
-    bpg_data_convert_fun_t decode,
-    void * ctx);
-
 uint32_t bpg_manage_flags(bpg_manage_t mgr);
 void bpg_manage_flags_set(bpg_manage_t mgr, uint32_t flag);
 void bpg_manage_flag_enable(bpg_manage_t mgr, bpg_manage_flag_t flag);

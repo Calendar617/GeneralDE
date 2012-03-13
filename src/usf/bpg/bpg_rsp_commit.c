@@ -70,6 +70,12 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
         return;
     }
 
+    bpg_req_set_convertor(
+        response_buf,
+        (bpg_data_convert_fun_t)(ptr_int_t)bpg_private->cvt_encode,
+        (bpg_data_convert_fun_t)(ptr_int_t)bpg_private->cvt_decode,
+        (void *)(ptr_int_t)bpg_private->cvt_ctx);
+
     if (bpg_req_pkg_capacity(response_buf) < sizeof(struct basepkg_head)) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_commit: response buf size is too small, head size is %d, but response buf size is %d!",
@@ -91,7 +97,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
     if (bpg_rsp_copy_ctx_to_pkg(bpg_rsp, op_context, pkg, bpg_req_pkg_capacity(response_buf), em) != 0) return;
 
     if (gd_dp_dispatch_by_string(bpg_mgr->m_send_to, bpg_req_to_dp_req(response_buf), em) != 0) {
-        CPE_ERROR(em, "%s.%s: bpg_rsp_commit: dispatch fail!", bpg_manage_name(bpg_mgr)), bpg_rsp_name(bpg_rsp);
+        CPE_ERROR(em, "%s.%s: bpg_rsp_commit: dispatch fail!", bpg_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
         return;
     }
 }

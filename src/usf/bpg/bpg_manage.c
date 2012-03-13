@@ -60,10 +60,6 @@ bpg_manage_create(
     mgr->m_ctx_fini = NULL;
     mgr->m_ctx_ctx = NULL;
 
-    mgr->m_cvt_encode = NULL;
-    mgr->m_cvt_decode = NULL;
-    mgr->m_cvt_ctx = NULL;
-
     mgr->m_rsp_size_max = 4 * 1024;
     mgr->m_rsp_buf = NULL;
 
@@ -282,17 +278,6 @@ int bpg_manage_set_metalib(bpg_manage_t mgr, LPDRMETALIB metalib) {
     }
 
     return rv;
-}
-
-void bpg_manage_set_convert(
-    bpg_manage_t mgr,
-    bpg_data_convert_fun_t encode,
-    bpg_data_convert_fun_t decode,
-    void * ctx)
-{
-    mgr->m_cvt_encode = encode;
-    mgr->m_cvt_decode = decode;
-    mgr->m_cvt_ctx = ctx;
 }
 
 uint32_t bpg_manage_flags(bpg_manage_t mgr) {

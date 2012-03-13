@@ -29,10 +29,6 @@ struct bpg_manage {
     bpg_logic_ctx_fini_fun_t m_ctx_fini;
     void * m_ctx_ctx;
 
-    bpg_data_convert_fun_t m_cvt_encode;
-    bpg_data_convert_fun_t m_cvt_decode;
-    void * m_cvt_ctx;
-
     size_t m_rsp_size_max;
     bpg_req_t m_rsp_buf;
 
@@ -50,14 +46,19 @@ struct bpg_rsp {
     logic_executor_t m_executor;
     uint32_t m_flags;
 
-    bpg_rsp_copy_info_list_t m_pdu_to_ctx;
     bpg_rsp_copy_info_list_t m_ctx_to_pdu;
 };
 
 struct bpg_req {
+    bpg_data_convert_fun_t m_cvt_encode;
+    bpg_data_convert_fun_t m_cvt_decode;
+    void * m_cvt_ctx;
+
     LPDRMETA m_carry_data_meta;
     size_t m_carry_data_size;
     size_t m_carry_data_capacity;
+
+
     gd_dp_req_t m_dp_req;
 };
 
