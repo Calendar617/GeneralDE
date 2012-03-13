@@ -3,12 +3,12 @@
 #include "cpe/utils/memory.h"
 #include "cpe/utils/hash_string.h"
 #include "gd/app/app_types.h"
+#include "utils_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef uint64_t usf_id_t;
 typedef struct usf_id_generator * usf_id_generator_t;
 
 usf_id_generator_t
