@@ -315,7 +315,7 @@ EXPORT_DIRECTIVE
 void bpg_manager_app_fini(gd_app_context_t app, gd_app_module_t module) {
     bpg_manage_t bpg_manager;
 
-    bpg_manager = bpg_manage_find(app, gd_app_module_name_hs(module));
+    bpg_manager = bpg_manage_find_nc(app, gd_app_module_name(module));
     if (bpg_manager) {
         bpg_manage_free(bpg_manager);
     }
