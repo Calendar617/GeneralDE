@@ -29,6 +29,8 @@ typedef int (*bpg_data_convert_fun_t)(
     void * ctx,
     error_monitor_t em);
 
+typedef struct bpg_req * bpg_req_t;
+
 #ifdef __cplusplus
 }
 #endif
