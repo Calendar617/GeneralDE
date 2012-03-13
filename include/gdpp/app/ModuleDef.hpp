@@ -21,15 +21,17 @@
         Gd::App::Module & module,                                       \
         Cpe::Cfg::Node & moduleCfg)                                     \
     {                                                                   \
+        __module_impl * product = NULL;                                 \
         try {                                                           \
-            __module_impl * product =                                   \
-                new (app.nmManager(), cpe_hs_data(__module_name::NAME)) \
+            product =                                                   \
+                new (app.nmManager(), module.name())                    \
                 __module_impl(app, module, moduleCfg);                  \
             (void)product;                                              \
             __init(product, app, module, moduleCfg);                    \
             return 0;                                                   \
         }                                                               \
         APP_CTX_CATCH_EXCEPTION(app, #__module_name " init:");          \
+        if (product) app.nmManager().removeObject(module.name());       \
         return -1;                                                      \
     }                                                                   \
                                                                         \
@@ -38,7 +40,7 @@
         Gd::App::Application & app,                                     \
         Gd::App::Module & module)                                       \
     {                                                                   \
-        app.nmManager().removeObject(__module_name::NAME);              \
+        app.nmManager().removeObject(module.name());                    \
     }                                                                   \
 
 
