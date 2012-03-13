@@ -13,7 +13,7 @@ public:
 extern "C" {
 int rsp_processor_1(gd_dp_req_t req, void * ctx, error_monitor_t em) { return 0; }
 int rsp_processor_1_init(gd_dp_rsp_t rsp, gd_app_context_t context, gd_app_module_type_t module, cfg_t cfg) { 
-    gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_processor, rsp_processor_1);
+    gd_dp_rsp_set_processor(rsp, rsp_processor_1, NULL);
     return 0;
 }
 int rsp_init_no_processor(gd_dp_rsp_t rsp, gd_app_context_t context, gd_app_module_type_t module, cfg_t cfg) { return 0; }
@@ -202,7 +202,7 @@ TEST_F(RspTest, rsp_load_no_binding) {
 
 extern "C"
 int rsp_default_with_init_init(gd_dp_rsp_t rsp, gd_app_context_t context, gd_app_module_type_t module, cfg_t cfg) { 
-    gd_dp_rsp_set_opt(rsp, gd_dp_rsp_set_processor, rsp_processor_1);
+    gd_dp_rsp_set_processor(rsp, rsp_processor_1, NULL);
     return 0;
 }
 
