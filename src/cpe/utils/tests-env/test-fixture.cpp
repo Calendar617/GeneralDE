@@ -1,7 +1,10 @@
+#include "cpe/utils/stream_buffer.h"
+#include "cpe/utils/memory_debug.h"
 #include "cpe/utils/tests-env/test-fixture.hpp"
 
 namespace testenv {
 
+/*tmp allocrator impl*/
 static void * do_tmp_alloc(size_t size, struct mem_allocrator * allocrator) {
     return mem_buffer_alloc((mem_buffer_t)(allocrator + 1), size);
 }
@@ -9,40 +12,20 @@ static void * do_tmp_alloc(size_t size, struct mem_allocrator * allocrator) {
 void do_tmp_free(void * p, struct mem_allocrator * allocrator) {
 }
 
-static void * do_count_alloc(size_t size, struct mem_allocrator * allocrator) {
-    struct Test::mem_allocrator_count * count_alloc = (struct Test::mem_allocrator_count *)allocrator;
-    ++count_alloc->m_alloc_count;
-    return mem_alloc(count_alloc->m_parent_alloc, size);
-}
+CPE_DEF_ERROR_MONITOR(g_test_fixture_em, cpe_error_log_to_consol, NULL);
 
-void do_count_free(void * p, struct mem_allocrator * allocrator) {
-    struct Test::mem_allocrator_count * count_alloc = (struct Test::mem_allocrator_count *)allocrator;
-    ++count_alloc->m_free_count;
-    return mem_free(count_alloc->m_parent_alloc, p);
-}
-
-Test::Test() {
+/*Test impl*/
+Test::Test() : m_allocrator(NULL) {
     m_tmp_allocrator.m_alloc = do_tmp_alloc;
     m_tmp_allocrator.m_free = do_tmp_free;
     mem_buffer_init(&m_tmp_alloc_buf, NULL);
 
-    m_allocrator.m_alloc.m_alloc = do_count_alloc;
-    m_allocrator.m_alloc.m_free = do_count_free;
-    m_allocrator.m_parent_alloc = NULL;
-    m_allocrator.m_alloc_count = 0;
-    m_allocrator.m_free_count = 0;
+    m_allocrator = mem_allocrator_debug_create(&m_tmp_allocrator, &m_tmp_allocrator, 10, &g_test_fixture_em);
 }
 
 Test::~Test() {
+    if (m_allocrator) mem_allocrator_debug_free(m_allocrator);
     mem_buffer_clear(&m_tmp_alloc_buf);
-}
-
-int Test::t_alloc_count(void) const {
-    return m_allocrator.m_alloc_count;
-}
-
-int Test::t_free_count(void) const {
-    return m_allocrator.m_free_count;
 }
 
 void Test::SetUp() {
@@ -52,9 +35,32 @@ void Test::TearDown() {
     CHECK_NO_MEMLEAK();
 }
 
+int Test::t_alloc_count(void) const {
+    return mem_allocrator_debug_alloc_count(m_allocrator);
+}
+
+int Test::t_free_count(void) const {
+    return mem_allocrator_debug_free_count(m_allocrator);
+}
+
+const char * Test::t_allocrator_alloc_info(void) {
+    struct mem_buffer buffer;
+    mem_buffer_init(&buffer, NULL);
+
+    struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&buffer);
+    mem_allocrator_debug_dump((write_stream_t)&stream, 4, m_allocrator);
+    stream_putc((write_stream_t)&stream, 0);
+
+    char * r = t_tmp_strdup((char *)mem_buffer_make_continuous(&buffer, 0));
+
+    mem_buffer_clear(&buffer);
+
+    return r;
+}
+
 mem_allocrator_t
 Test::t_allocrator() {
-    return &m_allocrator.m_alloc;
+    return m_allocrator;
 }
 
 void *
