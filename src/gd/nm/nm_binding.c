@@ -2,24 +2,7 @@
 #include <string.h>
 #include "nm_internal_ops.h"
 
-void gd_nm_binding_free_from_group(struct gd_nm_binding * binding) {
-    gd_nm_mgr_t nmm;
-    assert(binding);
-    assert(binding->m_group);
-    assert(binding->m_node);
-    assert(binding->m_group->m_mgr == binding->m_node->m_mgr);
-
-    nmm = binding->m_node->m_mgr;
-
-    TAILQ_REMOVE(
-        &binding->m_node->m_to_group_bindings,
-        binding,
-        m_qh);
-
-    gd_nm_binding_put(nmm, binding);
-}
-
-void gd_nm_binding_free_from_node(struct gd_nm_binding * binding) {
+void gd_nm_binding_free(struct gd_nm_binding * binding) {
     gd_nm_mgr_t nmm;
     assert(binding);
     assert(binding->m_group);
@@ -31,6 +14,11 @@ void gd_nm_binding_free_from_node(struct gd_nm_binding * binding) {
     cpe_hash_table_remove_by_ins(
         &binding->m_group->m_members,
         binding);
+
+    TAILQ_REMOVE(
+        &binding->m_node->m_to_group_bindings,
+        binding,
+        m_qh);
 
     gd_nm_binding_put(nmm, binding);
 }
