@@ -16,6 +16,12 @@ public:
     static LogicOp & get(gd_app_context_t app, cpe_hash_string_t name);
     static LogicOp & get(gd_app_context_t app, const char * name);
 
+    static void init(
+        LogicOp * product,
+        Gd::App::Application & app,
+        Gd::App::Module & module,
+        Cpe::Cfg::Node & moduleCfg);
+
 private:
     execute_fun m_exec_fun;
 

@@ -38,19 +38,27 @@ LogicOpTypeGroup::instance(gd_app_context_t app, cpe_hash_string_t name) {
     else {
         if (app == 0) app = g_app_context;
 
-        if (name) {
-            APP_CTX_THROW_EXCEPTION(
-                app,
-                ::std::runtime_error,
-                "get Usf::Logic::LogicOpTypeGroup with name %s fail!",
-                cpe_hs_data(name));
-        }
-        else {
-            APP_CTX_THROW_EXCEPTION(
-                app,
-                ::std::runtime_error,
-                "get Usf::Logic::LogicOpTypeGroup default fail!");
-        }
+        APP_CTX_THROW_EXCEPTION(
+            app,
+            ::std::runtime_error,
+            "get Usf::Logic::LogicOpTypeGroup '%s' fail!",
+            name ? cpe_hs_data(name) : "default");
+    }
+}
+
+LogicOpTypeGroup &
+LogicOpTypeGroup::instance(gd_app_context_t app, const char * name) {
+    if (LogicOpTypeGroup * r = find(app, name)) {
+        return *r;
+    }
+    else {
+        if (app == 0) app = g_app_context;
+
+        APP_CTX_THROW_EXCEPTION(
+            app,
+            ::std::runtime_error,
+            "get Usf::Logic::LogicOpTypeGroup '%s' fail!",
+            name ? name : "default");
     }
 }
 
@@ -62,6 +70,18 @@ LogicOpTypeGroup::find(gd_app_context_t app, cpe_hash_string_t name) {
         name == 0
         ? logic_executor_type_group_default(app)
         : logic_executor_type_group_find(app, name);
+
+    return (LogicOpTypeGroup*)type_group;
+}
+
+LogicOpTypeGroup *
+LogicOpTypeGroup::find(gd_app_context_t app, const char * name) {
+    if (app == 0) app = g_app_context;
+
+    logic_executor_type_group_t type_group =
+        name == 0
+        ? logic_executor_type_group_default(app)
+        : logic_executor_type_group_find_nc(app, name);
 
     return (LogicOpTypeGroup*)type_group;
 }

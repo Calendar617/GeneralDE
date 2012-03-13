@@ -13,19 +13,27 @@ LogicOpManager::instance(gd_app_context_t app, cpe_hash_string_t name) {
     else {
         if (app == 0) app = g_app_context;
 
-        if (name) {
-            APP_CTX_THROW_EXCEPTION(
-                app,
-                ::std::runtime_error,
-                "get Usf::Logic::LogicOpManager with name %s fail!",
-                cpe_hs_data(name));
-        }
-        else {
-            APP_CTX_THROW_EXCEPTION(
-                app,
-                ::std::runtime_error,
-                "get Usf::Logic::LogicOpManager default fail!");
-        }
+        APP_CTX_THROW_EXCEPTION(
+            app,
+            ::std::runtime_error,
+            "get Usf::Logic::LogicOpManager '%s' fail!",
+            name ? cpe_hs_data(name) : "default");
+    }
+}
+
+LogicOpManager &
+LogicOpManager::instance(gd_app_context_t app, const char * name) {
+    if (LogicOpManager * r = find(app, name)) {
+        return *r;
+    }
+    else {
+        if (app == 0) app = g_app_context;
+
+        APP_CTX_THROW_EXCEPTION(
+            app,
+            ::std::runtime_error,
+            "get Usf::Logic::LogicOpManager '%s' fail!",
+            name ? name : "default");
     }
 }
 
@@ -37,6 +45,18 @@ LogicOpManager::find(gd_app_context_t app, cpe_hash_string_t name) {
         name == 0
         ? logic_manage_default(app)
         : logic_manage_find(app, name);
+
+    return (LogicOpManager*)logic_manager;
+}
+
+LogicOpManager *
+LogicOpManager::find(gd_app_context_t app, const char * name) {
+    if (app == 0) app = g_app_context;
+
+    logic_manage_t logic_manager =
+        name == 0
+        ? logic_manage_default(app)
+        : logic_manage_find_nc(app, name);
 
     return (LogicOpManager*)logic_manager;
 }

@@ -34,7 +34,10 @@ public:
     void destory(void) { logic_manage_free(*this); }
 
     static LogicOpManager & instance(gd_app_context_t app = 0, cpe_hash_string_t name = 0);
+    static LogicOpManager & instance(gd_app_context_t app, const char * name);
+
     static LogicOpManager * find(gd_app_context_t app = 0, cpe_hash_string_t name = 0);
+    static LogicOpManager * find(gd_app_context_t app, const char * name);
 
     static LogicOpManager & install(gd_app_context_t app, mem_allocrator_t alloc = 0, const char * name = 0);
     static void uninstall(gd_app_context_t app, cpe_hash_string_t name = 0);

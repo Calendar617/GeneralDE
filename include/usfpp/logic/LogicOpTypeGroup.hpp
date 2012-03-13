@@ -26,7 +26,10 @@ public:
     void destory(void) { logic_executor_type_group_free(*this); }
 
     static LogicOpTypeGroup & instance(gd_app_context_t app = 0, cpe_hash_string_t name = 0);
+    static LogicOpTypeGroup & instance(gd_app_context_t app, const char * name);
+
     static LogicOpTypeGroup * find(gd_app_context_t app = 0, cpe_hash_string_t name = 0);
+    static LogicOpTypeGroup * find(gd_app_context_t app, const char * name);
 
     static LogicOpTypeGroup & install(gd_app_context_t app, mem_allocrator_t alloc = 0, const char * name = 0);
     static void uninstall(gd_app_context_t app, cpe_hash_string_t name = 0);
