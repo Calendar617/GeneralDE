@@ -42,10 +42,7 @@ const char * bpg_manage_response_meta_name(bpg_manage_t mgr);
 int bpg_manage_set_response_meta_name(bpg_manage_t mgr, const char * name);
 
 const char * bpg_manager_send_to(bpg_manage_t mgr);
-void bpg_manager_set_send_to(bpg_manage_t mgr, const char * name);
-
-const char * bpg_manager_receive_from(bpg_manage_t mgr);
-void bpg_manager_set_receive_from(bpg_manage_t mgr, const char * name);
+int bpg_manager_set_send_to(bpg_manage_t mgr, const char * name);
 
 LPDRMETALIB bpg_manage_metalib(bpg_manage_t mgr);
 int bpg_manage_set_metalib(bpg_manage_t mgr, LPDRMETALIB metalib);

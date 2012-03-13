@@ -120,8 +120,7 @@ static int bpg_rsp_create_dp_rsp_and_bind(bpg_rsp_t bpg_rsp, cfg_t cfg) {
         return -1;
     }
 
-    gd_dp_rsp_set_opt(dp_rsp, gd_dp_rsp_set_processor, bpg_rsp_execute);
-    gd_dp_rsp_set_opt(dp_rsp, gd_dp_rsp_set_context, bpg_rsp);
+    gd_dp_rsp_set_processor(dp_rsp, bpg_rsp_execute, bpg_rsp);
 
     if (bpg_rsp_bind_dp_rsp(bpg_rsp, dp_rsp, cfg_respons) != 0) {
         gd_dp_rsp_free(dp_rsp);

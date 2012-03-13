@@ -12,6 +12,7 @@ bpg_req_t bpg_manage_rsp_buf(bpg_manage_t mgr, LPDRMETA carry_meta, size_t caary
 
 /*bpg_rsp ops*/
 int bpg_rsp_execute(gd_dp_req_t req, void * ctx, error_monitor_t em);
+void bpg_rsp_commit(logic_context_t op_context, void * user_data);
 
 /*bpg_rsp_copy_info ops*/
 struct bpg_rsp_copy_info * bpg_rsp_copy_info_create(bpg_manage_t mgr, const char * data_name);

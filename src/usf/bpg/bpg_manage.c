@@ -67,6 +67,8 @@ bpg_manage_create(
     mgr->m_rsp_size_max = 4 * 1024;
     mgr->m_rsp_buf = NULL;
 
+    mgr->m_send_to = NULL;
+
     gd_nm_node_set_type(mgr_node, &s_nm_node_type_bpg_manage);
 
     return mgr;
@@ -79,6 +81,11 @@ static void bpg_manage_clear(gd_nm_node_t node) {
     if (mgr->m_rsp_buf) {
         bpg_req_free(mgr->m_rsp_buf);
         mgr->m_rsp_buf = NULL;
+    }
+
+    if (mgr->m_send_to) {
+        mem_free(mgr->m_alloc, mgr->m_send_to);
+        mgr->m_send_to = NULL;
     }
 }
 
@@ -129,6 +136,22 @@ const char * bpg_manage_name(bpg_manage_t mgr) {
 cpe_hash_string_t
 bpg_manage_name_hs(bpg_manage_t mgr) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
+}
+
+const char * bpg_manager_send_to(bpg_manage_t mgr) {
+    return mgr->m_send_to ? cpe_hs_data(mgr->m_send_to) : NULL;
+}
+
+int bpg_manager_set_send_to(bpg_manage_t mgr, const char * name) {
+    cpe_hash_string_t new_send_to;
+
+    new_send_to = cpe_hs_create(mgr->m_alloc, name);
+    if (new_send_to == NULL) return -1;
+
+    if (mgr->m_send_to) mem_free(mgr->m_alloc, mgr->m_send_to);
+    mgr->m_send_to = new_send_to;
+
+    return 0;
 }
 
 bpg_req_t

@@ -1,6 +1,7 @@
 #include "gd/dp/dp_request.h"
 #include "gd/app/app_context.h"
 #include "usf/bpg/bpg_req.h"
+#include "protocol/base/base_package.h"
 #include "bpg_internal_types.h"
 
 bpg_req_t
@@ -12,6 +13,9 @@ bpg_req_create(
 {
     gd_dp_req_t dp_req;
     bpg_req_t bpg_req;
+    struct basepkg * pkg;
+
+    if (pkg_capacity < sizeof (struct basepkg)) return NULL;
 
     dp_req = gd_dp_req_create(
         gd_app_dp_mgr(app),
@@ -26,7 +30,12 @@ bpg_req_create(
     bpg_req->m_carry_data_capacity = carry_data_capacity;
     bpg_req->m_dp_req = dp_req;
 
-    bpg_req_pkg_data_set_size(bpg_req, 0);
+    bpg_req_pkg_data_set_size(bpg_req, sizeof(struct basepkg));
+
+    pkg = (struct basepkg *)bpg_req_pkg_data(bpg_req);
+    bzero(pkg, sizeof(struct basepkg));
+    pkg->head.magic = BASEPKG_HEAD_MAGIC;
+    pkg->head.version = 1;
 
     return bpg_req;
 }
