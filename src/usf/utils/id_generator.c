@@ -19,6 +19,7 @@ struct usf_id_generator {
     const char * m_save_file;
     uint32_t m_one_alloc_size;
     struct cpe_range m_range;
+    int m_debug;
 };
 
 static void usf_id_generator_clear(gd_nm_node_t node);
@@ -48,6 +49,9 @@ usf_id_generator_create(
     generator->m_app = app;
     generator->m_alloc = alloc ? alloc : gd_app_alloc(app);
     generator->m_em = em ? em : gd_app_em(app);
+    generator->m_save_file = NULL;
+    generator->m_one_alloc_size = 2046;
+    generator->m_debug = 0;
 
     gd_nm_node_set_type(generator_node, &s_nm_node_type_usf_id_generator);
 
@@ -57,6 +61,11 @@ usf_id_generator_create(
 static void usf_id_generator_clear(gd_nm_node_t node) {
     usf_id_generator_t generator;
     generator = (usf_id_generator_t)gd_nm_node_data(node);
+
+    if (generator->m_save_file) {
+        mem_free(generator->m_alloc, generator->m_save_file);
+        generator->m_save_file = NULL;
+    }
 }
 
 void usf_id_generator_free(usf_id_generator_t generator) {
@@ -103,6 +112,36 @@ usf_id_generator_name_hs(usf_id_generator_t generator) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(generator));
 }
 
+const char * usf_id_generator_save_file(usf_id_generator_t generator) {
+    return generator->m_save_file;
+}
+
+int usf_id_generator_set_save_file(usf_id_generator_t generator, const char * file) {
+    char * new_save_file;
+    size_t size;
+    size = strlen(file) + 1;
+
+    new_save_file = mem_alloc(generator->m_alloc, size);
+    if (new_save_file == NULL) return -1;
+
+    memcpy(new_save_file, file, size);
+
+    if (generator->m_save_file) {
+        mem_free(generator->m_alloc, generator->m_save_file);
+    }
+
+    generator->m_save_file = new_save_file;
+    return 0;
+}
+
+uint32_t usf_id_generator_once_alloc_size(usf_id_generator_t generator) {
+    return generator->m_one_alloc_size;
+}
+
+void usf_id_generator_set_once_alloc_size(usf_id_generator_t generator, uint32_t once_alloc_size) {
+    generator->m_one_alloc_size = once_alloc_size;
+}
+
 static int usf_id_generator_read_range_start(ptr_int_t * result, usf_id_generator_t generator) {
     struct mem_buffer buffer;
     ssize_t size;
@@ -143,9 +182,12 @@ static int usf_id_generator_read_range_start(ptr_int_t * result, usf_id_generato
 
     mem_buffer_clear(&buffer);
 
-    CPE_INFO(
-        generator->m_em, "usf_id_generator %s: load new range success: start at %d",
-        usf_id_generator_name(generator), (int)*result);
+    if (usf_id_generator->m_debug) {
+        CPE_INFO(
+            generator->m_em, "usf_id_generator %s: load new range success: start at %d",
+            usf_id_generator_name(generator), (int)*result);
+    }
+
     return 0;
 }
 
@@ -161,9 +203,12 @@ static int usf_id_generator_write_back(usf_id_generator_t id_generator, ptr_int_
         return -1;
     }
 
-    CPE_INFO(
-        id_generator->m_em, "usf_id_generator %s: save new range success: value is %d",
-        usf_id_generator_name(id_generator), (int)new_begin);
+    if (usf_id_generator->m_debug) {
+        CPE_INFO(
+            id_generator->m_em, "usf_id_generator %s: save new range success: value is %d",
+            usf_id_generator_name(id_generator), (int)new_begin);
+    }
+
     return 0;
 }
 
@@ -219,6 +264,23 @@ int usf_id_generator_app_init(gd_app_context_t app, gd_app_module_t module, cfg_
 
     usf_id_generator = usf_id_generator_create(app, gd_app_module_name(module), NULL, NULL);
     if (usf_id_generator == NULL) return -1;
+
+    if (usf_id_generator_set_save_file(usf_id_generator, save_file) != 0) {
+        CPE_ERROR(gd_app_em(app), "%s: set save-file fail!", gd_app_module_name(module));
+        usf_id_generator_free(usf_id_generator);
+        return -1;
+    }
+
+    usf_id_generator_set_once_alloc_size(
+        cfg_get_uint32(cfg, "once-alloc-size", usf_id_generator->m_one_alloc_size));
+
+    usf_id_generator->m_debug = cfg_get_uint32(cfg, "debug", 0);
+
+    if (usf_id_generator->m_debug) {
+        CPE_INFO(
+            gd_app_em(app), "%s: save-file=%s, once-alloc-size=%d!",
+            gd_app_module_name(module), usf_id_generator->m_save_file, usf_id_generator->m_one_alloc_size);
+    }
 
     return 0;
 }
