@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+void bpg_net_agent_accept(net_listener_t listener, net_ep_t ep, void * ctx);
+
 #ifdef __cplusplus
 }
 #endif
