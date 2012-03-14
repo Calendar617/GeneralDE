@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "cpe/pal/pal_stdlib.h"
 #include "cpe/pal/pal_external.h"
+#include "cpe/cfg/cfg_read.h"
 #include "cpe/utils/error.h"
 #include "cpe/utils/range.h"
 #include "cpe/utils/file.h"
@@ -107,7 +108,12 @@ static int usf_id_generator_read_range_start(ptr_int_t * result, usf_id_generato
     ssize_t size;
     char * read_end_pos;
 
-    if (!file_exist(generator->m_save_file, generator->m_em)) return 1;
+    if (generator->m_save_file == NULL) return -1;
+
+    if (!file_exist(generator->m_save_file, generator->m_em)) {
+        *result = 1;
+        return 0;
+    }
 
     mem_buffer_init(&buffer, NULL);
 
@@ -203,6 +209,13 @@ int usf_id_generator_generate(usf_id_t * r, usf_id_generator_t generator) {
 EXPORT_DIRECTIVE
 int usf_id_generator_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
     usf_id_generator_t usf_id_generator;
+    const char * save_file;
+
+    save_file = cfg_get_string(cfg, "save-file", NULL);
+    if (save_file == NULL) {
+        CPE_ERROR(gd_app_em(app), "%s: save-file not configured!", gd_app_module_name(module));
+        return -1;
+    }
 
     usf_id_generator = usf_id_generator_create(app, gd_app_module_name(module), NULL, NULL);
     if (usf_id_generator == NULL) return -1;
