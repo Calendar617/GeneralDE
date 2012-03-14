@@ -4,7 +4,7 @@
 
 namespace Usf { namespace Utils {
 
-usf_id_t IdGenerator::generate(void) {
+usf_id_t IdGenerator::generateId(void) {
     usf_id_t r;
     if (usf_id_generator_generate(&r, *this) != 0) {
         APP_CTX_THROW_EXCEPTION(
@@ -14,6 +14,15 @@ usf_id_t IdGenerator::generate(void) {
     }
 
     return r;
+}
+
+void IdGenerator::setNextId(usf_id_t id) {
+    if (usf_id_generator_set_next_id(*this, id) != 0) {
+        APP_CTX_THROW_EXCEPTION(
+            app(),
+            ::std::runtime_error,
+            "IdGeneratro %s set next id %d fail!", name(), (int)id);
+    }
 }
 
 IdGenerator & IdGenerator::instance(gd_app_context_t app, cpe_hash_string_t name) {

@@ -10,7 +10,8 @@ class IdGenerator : public Cpe::Utils::SimulateObject  {
 public:
     operator usf_id_generator_t () const { return (usf_id_generator_t)this; }
 
-    usf_id_t generate(void);
+    usf_id_t generateId(void);
+    void setNextId(usf_id_t id);
 
     Gd::App::Application & app(void) { return Gd::App::Application::_cast(usf_id_generator_app(*this)); }
     Gd::App::Application const & app(void) const { return Gd::App::Application::_cast(usf_id_generator_app(*this)); }

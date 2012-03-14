@@ -38,6 +38,8 @@ gd_app_context_t usf_id_generator_app(usf_id_generator_t generator);
 const char * usf_id_generator_name(usf_id_generator_t generator);
 cpe_hash_string_t usf_id_generator_name_hs(usf_id_generator_t generator);
 
+int usf_id_generator_set_next_id(usf_id_generator_t generator, usf_id_t id);
+
 #ifdef __cplusplus
 }
 #endif
