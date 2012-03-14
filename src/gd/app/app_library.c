@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include "cpe/pal/pal_dlfcn.h"
+#include "gd/app/app_library.h"
 #include "app_internal_ops.h"
 
 struct gd_app_lib {
