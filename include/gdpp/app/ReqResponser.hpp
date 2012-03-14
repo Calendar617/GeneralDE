@@ -32,16 +32,13 @@ public:
                     *((::Cpe::Cfg::Node*)cfg));             \
             if (processor == NULL) {return -1;}             \
                                                             \
-            gd_dp_rsp_set_opt(                              \
-                rsp, gd_dp_rsp_set_processor,               \
-                &::Gd::App::ReqResponser::_process);        \
-                                                            \
-            gd_dp_rsp_set_opt(                              \
-                rsp, gd_dp_rsp_set_context,                 \
+            gd_dp_rsp_set_processor(                        \
+                rsp,                                        \
+                &::Gd::App::ReqResponser::_process,         \
                 processor);                                 \
                                                             \
-            gd_dp_rsp_set_opt(                              \
-                rsp, gd_dp_rsp_set_type,                    \
+            gd_dp_rsp_set_type(                             \
+                rsp,                                        \
                 ::Gd::App::ReqResponser::_type);            \
                                                             \
             return 0;                                       \

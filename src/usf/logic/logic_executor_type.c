@@ -43,7 +43,7 @@ logic_executor_type_create(
 
 void logic_executor_type_free(logic_executor_type_t t) {
     cpe_hash_table_remove_by_ins(&t->m_group->m_types, t);
-    mem_free(t->m_group->m_alloc, t);
+    mem_free(t->m_group->m_alloc, (void*)t->m_name);
 }
 
 void logic_executor_type_free_all(logic_executor_type_group_t group) {
