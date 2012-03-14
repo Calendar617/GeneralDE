@@ -4,7 +4,6 @@
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "gd/app/app_context.h"
-#include "gd/app/app_module.h"
 #include "usf/bpg/bpg_manage.h"
 #include "usf/bpg/bpg_req.h"
 #include "usf/logic/logic_manage.h"
@@ -316,25 +315,5 @@ void bpg_manage_set_context_op(
 LPDRMETALIB bpg_metalib(void) {
     extern LPDRMETALIB g_metalib_base_package;
     return g_metalib_base_package;
-}
-
-EXPORT_DIRECTIVE
-int bpg_manager_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
-    bpg_manage_t bpg_manager;
-
-    bpg_manager = bpg_manage_create(app, gd_app_module_name(module), NULL, NULL);
-    if (bpg_manager == NULL) return -1;
-
-    return 0;
-}
-
-EXPORT_DIRECTIVE
-void bpg_manager_app_fini(gd_app_context_t app, gd_app_module_t module) {
-    bpg_manage_t bpg_manager;
-
-    bpg_manager = bpg_manage_find_nc(app, gd_app_module_name(module));
-    if (bpg_manager) {
-        bpg_manage_free(bpg_manager);
-    }
 }
 

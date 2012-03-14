@@ -1,6 +1,7 @@
 #ifndef USF_BASEPKG_TYPES_H
 #define USF_BASEPKG_TYPES_H
 #include "cpe/utils/error.h"
+#include "cpe/utils/hash_string.h"
 #include "cpe/cfg/cfg_types.h"
 #include "cpe/dr/dr_types.h"
 #include "usf/logic/logic_types.h"
