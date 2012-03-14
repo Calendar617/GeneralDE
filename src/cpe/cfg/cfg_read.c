@@ -316,7 +316,7 @@ int cfg_path_print(write_stream_t stream, cfg_t cfg, cfg_t to) {
 
 const char * cfg_path(mem_buffer_t buffer, cfg_t cfg, cfg_t to) {
     struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
-    mem_buffer_clear(buffer);
+    mem_buffer_clear_data(buffer);
     cfg_path_print((write_stream_t)&stream, cfg, to);
     stream_putc((write_stream_t)&stream, 0);
     return (const char *)mem_buffer_make_continuous(buffer, 0);
