@@ -33,6 +33,12 @@ int bpg_req_pkg_data_set_size(bpg_req_t req, size_t size);
 
 void bpg_req_pkg_init(bpg_req_t req);
 
+uint32_t bpg_req_cmd(bpg_req_t req);
+void bpg_req_set_cmd(bpg_req_t req, uint32_t cmd);
+
+uint32_t bpg_req_sn(bpg_req_t req);
+void bpg_req_set_sn(bpg_req_t req, uint32_t cmd);
+
 int bpg_req_set_cvt(bpg_req_t req, const char * cvt_name);
 const char * bpg_req_cvt_name(bpg_req_t req);
 dr_cvt_t bpg_req_cvt(bpg_req_t req);

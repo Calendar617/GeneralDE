@@ -29,8 +29,10 @@ struct bpg_manage {
     bpg_logic_ctx_fini_fun_t m_ctx_fini;
     void * m_ctx_ctx;
 
-    size_t m_rsp_size_max;
+    size_t m_rsp_max_size;
     bpg_req_t m_rsp_buf;
+
+    int m_debug;
 
     cpe_hash_string_t m_send_to;
 };

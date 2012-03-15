@@ -28,6 +28,10 @@ gd_app_context_t bpg_net_agent_app(bpg_net_agent_t mgr);
 const char * bpg_net_agent_name(bpg_net_agent_t mgr);
 cpe_hash_string_t bpg_net_agent_name_hs(bpg_net_agent_t mgr);
 
+int bpg_net_agent_set_cvt(bpg_net_agent_t req, const char * cvt_name);
+const char * bpg_net_agent_cvt_name(bpg_net_agent_t req);
+dr_cvt_t bpg_net_agent_cvt(bpg_net_agent_t req);
+
 #ifdef __cplusplus
 }
 #endif

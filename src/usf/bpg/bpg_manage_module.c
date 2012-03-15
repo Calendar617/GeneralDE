@@ -6,6 +6,7 @@
 #include "gd/app/app_library.h"
 #include "usf/bpg/bpg_manage.h"
 #include "usf/bpg/bpg_rsp.h"
+#include "bpg_internal_types.h"
 
 static int bpg_manage_app_load_metalib(bpg_manage_t mgr, cfg_t cfg, error_monitor_t em) {
     const char * metalib_name;
@@ -86,6 +87,18 @@ int bpg_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg)
         }
     }
 
+    bpg_manage->m_rsp_max_size =
+        cfg_get_uint32(cfg, "rsp-max-size", bpg_manage->m_rsp_max_size);
+
+    bpg_manage->m_debug = cfg_get_int32(cfg, "debug", 0);
+
+    if (bpg_manage->m_debug) {
+        CPE_INFO(
+            gd_app_em(app),
+            "%s: create: done. rsp-max-size=%d",
+            gd_app_module_name(module), (int)bpg_manage->m_rsp_max_size);
+    }
+
     return 0;
 }
 
@@ -98,4 +111,3 @@ void bpg_manage_app_fini(gd_app_context_t app, gd_app_module_t module) {
         bpg_manage_free(bpg_manage);
     }
 }
-

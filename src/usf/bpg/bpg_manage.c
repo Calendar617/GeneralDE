@@ -59,8 +59,10 @@ bpg_manage_create(
     mgr->m_ctx_fini = NULL;
     mgr->m_ctx_ctx = NULL;
 
-    mgr->m_rsp_size_max = 4 * 1024;
+    mgr->m_rsp_max_size = 4 * 1024;
     mgr->m_rsp_buf = NULL;
+
+    mgr->m_debug = 0;
 
     mgr->m_send_to = NULL;
 
@@ -154,7 +156,7 @@ bpg_manage_rsp_buf(bpg_manage_t mgr, LPDRMETA carry_meta, size_t caary_capacity)
     if (mgr->m_rsp_buf) {
         if (bpg_req_carry_data_meta(mgr->m_rsp_buf) != carry_meta
             || bpg_req_carry_data_capacity(mgr->m_rsp_buf) < caary_capacity
-            || bpg_req_pkg_capacity(mgr->m_rsp_buf) < mgr->m_rsp_size_max)
+            || bpg_req_pkg_capacity(mgr->m_rsp_buf) < mgr->m_rsp_max_size)
         {
             bpg_req_free(mgr->m_rsp_buf);
             mgr->m_rsp_buf = NULL;
@@ -162,7 +164,7 @@ bpg_manage_rsp_buf(bpg_manage_t mgr, LPDRMETA carry_meta, size_t caary_capacity)
     }
 
     if (mgr->m_rsp_buf == NULL) {
-        mgr->m_rsp_buf = bpg_req_create(mgr->m_app, mgr->m_rsp_size_max, carry_meta, caary_capacity);
+        mgr->m_rsp_buf = bpg_req_create(mgr->m_app, mgr->m_rsp_max_size, carry_meta, caary_capacity);
     }
 
     return mgr->m_rsp_buf;
@@ -312,8 +314,32 @@ void bpg_manage_set_context_op(
     mgr->m_ctx_ctx = ctx_ctx;
 }
 
+extern LPDRMETALIB g_metalib_base_package;
+
 LPDRMETALIB bpg_metalib(void) {
-    extern LPDRMETALIB g_metalib_base_package;
     return g_metalib_base_package;
+}
+
+static LPDRMETA g_meta_pkghead = NULL;
+
+LPDRMETA bpg_meta_pkghead(void) {
+    if (g_meta_pkghead == NULL) {
+        g_meta_pkghead = dr_lib_find_meta_by_name(g_metalib_base_package, "basepkg_head");
+        assert(g_meta_pkghead);
+    }
+
+    return g_meta_pkghead;
+}
+
+
+static LPDRMETA g_meta_pkg = NULL;
+
+LPDRMETA bpg_meta_pkg(void) {
+    if (g_meta_pkg == NULL) {
+        g_meta_pkg = dr_lib_find_meta_by_name(g_metalib_base_package, "basepkg");
+        assert(g_meta_pkg);
+    }
+
+    return g_meta_pkg;
 }
 

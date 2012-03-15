@@ -113,6 +113,34 @@ int bpg_req_set_cvt(bpg_req_t req, const char * cvt) {
     return 0;
 }
 
+uint32_t bpg_req_cmd(bpg_req_t req) {
+    struct basepkg_head * head;
+    head = (struct basepkg_head *)bpg_req_pkg_data(req);
+
+    return head->cmd;
+}
+
+void bpg_req_set_cmd(bpg_req_t req, uint32_t cmd) {
+    struct basepkg_head * head;
+    head = (struct basepkg_head *)bpg_req_pkg_data(req);
+
+    head->cmd = cmd;
+}
+
+uint32_t bpg_req_sn(bpg_req_t req) {
+    struct basepkg_head * head;
+    head = (struct basepkg_head *)bpg_req_pkg_data(req);
+
+    return head->sn;
+}
+
+void bpg_req_set_sn(bpg_req_t req, uint32_t sn) {
+    struct basepkg_head * head;
+    head = (struct basepkg_head *)bpg_req_pkg_data(req);
+
+    head->sn = sn;
+}
+
 dr_cvt_t bpg_req_cvt(bpg_req_t req) {
     return req->m_cvt;
 }
