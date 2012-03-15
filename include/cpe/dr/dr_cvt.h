@@ -9,6 +9,8 @@ extern "C" {
 dr_cvt_t dr_cvt_create(const char * name);
 void dr_cvt_free(dr_cvt_t cvt);
 
+const char * dr_cvt_name(dr_cvt_t cvt);
+
 ssize_t dr_cvt_encode(
     dr_cvt_t cvt, 
     LPDRMETA meta,
