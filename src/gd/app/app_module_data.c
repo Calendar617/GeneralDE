@@ -39,7 +39,7 @@ gd_app_module_data_load(
     if (rootGroup == NULL) {
         rootGroup = gd_nm_group_create(nmm, cpe_hs_data(gd_app_module_type_root_group_name), 0);
         if (rootGroup == NULL) {
-            APP_CTX_ERROR(context, "create module %s: data root group fail!", moduleName);
+            APP_CTX_ERROR(context, "%s: create module: data root group fail!", moduleName);
             return NULL;
         }
         gd_nm_node_set_type(rootGroup, &g_module_root_group);
@@ -51,7 +51,7 @@ gd_app_module_data_load(
 
     moduleGroup = gd_nm_group_create(gd_app_nm_mgr(context), groupNameBuf, 0);
     if (moduleGroup == NULL) {
-        APP_CTX_ERROR(context, "create module %s: data group fail!", groupNameBuf);
+        APP_CTX_ERROR(context, "%s: create module: data group fail!", groupNameBuf);
         gd_app_module_data_free(context, moduleName);
         return NULL;
     }
@@ -59,7 +59,7 @@ gd_app_module_data_load(
     gd_nm_node_set_type(moduleGroup, &g_module_group);
 
     if (gd_nm_group_add_member(rootGroup, moduleGroup) != 0) {
-        APP_CTX_ERROR(context, "create module %s: add to root group fail!", groupNameBuf);
+        APP_CTX_ERROR(context, "%s: create module: add to root group fail!", groupNameBuf);
         gd_nm_node_free(moduleGroup);
         gd_app_module_data_free(context, moduleName);
         return NULL;
