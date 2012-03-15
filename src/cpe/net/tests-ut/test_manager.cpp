@@ -6,7 +6,7 @@ TEST_F(NetTest, basic) {
 }
 
 TEST_F(NetTest, ep_create_basic) {
-    net_ep_t ep = net_ep_create(t_net(), net_ep_socket);
+    net_ep_t ep = net_ep_create(t_net());
     ASSERT_TRUE(ep);
 
     EXPECT_EQ(0, (int)ep->m_id);

@@ -51,13 +51,13 @@ static void net_listener_cb_accept(EV_P_ ev_io *w, int revents) {
         return;
     }
 
-    ep = net_ep_create(listener->m_mgr, net_ep_socket);
+    ep = net_ep_create(listener->m_mgr);
     if (ep == 0) {
         net_socket_close(&new_fd, listener->m_mgr->m_em);
         return;
     }
 
-    ep->m_fd = new_fd;
+    net_ep_set_fd(ep, new_fd);
 
     listener->m_acceptor_fun(listener, ep, listener->m_acceptor_ctx);
 }

@@ -60,24 +60,47 @@ struct net_connector {
     struct cpe_hash_entry m_hh;
 };
 
-struct net_chanel {
-    net_mgr_t m_mgr;
-    void * m_buf;
-    size_t m_capacity;
-    void * m_write_ptr;
-    void * m_read_ptr;
-    void (*close)(net_chanel_t chanel);
+struct net_chanel_type {
+    const char * name;
+    net_chanel_type_id_t id;
+    int (*read_from_net)(net_chanel_t chanel, int fd);
+    int (*write_to_net)(net_chanel_t chanel, int fd);
+    int (*read_from_buf)(net_chanel_t chanel, const void * buf, size_t size);
+    ssize_t (*write_to_buf)(net_chanel_t chanel, void * buf, size_t capacity);
+    void * (*peek)(net_chanel_t chanel, void * buf, size_t size);
+    void (*erase)(net_chanel_t chanel, size_t size);
+    size_t (*data_size)(net_chanel_t chanel);
+    void (*destory)(net_chanel_t chanel);
+};
 
-    TAILQ_ENTRY(net_chanel) m_next;
+#define NET_CHANEL_COMMON                       \
+    net_mgr_t m_mgr;                            \
+    struct net_chanel_type * m_type;            \
+    net_chanel_state_t m_state;                 \
+    TAILQ_ENTRY(net_chanel) m_next
+
+struct net_chanel {
+    NET_CHANEL_COMMON;
+};
+
+struct net_chanel_queue {
+    NET_CHANEL_COMMON;
+    char * m_buf;
+    size_t m_size;
+    size_t m_capacity;
+    void (*m_destory_fun)(net_chanel_t chanel, void * ctx);
+    void * m_destory_ctx;
+
 };
 
 struct net_ep {
     net_ep_id_t m_id;
     net_mgr_t m_mgr;
-    net_ep_type_t m_type;
-    struct net_chanel * m_chanel_r;
-    struct net_chanel * m_chanel_w;
+    net_chanel_t m_chanel_r;
+    net_chanel_t m_chanel_w;
     struct net_connector * m_connector;
+    net_process_fun_t m_process_fun;
+    void * m_process_ctx;
     int m_fd;
     struct ev_io m_watcher;
 };
