@@ -30,7 +30,8 @@ void net_ep_set_processor(net_ep_t ep, net_process_fun_t process_fun, void * pro
 int net_ep_send(net_ep_t ep, const void * buf, size_t size);
 ssize_t net_ep_rece(net_ep_t ep, void * buf, size_t capacity);
 
-char * net_ep_peek(net_ep_t ep, void * buf, size_t size);
+size_t net_ep_size(net_ep_t ep);
+void * net_ep_peek(net_ep_t ep, void * buf, size_t size);
 void net_ep_erase(net_ep_t ep, size_t size);
 
 #ifdef __cplusplus

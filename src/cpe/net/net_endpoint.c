@@ -172,6 +172,11 @@ void net_ep_close(net_ep_t ep) {
     net_ep_close_i(ep, net_ep_event_close_by_user);
 }
 
+size_t net_ep_size(net_ep_t ep) {
+    assert(ep);
+    return ep->m_chanel_r ? ep->m_chanel_r->m_type->data_size(ep->m_chanel_r) : 0;
+}
+
 int net_ep_set_fd(net_ep_t ep, int fd) {
     assert(ep);
 
@@ -198,7 +203,7 @@ int net_ep_set_fd(net_ep_t ep, int fd) {
     return 0;
 }
 
-int ge_net_ep_send(net_ep_t ep, const void * buf, size_t size) {
+int net_ep_send(net_ep_t ep, const void * buf, size_t size) {
     int old_events;
     int r;
 
@@ -215,7 +220,7 @@ int ge_net_ep_send(net_ep_t ep, const void * buf, size_t size) {
     return r;
 }
 
-ssize_t ge_net_ep_rece(net_ep_t ep, void * buf, size_t capacity) {
+ssize_t net_ep_rece(net_ep_t ep, void * buf, size_t capacity) {
     int old_events;
     ssize_t r;
 
@@ -232,14 +237,14 @@ ssize_t ge_net_ep_rece(net_ep_t ep, void * buf, size_t capacity) {
     return r;
 }
 
-void * ge_net_ep_peek(net_ep_t ep, void * buf, size_t size) {
+void * net_ep_peek(net_ep_t ep, void * buf, size_t size) {
     assert(ep);
     if (ep->m_chanel_r == NULL) return NULL;
 
     return ep->m_chanel_r->m_type->peek(ep->m_chanel_r, buf, size);
 }
 
-void ge_net_ep_erase(net_ep_t ep, size_t size) {
+void net_ep_erase(net_ep_t ep, size_t size) {
     int old_events;
 
     assert(ep);
