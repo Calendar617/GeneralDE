@@ -1,5 +1,6 @@
 #include "cpe/pal/pal_string.h"
 #include "cpe/utils/memory.h"
+#include "cpe/dr/dr_metalib_manage.h"
 #include "dr_cvt_internal_ops.h"
 
 dr_cvt_type_list_t s_cvt_types = TAILQ_HEAD_INITIALIZER(s_cvt_types);
