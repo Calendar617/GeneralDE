@@ -43,6 +43,7 @@ CPE_DR_API int dr_entry_array_count(LPDRMETAENTRY entry);
 CPE_DR_API LPDRMETAENTRY dr_entry_array_refer_entry(LPDRMETAENTRY entry);
 CPE_DR_API LPDRMETAENTRY dr_entry_select_entry(LPDRMETAENTRY entry);
 CPE_DR_API const char *dr_entry_customattr(LPDRMETALIB metaLib, LPDRMETAENTRY entry);
+CPE_DR_API size_t dr_entry_data_start_pos(LPDRMETAENTRY entry);
 
 CPE_DR_API int dr_lib_find_macro_value(int *a_piID, LPDRMETALIB metaLib, const  char *name);
 CPE_DR_API LPDRMACRO dr_lib_macro_at(LPDRMETALIB metaLib, int a_iIdx);

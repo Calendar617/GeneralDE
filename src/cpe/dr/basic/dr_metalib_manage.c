@@ -414,6 +414,10 @@ int dr_entry_array_count(LPDRMETAENTRY entry) {
     return entry->m_array_count;
 }
 
+size_t dr_entry_data_start_pos(LPDRMETAENTRY entry) {
+    return entry->m_data_start_pos;
+}
+
 size_t dr_entry_element_size(LPDRMETAENTRY entry) {
     if (entry->m_type <= CPE_DR_TYPE_COMPOSITE) {
         LPDRMETA refMeta = dr_entry_ref_meta(entry);
