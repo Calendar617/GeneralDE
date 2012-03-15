@@ -16,6 +16,14 @@ uint32_t net_listener_hash(net_listener_t listener);
 int net_listener_cmp(net_listener_t l, net_listener_t r);
 void net_listeners_free(net_mgr_t nmgr);
 
+/*chanel ops*/
+#define net_chanel_read_from_buf(c, b, s) ((c)->m_type->read_from_buf(c, b, s))
+#define net_chanel_write_to_buf(c, b, s) ((c)->m_type->write_to_buf(c, b, s))
+
+/*ep ops*/
+int net_ep_set_fd(net_ep_t ep, int fd);
+void net_ep_close_i(net_ep_t ep, net_ep_event_t ev);
+
 /*ep_pages op*/
 net_ep_t net_ep_pages_alloc_ep(net_mgr_t nmgr);
 void net_ep_pages_free_ep(net_ep_t);

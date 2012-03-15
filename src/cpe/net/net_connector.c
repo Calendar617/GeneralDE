@@ -78,7 +78,7 @@ net_connector_create_with_ep(
     connector = net_connector_create(nmgr, name, ip, port);
     if (connector == NULL) return NULL;
 
-    ep = net_ep_create(nmgr, net_ep_socket);
+    ep = net_ep_create(nmgr);
     if (ep == NULL) {
         net_connector_free(connector);
         return NULL;
@@ -137,7 +137,7 @@ int net_connector_bind(net_connector_t connector, net_ep_t ep) {
     ep->m_connector = connector;
 
     if (net_ep_is_open(connector->m_ep)) {
-        net_ep_close(connector->m_ep);
+        net_ep_close_i(connector->m_ep, net_ep_event_close_by_error);
     }
 
     return 0;
@@ -380,7 +380,7 @@ void net_connector_disable(net_connector_t connector) {
     assert(connector->m_ep);
 
     if (net_ep_is_open(connector->m_ep)) {
-        net_ep_close(connector->m_ep);
+        net_ep_close_i(connector->m_ep, net_ep_event_close_by_user);
     }
 
     connector->m_state = net_connector_state_disable;
