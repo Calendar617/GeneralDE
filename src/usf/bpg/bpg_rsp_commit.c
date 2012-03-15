@@ -70,11 +70,13 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
         return;
     }
 
-    bpg_req_set_convertor(
-        response_buf,
-        (bpg_data_convert_fun_t)(ptr_int_t)bpg_private->cvt_encode,
-        (bpg_data_convert_fun_t)(ptr_int_t)bpg_private->cvt_decode,
-        (void *)(ptr_int_t)bpg_private->cvt_ctx);
+    if (bpg_req_set_cvt(response_buf, bpg_private->cvt_name) != 0) {
+        CPE_ERROR(
+            em, "%s.%s: bpg_rsp_commit: set response cvt %s fail!",
+            bpg_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp),
+            bpg_private->cvt_name);
+        return;
+    }
 
     if (bpg_req_pkg_capacity(response_buf) < sizeof(struct basepkg_head)) {
         CPE_ERROR(

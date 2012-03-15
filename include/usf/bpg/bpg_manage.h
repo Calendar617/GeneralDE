@@ -54,6 +54,8 @@ void bpg_manage_flag_disable(bpg_manage_t mgr, bpg_manage_flag_t flag);
 int bpg_manage_flag_is_enable(bpg_manage_t mgr, bpg_manage_flag_t flag);
 
 LPDRMETALIB bpg_metalib(void);
+LPDRMETA bpg_meta_pkghead(void);
+LPDRMETA bpg_meta_pkg(void);
 
 #ifdef __cplusplus
 }

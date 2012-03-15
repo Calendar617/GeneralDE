@@ -50,9 +50,7 @@ struct bpg_rsp {
 };
 
 struct bpg_req {
-    bpg_data_convert_fun_t m_cvt_encode;
-    bpg_data_convert_fun_t m_cvt_decode;
-    void * m_cvt_ctx;
+    dr_cvt_t m_cvt;
 
     LPDRMETA m_carry_data_meta;
     size_t m_carry_data_size;

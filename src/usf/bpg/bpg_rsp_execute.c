@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/dr/dr_cvt.h"
 #include "gd/dp/dp_request.h"
 #include "gd/dp/dp_manage.h"
 #include "usf/logic/logic_context.h"
@@ -116,8 +117,6 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, b
         }
     }
     else {
-        bpg_data_convert_fun_t decode;
-        
         data_meta = dr_entry_self_meta(dr_meta_entry_at(mgr->m_request_meta, cmd_entry_idx));
         if (data_meta == NULL) {
             CPE_ERROR(
@@ -135,13 +134,12 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, b
             return -1;
         }
 
-        decode = req->m_cvt_decode;
-        if (decode == NULL) decode = bpg_copy_convert;
-
-        if (decode(
+        if (dr_cvt_decode(
+                bpg_req_cvt(req),
+                data_meta,
                 logic_data_data(data), logic_data_capacity(data),
                 pkg->body, pkg->head.bodylen,
-                req->m_cvt_ctx, em) != 0)
+                em) != 0)
         {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: %s decode data fail, input len is %d, output len is %d!",
@@ -160,8 +158,6 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
     int i;
     int buf_begin;
     bpg_manage_t mgr;
-    bpg_data_convert_fun_t decode;
-
 
     mgr = rsp->m_mgr;
 
@@ -171,9 +167,6 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
             bpg_manage_name(mgr), bpg_rsp_name(rsp), pkg->head.appendInfoCount);
         return -1;
     }
-
-    decode = req->m_cvt_decode;
-    if (decode == NULL) decode = bpg_copy_convert;
 
     buf_begin =  pkg->head.bodylen;
     for(i = 0; i < pkg->head.appendInfoCount; ++i) {
@@ -203,10 +196,11 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
             return -1;
         }
 
-        if (decode(
+        if (dr_cvt_decode(
+                bpg_req_cvt(req),
+                data_meta,
                 logic_data_data(data), logic_data_capacity(data),
-                pkg->body, append->size,
-                req->m_cvt_ctx, em) != 0)
+                pkg->body, append->size, em) != 0)
         {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: append %d: %s decode data fail, input len is %d, output len is %d!",
@@ -304,9 +298,7 @@ int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context
         buf->carry_meta_name[0] = 0;
     }
 
-    buf->cvt_encode = (uint64_t)(ptr_int_t)(bpg_req->m_cvt_encode);
-    buf->cvt_decode = (uint64_t)(ptr_int_t)(bpg_req->m_cvt_decode);
-    buf->cvt_ctx = (uint64_t)(ptr_int_t)(bpg_req->m_cvt_ctx);
+    strncpy(buf->cvt_name, bpg_req_cvt_name(bpg_req), sizeof(buf->cvt_name));
 
     return 0;
 }

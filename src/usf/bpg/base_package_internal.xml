@@ -5,8 +5,6 @@
         <entry name="cmd" type="uint16"/>
         <entry name="carry_data_size" type="uint16"/>
         <entry name="carry_meta_name" type="string" size='64'/>
-        <entry name="cvt_encode" type="uint64"/>
-        <entry name="cvt_decode" type="uint64"/>
-        <entry name="cvt_ctx" type="uint64"/>
+        <entry name="cvt_name" type="string" size='32'/>
     </struct>
 </metalib>
