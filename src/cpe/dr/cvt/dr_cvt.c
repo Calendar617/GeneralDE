@@ -26,6 +26,10 @@ void dr_cvt_free(dr_cvt_t cvt) {
     mem_free(NULL, cvt);
 }
 
+const char * dr_cvt_name(dr_cvt_t cvt) {
+    return cvt->m_type->m_name;
+}
+
 ssize_t dr_cvt_encode(
     dr_cvt_t cvt, 
     LPDRMETA meta,
