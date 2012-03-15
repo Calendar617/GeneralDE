@@ -1,6 +1,7 @@
 #ifndef CPE_DR_TYPES_H
 #define CPE_DR_TYPES_H
 #include "cpe/pal/pal_types.h"
+#include "cpe/utils/error.h"
 #include "cpe/dr/dr_define.h"
 
 #ifdef __cplusplus
@@ -89,6 +90,15 @@ typedef struct dr_metalib_source_it {
 } * dr_metalib_source_it_t;
 
 struct DRInBuildMetaLib;
+
+typedef ssize_t (*dr_cvt_fun_t)(
+    LPDRMETA meta,
+    void * output, size_t output_capacity,
+    const void * input, size_t input_capacity,
+    void * ctx,
+    error_monitor_t em);
+
+typedef struct dr_cvt * dr_cvt_t;
 
 #ifdef __cplusplus
 }
