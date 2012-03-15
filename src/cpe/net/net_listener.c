@@ -9,18 +9,18 @@ static
 int net_listener_listen(net_listener_t listener) {
     listener->m_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (listener->m_fd == -1) {
-        CPE_ERROR(listener->m_mgr->m_em, "listener %s: socket call fail, errno=%d (%s)!", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
+        CPE_ERROR(listener->m_mgr->m_em, "%s: socket call fail, errno=%d (%s)!", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         return -1;
     }
 
     if(bind(listener->m_fd, (struct sockaddr *)&listener->m_addr, sizeof(listener->m_addr)) == -1 ) {
-        CPE_ERROR(listener->m_mgr->m_em, "listener %s: bind error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
+        CPE_ERROR(listener->m_mgr->m_em, "%s: bind error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
     }
 
     if (listen(listener->m_fd, listener->m_acceptQueueSize) == -1) {
-        CPE_ERROR(listener->m_mgr->m_em, "listener %s: listen error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
+        CPE_ERROR(listener->m_mgr->m_em, "%s: listen error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
     }
@@ -30,7 +30,7 @@ int net_listener_listen(net_listener_t listener) {
         return -1;
     }
 
-    CPE_INFO(listener->m_mgr->m_em, "listener %s: listen start", listener->m_name);
+    CPE_INFO(listener->m_mgr->m_em, "%s: listen start", listener->m_name);
     return 0;
 }
 
@@ -46,7 +46,7 @@ static void net_listener_cb_accept(EV_P_ ev_io *w, int revents) {
     if (new_fd == -1) {
         CPE_ERROR(
             listener->m_mgr->m_em,
-            "listener %s: accept error, errno=%d (%s)",
+            "%s: accept error, errno=%d (%s)",
             listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         return;
     }
@@ -90,7 +90,7 @@ net_listener_create(
     cpe_hash_entry_init(&listener->m_hh);
 
     if (cpe_hash_table_insert_unique(&nmgr->m_listeners, listener) != 0) {
-        CPE_ERROR(nmgr->m_em, "listener %s is already exist!", name);
+        CPE_ERROR(nmgr->m_em, "%s is already exist!", name);
         mem_free(nmgr->m_alloc, buf);
         return NULL;
     }
@@ -103,7 +103,7 @@ net_listener_create(
         ? INADDR_ANY
         : inet_addr(ip);
     if (inetAddr->sin_addr.s_addr == INADDR_NONE) {
-        CPE_ERROR(nmgr->m_em, "listener %s address %s format error!", name, ip);
+        CPE_ERROR(nmgr->m_em, "%s address %s format error!", name, ip);
         cpe_hash_table_remove_by_ins(&nmgr->m_listeners, listener);
         mem_free(nmgr->m_alloc, buf);
         return NULL;
@@ -158,7 +158,7 @@ short net_listener_using_port(net_listener_t listener) {
     if (getsockname(listener->m_fd, (struct sockaddr *)&addr, &len) == -1) {
         CPE_ERROR(
             listener->m_mgr->m_em,
-            "listener %s: getsockname fail, errno=%d (%s)!",
+            "%s: getsockname fail, errno=%d (%s)!",
             listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         return 0;
     }
