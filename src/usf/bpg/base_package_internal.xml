@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="GBK" standalone="yes" ?>
+<metalib tagsetversion="1" name="BASEPKG" version="1" >
+    <struct name="bpg_carry_info" version="1">
+        <entry name="clientId" type="uint64"/>
+        <entry name="cmd" type="uint16"/>
+        <entry name="carry_data_size" type="uint16"/>
+        <entry name="carry_meta_name" type="string" size='64'/>
+        <entry name="cvt_encode" type="uint64"/>
+        <entry name="cvt_decode" type="uint64"/>
+        <entry name="cvt_ctx" type="uint64"/>
+    </struct>
+</metalib>
