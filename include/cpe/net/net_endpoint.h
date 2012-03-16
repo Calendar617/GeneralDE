@@ -13,6 +13,7 @@ void net_ep_free(net_ep_t ep);
 
 net_ep_t net_ep_find(net_mgr_t nmgr, net_ep_id_t id);
 
+net_mgr_t net_ep_mgr(net_ep_t ep);
 net_ep_id_t net_ep_id(net_ep_t ep);
 net_chanel_t net_ep_chanel_r(net_ep_t ep);
 net_chanel_t net_ep_chanel_w(net_ep_t ep);
