@@ -19,7 +19,7 @@ static
 struct gd_app_module * 
 gd_app_module_create_i(
     gd_app_context_t context,
-    const char * moduleName,
+    const char * module_name,
     const char * type_name,
     const char * libName,
     cfg_t moduleCfg)
@@ -29,7 +29,9 @@ gd_app_module_create_i(
     gd_nm_node_t moduleDataGroup;
     size_t name_len;
 
-    if (type_name == NULL) type_name = moduleName;
+    assert(module_name);
+
+    if (type_name == NULL) type_name = module_name;
 
     module = gd_app_module_type_find(type_name);
     if (module == NULL) {
@@ -37,22 +39,22 @@ gd_app_module_create_i(
         if (module == NULL) return NULL;
     }
 
-    name_len = strlen(moduleName) + 1;
+    name_len = strlen(module_name) + 1;
 
     runing_module = (struct gd_app_module *)
         mem_alloc(context->m_alloc, sizeof(struct gd_app_module) + name_len);
     if (runing_module == NULL) {
-        APP_CTX_ERROR(context, "load module: alloc runing module fail!");
+        APP_CTX_ERROR(context, "%s: alloc runing module fail!", module_name);
         if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_type_free(module, context->m_em);
         return NULL;
     }
 
-    memcpy(runing_module + 1, moduleName, name_len);
+    memcpy(runing_module + 1, module_name, name_len);
 
     runing_module->m_alloc = context->m_alloc;
     runing_module->m_type = module;
 
-    moduleDataGroup = gd_app_module_data_load(context, moduleName);
+    moduleDataGroup = gd_app_module_data_load(context, module_name);
     if (moduleDataGroup == NULL) {
         if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_type_free(module, context->m_em);
         mem_free(context->m_alloc, runing_module);
@@ -61,8 +63,8 @@ gd_app_module_create_i(
 
     if (module->m_app_init) {
         if (module->m_app_init(context, runing_module, moduleCfg) != 0) {
-            APP_CTX_ERROR(context, "load module %s: app init fail!", moduleName);
-            gd_app_module_data_free(context, moduleName);
+            APP_CTX_ERROR(context, "%s: app init fail!", module_name);
+            gd_app_module_data_free(context, module_name);
             if (TAILQ_EMPTY(&module->m_runing_modules)) gd_app_module_type_free(module, context->m_em);
             mem_free(context->m_alloc, runing_module);
             return NULL;
@@ -71,30 +73,32 @@ gd_app_module_create_i(
 
     TAILQ_INSERT_TAIL(&context->m_runing_modules, runing_module, m_qh_for_app);
     TAILQ_INSERT_TAIL(&module->m_runing_modules, runing_module, m_qh_for_runing);
-    
+
+    APP_CTX_INFO(context, "%s: module create success!", module_name);
+
     return runing_module;
 }
 
 static int gd_app_module_create(gd_app_context_t context, cfg_t cfg) {
-    const char * moduleName;
+    const char * module_name;
     cfg_t moduleInitCfg;
     assert(context);
 
-    moduleName = cfg_get_string(cfg, "name", NULL);
-    if (moduleName == NULL) {
-        APP_CTX_ERROR(context, "load module: no name!");
+    module_name = cfg_get_string(cfg, "name", NULL);
+    if (module_name == NULL) {
+        APP_CTX_ERROR(context, "module ???: no name!");
         return -1;
     }
 
     moduleInitCfg = 
         cfg_find_cfg(
             cfg_find_cfg(gd_app_cfg(context), "modules"),
-            moduleName);
+            module_name);
     if (moduleInitCfg == NULL) moduleInitCfg = cfg;
 
     return gd_app_module_create_i(
         context,
-        moduleName,
+        module_name,
         cfg_get_string(cfg, "type", NULL),
         cfg_get_string(cfg, "library", NULL),
         moduleInitCfg) == NULL
@@ -121,6 +125,8 @@ static void gd_app_module_free(
 
     gd_app_module_data_free(context, gd_app_module_name(module));
 
+    APP_CTX_INFO(context, "%s: module free success!", gd_app_module_name(module));
+
     mem_free(module->m_alloc, module);
 
     if (TAILQ_EMPTY(&type->m_runing_modules)) {
@@ -137,12 +143,12 @@ int gd_app_modules_load(gd_app_context_t context) {
     moduleListCfg = cfg_find_cfg(context->m_cfg, "modules.load");
 
     if (moduleListCfg == NULL) {
-        APP_CTX_INFO(context, "no modules need to load!");
+        APP_CTX_INFO(context, "app: no modules need to load!");
         return -1;
     }
 
     if (cfg_type(moduleListCfg) != CPE_CFG_TYPE_SEQUENCE) {
-        APP_CTX_ERROR(context, "dispatcher config type error!");
+        APP_CTX_ERROR(context, "app: dispatcher config type error!");
         return -1;
     }
 
