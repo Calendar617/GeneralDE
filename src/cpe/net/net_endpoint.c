@@ -60,6 +60,10 @@ net_ep_id_t net_ep_id(net_ep_t ep) {
     return ep->m_id;
 }
 
+net_mgr_t net_ep_mgr(net_ep_t ep) {
+    return ep->m_mgr;
+}
+
 void net_ep_set_processor(net_ep_t ep, net_process_fun_t process_fun, void * process_ctx) {
     ep->m_process_fun = process_fun;
     ep->m_process_ctx = process_ctx;
@@ -82,8 +86,9 @@ void net_ep_set_processor(net_ep_t ep, net_process_fun_t process_fun, void * pro
     if (ep->m_fd >= 0) {                                            \
         int new_events = net_ep_calc_ev_events(ep);                 \
         if (old_events != new_events) {                             \
-            if (old_events)                                         \
+            if (old_events) {                                       \
                 ev_io_stop(ep->m_mgr->m_ev_loop, &ep->m_watcher);   \
+            }                                                       \
             if (new_events) {                                       \
                 ev_io_set(&ep->m_watcher, ep->m_fd, new_events);    \
                 ev_io_start(ep->m_mgr->m_ev_loop, &ep->m_watcher);  \
@@ -189,16 +194,7 @@ int net_ep_set_fd(net_ep_t ep, int fd) {
 
     ep->m_fd = fd;
 
-    if (net_ep_is_open(ep)) {
-        int events = net_ep_calc_ev_events(ep);
-        if (events) {
-            ev_io_set(&ep->m_watcher, ep->m_fd, events);
-            ev_io_start(ep->m_mgr->m_ev_loop, &ep->m_watcher);
-        }
-
-        if (ep->m_process_fun)
-            ep->m_process_fun(ep, ep->m_process_fun, net_ep_event_open);
-    }
+    net_ep_update_events(ep, 0);
 
     return 0;
 }

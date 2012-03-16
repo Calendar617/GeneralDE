@@ -13,13 +13,13 @@ int net_listener_listen(net_listener_t listener) {
         return -1;
     }
 
-    if(bind(listener->m_fd, (struct sockaddr *)&listener->m_addr, sizeof(listener->m_addr)) == -1 ) {
+    if(bind(listener->m_fd, (struct sockaddr *)&listener->m_addr, sizeof(listener->m_addr)) != 0) {
         CPE_ERROR(listener->m_mgr->m_em, "%s: bind error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
     }
 
-    if (listen(listener->m_fd, listener->m_acceptQueueSize) == -1) {
+    if (listen(listener->m_fd, listener->m_acceptQueueSize) != 0) {
         CPE_ERROR(listener->m_mgr->m_em, "%s: listen error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
@@ -77,6 +77,11 @@ net_listener_create(
     size_t nameLen;
     struct sockaddr_in * inetAddr;
 
+    assert(nmgr);
+    assert(name);
+    assert(ip);
+    assert(acceptor);
+
     nameLen = strlen(name);
 
     buf = mem_alloc(nmgr->m_alloc, sizeof(struct net_listener) + nameLen + 1);
@@ -97,7 +102,7 @@ net_listener_create(
 
     inetAddr = (struct sockaddr_in *)(&listener->m_addr);
     inetAddr->sin_family = AF_INET;
-    inetAddr->sin_port = port;
+    inetAddr->sin_port = htons(port);
     inetAddr->sin_addr.s_addr = 
         strcmp(ip, "") == 0
         ? INADDR_ANY
@@ -151,11 +156,11 @@ short net_listener_using_port(net_listener_t listener) {
     if (listener->m_fd < 0) return 0;
 
     if (((struct sockaddr_in *)(&listener->m_addr))->sin_port != 0) {
-        return ((struct sockaddr_in *)(&listener->m_addr))->sin_port;
+        return ntohs(((struct sockaddr_in *)(&listener->m_addr))->sin_port);
     }
 
     len = sizeof(addr);
-    if (getsockname(listener->m_fd, (struct sockaddr *)&addr, &len) == -1) {
+    if (getsockname(listener->m_fd, (struct sockaddr *)&addr, &len) != 0) {
         CPE_ERROR(
             listener->m_mgr->m_em,
             "%s: getsockname fail, errno=%d (%s)!",
@@ -163,7 +168,7 @@ short net_listener_using_port(net_listener_t listener) {
         return 0;
     }
 
-    return addr.sin_port;
+    return ntohs(addr.sin_port);
 }
 
 uint32_t net_listener_hash(net_listener_t listener) {
