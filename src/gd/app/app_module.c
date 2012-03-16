@@ -79,16 +79,9 @@ gd_app_module_create_i(
     return runing_module;
 }
 
-static int gd_app_module_create(gd_app_context_t context, cfg_t cfg) {
-    const char * module_name;
+static int gd_app_module_create(gd_app_context_t context, const char * module_name, cfg_t cfg) {
     cfg_t moduleInitCfg;
     assert(context);
-
-    module_name = cfg_get_string(cfg, "name", NULL);
-    if (module_name == NULL) {
-        APP_CTX_ERROR(context, "module ???: no name!");
-        return -1;
-    }
 
     moduleInitCfg = 
         cfg_find_cfg(
@@ -134,11 +127,70 @@ static void gd_app_module_free(
     }
 }
 
-int gd_app_modules_load(gd_app_context_t context) {
+static int gd_app_modules_load_i(gd_app_context_t context, cfg_t moduleListCfg, mem_buffer_t buffer) {
     int rv;
-    cfg_t moduleListCfg;
     cfg_t moduleCfg;
     struct cfg_it cfgIt;
+
+    if (cfg_type(moduleListCfg) != CPE_CFG_TYPE_SEQUENCE) {
+        APP_CTX_ERROR(
+            context, "app: load module [%s]: config type error!",
+            cfg_path(buffer, moduleListCfg, 0));
+        return -1;
+    }
+
+    rv = 0;
+    cfg_it_init(&cfgIt, moduleListCfg);
+    while(rv == 0 && (moduleCfg = cfg_it_next(&cfgIt))) {
+        const char * buf;
+
+        buf = cfg_get_string(moduleCfg, "name", NULL);
+        if (buf) {
+            if (gd_app_module_create(context, buf, moduleCfg) != 0) {
+                rv = -1;
+            }
+            continue;
+        }
+
+        buf = cfg_get_string(moduleCfg, "include", NULL);
+        if (buf) {
+            cfg_t includeCfg =
+                cfg_find_cfg(
+                    cfg_find_cfg(cfg_parent(moduleListCfg), buf),
+                    "load");
+            if (includeCfg == NULL) {
+                APP_CTX_ERROR(
+                    context, "app: load module [%s]: config type error!",
+                    cfg_path(buffer, moduleListCfg, 0));
+                rv = -1;
+            }
+            else {
+                if (gd_app_modules_load_i(context, includeCfg, buffer) != 0) {
+                    rv = -1;
+                }
+            }
+
+            continue;
+        }
+
+        APP_CTX_ERROR(
+            context, "app: load module [%s]: no name or include configured!",
+            cfg_path(buffer, moduleCfg, 0));
+
+        return -1;
+    }
+
+    if (rv != 0) {
+        gd_app_modules_unload(context);
+    }
+
+    return rv;
+}
+
+int gd_app_modules_load(gd_app_context_t context) {
+    cfg_t moduleListCfg;
+    struct mem_buffer buffer;
+    int r;
 
     moduleListCfg = cfg_find_cfg(context->m_cfg, "modules.load");
 
@@ -147,24 +199,13 @@ int gd_app_modules_load(gd_app_context_t context) {
         return -1;
     }
 
-    if (cfg_type(moduleListCfg) != CPE_CFG_TYPE_SEQUENCE) {
-        APP_CTX_ERROR(context, "app: dispatcher config type error!");
-        return -1;
-    }
+    mem_buffer_init(&buffer, context->m_alloc);
 
-    rv = 0;
-    cfg_it_init(&cfgIt, moduleListCfg);
-    while(rv == 0 && (moduleCfg = cfg_it_next(&cfgIt))) {
-        if (gd_app_module_create(context, moduleCfg) != 0) {
-            rv = -1;
-        }
-    }
+    r = gd_app_modules_load_i(context, moduleListCfg, &buffer);
 
-    if (rv != 0) {
-        gd_app_modules_unload(context);
-    }
+    mem_buffer_clear(&buffer);
 
-    return rv;
+    return r;
 }
 
 void gd_app_modules_unload(gd_app_context_t context) {
