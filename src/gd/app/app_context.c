@@ -5,8 +5,9 @@
 #include "gd/app/app_context.h"
 #include "app_internal_types.h"
 
-void gd_app_set_main(gd_app_context_t context, gd_app_main mf) {
-    context->m_main = mf;
+void gd_app_set_main(gd_app_context_t context, gd_app_fn_t fn_main, gd_app_fn_t fn_stop) {
+    context->m_main = fn_main;
+    context->m_stop = fn_stop;
 }
 
 void gd_app_set_em(gd_app_context_t context, error_monitor_t em) {
@@ -115,8 +116,36 @@ int gd_app_cfg_reload(gd_app_context_t context) {
     return rv;
 }
 
+uint32_t gd_app_flags(gd_app_context_t app) {
+    return app->m_flags;
+}
+
+void gd_app_flags_set(gd_app_context_t app, uint32_t flag) {
+    app->m_flags = flag;
+}
+
+void gd_app_flag_enable(gd_app_context_t app, gd_app_flag_t flag) {
+    app->m_flags |= flag;
+}
+
+void gd_app_flag_disable(gd_app_context_t app, gd_app_flag_t flag) {
+    app->m_flags &= ~((uint32_t)flag);
+}
+
+int gd_app_flag_is_enable(gd_app_context_t app, gd_app_flag_t flag) {
+    return app->m_flags & flag;
+}
+
 void gd_app_set_state(gd_app_context_t context, gd_app_status_t state) {
     context->m_state = state;
+}
+
+int gd_app_debug(gd_app_context_t context) {
+    return context->m_debug;
+}
+
+void gd_app_set_debug(gd_app_context_t context, int level) {
+    context->m_debug = level;
 }
 
 gd_app_status_t gd_app_state(gd_app_context_t context) {

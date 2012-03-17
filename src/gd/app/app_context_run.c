@@ -102,19 +102,21 @@ int gd_app_run(gd_app_context_t context) {
         return -1;
     }
 
-    if (gd_app_cfg_reload(context) != 0) {
-        g_app_context = NULL;
-        return -1;
-    }
+    if (!gd_app_flag_is_enable(context, gd_app_flag_no_auto_load)) {
+        if (gd_app_cfg_reload(context) != 0) {
+            g_app_context = NULL;
+            return -1;
+        }
 
-    if (gd_app_build_default_tickers(context) != 0) {
-        g_app_context = NULL;
-        return -1;
-    }
+        if (gd_app_build_default_tickers(context) != 0) {
+            g_app_context = NULL;
+            return -1;
+        }
 
-    if (gd_app_modules_load(context) != 0) {
-        g_app_context = NULL;
-        return -1;
+        if (gd_app_modules_load(context) != 0) {
+            g_app_context = NULL;
+            return -1;
+        }
     }
 
     if (context->m_main == NULL) {
@@ -131,4 +133,10 @@ int gd_app_run(gd_app_context_t context) {
     g_app_context = NULL;
 
     return rv;
+}
+
+int gd_app_stop(gd_app_context_t context) {
+    if (context->m_stop) return context->m_stop(context);
+    CPE_ERROR(context->m_em, "app no stop function!");
+    return -1;
 }

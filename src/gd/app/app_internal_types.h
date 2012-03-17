@@ -35,6 +35,8 @@ struct gd_app_context {
     char * m_argv[GD_APP_MAX_ARGV];
     mem_allocrator_t m_alloc;
     size_t m_capacity;
+    uint32_t m_flags;
+    uint32_t m_debug;
 
     error_monitor_t m_em;
     struct error_monitor m_em_print;
@@ -47,7 +49,8 @@ struct gd_app_context {
     gd_dp_mgr_t m_dp_mgr;
     gd_nm_mgr_t m_nm_mgr;
     net_mgr_t m_net_mgr;
-    gd_app_main m_main;
+    gd_app_fn_t m_main;
+    gd_app_fn_t m_stop;
 
     gd_app_module_list_t m_runing_modules;
 };

@@ -16,11 +16,15 @@ typedef enum gd_app_status {
     gd_app_shutingdown
 } gd_app_status_t;
 
+typedef enum gd_app_flag {
+    gd_app_flag_no_auto_load = 1 << 0
+} gd_app_flag_t;
+
 typedef struct gd_app_context * gd_app_context_t;
 typedef struct gd_app_lib * gd_app_lib_t;
 typedef struct gd_app_module * gd_app_module_t;
 
-typedef int (*gd_app_main)(gd_app_context_t ctx);
+typedef int (*gd_app_fn_t)(gd_app_context_t ctx);
 
 typedef int (*gd_app_module_global_init)(void);
 typedef void (*gd_app_module_global_fini)(void);

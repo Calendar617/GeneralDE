@@ -16,7 +16,7 @@ gd_app_context_t gd_app_context_create(
 
 void gd_app_context_free(gd_app_context_t context);
 
-void gd_app_set_main(gd_app_context_t context, gd_app_main mf);
+void gd_app_set_main(gd_app_context_t context, gd_app_fn_t fn_main, gd_app_fn_t fn_stop);
 
 /*arg operations*/
 int gd_app_argc(gd_app_context_t context);
@@ -50,9 +50,20 @@ gd_app_status_t gd_app_state(gd_app_context_t context);
 int gd_app_tick_add(gd_app_context_t context, gd_app_tick_fun tick, void * tick_ctx, ptr_int_t tick_arg);
 int gd_app_tick_remove(gd_app_context_t context, gd_app_tick_fun tick, void * tick_ctx);
 void gd_app_tick(gd_app_context_t context);
+
+/*app falgs functions*/
+uint32_t gd_app_flags(gd_app_context_t context);
+void gd_app_flags_set(gd_app_context_t context, uint32_t flag);
+void gd_app_flag_enable(gd_app_context_t context, gd_app_flag_t flag);
+void gd_app_flag_disable(gd_app_context_t context, gd_app_flag_t flag);
+int gd_app_flag_is_enable(gd_app_context_t context, gd_app_flag_t flag);
  
 /*the main*/
 int gd_app_run(gd_app_context_t context);
+int gd_app_stop(gd_app_context_t context);
+
+int gd_app_debug(gd_app_context_t context);
+void gd_app_set_debug(gd_app_context_t context, int level);
 
 void gd_set_default_library(void * handler);
 
