@@ -36,6 +36,14 @@ typedef int (*gd_app_rsp_init_fun_t)(
 
 typedef ptr_int_t (*gd_app_tick_fun)(void * ctx, ptr_int_t arg);
 
+typedef struct gd_app_module_def {
+    const char * name;
+    const char * type;
+    const char * lib;
+    const char * static_cfg;
+    int (*dynamic_cfg)(gd_app_context_t app, cfg_t cfg, struct gd_app_module_def * module_def, void * ctx);
+} * gd_app_module_def_t;
+
 #ifdef __cplusplus
 }
 #endif

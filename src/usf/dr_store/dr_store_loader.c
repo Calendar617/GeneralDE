@@ -1,10 +1,12 @@
 #include "cpe/pal/pal_external.h"
+#include "cpe/utils/file.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/dr/dr_metalib_builder.h"
 #include "cpe/dr/dr_metalib_build.h"
 #include "gd/app/app_log.h"
 #include "gd/app/app_library.h"
 #include "gd/app/app_module.h"
+#include "gd/app/app_library.h"
 #include "gd/app/app_context.h"
 #include "usf/dr_store/dr_store.h"
 #include "usf/dr_store/dr_store_manage.h"
@@ -15,8 +17,10 @@ static int dr_store_loader_load_from_symbol(
 {
     int rv;
     LPDRMETALIB metalib;
+    
+    metalib = gd_app_lib_sym(NULL, arg, gd_app_em(app));
     if (metalib == NULL) {
-        APP_CTX_ERROR(app, "%s: read load-from-symbol error!", gd_app_module_name(module));
+        APP_CTX_ERROR(app, "%s: read load-from-symbol %s: error!", gd_app_module_name(module), arg);
         return -1;
     }
 
@@ -24,7 +28,7 @@ static int dr_store_loader_load_from_symbol(
 
     if (rv == 0) {
         if (mgr->m_debug) {
-            APP_CTX_INFO(app, "%s: metalib load from symbol %s success!", gd_app_module_name(module), arg);
+            APP_CTX_INFO(app, "%s: metalib load from symbol %s: success!", gd_app_module_name(module), arg);
         }
     }
 
@@ -82,7 +86,7 @@ static int dr_store_loader_load_from_file(
     struct cfg_it child_it;
     cfg_t child;
     dr_metalib_builder_t builder = NULL;
-    void * buf;
+    void * buf = NULL;
     int rv;
     struct mem_buffer buffer;
 
@@ -125,7 +129,7 @@ static int dr_store_loader_load_from_file(
         rv = -1;
     }
 
-    if (rv != 0) goto COMPLETE;
+    if (rv != 0) goto FROM_FILE_COMPLETE;
 
     dr_metalib_builder_analize(builder);
     if (dr_inbuild_build_lib(
@@ -137,7 +141,7 @@ static int dr_store_loader_load_from_file(
             app, "%s: load from file: build metalib fail!",
             gd_app_module_name(module));
         rv = -1;
-        goto COMPLETE;
+        goto FROM_FILE_COMPLETE;
     }
 
     buf = mem_alloc(gd_app_alloc(app), mem_buffer_size(&buffer));
@@ -146,7 +150,7 @@ static int dr_store_loader_load_from_file(
             app, "%s: load from file: alloc buf to store metalib fail, size is %d!",
             gd_app_module_name(module), (int)mem_buffer_size(&buffer));
         rv = -1;
-        goto COMPLETE;
+        goto FROM_FILE_COMPLETE;
     }
 
     if (mem_buffer_read(buf, mem_buffer_size(&buffer), &buffer) != mem_buffer_size(&buffer)) {
@@ -154,21 +158,97 @@ static int dr_store_loader_load_from_file(
             app, "%s: load from file: copy to save buffer fail!",
             gd_app_module_name(module));
         rv = -1;
-        goto COMPLETE;
+        goto FROM_FILE_COMPLETE;
     }
 
     if (dr_store_add_lib(
             mgr, gd_app_module_name(module),
             (LPDRMETALIB)buf, dr_store_loader_lib_destory, gd_app_alloc(app)) != 0)
     {
-        mem_free(gd_app_alloc(app), buf);
         rv = -1;
-        goto COMPLETE;
+        goto FROM_FILE_COMPLETE;
     }
 
-COMPLETE:
+    buf = NULL;
+
+FROM_FILE_COMPLETE:
+    if (rv == 0) {
+        if (mgr->m_debug) {
+            APP_CTX_INFO(app, "%s: metalib load from files: success!", gd_app_module_name(module));
+        }
+    }
+
+    if (buf) mem_free(gd_app_alloc(app), buf);
+
     mem_buffer_clear(&buffer);
     dr_metalib_builder_free(builder);
+
+    return rv;
+}
+
+static int dr_store_loader_load_from_bin(
+    gd_app_context_t app, gd_app_module_t module, dr_store_manage_t mgr, const char * arg)
+{
+    ssize_t buf_size, load_size;
+    char * buf = NULL;
+    FILE * fp = NULL;
+    int rv = 0;
+
+    fp = file_stream_open(arg, "r", gd_app_em(app));
+    if (fp == NULL) {
+        APP_CTX_ERROR(
+            app, "%s: read load-from-bin %s: open file error!",
+            gd_app_module_name(module), arg);
+        rv = -1;
+        goto FROM_BIN_COMPLETE;
+    }
+
+    buf_size = file_stream_size(fp, gd_app_em(app));
+    if (buf_size <= 0) {
+        APP_CTX_ERROR(
+            app, "%s: read load-from-bin %s: read size error!",
+            gd_app_module_name(module), arg);
+        rv = -1;
+        goto FROM_BIN_COMPLETE;
+    }
+
+    buf = mem_alloc(gd_app_alloc(app), buf_size);
+    if (buf == NULL) {
+        APP_CTX_ERROR(
+            app, "%s: load from bin %s: alloc buf to store metalib fail, size is %d!",
+            gd_app_module_name(module), arg, (int)buf_size);
+        rv = -1;
+        goto FROM_BIN_COMPLETE;
+    }
+
+    load_size = file_stream_load_to_buf(buf, buf_size, fp, gd_app_em(app));
+    if (load_size != buf_size) {
+        APP_CTX_ERROR(
+            app, "%s: load from bin %s: load data to buf fail, reque %d, but load %d!",
+            gd_app_module_name(module), arg, (int)buf_size, (int)load_size);
+        rv = -1;
+        goto FROM_BIN_COMPLETE;
+    }
+
+    if (dr_store_add_lib(
+            mgr, gd_app_module_name(module),
+            (LPDRMETALIB)buf, dr_store_loader_lib_destory, gd_app_alloc(app)) != 0)
+    {
+        rv = -1;
+        goto FROM_BIN_COMPLETE;
+    }
+
+    buf = NULL;
+
+FROM_BIN_COMPLETE:
+    if (fp) file_stream_close(fp, gd_app_em(app));
+    if (buf) mem_free(gd_app_alloc(app), buf);
+
+    if (rv == 0) {
+        if (mgr->m_debug) {
+            APP_CTX_INFO(app, "%s: metalib load from bin %s success!", gd_app_module_name(module), arg);
+        }
+    }
 
     return rv;
 }
@@ -189,11 +269,15 @@ int dr_store_loader_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t
         return dr_store_loader_load_from_symbol(app, module, mgr, arg);
     }
 
+    if ((arg = cfg_get_string(cfg, "load-from-bin", NULL))) {
+        return dr_store_loader_load_from_bin(app, module, mgr, arg);
+    }
+
     if ((child_cfg = cfg_find_cfg(cfg, "load-from-file"))) {
         return dr_store_loader_load_from_file(app, module, mgr, child_cfg);
     }
 
-    APP_CTX_ERROR(app, "%s: no anly load way!", gd_app_module_name(module));
+    APP_CTX_ERROR(app, "%s: no any load way!", gd_app_module_name(module));
     return -1;
 }
 

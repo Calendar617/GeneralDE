@@ -33,10 +33,13 @@ bpg_manage_create(
     assert(app);
 
     if (logic_mgr == 0) logic_mgr = logic_manage_default(app);
-    if (logic_mgr == 0) return NULL;
-
     if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_bpg_manager_default_name);
     if (em == 0) em = gd_app_em(app);
+
+    if (logic_mgr == 0) {
+        CPE_ERROR(em, "%s: create: logic_mgr not exist!", name);
+        return NULL;
+    }
 
     mgr_node = gd_nm_group_create(gd_app_nm_mgr(app), name, sizeof(struct bpg_manage));
     if (mgr_node == NULL) return NULL;
@@ -76,6 +79,11 @@ bpg_manage_create(
 static void bpg_manage_clear(gd_nm_node_t node) {
     bpg_manage_t mgr;
     mgr = (bpg_manage_t)gd_nm_node_data(node);
+
+    if (mgr->m_metalib_ref) {
+        dr_ref_free(mgr->m_metalib_ref);
+        mgr->m_metalib_ref = NULL;
+    }
 
     if (mgr->m_rsp_buf) {
         bpg_req_free(mgr->m_rsp_buf);
@@ -230,17 +238,6 @@ int bpg_manage_set_response_meta_name(bpg_manage_t mgr, const char * name) {
             bpg_manage_name(mgr), name);
         return -1;
     }
-
-    /* meta = NULL; */
-    /* if (mgr->m_metalib_ref) { */
-    /*     meta = dr_lib_find_meta_by_name(mgr->m_metalib_ref, name); */
-    /*     if (meta == NULL) { */
-    /*         CPE_ERROR( */
-    /*             mgr->m_em, "bpg_manage %s: set response meta name %s, meta not exist in metalib!",  */
-    /*             bpg_manage_name(mgr), name); */
-    /*         return -1; */
-    /*     } */
-    /* } */
 
     memcpy(mgr->m_response_meta_name, name, name_len);
     mgr->m_response_meta = NULL;

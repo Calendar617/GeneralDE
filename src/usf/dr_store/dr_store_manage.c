@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
+#include "cpe/cfg/cfg_read.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "gd/app/app_context.h"
@@ -136,6 +137,8 @@ int dr_store_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t
         dr_store_manage_create(
             app, gd_app_module_name(module), gd_app_alloc(app), gd_app_em(app));
     if (dr_store_manage == NULL) return -1;
+
+    dr_store_manage->m_debug = cfg_get_int32(cfg, "debug", 0);
 
     return 0;
 }

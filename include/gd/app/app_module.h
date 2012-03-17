@@ -29,6 +29,12 @@ int gd_app_uninstall_module(
     gd_app_context_t context,
     const char * name);
 
+int gd_app_bulk_install_module(
+    gd_app_context_t context,
+    gd_app_module_def_t module_defs,
+    int module_def_count,
+    void * ctx);
+
 #ifdef __cplusplus
 }
 #endif

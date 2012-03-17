@@ -1,6 +1,8 @@
 #include <assert.h>
 #include "cpe/pal/pal_string.h"
+#include "cpe/utils/stream_mem.h"
 #include "cpe/cfg/cfg_read.h"
+#include "cpe/cfg/cfg_manage.h"
 #include "gd/app/app_log.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
@@ -274,4 +276,76 @@ int gd_app_uninstall_module(
     }
 
     return -1;
+}
+
+int gd_app_bulk_install_module(
+    gd_app_context_t context,
+    gd_app_module_def_t module_defs,
+    int module_def_count,
+    void * ctx)
+{
+    cfg_t cfg = NULL;
+    int rv = 0;
+    int i;
+
+    for(i = 0; rv == 0 && i < module_def_count; ++i) {
+        gd_app_module_def_t module_info = module_defs + i;
+
+        if (cfg) { cfg_free(cfg); cfg = NULL; }
+
+        if (module_info->static_cfg) {
+            struct read_stream_mem stream = 
+                CPE_READ_STREAM_MEM_INITIALIZER(module_info->static_cfg, strlen(module_info->static_cfg));
+
+            cfg = cfg_create(NULL);
+            if (cfg == NULL) {
+                APP_CTX_ERROR(
+                    context, "app: bulk install module: [%d] %s: create cfg fail!",
+                    i, module_info->name);
+                rv = -1;
+                break;
+            }
+
+            if (cfg_read(cfg, (read_stream_t)&stream, cfg_merge_use_new, gd_app_em(context)) != 0) {
+                APP_CTX_ERROR(
+                    context, "app: bulk install module: [%d] %s: read cfg error!",
+                    i, module_info->name);
+                rv = -1;
+                break;
+            }
+        }
+
+        if (module_info->dynamic_cfg) {
+            if (cfg == NULL) {
+                cfg = cfg_create(NULL);
+                if (cfg == NULL) {
+                    APP_CTX_ERROR(
+                        context, "app: bulk install module: [%d] %s: create cfg fail!",
+                        i, module_info->name);
+                    rv = -1;
+                    break;
+                }
+            }
+
+            if (module_info->dynamic_cfg(context, cfg, module_info, ctx) != 0) {
+                APP_CTX_ERROR(
+                    context, "app: bulk install module: [%d] %s: process dynamic cfg fail!",
+                    i, module_info->name);
+                rv = -1;
+                break;
+            }
+        }
+
+        if (gd_app_install_module(context, module_info->name, module_info->type, module_info->lib, cfg) == NULL) {
+            APP_CTX_ERROR(
+                context, "app: bulk install module: [%d] %s: install fail!",
+                i, module_info->name);
+            rv = -1;
+            break;
+        }
+    }
+
+    if (cfg) { cfg_free(cfg); cfg = NULL; }
+
+    return rv;
 }

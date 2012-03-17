@@ -22,7 +22,7 @@ dr_store_create(dr_store_manage_t mgr, const char * name) {
     dr_store = (dr_store_t)(buf + name_len);
 
     dr_store->m_mgr = mgr;
-    dr_store->m_name = name;
+    dr_store->m_name = buf;
     dr_store->m_lib = NULL;
     dr_store->m_free_fun = NULL;
     dr_store->m_free_ctx = NULL;
