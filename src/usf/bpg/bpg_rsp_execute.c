@@ -153,6 +153,7 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, b
 }
 
 static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_req_t req, struct basepkg * pkg, error_monitor_t em) {
+    LPDRMETALIB metalib;
     LPDRMETA data_meta;
     logic_data_t data;
     int i;
@@ -160,6 +161,10 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
     bpg_manage_t mgr;
 
     mgr = rsp->m_mgr;
+    assert(mgr);
+
+    metalib = bpg_manage_metalib(mgr);
+    assert(metalib); /*checked in bpg_rsp_copy_pkg_to_ctx*/
 
     if (pkg->head.appendInfoCount > (sizeof(pkg->head.appendInfos) / sizeof(pkg->head.appendInfos[0]))) {
         CPE_ERROR(
@@ -180,7 +185,7 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
             return -1;
         }
 
-        data_meta = dr_lib_find_meta_by_id(mgr->m_metalib, append->id);
+        data_meta = dr_lib_find_meta_by_id(metalib, append->id);
         if (data_meta == NULL) {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: append %d: meta of id %d not exist in lib!",
@@ -218,19 +223,24 @@ int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_req_t
     bpg_manage_t mgr;
 
     mgr = rsp->m_mgr;
-    
-    if (mgr->m_metalib == NULL) {
+
+    if (bpg_manage_metalib(mgr) == NULL) {
         CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: metalib is not set!"
-            , bpg_manage_name(mgr), bpg_rsp_name(rsp));
+            em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: metalib %s not exist!",
+            bpg_manage_name(mgr), bpg_rsp_name(rsp), 
+            bpg_manage_metalib_name(mgr));
         return -1;
     }
 
     if (mgr->m_request_meta == NULL) {
-        CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: request meta is not set!",
-            bpg_manage_name(mgr), bpg_rsp_name(rsp));
-        return -1;
+        bpg_manage_request_meta(mgr);
+        if (mgr->m_request_meta == NULL) {
+            CPE_ERROR(
+                em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: request meta %s not exist in metalib %s!",
+                bpg_manage_name(mgr), bpg_rsp_name(rsp), 
+                bpg_manage_request_meta_name(mgr), bpg_manage_metalib_name(mgr));
+            return -1;
+        }    
     }
 
     if (bpg_rsp_copy_main_to_ctx(rsp, op_context, req, pkg, em) != 0) return -1;

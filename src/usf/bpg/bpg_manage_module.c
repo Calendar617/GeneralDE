@@ -3,27 +3,17 @@
 #include "cpe/cfg/cfg_read.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
-#include "gd/app/app_library.h"
 #include "usf/bpg/bpg_manage.h"
 #include "usf/bpg/bpg_rsp.h"
 #include "bpg_internal_types.h"
 
 static int bpg_manage_app_load_metalib(bpg_manage_t mgr, cfg_t cfg, error_monitor_t em) {
     const char * metalib_name;
-    LPDRMETALIB metalib;
     
     metalib_name = cfg_get_string(cfg, "meta.lib-name", NULL);
     if (metalib_name == NULL) return 0;
 
-    metalib = (LPDRMETALIB)gd_app_lib_sym(NULL, metalib_name, em);
-    if (metalib == NULL) {
-        CPE_ERROR(
-            em, "%s: create: load metalib %s fail!",
-            bpg_manage_name(mgr), metalib_name);
-        return -1;
-    }
-
-    if (bpg_manage_set_metalib(mgr, metalib) != 0) {
+    if (bpg_manage_set_metalib(mgr, metalib_name) != 0) {
         CPE_ERROR(
             em, "%s: create: set metalib %s fail!",
             bpg_manage_name(mgr), metalib_name);

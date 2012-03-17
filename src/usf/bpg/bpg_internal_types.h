@@ -4,6 +4,7 @@
 #include "cpe/utils/memory.h"
 #include "cpe/utils/hash.h"
 #include "cpe/utils/hash_string.h"
+#include "usf/dr_store/dr_store_types.h"
 #include "usf/bpg/bpg_types.h"
 
 #ifdef __cplusplus
@@ -13,7 +14,7 @@ extern "C" {
 struct bpg_manage {
     gd_app_context_t m_app;
     mem_allocrator_t m_alloc;
-    LPDRMETALIB m_metalib;
+    dr_ref_t m_metalib_ref;
     logic_manage_t m_logic_mgr;
     error_monitor_t m_em;
     uint32_t m_flags;

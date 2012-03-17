@@ -7,6 +7,8 @@
 #include "usf/bpg/bpg_manage.h"
 #include "usf/bpg/bpg_req.h"
 #include "usf/logic/logic_manage.h"
+#include "usf/dr_store/dr_ref.h"
+#include "usf/dr_store/dr_store_manage.h"
 #include "bpg_internal_ops.h"
 
 static void bpg_manage_clear(gd_nm_node_t node);
@@ -43,7 +45,7 @@ bpg_manage_create(
 
     mgr->m_app = app;
     mgr->m_alloc = gd_app_alloc(app);
-    mgr->m_metalib = NULL;
+    mgr->m_metalib_ref = NULL;
     mgr->m_logic_mgr = logic_mgr;
     mgr->m_em = em;
     mgr->m_flags = 0;
@@ -170,6 +172,17 @@ bpg_manage_rsp_buf(bpg_manage_t mgr, LPDRMETA carry_meta, size_t caary_capacity)
     return mgr->m_rsp_buf;
 }
 
+LPDRMETA bpg_manage_request_meta(bpg_manage_t mgr) {
+    if (mgr->m_request_meta == NULL && mgr->m_request_meta_name[0]) {
+        LPDRMETALIB metalib = bpg_manage_metalib(mgr);
+        if (metalib) {
+            mgr->m_request_meta = dr_lib_find_meta_by_name(metalib, mgr->m_request_meta_name);
+        }
+    }
+
+    return mgr->m_request_meta;
+}
+
 const char *
 bpg_manage_request_meta_name(bpg_manage_t mgr) {
     return mgr->m_request_meta_name;
@@ -177,7 +190,6 @@ bpg_manage_request_meta_name(bpg_manage_t mgr) {
 
 int bpg_manage_set_request_meta_name(bpg_manage_t mgr, const char * name) {
     size_t name_len;
-    LPDRMETA meta;
 
     name_len = strlen(name) + 1;
     if (name_len > sizeof(mgr->m_request_meta_name)) {
@@ -187,21 +199,21 @@ int bpg_manage_set_request_meta_name(bpg_manage_t mgr, const char * name) {
         return -1;
     }
 
-    meta = NULL;
-    if (mgr->m_metalib) {
-        meta = dr_lib_find_meta_by_name(mgr->m_metalib, name);
-        if (meta == NULL) {
-            CPE_ERROR(
-                mgr->m_em, "bpg_manage %s: set request meta name %s, meta not exist in metalib!", 
-                bpg_manage_name(mgr), name);
-            return -1;
+    memcpy(mgr->m_request_meta_name, name, name_len);
+    mgr->m_request_meta = NULL;
+
+    return 0;
+}
+
+LPDRMETA bpg_manage_response_meta(bpg_manage_t mgr) {
+    if (mgr->m_response_meta == NULL && mgr->m_response_meta_name[0]) {
+        LPDRMETALIB metalib = bpg_manage_metalib(mgr);
+        if (metalib) {
+            mgr->m_response_meta = dr_lib_find_meta_by_name(metalib, mgr->m_response_meta_name);
         }
     }
 
-    memcpy(mgr->m_request_meta_name, name, name_len);
-    mgr->m_request_meta = meta;
-
-    return 0;
+    return mgr->m_response_meta;
 }
 
 const char * bpg_manage_response_meta_name(bpg_manage_t mgr) {
@@ -210,7 +222,6 @@ const char * bpg_manage_response_meta_name(bpg_manage_t mgr) {
 
 int bpg_manage_set_response_meta_name(bpg_manage_t mgr, const char * name) {
     size_t name_len;
-    LPDRMETA meta;
 
     name_len = strlen(name) + 1;
     if (name_len > sizeof(mgr->m_response_meta_name)) {
@@ -220,65 +231,52 @@ int bpg_manage_set_response_meta_name(bpg_manage_t mgr, const char * name) {
         return -1;
     }
 
-    meta = NULL;
-    if (mgr->m_metalib) {
-        meta = dr_lib_find_meta_by_name(mgr->m_metalib, name);
-        if (meta == NULL) {
-            CPE_ERROR(
-                mgr->m_em, "bpg_manage %s: set response meta name %s, meta not exist in metalib!", 
-                bpg_manage_name(mgr), name);
-            return -1;
-        }
-    }
+    /* meta = NULL; */
+    /* if (mgr->m_metalib_ref) { */
+    /*     meta = dr_lib_find_meta_by_name(mgr->m_metalib_ref, name); */
+    /*     if (meta == NULL) { */
+    /*         CPE_ERROR( */
+    /*             mgr->m_em, "bpg_manage %s: set response meta name %s, meta not exist in metalib!",  */
+    /*             bpg_manage_name(mgr), name); */
+    /*         return -1; */
+    /*     } */
+    /* } */
 
     memcpy(mgr->m_response_meta_name, name, name_len);
-    mgr->m_response_meta = meta;
+    mgr->m_response_meta = NULL;
 
     return 0;
 }
 
-LPDRMETALIB bpg_manage_metalib(bpg_manage_t mgr) {
-    return mgr->m_metalib;
+const char * bpg_manage_metalib_name(bpg_manage_t mgr) {
+    return mgr->m_metalib_ref ? dr_ref_lib_name(mgr->m_metalib_ref) : "???";
 }
 
-int bpg_manage_set_metalib(bpg_manage_t mgr, LPDRMETALIB metalib) {
-    LPDRMETA request_meta;
-    LPDRMETA response_meta;
-    int rv;
+LPDRMETALIB bpg_manage_metalib(bpg_manage_t mgr) {
+    return mgr->m_metalib_ref ? dr_ref_lib(mgr->m_metalib_ref) : NULL;
+}
 
-    rv = 0;
-    request_meta = NULL;
-    response_meta = NULL;
+int bpg_manage_set_metalib(bpg_manage_t mgr, const char * metalib_name) {
+    assert(mgr);
+    assert(metalib_name);
 
-    if (metalib) {
-        if (mgr->m_request_meta_name[0]) {
-            request_meta = dr_lib_find_meta_by_name(metalib, mgr->m_request_meta_name);
-            if (request_meta == NULL) {
-                CPE_ERROR(
-                    mgr->m_em, "bpg_manage %s: set metalib, request meta %s not exist in metalib!", 
-                    bpg_manage_name(mgr), mgr->m_request_meta_name);
-                rv = -1;
-            }
-        }
+    if (mgr->m_metalib_ref) dr_ref_free(mgr->m_metalib_ref);
 
-        if (mgr->m_response_meta_name[0]) {
-            response_meta = dr_lib_find_meta_by_name(metalib, mgr->m_response_meta_name);
-            if (response_meta == NULL) {
-                CPE_ERROR(
-                    mgr->m_em, "bpg_manage %s: set metalib, response meta %s not exist in metalib!", 
-                    bpg_manage_name(mgr), mgr->m_response_meta_name);
-                rv = -1;
-            }
-        }
+    mgr->m_metalib_ref =
+        dr_ref_create(
+            dr_store_manage_default(mgr->m_app),
+            metalib_name);
+    if (mgr->m_metalib_ref == NULL) {
+        CPE_ERROR(
+            mgr->m_em, "bpg_manage %s: set metalib %s, create dr_ref fail!", 
+            bpg_manage_name(mgr), metalib_name);
+        return -1;
     }
 
-    if (rv == 0) {
-        mgr->m_metalib = metalib;
-        mgr->m_request_meta = request_meta;
-        mgr->m_response_meta = response_meta;
-    }
+    mgr->m_request_meta = NULL;
+    mgr->m_response_meta = NULL;
 
-    return rv;
+    return 0;
 }
 
 uint32_t bpg_manage_flags(bpg_manage_t mgr) {
@@ -330,7 +328,6 @@ LPDRMETA bpg_meta_pkghead(void) {
 
     return g_meta_pkghead;
 }
-
 
 static LPDRMETA g_meta_pkg = NULL;
 
