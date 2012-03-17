@@ -39,6 +39,8 @@ void net_connector_set_monitor(
     net_connector_t connector,
     net_connector_state_monitor_fun_t fun, void * ctx);
 
+net_ep_t net_connector_ep(net_connector_t connector);
+
 #ifdef __cplusplus
 }
 #endif
