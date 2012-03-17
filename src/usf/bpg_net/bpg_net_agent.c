@@ -141,6 +141,10 @@ const char * bpg_net_agent_cvt_name(bpg_net_agent_t mgr) {
     return mgr->m_cvt ? dr_cvt_name(mgr->m_cvt) : "";
 }
 
+short bpg_net_agent_port(bpg_net_agent_t svr) {
+    return net_listener_using_port(svr->m_listener);
+}
+
 bpg_req_t
 bpg_net_agent_req_buf(bpg_net_agent_t mgr) {
     if (mgr->m_req_buf) {
@@ -190,8 +194,10 @@ int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t c
     if (bpg_net_agent->m_debug) {
         CPE_INFO(
             gd_app_em(app),
-            "%s: create: done. ip=%s, port=%d, accept-queue-size=%d, req-max-size=%d",
-            gd_app_module_name(module), ip, port, accept_queue_size, (int)bpg_net_agent->m_req_max_size);
+            "%s: create: done. ip=%s, port=%u, accept-queue-size=%d, req-max-size=%d",
+            gd_app_module_name(module),
+            ip, bpg_net_agent_port(bpg_net_agent),
+            accept_queue_size, (int)bpg_net_agent->m_req_max_size);
     }
 
     return 0;

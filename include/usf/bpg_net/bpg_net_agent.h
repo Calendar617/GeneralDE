@@ -32,6 +32,8 @@ int bpg_net_agent_set_cvt(bpg_net_agent_t req, const char * cvt_name);
 const char * bpg_net_agent_cvt_name(bpg_net_agent_t req);
 dr_cvt_t bpg_net_agent_cvt(bpg_net_agent_t req);
 
+short bpg_net_agent_port(bpg_net_agent_t svr);
+
 #ifdef __cplusplus
 }
 #endif
