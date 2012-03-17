@@ -4,7 +4,7 @@ endif
 
 $(call assert-not-null,target-product)
 
-include $(CPED_BUILD_DETAIL_DIR)/create-dirs.mk
+include $(CPDE_BUILD_DETAIL_DIR)/create-dirs.mk
 
 .PHONY: ut
 
