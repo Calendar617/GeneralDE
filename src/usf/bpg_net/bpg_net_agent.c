@@ -119,7 +119,7 @@ bpg_net_agent_name_hs(bpg_net_agent_t mgr) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
 }
 
-int bpg_net_aent_set_cvt(bpg_net_agent_t mgr, const char * cvt) {
+int bpg_net_agent_set_cvt(bpg_net_agent_t mgr, const char * cvt) {
     dr_cvt_t new_cvt;
 
     if (mgr->m_cvt && strcmp(dr_cvt_name(mgr->m_cvt), cvt) == 0) return 0;

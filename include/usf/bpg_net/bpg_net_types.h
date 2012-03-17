@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 typedef struct bpg_net_agent * bpg_net_agent_t;
+typedef struct bpg_net_client * bpg_net_client_t;
 
 #ifdef __cplusplus
 }

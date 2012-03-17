@@ -21,6 +21,19 @@ struct bpg_net_agent {
     int m_debug;
 };
 
+struct bpg_net_client {
+    gd_app_context_t m_app;
+    mem_allocrator_t m_alloc;
+    error_monitor_t m_em;
+    net_connector_t m_connector;
+    dr_cvt_t m_cvt;
+
+    size_t m_req_max_size;
+    bpg_req_t m_req_buf;
+
+    int m_debug;
+};
+
 #ifdef __cplusplus
 }
 #endif
