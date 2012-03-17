@@ -33,10 +33,13 @@ bpg_manage_create(
     assert(app);
 
     if (logic_mgr == 0) logic_mgr = logic_manage_default(app);
-    if (logic_mgr == 0) return NULL;
-
     if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_bpg_manager_default_name);
     if (em == 0) em = gd_app_em(app);
+
+    if (logic_mgr == 0) {
+        CPE_ERROR(em, "%s: create: logic_mgr not exist!", name);
+        return NULL;
+    }
 
     mgr_node = gd_nm_group_create(gd_app_nm_mgr(app), name, sizeof(struct bpg_manage));
     if (mgr_node == NULL) return NULL;

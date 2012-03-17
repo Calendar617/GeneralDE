@@ -169,6 +169,8 @@ static int dr_store_loader_load_from_file(
         goto FROM_FILE_COMPLETE;
     }
 
+    buf = NULL;
+
 FROM_FILE_COMPLETE:
     if (rv == 0) {
         if (mgr->m_debug) {
@@ -236,6 +238,8 @@ static int dr_store_loader_load_from_bin(
         goto FROM_BIN_COMPLETE;
     }
 
+    buf = NULL;
+
 FROM_BIN_COMPLETE:
     if (fp) file_stream_close(fp, gd_app_em(app));
     if (buf) mem_free(gd_app_alloc(app), buf);
@@ -266,14 +270,14 @@ int dr_store_loader_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t
     }
 
     if ((arg = cfg_get_string(cfg, "load-from-bin", NULL))) {
-        dr_store_loader_load_from_bin(app, module, mgr, arg);
+        return dr_store_loader_load_from_bin(app, module, mgr, arg);
     }
 
     if ((child_cfg = cfg_find_cfg(cfg, "load-from-file"))) {
         return dr_store_loader_load_from_file(app, module, mgr, child_cfg);
     }
 
-    APP_CTX_ERROR(app, "%s: no anly load way!", gd_app_module_name(module));
+    APP_CTX_ERROR(app, "%s: no any load way!", gd_app_module_name(module));
     return -1;
 }
 
