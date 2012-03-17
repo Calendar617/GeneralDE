@@ -12,6 +12,7 @@ extern "C" {
 
 typedef struct dr_store_manage * dr_store_manage_t;
 typedef struct dr_store * dr_store_t;
+typedef struct dr_ref * dr_ref_t;
 
 typedef void (*dr_lib_free_fun_t)(LPDRMETALIB lib, void * ctx);
 

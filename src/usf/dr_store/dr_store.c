@@ -3,6 +3,7 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cfg.h"
 #include "usf/dr_store/dr_store.h"
+#include "usf/dr_store/dr_store_manage.h"
 #include "dr_store_internal_ops.h"
 
 dr_store_t
@@ -25,6 +26,7 @@ dr_store_create(dr_store_manage_t mgr, const char * name) {
     dr_store->m_lib = NULL;
     dr_store->m_free_fun = NULL;
     dr_store->m_free_ctx = NULL;
+    dr_store->m_ref_count = 1;
 
     cpe_hash_entry_init(&dr_store->m_hh);
     if (cpe_hash_table_insert_unique(&mgr->m_stores, dr_store) != 0) {
@@ -32,13 +34,44 @@ dr_store_create(dr_store_manage_t mgr, const char * name) {
         return NULL;
     }
 
+    if (mgr->m_debug) {
+        CPE_INFO(
+            mgr->m_em,
+            "%s: dr_store %s create success",
+            dr_store_manage_name(mgr), name);
+    }
+
     return dr_store;
 }
 
 void dr_store_free(dr_store_t dr_store) {
+    dr_store_manage_t mgr;
+
     assert(dr_store);
-    cpe_hash_table_remove_by_ins(&dr_store->m_mgr->m_stores, dr_store);
-    mem_free(dr_store->m_mgr->m_alloc, (void*)dr_store->m_name);
+
+    mgr = dr_store->m_mgr;
+    assert(mgr);
+
+    dr_store_reset_lib(dr_store, NULL, NULL, NULL);
+
+    --dr_store->m_ref_count;
+    if (dr_store->m_ref_count > 0) {
+        if (mgr->m_debug) {
+            CPE_INFO(
+                mgr->m_em, "%s: dr_store %s free delay, %d ref remain!",
+                dr_store_manage_name(mgr), dr_store->m_name, dr_store->m_ref_count);
+        }
+    }
+    else {
+        if (mgr->m_debug) {
+            CPE_INFO(
+                mgr->m_em, "%s: dr_store %s free success!",
+                dr_store_manage_name(mgr), dr_store->m_name);
+        }
+
+        cpe_hash_table_remove_by_ins(&mgr->m_stores, dr_store);
+        mem_free(mgr->m_alloc, (void*)dr_store->m_name);
+    }
 }
 
 void dr_store_free_all(dr_store_manage_t mgr) {
@@ -52,6 +85,53 @@ void dr_store_free_all(dr_store_manage_t mgr) {
         dr_store_t next = cpe_hash_it_next(&dr_store_it);
         dr_store_free(dr_store);
         dr_store = next;
+    }
+}
+
+void dr_store_add_ref(dr_store_t dr_store) {
+    dr_store_manage_t mgr;
+
+    assert(dr_store);
+
+    mgr = dr_store->m_mgr;
+    assert(mgr);
+
+    dr_store->m_ref_count++;
+
+    if (mgr->m_debug) {
+        CPE_INFO(
+            mgr->m_em, "%s: dr_store %s add ref, ref-count=%d!",
+            dr_store_manage_name(mgr), dr_store->m_name, dr_store->m_ref_count);
+    }
+}
+
+void dr_store_remove_ref(dr_store_t dr_store) {
+    dr_store_manage_t mgr;
+
+    assert(dr_store);
+
+    mgr = dr_store->m_mgr;
+    assert(mgr);
+
+    --dr_store->m_ref_count;
+
+    if (mgr->m_debug) {
+        CPE_INFO(
+            mgr->m_em, "%s: dr_store %s remove ref, ref-count=%d!",
+            dr_store_manage_name(mgr), dr_store->m_name, dr_store->m_ref_count);
+    }
+
+    if (dr_store->m_ref_count <= 0) {
+        assert(dr_store->m_lib == NULL);
+
+        if (mgr->m_debug) {
+            CPE_INFO(
+                mgr->m_em, "%s: dr_store %s free delay complete!",
+                dr_store_manage_name(mgr), dr_store->m_name);
+        }
+
+        cpe_hash_table_remove_by_ins(&mgr->m_stores, dr_store);
+        mem_free(mgr->m_alloc, (void*)dr_store->m_name);
     }
 }
 
@@ -92,4 +172,27 @@ void dr_store_reset_lib(dr_store_t dr_store, LPDRMETALIB lib, dr_lib_free_fun_t 
     dr_store->m_lib = lib;
     dr_store->m_free_fun = free_fun;
     dr_store->m_free_ctx = free_ctx;
+}
+
+int dr_store_add_lib(
+    dr_store_manage_t mgr, const char * name,
+    LPDRMETALIB lib, dr_lib_free_fun_t free_fun, void * free_ctx)
+{
+    dr_store_t store;
+    store = dr_store_find_or_create(mgr, name);
+    if (store == NULL) {
+        CPE_ERROR(
+            mgr->m_em, "%s: create meta lib %s: create fail!",
+            dr_store_manage_name(mgr), name);
+        return -1;
+    } 
+    
+    if (dr_store_set_lib(store, lib, free_fun, free_ctx) != 0) {
+        CPE_ERROR(
+            mgr->m_em, "%s: create meta lib %s: meta lib already loaded!",
+            dr_store_manage_name(mgr), name);
+        return -1;
+    }
+
+    return 0;
 }

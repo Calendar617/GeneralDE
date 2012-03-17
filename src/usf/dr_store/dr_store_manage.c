@@ -34,6 +34,8 @@ dr_store_manage_create(
     mgr->m_em = em;
     mgr->m_debug = 0;
 
+    TAILQ_INIT(&mgr->m_refs);
+
     if (cpe_hash_table_init(
             &mgr->m_stores,
             alloc,
