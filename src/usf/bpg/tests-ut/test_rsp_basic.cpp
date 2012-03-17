@@ -1,7 +1,12 @@
+#include "cpe/dr/dr_metalib_manage.h"
+#include "usf/bpg/bpg_req.h"
 #include "BpgTest.hpp"
 
-class BpgBasicTest : public BpgTest {
+class BpgMetaTest : public BpgTest {
 };
 
-TEST_F(BpgBasicTest, defaults) {
+TEST_F(BpgMetaTest, basic) {
+    LPDRMETA meta = bpg_meta_pkghead();
+
+    EXPECT_STREQ("basepkg_head", dr_meta_name(meta));
 }

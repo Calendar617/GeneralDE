@@ -314,17 +314,17 @@ void bpg_manage_set_context_op(
     mgr->m_ctx_ctx = ctx_ctx;
 }
 
-extern LPDRMETALIB g_metalib_base_package;
+extern char g_metalib_base_package[];
 
 LPDRMETALIB bpg_metalib(void) {
-    return g_metalib_base_package;
+    return (LPDRMETALIB)g_metalib_base_package;
 }
 
 static LPDRMETA g_meta_pkghead = NULL;
 
 LPDRMETA bpg_meta_pkghead(void) {
     if (g_meta_pkghead == NULL) {
-        g_meta_pkghead = dr_lib_find_meta_by_name(g_metalib_base_package, "basepkg_head");
+        g_meta_pkghead = dr_lib_find_meta_by_name(bpg_metalib(), "basepkg_head");
         assert(g_meta_pkghead);
     }
 
@@ -336,7 +336,7 @@ static LPDRMETA g_meta_pkg = NULL;
 
 LPDRMETA bpg_meta_pkg(void) {
     if (g_meta_pkg == NULL) {
-        g_meta_pkg = dr_lib_find_meta_by_name(g_metalib_base_package, "basepkg");
+        g_meta_pkg = dr_lib_find_meta_by_name(bpg_metalib(), "basepkg");
         assert(g_meta_pkg);
     }
 
