@@ -388,3 +388,7 @@ void net_connector_disable(net_connector_t connector) {
         connector->m_monitor_fun(connector, connector->m_monitor_ctx);
     }
 }
+
+net_ep_t net_connector_ep(net_connector_t connector) {
+    return connector->m_ep;
+}
