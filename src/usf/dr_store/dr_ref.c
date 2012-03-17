@@ -37,6 +37,10 @@ void dr_ref_free(dr_ref_t dr_ref) {
     mem_free(dr_ref->m_mgr->m_alloc, dr_ref);
 }
 
+const char * dr_ref_lib_name(dr_ref_t dr_ref) {
+    return dr_ref->m_store->m_name;
+}
+
 LPDRMETALIB dr_ref_lib(dr_ref_t dr_ref) {
     return dr_ref->m_store->m_lib;
 }
