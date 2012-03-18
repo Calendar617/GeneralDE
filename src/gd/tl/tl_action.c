@@ -168,6 +168,7 @@ int gd_tl_event_send_ex(
 {
     gd_tl_t tl;
     gd_tl_manage_t tm;
+    gd_tl_intercept_t intercept;
 
     if (event == NULL || event->m_tl == NULL || event->m_tl->m_manage == NULL)
         return GD_TL_ERROR_BAD_ARG;
@@ -185,6 +186,12 @@ int gd_tl_event_send_ex(
     if (delay < 0) return GD_TL_ERROR_BAD_ARG;
     if (span < 0 || (repeatCount != 1 && span == 0)) return GD_TL_ERROR_BAD_ARG;
     if (!gd_tl_event_in_building_queue(event)) return GD_TL_ERROR_EVENT_UNKNOWN;
+
+    TAILQ_FOREACH(intercept, &tl->m_intercepts, m_next) {
+        if (intercept->m_intercept_fun(event, intercept->m_intercept_ctx)) {
+            return GD_TL_ERROR_NONE;
+        }
+    }
 
     if (tl->m_event_enqueue) {
         return tl->m_event_enqueue(

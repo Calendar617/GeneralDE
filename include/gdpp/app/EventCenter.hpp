@@ -11,6 +11,7 @@ class EventCenter : public Gd::Nm::Object {
 public:
     virtual Event & createEvent(const char * typeName, ssize_t capacity = -1) = 0;
 	virtual void sendEvent(const char * oid, Event & event) = 0;
+    virtual gd_tl_t tl(void) = 0;
 
     template<typename T>
     void registerResponser(const char * oid, T & r, void (T::*fun)(const char * oid, Event const & e)) {
