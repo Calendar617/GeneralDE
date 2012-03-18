@@ -28,6 +28,8 @@ gd_tl_intercept_create(
     intercept->m_intercept_fun = intercept_fun;
     intercept->m_intercept_ctx = intercept_ctx;
 
+    TAILQ_INSERT_TAIL(&tl->m_intercepts, intercept, m_next);
+
     return intercept;
 }
 
