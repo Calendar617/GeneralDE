@@ -109,15 +109,12 @@ gd_app_module_type_create(
 
     TAILQ_INSERT_TAIL(&g_app_module_types, module_type, m_next);
 
-    CPE_INFO(em, "%s: module-type create success!", type_name);
-
     return module_type;
 }
 
 void gd_app_module_type_free(struct gd_app_module_type * module_type, error_monitor_t em) {
     TAILQ_REMOVE(&g_app_module_types, module_type, m_next);
     if (module_type->m_lib) gd_app_lib_close_for_module(module_type->m_lib, module_type, em);
-    CPE_INFO(em, "%s: module-type free success!", cpe_hs_data(module_type->m_name));
     mem_free(NULL, module_type->m_name);
 }
 
