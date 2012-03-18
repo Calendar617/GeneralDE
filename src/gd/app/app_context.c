@@ -108,7 +108,9 @@ int gd_app_cfg_reload(gd_app_context_t context) {
         context->m_alloc);
 
     if (rv == 0) {
-        CPE_INFO(context->m_em, "load config from %s success!", (char*)mem_buffer_make_continuous(&tbuf, 0));
+        if (context->m_debug) {
+            CPE_INFO(context->m_em, "load config from %s success!", (char*)mem_buffer_make_continuous(&tbuf, 0));
+        }
     }
 
     mem_buffer_clear(&tbuf);

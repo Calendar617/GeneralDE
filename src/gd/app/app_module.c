@@ -76,7 +76,9 @@ gd_app_module_create_i(
     TAILQ_INSERT_TAIL(&context->m_runing_modules, runing_module, m_qh_for_app);
     TAILQ_INSERT_TAIL(&module->m_runing_modules, runing_module, m_qh_for_runing);
 
-    APP_CTX_INFO(context, "%s: module create success!", module_name);
+    if (context->m_debug) {
+        APP_CTX_INFO(context, "%s: module create success!", module_name);
+    }
 
     return runing_module;
 }
@@ -120,7 +122,9 @@ static void gd_app_module_free(
 
     gd_app_module_data_free(context, gd_app_module_name(module));
 
-    APP_CTX_INFO(context, "%s: module free success!", gd_app_module_name(module));
+    if (context->m_debug) {
+        APP_CTX_INFO(context, "%s: module free success!", gd_app_module_name(module));
+    }
 
     mem_free(module->m_alloc, module);
 
@@ -197,7 +201,9 @@ int gd_app_modules_load(gd_app_context_t context) {
     moduleListCfg = cfg_find_cfg(context->m_cfg, "modules.load");
 
     if (moduleListCfg == NULL) {
-        APP_CTX_INFO(context, "app: no modules need to load!");
+        if (context->m_debug) {
+            APP_CTX_INFO(context, "app: no modules need to load!");
+        }
         return -1;
     }
 
