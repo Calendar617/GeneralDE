@@ -2,6 +2,7 @@
 #include <assert.h>
 #include "gd/tl/tl_manage.h"
 #include "gd/tl/tl_errno.h"
+#include "gd/tl/tl_intercept.h"
 #include "tl_internal_types.h"
 #include "tl_internal_ops.h"
 
@@ -129,6 +130,7 @@ gd_tl_t gd_tl_create(gd_tl_manage_t tm) {
     tl->m_event_destory = NULL;
     tl->m_event_op_context = NULL;
     TAILQ_INIT(&tl->m_events);
+    TAILQ_INIT(&tl->m_intercepts);
 
     TAILQ_INSERT_TAIL(&tm->m_tls, tl, m_next);
 
@@ -140,6 +142,10 @@ void gd_tl_free(gd_tl_t tl) {
 
     while(!TAILQ_EMPTY(&tl->m_events)) {
         gd_tl_event_node_free(TAILQ_FIRST(&tl->m_events));
+    }
+
+    while(!TAILQ_EMPTY(&tl->m_intercepts)) {
+        gd_tl_intercept_free(TAILQ_FIRST(&tl->m_intercepts));
     }
 
     TAILQ_REMOVE(&tl->m_manage->m_tls, tl, m_next);

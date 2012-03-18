@@ -45,6 +45,17 @@ union gd_tl_action {
     char m_reserve[GD_TL_ACTION_SIZE];
 };
 
+struct gd_tl_intercept {
+    gd_tl_t m_tl;
+    const char * m_name;
+    gd_tl_intercept_fun_t m_intercept_fun;
+    void * m_intercept_ctx;
+
+    TAILQ_ENTRY(gd_tl_intercept) m_next;
+};
+
+TAILQ_HEAD(gd_tl_intercept_list, gd_tl_intercept);
+
 struct gd_tl {
     gd_tl_manage_t m_manage;
 
@@ -55,6 +66,8 @@ struct gd_tl {
     void * m_event_op_context;
 
     struct gd_tl_event_node_queue m_events;
+    struct gd_tl_intercept_list m_intercepts;
+
     TAILQ_ENTRY(gd_tl) m_next;
 };
 

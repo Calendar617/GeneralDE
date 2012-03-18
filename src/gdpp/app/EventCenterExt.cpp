@@ -92,6 +92,10 @@ public:
         return e;
     }
 
+    virtual gd_tl_t tl(void) {
+        return _tl;
+    }
+
 	virtual void sendEvent(const char * oid, Event & event) {
         assert(event.attach_capacity() == cpe_hs_len_to_binary_len(_oid_max_len));
         cpe_hs_init(
