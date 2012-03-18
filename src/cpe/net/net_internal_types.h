@@ -22,6 +22,7 @@ struct net_ep_page;
 struct net_mgr {
     mem_allocrator_t m_alloc;
     error_monitor_t m_em;
+    int m_debug;
 
     struct cpe_range_mgr m_ep_ids;
     size_t m_ep_page_capacity;
@@ -63,8 +64,8 @@ struct net_connector {
 struct net_chanel_type {
     const char * name;
     net_chanel_type_id_t id;
-    int (*read_from_net)(net_chanel_t chanel, int fd);
-    int (*write_to_net)(net_chanel_t chanel, int fd);
+    ssize_t (*read_from_net)(net_chanel_t chanel, int fd);
+    ssize_t (*write_to_net)(net_chanel_t chanel, int fd);
     int (*read_from_buf)(net_chanel_t chanel, const void * buf, size_t size);
     ssize_t (*write_to_buf)(net_chanel_t chanel, void * buf, size_t capacity);
     void * (*peek)(net_chanel_t chanel, void * buf, size_t size);

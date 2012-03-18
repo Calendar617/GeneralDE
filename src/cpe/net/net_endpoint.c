@@ -263,7 +263,8 @@ void net_ep_cb(EV_P_ ev_io *w, int revents) {
     old_events = net_ep_calc_ev_events(ep);
 
     if (revents & EV_READ) {
-        if (ep->m_chanel_r->m_type->read_from_net(ep->m_chanel_r, ep->m_fd) != 0) {
+        int recv_size = ep->m_chanel_r->m_type->read_from_net(ep->m_chanel_r, ep->m_fd);
+        if (recv_size < 0) {
             CPE_ERROR(
                 ep->m_mgr->m_em,
                 "net_mgr: ep %d: read data error, errno=%d (%s)",
@@ -271,7 +272,18 @@ void net_ep_cb(EV_P_ ev_io *w, int revents) {
             net_ep_close_i(ep, net_ep_event_close_by_error);
             return;
         }
+        else if (recv_size == 0) {
+            if (ep->m_mgr->m_debug) {
+                CPE_INFO(ep->m_mgr->m_em, "net_mgr: ep %d: socket close by peer!", ep->m_id);
+            }
+            net_ep_close_i(ep, net_ep_event_close_by_peer);
+            return;
+        }
         else {
+            if (ep->m_mgr->m_debug) {
+                CPE_INFO(ep->m_mgr->m_em, "net_mgr: ep %d: receive %d types data!", ep->m_id, (int)recv_size);
+            }
+
             if (ep->m_process_fun) {
                 ep->m_process_fun(ep, ep->m_process_ctx, net_ep_event_read);
             }
@@ -279,13 +291,19 @@ void net_ep_cb(EV_P_ ev_io *w, int revents) {
     }
 
     if (revents & EV_WRITE) {
-        if (ep->m_chanel_w->m_type->write_to_net(ep->m_chanel_w, ep->m_fd) != 0) {
+        ssize_t send_size = ep->m_chanel_w->m_type->write_to_net(ep->m_chanel_w, ep->m_fd);
+        if (send_size < 0) {
             CPE_ERROR(
                 ep->m_mgr->m_em,
                 "net_mgr: ep %d: write data error, errno=%d (%s)",
                 ep->m_id, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
             net_ep_close_i(ep, net_ep_event_close_by_error);
             return;
+        }
+        else {
+            if (ep->m_mgr->m_debug) {
+                CPE_INFO(ep->m_mgr->m_em, "net_mgr: ep %d: send %d bytes data!", ep->m_id, (int)send_size);
+            }
         }
     }
 
