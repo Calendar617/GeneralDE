@@ -94,6 +94,11 @@ void cpe_error_log_to_consol(struct error_info * info, void * context, const cha
     printf("\n");
 }
 
+void cpe_error_log_to_consol_and_flush(struct error_info * info, void * context, const char * fmt, va_list args) {
+    cpe_error_log_to_consol(info, context, fmt, args);
+    fflush(stdout);
+}
+
 void cpe_error_save_last_errno(struct error_info * info, void * context, const char * fmt, va_list args) {
     if (info->m_level == CPE_EL_ERROR) {
         *((int*)context) = info->m_errno;
