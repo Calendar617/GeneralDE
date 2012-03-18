@@ -107,7 +107,7 @@ static int net_chanel_queue_read_from_buf(net_chanel_t bc, const void * buf, siz
 
     memcpy(chanel->m_buf + chanel->m_size, buf, size);
     chanel->m_size += size;
-    chanel->m_size = net_chanel_queue_calac_state(chanel);
+    chanel->m_state = net_chanel_queue_calac_state(chanel);
 
     return 0;
 }
@@ -130,12 +130,12 @@ static ssize_t net_chanel_queue_write_to_buf(net_chanel_t bc, void * buf, size_t
         memmove(buf, buf + size, chanel->m_size);
     }
 
-    chanel->m_size = net_chanel_queue_calac_state(chanel);
+    chanel->m_state = net_chanel_queue_calac_state(chanel);
 
     return size;
 }
 
-static int net_chanel_queue_read_from_ep(net_chanel_t bc, int fd) {
+static ssize_t net_chanel_queue_read_from_net(net_chanel_t bc, int fd) {
     struct net_chanel_queue * chanel;
     ssize_t recv_size;
 
@@ -148,12 +148,12 @@ static int net_chanel_queue_read_from_ep(net_chanel_t bc, int fd) {
     if (recv_size < 0) return -1;
 
     chanel->m_size += recv_size;
-    chanel->m_size = net_chanel_queue_calac_state(chanel);
+    chanel->m_state = net_chanel_queue_calac_state(chanel);
 
-    return 0;
+    return recv_size;
 }
 
-static int net_chanel_queue_write_to_ep(net_chanel_t bc, int fd) {
+static ssize_t net_chanel_queue_write_to_net(net_chanel_t bc, int fd) {
     struct net_chanel_queue * chanel;
     ssize_t send_size;
 
@@ -164,7 +164,7 @@ static int net_chanel_queue_write_to_ep(net_chanel_t bc, int fd) {
     if (chanel->m_size == 0) return 0;
 
     send_size = send(fd, chanel->m_buf, chanel->m_size, 0);
-    if (send_size < 0) return -1;
+    if (send_size < 0) return send_size;
 
     if (send_size != chanel->m_size) {
         memmove(chanel->m_buf, chanel->m_buf + send_size, chanel->m_size - send_size);
@@ -176,7 +176,7 @@ static int net_chanel_queue_write_to_ep(net_chanel_t bc, int fd) {
 
     chanel->m_state = net_chanel_queue_calac_state(chanel);
 
-    return 0;
+    return send_size;
 }
 
 static void * net_chanel_queue_peek(net_chanel_t bc, void * buf, size_t size) {
@@ -217,8 +217,8 @@ static void net_chanel_queue_erase(net_chanel_t bc, size_t size) {
 static struct net_chanel_type s_net_chanel_type_queue = {
     "queue"
     , net_chanel_type_id_queue
-    , net_chanel_queue_read_from_ep
-    , net_chanel_queue_write_to_ep
+    , net_chanel_queue_read_from_net
+    , net_chanel_queue_write_to_net
     , net_chanel_queue_read_from_buf
     , net_chanel_queue_write_to_buf
     , net_chanel_queue_peek

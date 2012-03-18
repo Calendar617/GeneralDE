@@ -30,6 +30,7 @@ net_mgr_create(mem_allocrator_t alloc, error_monitor_t em) {
 
     nmgr->m_alloc = alloc;
     nmgr->m_em = em;
+    nmgr->m_debug = 0;
     nmgr->m_ep_page_capacity = 0;
     nmgr->m_ep_pages = NULL;
 
@@ -98,4 +99,12 @@ void net_mgr_free(net_mgr_t nmgr) {
 
 error_monitor_t net_mgr_em(net_mgr_t nmgr) {
     return nmgr->m_em;
+}
+
+int net_mgr_debug(net_mgr_t nmgr) {
+    return nmgr->m_debug;
+}
+
+void net_mgr_set_debug(net_mgr_t nmgr, int debug) {
+    nmgr->m_debug = debug;
 }
