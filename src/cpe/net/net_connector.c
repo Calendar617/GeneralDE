@@ -38,7 +38,7 @@ net_connector_create(
 
     inetAddr = (struct sockaddr_in *)(&connector->m_addr);
     inetAddr->sin_family = AF_INET;
-    inetAddr->sin_port = port;
+    inetAddr->sin_port = htons(port);
     inetAddr->sin_addr.s_addr = inet_addr(ip);
 
     connector->m_ep = NULL;
