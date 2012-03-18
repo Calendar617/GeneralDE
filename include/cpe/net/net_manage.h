@@ -17,6 +17,9 @@ void net_mgr_stop(net_mgr_t nmgr);
 int net_mgr_tick(net_mgr_t nmgr);
 int net_mgr_run(net_mgr_t nmgr);
 
+int net_mgr_debug(net_mgr_t nmgr);
+void net_mgr_set_debug(net_mgr_t nmgr, int debug);
+
 #ifdef __cplusplus
 }
 #endif
