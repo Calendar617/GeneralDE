@@ -1,7 +1,7 @@
 product:=usf_bpg_tool
 $(product).type:=progn 
 $(product).depends:=argtable2 \
-                    dr_json \
+                    cpe_dr_data_json \
                     gd_app \
                     usf_bpg_net 
 $(product).c.libraries:=

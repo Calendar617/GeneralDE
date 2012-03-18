@@ -11,10 +11,7 @@ struct arg_file * a_input;
 struct arg_str * a_ip;
 struct arg_int * a_port;
 struct arg_lit * a_help;
-<<<<<<< HEAD
-=======
 struct arg_int * a_app_debug;
->>>>>>> refs/top-bases/t/support/usf
 struct arg_end * a_end;
 
 int prepaire_dr_load_cfg(gd_app_context_t app, cfg_t cfg, struct gd_app_module_def * module_def, void * ctx) {
@@ -66,10 +63,7 @@ int main(int argc, char * argv[]) {
          ,    a_port = arg_int1(   "p",   "port",              "<string>",     "input file")
          ,    a_input = arg_filen(   "i",   "input",              "<string>",   1, 100,  "input file")
          ,    a_help = arg_lit0(   NULL,  "help",                                   "print this help and exit")
-<<<<<<< HEAD
-=======
          , a_app_debug = arg_int0(   NULL,  "app-debug",        "<string>", "debug app framework")
->>>>>>> refs/top-bases/t/support/usf
          ,    a_end = arg_end(20)
     };
     int nerrors;
@@ -100,13 +94,10 @@ int main(int argc, char * argv[]) {
         return -1;
     }
 
-<<<<<<< HEAD
-=======
     if (a_app_debug->count > 0) {
         gd_app_set_debug(app, a_app_debug->ival[0]);
     }
 
->>>>>>> refs/top-bases/t/support/usf
     rv = tools_main(app);
 
 exit:
