@@ -42,7 +42,7 @@ bpg_net_client_create(
     mgr->m_debug = 0;
 
     mgr->m_connector =
-        net_connector_create(
+        net_connector_create_with_ep(
             gd_app_net_mgr(app),
             name,
             ip,
