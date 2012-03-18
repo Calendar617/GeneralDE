@@ -6,7 +6,6 @@
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "gd/app/app_context.h"
-#include "gd/app/app_module.h"
 #include "usf/bpg/bpg_req.h"
 #include "usf/bpg_net/bpg_net_client.h"
 #include "bpg_net_internal_ops.h"
@@ -49,6 +48,12 @@ bpg_net_client_create(
             ip,
             port);
     if (mgr->m_connector == NULL) {
+        gd_nm_node_free(mgr_node);
+        return NULL;
+    }
+
+    if (bpg_net_client_ep_init(mgr, net_connector_ep(mgr->m_connector)) != 0) {
+        net_connector_free(mgr->m_connector);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
@@ -153,54 +158,13 @@ bpg_net_client_req_buf(bpg_net_client_t mgr) {
     return mgr->m_req_buf;
 }
 
+net_connector_t bpg_net_client_connector(bpg_net_client_t mgr) {
+    return mgr->m_connector;
+}
+
 static void bpg_net_client_clear(gd_nm_node_t node);
 
 struct gd_nm_node_type s_nm_node_type_bpg_net_client = {
     "usf_bpg_net_client",
     bpg_net_client_clear
 };
-
-EXPORT_DIRECTIVE
-int bpg_net_client_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
-    bpg_net_client_t bpg_net_client;
-    const char * ip;
-    short port;
-    int accept_queue_size;
-
-    ip = cfg_get_string(cfg, "ip", "");
-    port = cfg_get_int16(cfg, "port", 0);
-    accept_queue_size = cfg_get_int32(cfg, "accept-queue-size", 256);
-
-    bpg_net_client =
-        bpg_net_client_create(
-            app, gd_app_module_name(module),
-            ip, port,
-            gd_app_alloc(app), gd_app_em(app));
-    if (bpg_net_client == NULL) return -1;
-
-    bpg_net_client->m_req_max_size =
-        cfg_get_uint32(cfg, "req-max-size", bpg_net_client->m_req_max_size);
-
-    bpg_net_client->m_debug = cfg_get_int32(cfg, "debug", 0);
-
-    if (bpg_net_client->m_debug) {
-        CPE_INFO(
-            gd_app_em(app),
-            "%s: create: done. ip=%s, port=%u, req-max-size=%d",
-            gd_app_module_name(module),
-            ip, port, 
-            (int)bpg_net_client->m_req_max_size);
-    }
-
-    return 0;
-}
-
-EXPORT_DIRECTIVE
-void bpg_net_client_app_fini(gd_app_context_t app, gd_app_module_t module) {
-    bpg_net_client_t bpg_net_client;
-
-    bpg_net_client = bpg_net_client_find_nc(app, gd_app_module_name(module));
-    if (bpg_net_client) {
-        bpg_net_client_free(bpg_net_client);
-    }
-}
