@@ -71,6 +71,19 @@ bpg_manage_create(
 
     mgr->m_send_to = NULL;
 
+    mgr->m_running_req_sn = 0;
+    if (cpe_hash_table_init(
+            &mgr->m_running_reqs,
+            mgr->m_alloc,
+            (cpe_hash_fun_t) bpg_running_req_hash,
+            (cpe_hash_cmp_t) bpg_running_req_cmp,
+            CPE_HASH_OBJ2ENTRY(bpg_running_req, m_hh),
+            -1) != 0)
+    {
+        gd_nm_node_free(mgr_node);
+        return NULL;
+    }
+
     gd_nm_node_set_type(mgr_node, &s_nm_node_type_bpg_manage);
 
     return mgr;
@@ -79,6 +92,9 @@ bpg_manage_create(
 static void bpg_manage_clear(gd_nm_node_t node) {
     bpg_manage_t mgr;
     mgr = (bpg_manage_t)gd_nm_node_data(node);
+
+    bpg_running_req_free_all(mgr);
+    cpe_hash_table_fini(&mgr->m_running_reqs);
 
     if (mgr->m_metalib_ref) {
         dr_ref_free(mgr->m_metalib_ref);

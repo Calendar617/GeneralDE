@@ -18,6 +18,11 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data);
 struct bpg_rsp_copy_info * bpg_rsp_copy_info_create(bpg_manage_t mgr, const char * data_name);
 void bpg_rsp_copy_info_free(bpg_manage_t mgr, struct bpg_rsp_copy_info * copy_info);
 
+/*bpg_runing_req ops*/
+uint32_t bpg_running_req_hash(const struct bpg_running_req * runing_req);
+int bpg_running_req_cmp(const struct bpg_running_req * l, const struct bpg_running_req * r);
+void bpg_running_req_free_all(bpg_manage_t mgr);
+
 #ifdef __cplusplus
 }
 #endif

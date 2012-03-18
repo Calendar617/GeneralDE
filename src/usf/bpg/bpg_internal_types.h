@@ -30,6 +30,9 @@ struct bpg_manage {
     bpg_logic_ctx_fini_fun_t m_ctx_fini;
     void * m_ctx_ctx;
 
+    uint32_t m_running_req_sn;
+    struct cpe_hash_table m_running_reqs;
+
     size_t m_rsp_max_size;
     bpg_req_t m_rsp_buf;
 
@@ -61,6 +64,28 @@ struct bpg_req {
 
 
     gd_dp_req_t m_dp_req;
+};
+
+typedef enum bpg_running_req_dispatch_way {
+    bpg_running_response_way_dispatch_none
+    , bpg_running_response_req_dispatch_str
+    , bpg_running_response_req_dispatch_int
+    , bpg_running_response_req_dispatch_logic
+} bpg_running_req_dispatch_way_t;
+
+typedef union bpg_running_req_dispatch_target {
+    const char * m_response_to_str;
+    uint32_t m_response_to_int;
+} bpg_running_req_dispatch_target_t;
+
+struct bpg_running_req {
+    bpg_manage_t m_mgr;
+    bpg_req_sn_t m_sn;
+    bpg_running_req_dispatch_way_t m_dispatch_way;
+    bpg_running_req_dispatch_target_t m_dispatch_target;
+    logic_require_id_t m_logic_req;
+
+    struct cpe_hash_entry m_hh;
 };
 
 #ifdef __cplusplus
