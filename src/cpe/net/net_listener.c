@@ -19,6 +19,11 @@ int net_listener_listen(net_listener_t listener) {
         return -1;
     }
 
+    if (net_socket_set_reuseaddr(listener->m_fd, listener->m_mgr->m_em)) {
+        net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
+        return -1;
+    }
+
     if (listen(listener->m_fd, listener->m_acceptQueueSize) != 0) {
         CPE_ERROR(listener->m_mgr->m_em, "%s: listen error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         net_socket_close(&listener->m_fd, listener->m_mgr->m_em);

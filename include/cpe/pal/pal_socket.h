@@ -32,6 +32,7 @@ extern "C" {
 #endif
 
 int cpe_sock_set_none_block(int fd, int is_non_block);
+int cpe_sock_set_reuseaddr(int fd, int is_reuseaddr);
 
 #ifdef __cplusplus
 }
