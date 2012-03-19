@@ -161,8 +161,7 @@ bpg_req_t bpg_req_from_dp_req(gd_dp_req_t req) {
 int bpg_req_set_data(bpg_req_t req, LPDRMETA meta, void * buf, size_t capacity, error_monitor_t em) {
     struct basepkg_head * head;
     size_t cur_size;
-    size_t cur_capacity;
-    int use_size;
+    size_t use_size;
 
     assert(req);
     assert(meta);
@@ -176,12 +175,14 @@ int bpg_req_set_data(bpg_req_t req, LPDRMETA meta, void * buf, size_t capacity, 
     }
 
     cur_size = sizeof(struct basepkg_head);
-    cur_capacity = bpg_req_pkg_capacity(req) - cur_size;
+    use_size = bpg_req_pkg_capacity(req) - cur_size;
 
-    use_size = dr_cvt_encode(
-        bpg_req_cvt(req),
-        meta, ((char *)bpg_req_pkg_data(req)) + cur_size, cur_capacity, buf, capacity, em);
-    if (use_size < 0) {
+    if (dr_cvt_encode(
+            bpg_req_cvt(req),
+            meta, ((char *)bpg_req_pkg_data(req)) + cur_size, &use_size,
+            buf, &capacity,
+            em, 0) != 0)
+    {
         CPE_ERROR(em, "bpg_req_set_data: encode fail!");
         return -1;
     }
@@ -200,8 +201,7 @@ int bpg_req_append_data(bpg_req_t req, LPDRMETA meta, void * buf, size_t capacit
     struct AppendInfo * appendInfo;
 
     size_t cur_size;
-    size_t cur_capacity;
-    int use_size;
+    size_t use_size;
 
     assert(req);
 
@@ -213,12 +213,14 @@ int bpg_req_append_data(bpg_req_t req, LPDRMETA meta, void * buf, size_t capacit
     }
 
     cur_size = bpg_req_pkg_data_size(req);
-    cur_capacity = bpg_req_pkg_capacity(req) - cur_size;
+    use_size = bpg_req_pkg_capacity(req) - cur_size;
 
-    use_size = dr_cvt_encode(
-        bpg_req_cvt(req),
-        meta, ((char *)bpg_req_pkg_data(req)) + cur_size, cur_capacity, buf, capacity, em);
-    if (use_size < 0) {
+    if (dr_cvt_encode(
+            bpg_req_cvt(req), meta,
+            ((char *)bpg_req_pkg_data(req)) + cur_size, &use_size,
+            buf, &capacity,
+            em, 0) != 0)
+    {
         CPE_ERROR(em, "bpg_req_pkg_data: encode fail!");
         return -1;
     }

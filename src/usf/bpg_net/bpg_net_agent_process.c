@@ -44,6 +44,7 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
         size_t buf_size;
         size_t input_size;
         size_t output_size;
+        dr_cvt_result_t cvt_result;
 
         buf_size = net_ep_size(ep);
         if (buf_size <= 0) break;
@@ -60,13 +61,22 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
         input_size = buf_size;
         output_size = bpg_req_pkg_capacity(req_buf);
 
-        if (dr_cvt_decode(
+        cvt_result =
+            dr_cvt_decode(
                 bpg_net_agent_cvt(agent),
                 bpg_meta_pkg(agent->m_bpg_manage),
                 bpg_req_pkg_data(req_buf),
                 &output_size,
-                buf, &input_size, agent->m_em) != 0)
-        {
+                buf, &input_size, agent->m_em, agent->m_debug);
+        if (cvt_result != dr_cvt_result_not_enough_input) {
+            if(agent->m_debug) {
+                CPE_ERROR(
+                    agent->m_em, "%s: ep %d: not enough data, input size is %d!",
+                bpg_net_agent_name(agent), (int)net_ep_id(ep), (int)buf_size);
+            }
+            break;
+        }
+        else if (cvt_result != dr_cvt_result_success) {
             CPE_ERROR(
                 agent->m_em, "%s: ep %d: decode package fail, input size is %d!",
                 bpg_net_agent_name(agent), (int)net_ep_id(ep), buf_size);

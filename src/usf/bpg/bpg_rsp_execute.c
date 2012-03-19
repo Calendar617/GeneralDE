@@ -144,7 +144,7 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, b
                 data_meta,
                 logic_data_data(data), &output_size,
                 pkg->body, &input_size,
-                em) != 0)
+                em, logic_context_flag_is_enable(op_context, logic_context_flag_debug)) != 0)
         {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: %s decode data fail, input len is %d, output len is %d!",
@@ -214,7 +214,7 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
                 bpg_req_cvt(req),
                 data_meta,
                 logic_data_data(data), &output_size,
-                pkg->body, &input_size, em) != 0)
+                pkg->body, &input_size, em, logic_context_flag_is_enable(op_context, logic_context_flag_debug)) != 0)
         {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: append %d: %s decode data fail, input len is %d, output len is %d!",
