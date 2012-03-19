@@ -1,12 +1,9 @@
 #include <assert.h>
-#include "cpe/pal/pal_external.h"
-#include "cpe/cfg/cfg_read.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/net/net_listener.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "gd/app/app_context.h"
-#include "gd/app/app_module.h"
 #include "usf/bpg/bpg_req.h"
 #include "usf/bpg_net/bpg_net_agent.h"
 #include "bpg_net_internal_ops.h"
@@ -16,6 +13,7 @@ struct gd_nm_node_type s_nm_node_type_bpg_net_agent;
 bpg_net_agent_t
 bpg_net_agent_create(
     gd_app_context_t app,
+    bpg_manage_t bpg_manage,
     const char * name,
     const char * ip,
     short port,
@@ -40,8 +38,9 @@ bpg_net_agent_create(
     mgr->m_em = em;
     mgr->m_req_max_size = 4 * 1024;
     mgr->m_req_buf = NULL;
-
+    mgr->m_cvt = NULL;
     mgr->m_debug = 0;
+    mgr->m_bpg_manage = bpg_manage;
 
     mgr->m_listener =
         net_listener_create(
@@ -119,13 +118,16 @@ bpg_net_agent_name_hs(bpg_net_agent_t mgr) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
 }
 
-int bpg_net_agent_set_cvt(bpg_net_agent_t mgr, const char * cvt) {
+int bpg_net_agent_set_cvt(bpg_net_agent_t mgr, const char * cvt_name) {
     dr_cvt_t new_cvt;
 
-    if (mgr->m_cvt && strcmp(dr_cvt_name(mgr->m_cvt), cvt) == 0) return 0;
+    if (mgr->m_cvt && strcmp(dr_cvt_name(mgr->m_cvt), cvt_name) == 0) return 0;
 
-    new_cvt = dr_cvt_create(cvt);
-    if (new_cvt == NULL) return -1;
+    new_cvt = NULL;
+    if (cvt_name) {
+        new_cvt = dr_cvt_create(cvt_name);
+        if (new_cvt == NULL) return -1;
+    }
 
     if (mgr->m_cvt) dr_cvt_free(mgr->m_cvt);
 
@@ -167,48 +169,3 @@ struct gd_nm_node_type s_nm_node_type_bpg_net_agent = {
     "usf_bpg_net_agent",
     bpg_net_agent_clear
 };
-
-EXPORT_DIRECTIVE
-int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
-    bpg_net_agent_t bpg_net_agent;
-    const char * ip;
-    short port;
-    int accept_queue_size;
-
-    ip = cfg_get_string(cfg, "ip", "");
-    port = cfg_get_int16(cfg, "port", 0);
-    accept_queue_size = cfg_get_int32(cfg, "accept-queue-size", 256);
-
-    bpg_net_agent =
-        bpg_net_agent_create(
-            app, gd_app_module_name(module),
-            ip, port, accept_queue_size,
-            gd_app_alloc(app), gd_app_em(app));
-    if (bpg_net_agent == NULL) return -1;
-
-    bpg_net_agent->m_req_max_size =
-        cfg_get_uint32(cfg, "req-max-size", bpg_net_agent->m_req_max_size);
-
-    bpg_net_agent->m_debug = cfg_get_int32(cfg, "debug", 0);
-
-    if (bpg_net_agent->m_debug) {
-        CPE_INFO(
-            gd_app_em(app),
-            "%s: create: done. ip=%s, port=%u, accept-queue-size=%d, req-max-size=%d",
-            gd_app_module_name(module),
-            ip, bpg_net_agent_port(bpg_net_agent),
-            accept_queue_size, (int)bpg_net_agent->m_req_max_size);
-    }
-
-    return 0;
-}
-
-EXPORT_DIRECTIVE
-void bpg_net_agent_app_fini(gd_app_context_t app, gd_app_module_t module) {
-    bpg_net_agent_t bpg_net_agent;
-
-    bpg_net_agent = bpg_net_agent_find_nc(app, gd_app_module_name(module));
-    if (bpg_net_agent) {
-        bpg_net_agent_free(bpg_net_agent);
-    }
-}

@@ -11,17 +11,23 @@
 #include "usf/bpg_net/bpg_net_agent.h"
 #include "bpg_net_internal_ops.h"
 
-static LPDRMETAENTRY s_totallen_entry;
-static int s_totallen_start_pos = 0;
-static int s_totallen_end_pos = 0;
-
 static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
     bpg_req_t req_buf;
+    dr_cvt_t cvt;
 
     if(agent->m_debug) {
         CPE_INFO(
             agent->m_em, "%s: ep %d: on read",
             bpg_net_agent_name(agent), (int)net_ep_id(ep));
+    }
+
+    cvt = bpg_net_agent_cvt(agent);
+    if (cvt == NULL) {
+        CPE_ERROR(
+            agent->m_em, "%s: ep %d: get cvt fail!",
+            bpg_net_agent_name(agent), (int)net_ep_id(ep));
+        net_ep_close(ep);
+        return;
     }
 
     req_buf = bpg_net_agent_req_buf(agent);
@@ -33,36 +39,14 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
         return;
     }
 
-    if (s_totallen_start_pos == 0) {
-        s_totallen_entry = dr_meta_find_entry_by_name(bpg_meta_pkghead(), "bodytotallen");
-        if (s_totallen_entry == NULL) {
-            s_totallen_start_pos = -1;
-        }
-        else {
-            s_totallen_start_pos = dr_entry_data_start_pos(s_totallen_entry);
-            s_totallen_end_pos = s_totallen_start_pos + dr_entry_element_size(s_totallen_entry);
-        }
-    }
-
-    if (s_totallen_start_pos < 0) {
-        CPE_ERROR(
-            agent->m_em, "%s: ep %d: get bodytotallen entry fail!",
-            bpg_net_agent_name(agent), (int)net_ep_id(ep));
-        net_ep_close(ep);
-        return;
-    }
-
-    assert(s_totallen_entry);
-
     while(1) {
         char * buf;
         size_t buf_size;
-        int32_t package_input_size;
-        ssize_t package_decode_size;
+        size_t input_size;
+        size_t output_size;
 
         buf_size = net_ep_size(ep);
-
-        if (buf_size < s_totallen_end_pos) break;
+        if (buf_size <= 0) break;
 
         buf = net_ep_peek(ep, NULL, buf_size);
         if (buf == NULL) {
@@ -73,43 +57,43 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
             break;
         }
 
-        if (dr_entry_try_read_int32(&package_input_size, buf + s_totallen_start_pos, s_totallen_entry, agent->m_em) != 0) {
+        input_size = buf_size;
+        output_size = bpg_req_pkg_capacity(req_buf);
+
+        if (dr_cvt_decode(
+                bpg_net_agent_cvt(agent),
+                bpg_meta_pkg(agent->m_bpg_manage),
+                bpg_req_pkg_data(req_buf),
+                &output_size,
+                buf, &input_size, agent->m_em) != 0)
+        {
             CPE_ERROR(
-                agent->m_em, "%s: ep %d: read package size fail!",
-                bpg_net_agent_name(agent), (int)net_ep_id(ep));
+                agent->m_em, "%s: ep %d: decode package fail, input size is %d!",
+                bpg_net_agent_name(agent), (int)net_ep_id(ep), buf_size);
             net_ep_close(ep);
             break;
         }
+        net_ep_erase(ep, input_size);
 
-        package_decode_size =
-            dr_cvt_decode(
-                bpg_net_agent_cvt(agent),
-                bpg_meta_pkg(),
-                bpg_req_pkg_data(req_buf),
-                bpg_req_pkg_capacity(req_buf),
-                buf, package_input_size, agent->m_em);
-        net_ep_erase(ep, package_input_size);
-
-        if (package_decode_size < 0) {
-            CPE_ERROR(
-                agent->m_em, "%s: ep %d: decode package fail!",
-                bpg_net_agent_name(agent), (int)net_ep_id(ep));
-            continue;
+        if(agent->m_debug) {
+            CPE_INFO(
+                agent->m_em, "%s: ep %d: decode one package, output-size=%d, buf-origin-size=%d left-size=%d!",
+                bpg_net_agent_name(agent), (int)net_ep_id(ep), output_size, buf_size, net_ep_size(ep));
         }
 
-        if (bpg_req_pkg_data_set_size(req_buf, package_decode_size) != 0) {
+        if (bpg_req_pkg_data_set_size(req_buf, output_size) != 0) {
             CPE_ERROR(
                 agent->m_em, "%s: ep %d: bpg set size %d error!",
-                bpg_net_agent_name(agent), (int)net_ep_id(ep), (int)package_decode_size);
+                bpg_net_agent_name(agent), (int)net_ep_id(ep), (int)output_size);
             net_ep_close(ep);
             break;
         }
 
         if(agent->m_debug) {
             CPE_ERROR(
-                agent->m_em, "%s: ep %d: read one request, cmd=%d, input-size=%d, package-size=%d!",
+                agent->m_em, "%s: ep %d: read one request, cmd=%d, input-size=%d, output-size=%d!",
                 bpg_net_agent_name(agent), (int)net_ep_id(ep),
-                bpg_req_cmd(req_buf), (int)package_input_size, (int)package_decode_size);
+                bpg_req_cmd(req_buf), (int)input_size, (int)output_size);
         }
 
         if (gd_dp_dispatch_by_numeric(bpg_req_cmd(req_buf), bpg_req_to_dp_req(req_buf), agent->m_em) != 0) {

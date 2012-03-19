@@ -43,8 +43,8 @@ LPDRMETA bpg_manage_response_meta(bpg_manage_t mgr);
 const char * bpg_manage_response_meta_name(bpg_manage_t mgr);
 int bpg_manage_set_response_meta_name(bpg_manage_t mgr, const char * name);
 
-const char * bpg_manager_send_to(bpg_manage_t mgr);
-int bpg_manager_set_send_to(bpg_manage_t mgr, const char * name);
+const char * bpg_manage_send_to(bpg_manage_t mgr);
+int bpg_manage_set_send_to(bpg_manage_t mgr, const char * name);
 
 const char * bpg_manage_metalib_name(bpg_manage_t mgr);
 LPDRMETALIB bpg_manage_metalib(bpg_manage_t mgr);
@@ -56,9 +56,9 @@ void bpg_manage_flag_enable(bpg_manage_t mgr, bpg_manage_flag_t flag);
 void bpg_manage_flag_disable(bpg_manage_t mgr, bpg_manage_flag_t flag);
 int bpg_manage_flag_is_enable(bpg_manage_t mgr, bpg_manage_flag_t flag);
 
-LPDRMETALIB bpg_metalib(void);
-LPDRMETA bpg_meta_pkghead(void);
-LPDRMETA bpg_meta_pkg(void);
+LPDRMETALIB bpg_metalib(bpg_manage_t mgr);
+LPDRMETA bpg_meta_pkghead(bpg_manage_t mgr);
+LPDRMETA bpg_meta_pkg(bpg_manage_t mgr);
 
 #ifdef __cplusplus
 }

@@ -13,7 +13,7 @@
 
 static void bpg_manage_clear(gd_nm_node_t node);
 
-static cpe_hash_string_buf s_bpg_manager_default_name = CPE_HS_BUF_MAKE("bpg_manager");
+static cpe_hash_string_buf s_bpg_manage_default_name = CPE_HS_BUF_MAKE("bpg_manage");
 
 struct gd_nm_node_type s_nm_node_type_bpg_manage = {
     "usf_bpg_manage",
@@ -33,7 +33,7 @@ bpg_manage_create(
     assert(app);
 
     if (logic_mgr == 0) logic_mgr = logic_manage_default(app);
-    if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_bpg_manager_default_name);
+    if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_bpg_manage_default_name);
     if (em == 0) em = gd_app_em(app);
 
     if (logic_mgr == 0) {
@@ -71,6 +71,16 @@ bpg_manage_create(
 
     mgr->m_send_to = NULL;
 
+    mgr->m_metalib_basepkg_ref =
+        dr_ref_create(
+            dr_store_manage_default(mgr->m_app),
+            BPG_BASEPKG_NAME);
+    if (mgr->m_metalib_basepkg_ref == NULL) {
+        CPE_ERROR(em, "%s: create: create basepkg_ref fail!", name);
+        gd_nm_node_free(mgr_node);
+        return NULL;
+    }
+
     mgr->m_running_req_sn = 0;
     if (cpe_hash_table_init(
             &mgr->m_running_reqs,
@@ -80,6 +90,7 @@ bpg_manage_create(
             CPE_HASH_OBJ2ENTRY(bpg_running_req, m_hh),
             -1) != 0)
     {
+        dr_ref_free(mgr->m_metalib_basepkg_ref);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
@@ -95,6 +106,11 @@ static void bpg_manage_clear(gd_nm_node_t node) {
 
     bpg_running_req_free_all(mgr);
     cpe_hash_table_fini(&mgr->m_running_reqs);
+
+    if (mgr->m_metalib_basepkg_ref) {
+        dr_ref_free(mgr->m_metalib_basepkg_ref);
+        mgr->m_metalib_ref = NULL;
+    }
 
     if (mgr->m_metalib_ref) {
         dr_ref_free(mgr->m_metalib_ref);
@@ -125,7 +141,7 @@ bpg_manage_t
 bpg_manage_find(gd_app_context_t app, cpe_hash_string_t name) {
     gd_nm_node_t node;
 
-    if (name == NULL) name = (cpe_hash_string_t)&s_bpg_manager_default_name;
+    if (name == NULL) name = (cpe_hash_string_t)&s_bpg_manage_default_name;
 
     node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
     if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_bpg_manage) return NULL;
@@ -145,7 +161,7 @@ bpg_manage_find_nc(gd_app_context_t app, const char * name) {
 
 bpg_manage_t
 bpg_manage_default(gd_app_context_t app) {
-    return bpg_manage_find(app, (cpe_hash_string_t)&s_bpg_manager_default_name);
+    return bpg_manage_find(app, (cpe_hash_string_t)&s_bpg_manage_default_name);
 }
 
 gd_app_context_t bpg_manage_app(bpg_manage_t mgr) {
@@ -161,11 +177,11 @@ bpg_manage_name_hs(bpg_manage_t mgr) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
 }
 
-const char * bpg_manager_send_to(bpg_manage_t mgr) {
+const char * bpg_manage_send_to(bpg_manage_t mgr) {
     return mgr->m_send_to ? cpe_hs_data(mgr->m_send_to) : NULL;
 }
 
-int bpg_manager_set_send_to(bpg_manage_t mgr, const char * name) {
+int bpg_manage_set_send_to(bpg_manage_t mgr, const char * name) {
     cpe_hash_string_t new_send_to;
 
     new_send_to = cpe_hs_create(mgr->m_alloc, name);
@@ -325,31 +341,15 @@ void bpg_manage_set_context_op(
     mgr->m_ctx_ctx = ctx_ctx;
 }
 
-extern char g_metalib_base_package[];
-
-LPDRMETALIB bpg_metalib(void) {
-    return (LPDRMETALIB)g_metalib_base_package;
+LPDRMETALIB bpg_metalib(bpg_manage_t mgr) {
+    return mgr->m_metalib_basepkg_ref ? dr_ref_lib(mgr->m_metalib_basepkg_ref) : NULL;
 }
 
-static LPDRMETA g_meta_pkghead = NULL;
-
-LPDRMETA bpg_meta_pkghead(void) {
-    if (g_meta_pkghead == NULL) {
-        g_meta_pkghead = dr_lib_find_meta_by_name(bpg_metalib(), "basepkg_head");
-        assert(g_meta_pkghead);
-    }
-
-    return g_meta_pkghead;
+LPDRMETA bpg_meta_pkghead(bpg_manage_t mgr) {
+    return dr_lib_find_meta_by_name(bpg_metalib(mgr), "basepkg_head");
 }
 
-static LPDRMETA g_meta_pkg = NULL;
-
-LPDRMETA bpg_meta_pkg(void) {
-    if (g_meta_pkg == NULL) {
-        g_meta_pkg = dr_lib_find_meta_by_name(bpg_metalib(), "basepkg");
-        assert(g_meta_pkg);
-    }
-
-    return g_meta_pkg;
+LPDRMETA bpg_meta_pkg(bpg_manage_t mgr) {
+    return dr_lib_find_meta_by_name(bpg_metalib(mgr), "basepkg");
 }
 

@@ -12,6 +12,8 @@ void dr_store_free(dr_store_t dr_store);
 dr_store_t
 dr_store_find(dr_store_manage_t mgr, const char * name);
 
+LPDRMETALIB dr_store_lib(dr_store_t dr_store);
+
 dr_store_t
 dr_store_find_or_create(dr_store_manage_t mgr, const char * name);
 

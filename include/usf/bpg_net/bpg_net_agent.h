@@ -9,6 +9,7 @@ extern "C" {
 bpg_net_agent_t
 bpg_net_agent_create(
     gd_app_context_t app,
+    bpg_manage_t bpg_manage,
     const char * name,
     const char * ip,
     short port,

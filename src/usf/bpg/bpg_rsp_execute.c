@@ -117,6 +117,9 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, b
         }
     }
     else {
+        size_t input_size;
+        size_t output_size;
+
         data_meta = dr_entry_self_meta(dr_meta_entry_at(mgr->m_request_meta, cmd_entry_idx));
         if (data_meta == NULL) {
             CPE_ERROR(
@@ -134,11 +137,13 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, b
             return -1;
         }
 
+        input_size = pkg->head.bodylen;
+        output_size = logic_data_capacity(data);
         if (dr_cvt_decode(
                 bpg_req_cvt(req),
                 data_meta,
-                logic_data_data(data), logic_data_capacity(data),
-                pkg->body, pkg->head.bodylen,
+                logic_data_data(data), &output_size,
+                pkg->body, &input_size,
                 em) != 0)
         {
             CPE_ERROR(
@@ -177,6 +182,8 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
     for(i = 0; i < pkg->head.appendInfoCount; ++i) {
         struct AppendInfo * append = &pkg->head.appendInfos[i];
         int buf_end = buf_begin + append->size;
+        size_t input_size;
+        size_t output_size;
 
         if (buf_end > pkg->head.bodytotallen) {
             CPE_ERROR(
@@ -201,11 +208,13 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
             return -1;
         }
 
+        input_size = append->size;
+        output_size = logic_data_capacity(data);
         if (dr_cvt_decode(
                 bpg_req_cvt(req),
                 data_meta,
-                logic_data_data(data), logic_data_capacity(data),
-                pkg->body, append->size, em) != 0)
+                logic_data_data(data), &output_size,
+                pkg->body, &input_size, em) != 0)
         {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: append %d: %s decode data fail, input len is %d, output len is %d!",
@@ -279,7 +288,7 @@ int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context
 
     mgr = rsp->m_mgr;
 
-    bpg_carry_data_meta = dr_lib_find_meta_by_name(bpg_metalib(), "bpg_carry_info");
+    bpg_carry_data_meta =dr_lib_find_meta_by_name(bpg_metalib(rsp->m_mgr), "bpg_carry_info");
     if (bpg_carry_data_meta == NULL) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_execute: copy_bpg_carry_data: bpg_carry_info meta not exist!",

@@ -12,6 +12,7 @@ struct bpg_net_agent {
     gd_app_context_t m_app;
     mem_allocrator_t m_alloc;
     error_monitor_t m_em;
+    bpg_manage_t m_bpg_manage;
     net_listener_t m_listener;
     dr_cvt_t m_cvt;
 

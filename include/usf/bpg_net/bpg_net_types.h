@@ -5,6 +5,7 @@
 #include "cpe/utils/memory.h"
 #include "cpe/utils/hash_string.h"
 #include "gd/app/app_types.h"
+#include "usf/bpg/bpg_types.h"
 
 #ifdef __cplusplus
 extern "C" {
