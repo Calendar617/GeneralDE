@@ -17,15 +17,19 @@ c-source-to-object = $(call c-source-dir-to-binary-dir,\
 						$(subst .c,.o,$(filter %.c,$1))\
 						,$2)
 
+# $(call c-generate-env-arg-name-list,product-name,arg-name)
+c-generate-env-arg-name-list=$2 $($1.env).$2 $1.$2
+
 c-generate-depend-ld-flags=$(addprefix -L$(CPDE_OUTPUT_ROOT)/,\
-								 $(sort  $(r.$1.c.ldpathes) \
-                                         $(call product-gen-depend-value-list,$1,product.c.ldpathes) \
-                                         $(call product-gen-depend-value-list,$1,$($2.env).product.c.ldpathes) \
-                                         $(call product-gen-depend-value-list,$1,$2.product.c.ldpathes) \
+								 $(call merge-list, $(r.$1.c.ldpathes) \
+                                                  , $(call product-gen-depend-value-list,$1,\
+                                                           $(call c-generate-env-arg-name-list,$2,product.c.ldpathes)) \
                                  )) \
-                           $(addprefix -l,$(sort $(r.$1.c.libraries) $(call product-gen-depend-value-list,$1,product.c.libraries))) \
-                           $(addprefix -l,$(sort $(r.$1.c.libraries) $(call product-gen-depend-value-list,$1,$($2.env).product.c.libraries))) \
-                           $(addprefix -l,$(sort $(r.$1.c.libraries) $(call product-gen-depend-value-list,$1,$2.product.c.libraries))) \
+                           $(addprefix -l,$(call merge-list, \
+                                                 $(r.$1.c.libraries) $(r.$1.product.c.libraries),\
+                                                 $(call product-gen-depend-value-list,$1,\
+                                                        $(call c-generate-env-arg-name-list,$2,product.c.libraries)) \
+                                            )) \
                            $(addprefix -framework ,\
 								 $(sort $(r.$1.c.frameworks) $(r.$1.product.c.frameworks) \
 									$(call product-gen-depend-value-list,$1,product.c.frameworks))) \
