@@ -52,6 +52,24 @@ define path-list-join
 $(if $1,$(word 1,$1):$(call path-list-join,$(wordlist 2,$(words $1), $1)),)
 endef
 
+# $(call append-if-need,list,var)
+append-if-need=$(if $(filter $(strip $2),$1),$1,$1 $(strip $2))
+
+# $(call apend-force-to-end,list,var)
+append-force-to-end=$(filter-out $(strip $2),$1) $(strip $2)
+
+# $(call merge-list,list,list2)
+merge-list=$(if $2,$(call append-if-need,$(call merge-list,$1,$(wordlist 2,$(words $2),$2)),$(word 1,$2)),$1)
+
+# $(call merge-list,list,list2)
+merge-force-to-end=$(filter-out $2, $1) $2
+
+# $(call revert-list,$1)
+revert-list=$(if $1,$(call revert-list,$(wordlist 2,$(words $1),$1)) $(word 1,$1))
+
+# $(call regular-list,$1)
+regular-list=$(if $1,$(word 1,$1) $(call regular-list,$(wordlist 2,$(words $1),$1)))
+
 # $(call select-var,var-list)
 define select-var
 $(if $1\
