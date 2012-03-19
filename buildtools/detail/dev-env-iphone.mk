@@ -28,7 +28,8 @@ iphone.check=$(call assert-not-null,PLATFORM_NAME) \
              $(call assert-not-null,$(PLATFORM_NAME).MFLAGS) \
              $(call assert-not-null,$(PLATFORM_NAME).MMFLAGS) \
              $(call assert-not-null,$(PLATFORM_NAME).LDFLAGS) \
-             $(call assert-not-null,$(PLATFORM_NAME).TARGET_ARCH)
+             $(call assert-not-null,$(PLATFORM_NAME).TARGET_ARCH) \
+             $(call assert-file-exists,$(SDK_PREFIX))
 
 # }}}
 # {{{ sdk iPhoneSimulator
@@ -84,7 +85,8 @@ application "iPhone Simulator" activate\n \
 # }}}
 # {{{ toolset def
 
-PLATFORM_PREFIX:=/Developer/Platforms/$(PLATFORM_NAME).platform
+IOS_XCODE_ROOT:=$(shell xcode-select -print-path)
+PLATFORM_PREFIX:=$(IOS_XCODE_ROOT)/Platforms/$(PLATFORM_NAME).platform
 PLATFORM_BIN_PATH:=$(PLATFORM_PREFIX)/Developer/usr/bin
 SDK_PREFIX:=$(PLATFORM_PREFIX)/Developer/SDKs/$(PLATFORM_NAME)$(PLATFORM_VERSION).sdk
 
