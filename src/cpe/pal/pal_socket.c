@@ -35,3 +35,37 @@ int cpe_sock_set_none_block(int fd, int is_non_block) {
 }
 
 
+int cpe_sock_set_reuseaddr(int fd, int is_reuseaddr) {
+#if _MSC_VER
+    BOOL flag;
+
+    flag = is_non_block ? TRUE : FALSE;
+    return setsockopt(fd,  SOL_SOCKET, SO_EXCLUSIVEADDRUSE, &flag, sizeof(flag));
+#else
+    int flags;
+    if ((flags = fcntl(fd, F_GETFL)) == -1) {
+        return -1;
+    }
+
+    if (is_reuseaddr) {
+        if (flags & SO_REUSEADDR) {
+            return 0;
+        }
+        else {
+            flags |= SO_REUSEADDR;
+        }
+    }
+    else {
+        if (!(flags & SO_REUSEADDR)) {
+            return 0;
+        }
+        else {
+            flags &= ~SO_REUSEADDR;
+        }
+    }
+
+    return fcntl(fd, F_SETFL, flags);
+#endif
+}
+
+

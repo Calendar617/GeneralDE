@@ -91,10 +91,10 @@ typedef struct dr_metalib_source_it {
 
 struct DRInBuildMetaLib;
 
-typedef ssize_t (*dr_cvt_fun_t)(
+typedef int (*dr_cvt_fun_t)(
     LPDRMETA meta,
-    void * output, size_t output_capacity,
-    const void * input, size_t input_capacity,
+    void * output, size_t * output_capacity,
+    const void * input, size_t * input_capacity,
     void * ctx,
     error_monitor_t em);
 
