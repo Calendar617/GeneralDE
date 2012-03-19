@@ -7,20 +7,27 @@ product-def-not-null-items:=type
 
 product-base = $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)), $(MAKEFILE_LIST))))
 
+#$(call product-gen-depend-list-expand,cur-list,product-list)
+product-gen-depend-list-expand=\
+  $(if $(strip $2) \
+       , $(if $(filter $(strip $(firstword $2)),$1) \
+              , $(call product-gen-depend-list-expand\
+                       , $(call merge-force-to-end \
+                                , $1 \
+                                , $(firstword $2) $(call product-gen-depend-list-expand,,$(firstword $2))) \
+                       , $(wordlist 2,$(words $2),$2)) \
+              , $(call product-gen-depend-list-expand\
+                       , $1 $(firstword $2)\
+                       , $(wordlist 2,$(words $2),$2) $(r.$(strip $(firstword $2)).depends))) \
+       , $1)
+
 #$(call product-gen-depend-list,product-list)
-define product-gen-depend-list
-$(sort \
-    $(foreach p,$1,\
-        $(foreach dep,$(r.$p.depends),\
-	        $(dep) $(call product-gen-depend-list,$(dep)))))
-endef
+product-gen-depend-list=$(call regular-list,$(call product-gen-depend-list-expand,,$(foreach p,$1,$(r.$p.depends))))
 
+#$(call product-gen-depend-value-list,product-name,value-name-list)
+product-gen-depend-value-list=$(call merge-list,,$(foreach p,$(call product-gen-depend-list,$1),$(foreach v,$2,$(r.$p.$v))))
 
-#$(call product-gen-depend-value-list,product-name,value-name)
-define product-gen-depend-value-list
-$(foreach dep,$(r.$1.depends),\
-	$(r.$(dep).$2) $(call product-gen-depend-value-list,$(dep),$2))
-endef
+product-gen-depend-value-list-r=$(call merge-list,,$(foreach p,$(call revert-list,$(call product-gen-depend-list,$1)),$(foreach v,$2,$(r.$p.$v))))
 
 # $(call product-def-for-domain,product-name,domain)
 define product-def-for-domain
