@@ -10,5 +10,5 @@ product:=cpe_dr_tool
 $(product).type:=progn
 $(product).depends:=cpe_dr_tool_lib
 $(product).c.sources:=$(product-base)/main.c
-$(product).c.flags.ld:=-lcpe_dr -lcpe_dr_meta_inout -lxml2 -lm
 $(eval $(call product-def,$(product),tools))
+
