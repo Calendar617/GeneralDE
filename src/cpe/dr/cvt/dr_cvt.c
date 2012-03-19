@@ -37,10 +37,32 @@ dr_cvt_result_t dr_cvt_encode(
     const void * input, size_t * input_capacity,
     error_monitor_t em, int debug)
 {
-    if (cvt == NULL || output == NULL || input == NULL) return -1;
+    if (cvt == NULL) {
+        CPE_ERROR(em, "dr_cvt_encode: input cvt is null!");
+        return dr_cvt_result_error;
+    }
+
+    if (meta == NULL) {
+        CPE_ERROR(em, "dr_cvt_encode: input meta is null!");
+        return dr_cvt_result_error;
+    }
+
+    if (output == NULL) {
+        CPE_ERROR(em, "dr_cvt_encode: output buf is null!");
+        return dr_cvt_result_error;
+    }
+
+    if (input == NULL) {
+        CPE_ERROR(em, "dr_cvt_encode: input buf is null!");
+        return dr_cvt_result_error;
+    }
+
     assert(cvt->m_type);
 
-    if (cvt->m_type->m_encode == NULL) return -1;
+    if (cvt->m_type->m_encode == NULL) {
+        CPE_ERROR(em, "dr_cvt_encode: cvt %s not support encode!", cvt->m_type->m_name);
+        return dr_cvt_result_error;
+    }
 
     return cvt->m_type->m_encode(meta, output, output_capacity, input, input_capacity, cvt->m_type->m_ctx, em, debug);
 }
@@ -52,10 +74,32 @@ dr_cvt_result_t dr_cvt_decode(
     const void * input, size_t * input_capacity,
     error_monitor_t em, int debug)
 {
-    if (cvt == NULL || output == NULL || input == NULL) return -1;
+    if (cvt == NULL) {
+        CPE_ERROR(em, "dr_cvt_decode: input cvt is null!");
+        return dr_cvt_result_error;
+    }
+
+    if (meta == NULL) {
+        CPE_ERROR(em, "dr_cvt_decode: input meta is null!");
+        return dr_cvt_result_error;
+    }
+
+    if (output == NULL) {
+        CPE_ERROR(em, "dr_cvt_decode: output buf is null!");
+        return dr_cvt_result_error;
+    }
+
+    if (input == NULL) {
+        CPE_ERROR(em, "dr_cvt_decode: input buf is null!");
+        return dr_cvt_result_error;
+    }
+
     assert(cvt->m_type);
 
-    if (cvt->m_type->m_decode == NULL) return -1;
+    if (cvt->m_type->m_decode == NULL) {
+        CPE_ERROR(em, "dr_cvt_decode: cvt %s not support decode!", cvt->m_type->m_name);
+        return -1;
+    }
 
     return cvt->m_type->m_decode(meta, output, output_capacity, input, input_capacity, cvt->m_type->m_ctx, em, debug);
 }
