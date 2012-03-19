@@ -85,7 +85,7 @@ application "iPhone Simulator" activate\n \
 # }}}
 # {{{ toolset def
 
-IOS_XCODE_ROOT:=$(shell xcode-select -print-path)
+IOS_XCODE_ROOT:=$(if $(filter mac,$(OS_NAME)),$(shell xcode-select -print-path))
 PLATFORM_PREFIX:=$(IOS_XCODE_ROOT)/Platforms/$(PLATFORM_NAME).platform
 PLATFORM_BIN_PATH:=$(PLATFORM_PREFIX)/Developer/usr/bin
 SDK_PREFIX:=$(PLATFORM_PREFIX)/Developer/SDKs/$(PLATFORM_NAME)$(PLATFORM_VERSION).sdk
