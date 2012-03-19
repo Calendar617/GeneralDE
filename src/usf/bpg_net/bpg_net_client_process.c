@@ -8,11 +8,13 @@
 #include "gd/app/app_context.h"
 #include "usf/bpg/bpg_req.h"
 #include "usf/bpg/bpg_manage.h"
+#include "usf/dr_store/dr_ref.h"
 #include "usf/bpg_net/bpg_net_client.h"
 #include "bpg_net_internal_ops.h"
 
 static void bpg_net_client_on_read(bpg_net_client_t client, net_ep_t ep) {
     bpg_req_t req_buf;
+    dr_cvt_t cvt;
 
     if(client->m_debug) {
         CPE_INFO(
@@ -20,100 +22,99 @@ static void bpg_net_client_on_read(bpg_net_client_t client, net_ep_t ep) {
             bpg_net_client_name(client), (int)net_ep_id(ep));
     }
 
-    /* req_buf = bpg_net_client_req_buf(client); */
-    /* if (req_buf == NULL) { */
-    /*     CPE_ERROR( */
-    /*         client->m_em, "%s: ep %d: get req buf fail!", */
-    /*         bpg_net_client_name(client), (int)net_ep_id(ep)); */
-    /*     net_ep_close(ep); */
-    /*     return; */
-    /* } */
+    cvt = bpg_net_client_cvt(client);
+    if (cvt == NULL) {
+        CPE_ERROR(
+            client->m_em, "%s: ep %d: get cvt fail!",
+            bpg_net_client_name(client), (int)net_ep_id(ep));
+        net_ep_close(ep);
+        return;
+    }
 
-    /* if (s_totallen_start_pos == 0) { */
-    /*     s_totallen_entry = dr_meta_find_entry_by_name(bpg_meta_pkghead(), "bodytotallen"); */
-    /*     if (s_totallen_entry == NULL) { */
-    /*         s_totallen_start_pos = -1; */
-    /*     } */
-    /*     else { */
-    /*         s_totallen_start_pos = dr_entry_data_start_pos(s_totallen_entry); */
-    /*         s_totallen_end_pos = s_totallen_start_pos + dr_entry_element_size(s_totallen_entry); */
-    /*     } */
-    /* } */
+    req_buf = bpg_net_client_req_buf(client);
+    if (req_buf == NULL) {
+        CPE_ERROR(
+            client->m_em, "%s: ep %d: get req buf fail!",
+            bpg_net_client_name(client), (int)net_ep_id(ep));
+        net_ep_close(ep);
+        return;
+    }
 
-    /* if (s_totallen_start_pos < 0) { */
-    /*     CPE_ERROR( */
-    /*         client->m_em, "%s: ep %d: get bodytotallen entry fail!", */
-    /*         bpg_net_client_name(client), (int)net_ep_id(ep)); */
-    /*     net_ep_close(ep); */
-    /*     return; */
-    /* } */
+    while(1) {
+        char * buf;
+        size_t buf_size;
+        size_t input_size;
+        size_t output_size;
+        dr_cvt_result_t cvt_result;
 
-    /* assert(s_totallen_entry); */
+        buf_size = net_ep_size(ep);
+        if (buf_size <= 0) break;
 
-    /* while(1) { */
-    /*     char * buf; */
-    /*     size_t buf_size; */
-    /*     int32_t package_input_size; */
-    /*     ssize_t package_decode_size; */
+        buf = net_ep_peek(ep, NULL, buf_size);
+        if (buf == NULL) {
+            CPE_ERROR(
+                client->m_em, "%s: ep %d: peek data fail, size=%d!",
+                bpg_net_client_name(client), (int)net_ep_id(ep), (int)buf_size);
+            net_ep_close(ep);
+            break;
+        }
 
-    /*     buf_size = net_ep_size(ep); */
+        input_size = buf_size;
+        output_size = bpg_req_pkg_capacity(req_buf);
 
-    /*     if (buf_size < s_totallen_end_pos) break; */
+        cvt_result =
+            dr_cvt_decode(
+                bpg_net_client_cvt(client),
+                dr_lib_find_meta_by_name(
+                    dr_ref_lib(client->m_metalib_basepkg_ref),
+                    BPG_BASEPKG_META_NAME),
+                bpg_req_pkg_data(req_buf),
+                &output_size,
+                buf, &input_size, client->m_em, client->m_debug);
+        if (cvt_result != dr_cvt_result_not_enough_input) {
+            if(client->m_debug) {
+                CPE_ERROR(
+                    client->m_em, "%s: ep %d: not enough data, input size is %d!",
+                bpg_net_client_name(client), (int)net_ep_id(ep), (int)buf_size);
+            }
+            break;
+        }
+        else if (cvt_result != dr_cvt_result_success) {
+            CPE_ERROR(
+                client->m_em, "%s: ep %d: decode package fail, input size is %d!",
+                bpg_net_client_name(client), (int)net_ep_id(ep), (int)buf_size);
+            net_ep_close(ep);
+            break;
+        }
+        net_ep_erase(ep, input_size);
 
-    /*     buf = net_ep_peek(ep, NULL, buf_size); */
-    /*     if (buf == NULL) { */
-    /*         CPE_ERROR( */
-    /*             client->m_em, "%s: ep %d: peek data fail, size=%d!", */
-    /*             bpg_net_client_name(client), (int)net_ep_id(ep), (int)buf_size); */
-    /*         net_ep_close(ep); */
-    /*         break; */
-    /*     } */
+        if(client->m_debug) {
+            CPE_INFO(
+                client->m_em, "%s: ep %d: decode one package, output-size=%d, buf-origin-size=%d left-size=%d!",
+                bpg_net_client_name(client), (int)net_ep_id(ep), (int)output_size, (int)buf_size, (int)net_ep_size(ep));
+        }
 
-    /*     if (dr_entry_try_read_int32(&package_input_size, buf + s_totallen_start_pos, s_totallen_entry, client->m_em) != 0) { */
-    /*         CPE_ERROR( */
-    /*             client->m_em, "%s: ep %d: read package size fail!", */
-    /*             bpg_net_client_name(client), (int)net_ep_id(ep)); */
-    /*         net_ep_close(ep); */
-    /*         break; */
-    /*     } */
+        if (bpg_req_pkg_data_set_size(req_buf, output_size) != 0) {
+            CPE_ERROR(
+                client->m_em, "%s: ep %d: bpg set size %d error!",
+                bpg_net_client_name(client), (int)net_ep_id(ep), (int)output_size);
+            net_ep_close(ep);
+            break;
+        }
 
-    /*     package_decode_size = */
-    /*         dr_cvt_decode( */
-    /*             bpg_net_client_cvt(client), */
-    /*             bpg_meta_pkg(), */
-    /*             bpg_req_pkg_data(req_buf), */
-    /*             bpg_req_pkg_capacity(req_buf), */
-    /*             buf, package_input_size, client->m_em); */
-    /*     net_ep_erase(ep, package_input_size); */
+        if(client->m_debug) {
+            CPE_ERROR(
+                client->m_em, "%s: ep %d: read one request, cmd=%d, input-size=%d, output-size=%d!",
+                bpg_net_client_name(client), (int)net_ep_id(ep),
+                bpg_req_cmd(req_buf), (int)input_size, (int)output_size);
+        }
 
-    /*     if (package_decode_size < 0) { */
-    /*         CPE_ERROR( */
-    /*             client->m_em, "%s: ep %d: decode package fail!", */
-    /*             bpg_net_client_name(client), (int)net_ep_id(ep)); */
-    /*         continue; */
-    /*     } */
-
-    /*     if (bpg_req_pkg_data_set_size(req_buf, package_decode_size) != 0) { */
-    /*         CPE_ERROR( */
-    /*             client->m_em, "%s: ep %d: bpg set size %d error!", */
-    /*             bpg_net_client_name(client), (int)net_ep_id(ep), (int)package_decode_size); */
-    /*         net_ep_close(ep); */
-    /*         break; */
-    /*     } */
-
-    /*     if(client->m_debug) { */
-    /*         CPE_ERROR( */
-    /*             client->m_em, "%s: ep %d: read one request, cmd=%d, input-size=%d, package-size=%d!", */
-    /*             bpg_net_client_name(client), (int)net_ep_id(ep), */
-    /*             bpg_req_cmd(req_buf), (int)package_input_size, (int)package_decode_size); */
-    /*     } */
-
-    /*     if (gd_dp_dispatch_by_numeric(bpg_req_cmd(req_buf), bpg_req_to_dp_req(req_buf), client->m_em) != 0) { */
-    /*         CPE_ERROR( */
-    /*             client->m_em, "%s: ep %d: dispatch cmd %d error!", */
-    /*             bpg_net_client_name(client), (int)net_ep_id(ep), bpg_req_cmd(req_buf)); */
-    /*     } */
-    /* } */
+        if (gd_dp_dispatch_by_numeric(bpg_req_cmd(req_buf), bpg_req_to_dp_req(req_buf), client->m_em) != 0) {
+            CPE_ERROR(
+                client->m_em, "%s: ep %d: dispatch cmd %d error!",
+                bpg_net_client_name(client), (int)net_ep_id(ep), bpg_req_cmd(req_buf));
+        }
+    }
 }
 
 static void bpg_net_client_on_open(bpg_net_client_t client, net_ep_t ep) {

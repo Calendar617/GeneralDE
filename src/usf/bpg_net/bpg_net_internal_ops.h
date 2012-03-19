@@ -13,6 +13,7 @@ bpg_req_t bpg_net_agent_req_buf(bpg_net_agent_t mgr);
 
 /*client process*/
 int bpg_net_client_ep_init(bpg_net_client_t client, net_ep_t ep);
+bpg_req_t bpg_net_client_req_buf(bpg_net_client_t mgr);
 
 #ifdef __cplusplus
 }

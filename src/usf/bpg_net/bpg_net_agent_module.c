@@ -8,10 +8,8 @@
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/bpg/bpg_req.h"
-#include "usf/bpg/bpg_manage.h"
 #include "usf/bpg_net/bpg_net_agent.h"
 #include "bpg_net_internal_ops.h"
-
 
 EXPORT_DIRECTIVE
 int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
@@ -19,25 +17,14 @@ int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t c
     const char * ip;
     short port;
     int accept_queue_size;
-    bpg_manage_t bpg_manage;
 
     ip = cfg_get_string(cfg, "ip", "");
     port = cfg_get_int16(cfg, "port", 0);
     accept_queue_size = cfg_get_int32(cfg, "accept-queue-size", 256);
 
-    bpg_manage = bpg_manage_find_nc(app, cfg_get_string(cfg, "bind-to-bpg-manage", NULL));
-    if (bpg_manage == NULL) {
-        CPE_ERROR(
-            gd_app_em(app),
-            "%s: create: bpg_manage %s not exist!",
-            gd_app_module_name(module),
-            cfg_get_string(cfg, "bind-to-bpg-manage", "default"));
-        return -1;
-    }
-
     bpg_net_agent =
         bpg_net_agent_create(
-            app, bpg_manage, gd_app_module_name(module),
+            app, gd_app_module_name(module),
             ip, port, accept_queue_size,
             gd_app_alloc(app), gd_app_em(app));
     if (bpg_net_agent == NULL) return -1;

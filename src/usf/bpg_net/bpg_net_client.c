@@ -8,6 +8,8 @@
 #include "gd/app/app_context.h"
 #include "usf/bpg/bpg_req.h"
 #include "usf/bpg_net/bpg_net_client.h"
+#include "usf/dr_store/dr_ref.h"
+#include "usf/dr_store/dr_store_manage.h"
 #include "bpg_net_internal_ops.h"
 
 struct gd_nm_node_type s_nm_node_type_bpg_net_client;
@@ -41,6 +43,16 @@ bpg_net_client_create(
 
     mgr->m_debug = 0;
 
+    mgr->m_metalib_basepkg_ref =
+        dr_ref_create(
+            dr_store_manage_default(mgr->m_app),
+            BPG_BASEPKG_LIB_NAME);
+    if (mgr->m_metalib_basepkg_ref == NULL) {
+        CPE_ERROR(em, "%s: create: create basepkg_ref fail!", name);
+        gd_nm_node_free(mgr_node);
+        return NULL;
+    }
+
     mgr->m_connector =
         net_connector_create_with_ep(
             gd_app_net_mgr(app),
@@ -48,11 +60,13 @@ bpg_net_client_create(
             ip,
             port);
     if (mgr->m_connector == NULL) {
+        dr_ref_free(mgr->m_metalib_basepkg_ref);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
 
     if (bpg_net_client_ep_init(mgr, net_connector_ep(mgr->m_connector)) != 0) {
+        dr_ref_free(mgr->m_metalib_basepkg_ref);
         net_connector_free(mgr->m_connector);
         gd_nm_node_free(mgr_node);
         return NULL;
@@ -66,6 +80,11 @@ bpg_net_client_create(
 static void bpg_net_client_clear(gd_nm_node_t node) {
     bpg_net_client_t mgr;
     mgr = (bpg_net_client_t)gd_nm_node_data(node);
+
+    if (mgr->m_metalib_basepkg_ref) {
+        dr_ref_free(mgr->m_metalib_basepkg_ref);
+        mgr->m_metalib_basepkg_ref = NULL;
+    }
 
     if (mgr->m_req_buf) {
         bpg_req_free(mgr->m_req_buf);

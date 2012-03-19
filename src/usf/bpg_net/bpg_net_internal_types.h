@@ -2,6 +2,7 @@
 #define USF_BPG_NET_INTERNAL_TYPES_H
 #include "cpe/net/net_types.h"
 #include "usf/bpg/bpg_types.h"
+#include "usf/dr_store/dr_store_types.h"
 #include "usf/bpg_net/bpg_net_types.h"
 
 #ifdef __cplusplus
@@ -12,8 +13,8 @@ struct bpg_net_agent {
     gd_app_context_t m_app;
     mem_allocrator_t m_alloc;
     error_monitor_t m_em;
-    bpg_manage_t m_bpg_manage;
     net_listener_t m_listener;
+    dr_ref_t m_metalib_basepkg_ref;
     dr_cvt_t m_cvt;
 
     size_t m_req_max_size;
@@ -27,6 +28,7 @@ struct bpg_net_client {
     mem_allocrator_t m_alloc;
     error_monitor_t m_em;
     net_connector_t m_connector;
+    dr_ref_t m_metalib_basepkg_ref;
     dr_cvt_t m_cvt;
 
     size_t m_req_max_size;

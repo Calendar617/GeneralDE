@@ -1,6 +1,5 @@
 #include <assert.h>
 #include "cpe/dr/dr_metalib_manage.h"
-#include "cpe/dr/dr_data.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/net/net_chanel.h"
 #include "cpe/net/net_endpoint.h"
@@ -9,6 +8,7 @@
 #include "usf/bpg/bpg_req.h"
 #include "usf/bpg/bpg_manage.h"
 #include "usf/bpg_net/bpg_net_agent.h"
+#include "usf/dr_store/dr_ref.h"
 #include "bpg_net_internal_ops.h"
 
 static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
@@ -64,7 +64,9 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
         cvt_result =
             dr_cvt_decode(
                 bpg_net_agent_cvt(agent),
-                bpg_meta_pkg(agent->m_bpg_manage),
+                dr_lib_find_meta_by_name(
+                    dr_ref_lib(agent->m_metalib_basepkg_ref),
+                    BPG_BASEPKG_META_NAME),
                 bpg_req_pkg_data(req_buf),
                 &output_size,
                 buf, &input_size, agent->m_em, agent->m_debug);

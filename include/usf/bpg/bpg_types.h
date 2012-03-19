@@ -28,6 +28,9 @@ typedef struct bpg_running_req * bpg_running_req_t;
 typedef int (*bpg_logic_ctx_init_fun_t)(logic_context_t context, void * ctx);
 typedef void (*bpg_logic_ctx_fini_fun_t)(logic_context_t context, void * ctx);
 
+#define BPG_BASEPKG_LIB_NAME "basepkg"
+#define BPG_BASEPKG_META_NAME "basepkg"
+
 #ifdef __cplusplus
 }
 #endif

@@ -74,7 +74,7 @@ bpg_manage_create(
     mgr->m_metalib_basepkg_ref =
         dr_ref_create(
             dr_store_manage_default(mgr->m_app),
-            BPG_BASEPKG_NAME);
+            BPG_BASEPKG_LIB_NAME);
     if (mgr->m_metalib_basepkg_ref == NULL) {
         CPE_ERROR(em, "%s: create: create basepkg_ref fail!", name);
         gd_nm_node_free(mgr_node);

@@ -23,6 +23,8 @@ uint32_t bpg_running_req_hash(const struct bpg_running_req * runing_req);
 int bpg_running_req_cmp(const struct bpg_running_req * l, const struct bpg_running_req * r);
 void bpg_running_req_free_all(bpg_manage_t mgr);
 
+LPDRMETALIB bpg_metalib(bpg_manage_t mgr);
+
 #ifdef __cplusplus
 }
 #endif
