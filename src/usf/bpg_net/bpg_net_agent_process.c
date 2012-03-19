@@ -79,7 +79,7 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
         else if (cvt_result != dr_cvt_result_success) {
             CPE_ERROR(
                 agent->m_em, "%s: ep %d: decode package fail, input size is %d!",
-                bpg_net_agent_name(agent), (int)net_ep_id(ep), buf_size);
+                bpg_net_agent_name(agent), (int)net_ep_id(ep), (int)buf_size);
             net_ep_close(ep);
             break;
         }
@@ -88,7 +88,7 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
         if(agent->m_debug) {
             CPE_INFO(
                 agent->m_em, "%s: ep %d: decode one package, output-size=%d, buf-origin-size=%d left-size=%d!",
-                bpg_net_agent_name(agent), (int)net_ep_id(ep), output_size, buf_size, net_ep_size(ep));
+                bpg_net_agent_name(agent), (int)net_ep_id(ep), (int)output_size, (int)buf_size, (int)net_ep_size(ep));
         }
 
         if (bpg_req_pkg_data_set_size(req_buf, output_size) != 0) {
