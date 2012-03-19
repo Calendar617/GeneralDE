@@ -4,6 +4,24 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "generate_ops.h"
 
+static void cpe_dr_generate_h_macros(write_stream_t stream, dr_metalib_source_t source, cpe_dr_generate_ctx_t ctx) {
+    struct dr_metalib_source_element_it element_it;
+    dr_metalib_source_element_t element;
+    int macro_value;
+
+    dr_metalib_source_elements(&element_it, source);
+    while((element = dr_metalib_source_element_next(&element_it))) {
+       if (dr_metalib_source_element_type(element) != dr_metalib_source_element_type_macro) continue;
+
+       if (dr_lib_find_macro_value(&macro_value, ctx->m_metalib, dr_metalib_source_element_name(element)) == 0) {
+           stream_printf(
+               stream, "\n#define %s (%d)",
+               dr_metalib_source_element_name(element),
+               macro_value);
+       }
+    }
+}
+
 static void cpe_dr_generate_h_metas(write_stream_t stream, dr_metalib_source_t source, cpe_dr_generate_ctx_t ctx) {
     struct dr_metalib_source_element_it element_it;
     dr_metalib_source_element_t element;
@@ -43,7 +61,7 @@ static void cpe_dr_generate_h_metas(write_stream_t stream, dr_metalib_source_t s
                 ref_meta = dr_entry_ref_meta(entry);
                 if (ref_meta == NULL) continue;
 
-                stream_printf(stream, "%s %s", dr_meta_name(ref_meta), dr_entry_name(entry));
+                stream_printf(stream, "%s %s %s", dr_type_name(dr_entry_type(entry)), dr_meta_name(ref_meta), dr_entry_name(entry));
                 break;
             }
             case CPE_DR_TYPE_STRING: {
@@ -86,6 +104,8 @@ int cpe_dr_generate_h(write_stream_t stream, dr_metalib_source_t source, cpe_dr_
         stream_printf(stream, "#define DR_GENERATED_H_%s_INCLEDED\n", dr_metalib_source_name(source));
     }
     stream_printf(stream, "#include \"cpe/pal/pal_types.h\"\n");
+
+    cpe_dr_generate_h_macros(stream, source, ctx);
 
     stream_printf(
         stream, 
