@@ -2,40 +2,92 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "dr_cvt_internal_types.h"
 
-ssize_t dr_cvt_fun_copy_encode(
+dr_cvt_result_t dr_cvt_fun_copy_encode(
     LPDRMETA meta,
-    void * output, size_t output_capacity,
-    const void * input, size_t input_capacity,
+    void * output, size_t * output_capacity,
+    const void * input, size_t * input_capacity,
     void * ctx,
-    error_monitor_t em)
+    error_monitor_t em, int debug)
 {
-    if (output_capacity < input_capacity) {
+    int32_t size;
+    size_t require_size = sizeof(size) + *input_capacity;
+
+    if (*output_capacity < require_size) {
         CPE_ERROR(
-            em, "encode %s: copy: not enought output buf, require %d, but only %d!",
-            dr_meta_name(meta), (int)input_capacity, (int)output_capacity);
-        return -1;
+            em, "encode %s: copy: not enought output buf, require %d(input=%d), but only %d!",
+            dr_meta_name(meta), (int)require_size, (int)*input_capacity, (int)*output_capacity);
+        return dr_cvt_result_not_enough_output;
     }
 
-    memcpy(output, input, input_capacity);
-    return input_capacity;
+    size = *input_capacity;
+    memcpy(output, &size, sizeof(size));
+    memcpy(((char*)output) + sizeof(size), input, *input_capacity);
+
+    *output_capacity = require_size;
+
+    if (debug) {
+        CPE_INFO(
+            em, "encode %s: copy: copy %d data to output, input-size=%d",
+            dr_meta_name(meta), (int)require_size, (int)*input_capacity);
+    }
+
+    return dr_cvt_result_success;
 }
 
-ssize_t dr_cvt_fun_copy_decode(
+dr_cvt_result_t
+dr_cvt_fun_copy_decode(
     LPDRMETA meta,
-    void * output, size_t output_capacity,
-    const void * input, size_t input_capacity,
+    void * output, size_t * output_capacity,
+    const void * input, size_t * input_capacity,
     void * ctx,
-    error_monitor_t em)
+    error_monitor_t em, int debug)
 {
-    if (output_capacity < input_capacity) {
-        CPE_ERROR(
-            em, "decode %s: copy: not enought output buf, require %d, but only %d!",
-            dr_meta_name(meta), (int)input_capacity, (int)output_capacity);
-        return -1;
+    int32_t size;
+
+    if (*input_capacity < sizeof(size)) {
+        if (debug) {
+            CPE_INFO(
+                em, "decode %s: copy: not enought input data, require at least %d, but only %d!",
+                dr_meta_name(meta), sizeof(size), (int)*input_capacity);
+        }
+        *output_capacity = 0;
+        *input_capacity = 0;
+        return dr_cvt_result_not_enough_input;
     }
 
-    memcpy(output, input, input_capacity);
-    return input_capacity;
+    memcpy(&size, input, sizeof(size));
+    if (*input_capacity < sizeof(size) + size) {
+        if (debug) {
+            CPE_INFO(
+                em, "decode %s: copy: not enought input data, require %d(size=%d), but only %d!",
+                dr_meta_name(meta), sizeof(size) + size, size, (int)*input_capacity);
+        }
+        *output_capacity = 0;
+        *input_capacity = 0;
+        return dr_cvt_result_not_enough_input;
+    }
+
+    if (*output_capacity < (size_t)size) {
+        if (debug) {
+            CPE_INFO(
+                em, "decode %s: copy: not enought output buf, require %d, but only %d!",
+                dr_meta_name(meta), (int)size, (int)*output_capacity);
+        }
+
+        return dr_cvt_result_not_enough_output;
+    }
+
+    memcpy(output, ((const char *)input) + sizeof(size), size);
+    *output_capacity = size;
+    *input_capacity = size + sizeof(size);
+
+    if (debug) {
+        CPE_INFO(
+            em, "decode %s: copy: copy %d data to output, input-size=%d",
+            dr_meta_name(meta), (int)size, (int)*input_capacity);
+    }
+
+    return dr_cvt_result_success;
 }
 
 struct dr_cvt_type s_cvt_type_copy = {

@@ -91,12 +91,19 @@ typedef struct dr_metalib_source_it {
 
 struct DRInBuildMetaLib;
 
-typedef int (*dr_cvt_fun_t)(
+typedef enum dr_cvt_result {
+    dr_cvt_result_success = 0
+    , dr_cvt_result_error
+    , dr_cvt_result_not_enough_input
+    , dr_cvt_result_not_enough_output
+} dr_cvt_result_t;
+
+typedef dr_cvt_result_t (*dr_cvt_fun_t)(
     LPDRMETA meta,
     void * output, size_t * output_capacity,
     const void * input, size_t * input_capacity,
     void * ctx,
-    error_monitor_t em);
+    error_monitor_t em, int debug);
 
 typedef struct dr_cvt * dr_cvt_t;
 

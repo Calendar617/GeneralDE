@@ -30,33 +30,33 @@ const char * dr_cvt_name(dr_cvt_t cvt) {
     return cvt->m_type->m_name;
 }
 
-int dr_cvt_encode(
+dr_cvt_result_t dr_cvt_encode(
     dr_cvt_t cvt, 
     LPDRMETA meta,
     void * output, size_t * output_capacity,
     const void * input, size_t * input_capacity,
-    error_monitor_t em)
+    error_monitor_t em, int debug)
 {
     if (cvt == NULL || output == NULL || input == NULL) return -1;
     assert(cvt->m_type);
 
     if (cvt->m_type->m_encode == NULL) return -1;
 
-    return cvt->m_type->m_encode(meta, output, output_capacity, input, input_capacity, cvt->m_type->m_ctx, em);
+    return cvt->m_type->m_encode(meta, output, output_capacity, input, input_capacity, cvt->m_type->m_ctx, em, debug);
 }
 
-int dr_cvt_decode(
+dr_cvt_result_t dr_cvt_decode(
     dr_cvt_t cvt, 
     LPDRMETA meta,
     void * output, size_t * output_capacity,
     const void * input, size_t * input_capacity,
-    error_monitor_t em)
+    error_monitor_t em, int debug)
 {
     if (cvt == NULL || output == NULL || input == NULL) return -1;
     assert(cvt->m_type);
 
     if (cvt->m_type->m_decode == NULL) return -1;
 
-    return cvt->m_type->m_decode(meta, output, output_capacity, input, input_capacity, cvt->m_type->m_ctx, em);
+    return cvt->m_type->m_decode(meta, output, output_capacity, input, input_capacity, cvt->m_type->m_ctx, em, debug);
 }
 
