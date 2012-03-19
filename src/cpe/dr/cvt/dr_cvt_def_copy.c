@@ -48,7 +48,7 @@ dr_cvt_fun_copy_decode(
         if (debug) {
             CPE_INFO(
                 em, "decode %s: copy: not enought input data, require at least %d, but only %d!",
-                dr_meta_name(meta), sizeof(size), (int)*input_capacity);
+                dr_meta_name(meta), (int)sizeof(size), (int)*input_capacity);
         }
         *output_capacity = 0;
         *input_capacity = 0;
@@ -60,7 +60,7 @@ dr_cvt_fun_copy_decode(
         if (debug) {
             CPE_INFO(
                 em, "decode %s: copy: not enought input data, require %d(size=%d), but only %d!",
-                dr_meta_name(meta), sizeof(size) + size, size, (int)*input_capacity);
+                dr_meta_name(meta), (int)sizeof(size) + size, size, (int)*input_capacity);
         }
         *output_capacity = 0;
         *input_capacity = 0;
