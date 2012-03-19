@@ -11,18 +11,18 @@ void dr_cvt_free(dr_cvt_t cvt);
 
 const char * dr_cvt_name(dr_cvt_t cvt);
 
-ssize_t dr_cvt_encode(
+int dr_cvt_encode(
     dr_cvt_t cvt, 
     LPDRMETA meta,
-    void * output, size_t output_capacity,
-    const void * input, size_t input_capacity,
+    void * output, size_t * output_capacity,
+    const void * input, size_t * input_capacity,
     error_monitor_t em);
 
-ssize_t dr_cvt_decode(
+int dr_cvt_decode(
     dr_cvt_t cvt, 
     LPDRMETA meta,
-    void * output, size_t output_capacity,
-    const void * input, size_t input_capacity,
+    void * output, size_t * output_capacity,
+    const void * input, size_t * input_capacity,
     error_monitor_t em);
 
 int dr_cvt_type_create(

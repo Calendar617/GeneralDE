@@ -32,6 +32,7 @@ void net_ep_pages_free(net_mgr_t nmgr);
 /*tcp ops*/
 void net_socket_close(int * fd, error_monitor_t em);
 int net_socket_set_none_block(int fd, error_monitor_t em);
+int net_socket_set_reuseaddr(int fd, error_monitor_t em);
 
 #ifdef __cplusplus
 }

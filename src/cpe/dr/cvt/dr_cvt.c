@@ -30,11 +30,11 @@ const char * dr_cvt_name(dr_cvt_t cvt) {
     return cvt->m_type->m_name;
 }
 
-ssize_t dr_cvt_encode(
+int dr_cvt_encode(
     dr_cvt_t cvt, 
     LPDRMETA meta,
-    void * output, size_t output_capacity,
-    const void * input, size_t input_capacity,
+    void * output, size_t * output_capacity,
+    const void * input, size_t * input_capacity,
     error_monitor_t em)
 {
     if (cvt == NULL || output == NULL || input == NULL) return -1;
@@ -45,11 +45,11 @@ ssize_t dr_cvt_encode(
     return cvt->m_type->m_encode(meta, output, output_capacity, input, input_capacity, cvt->m_type->m_ctx, em);
 }
 
-ssize_t dr_cvt_decode(
+int dr_cvt_decode(
     dr_cvt_t cvt, 
     LPDRMETA meta,
-    void * output, size_t output_capacity,
-    const void * input, size_t input_capacity,
+    void * output, size_t * output_capacity,
+    const void * input, size_t * input_capacity,
     error_monitor_t em)
 {
     if (cvt == NULL || output == NULL || input == NULL) return -1;
