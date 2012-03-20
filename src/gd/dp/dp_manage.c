@@ -58,6 +58,8 @@ void gd_dp_mgr_free(gd_dp_mgr_t dp) {
 gd_dp_rsp_t gd_dp_rsp_find_by_name(gd_dp_mgr_t dp, const char * name) {
     struct gd_dp_rsp rspBuf;
 
+    assert(dp);
+
     rspBuf.m_name_len = strlen(name);
     rspBuf.m_name = name;
 
