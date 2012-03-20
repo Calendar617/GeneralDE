@@ -42,6 +42,8 @@ const char * dr_ref_lib_name(dr_ref_t dr_ref) {
 }
 
 LPDRMETALIB dr_ref_lib(dr_ref_t dr_ref) {
+    assert(dr_ref);
+    assert(dr_ref->m_store);
     return dr_ref->m_store->m_lib;
 }
 

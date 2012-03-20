@@ -79,7 +79,7 @@ int bpg_pkg_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
 
     if (bpg_pkg_manage_set_base_cvt(bpg_pkg_manage, cfg_get_string(cfg, "base-cvt", NULL)) != 0) {
         CPE_ERROR(
-            gd_app_em(app), "%s: create: set base-cvt %s f1il",
+            gd_app_em(app), "%s: create: set base-cvt %s fail",
             gd_app_module_name(module), cfg_get_string(cfg, "base-cvt", NULL));
         bpg_pkg_manage_free(bpg_pkg_manage);
         return -1;
@@ -87,7 +87,7 @@ int bpg_pkg_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
 
     if (bpg_pkg_manage_set_data_cvt(bpg_pkg_manage, cfg_get_string(cfg, "data-cvt", NULL)) != 0) {
         CPE_ERROR(
-            gd_app_em(app), "%s: create: set data-cvt %s f1il",
+            gd_app_em(app), "%s: create: set data-cvt %s fail",
             gd_app_module_name(module), cfg_get_string(cfg, "data-cvt", NULL));
         bpg_pkg_manage_free(bpg_pkg_manage);
         return -1;

@@ -31,6 +31,7 @@ bpg_pkg_create(
 
     bpg_pkg = (bpg_pkg_t)gd_dp_req_data(dp_req);
 
+    bpg_pkg->m_mgr = mgr;
     bpg_pkg->m_carry_data_meta = carry_data_meta;
     bpg_pkg->m_carry_data_size = 0;
     bpg_pkg->m_carry_data_capacity = carry_data_capacity;
