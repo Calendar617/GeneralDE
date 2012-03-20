@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <string.h>
+#include "cpe/cfg/cfg_read.h"
 #include "gd/dp/dp_responser.h"
 #include "gd/dp/dp_manage.h"
 #include "dp_internal_ops.h"
@@ -264,3 +265,78 @@ int gd_dp_rsp_unbind_string(gd_dp_rsp_t rsp, const char * cmd) {
     return count;
 }
 
+int gd_dp_rsp_bind_by_cfg(gd_dp_rsp_t dp_rsp, cfg_t cfg_respons, error_monitor_t em) {
+    int rv = 0;
+
+    if (cfg_respons == NULL) return 0;
+
+    switch(cfg_type(cfg_respons)) {
+    case CPE_CFG_TYPE_SEQUENCE: {
+        struct cfg_it cfg_it;
+        cfg_t cfg_sub;
+        cfg_it_init(&cfg_it, cfg_respons);
+        while((cfg_sub = cfg_it_next(&cfg_it))) {
+            if (gd_dp_rsp_bind_by_cfg(dp_rsp, cfg_sub, em) != 0) {
+                rv = -1;
+            }
+        }
+        break;
+    }
+    case CPE_CFG_TYPE_STRING: {
+        const char * cmd = cfg_as_string(cfg_respons, NULL);
+        if (cmd == NULL) {
+            CPE_ERROR(
+                em,
+                "%s: gd_dp_rsp_bind_by_cfg: not support bind to str cmd NULL!",
+                gd_dp_rsp_name(dp_rsp));
+            return -1;
+        }
+
+        if (gd_dp_rsp_bind_string(dp_rsp, cmd, em) != 0) {
+            CPE_ERROR(
+                em,
+                "%s: gd_dp_rsp_bind_by_cfg: not support bind to str cmd %s fail!",
+                gd_dp_rsp_name(dp_rsp), cmd);
+            return -1;
+        }
+
+        break;
+    }
+    case CPE_CFG_TYPE_INT8:
+    case CPE_CFG_TYPE_UINT8:
+    case CPE_CFG_TYPE_INT16:
+    case CPE_CFG_TYPE_UINT16:
+    case CPE_CFG_TYPE_INT32:
+    case CPE_CFG_TYPE_UINT32:
+    case CPE_CFG_TYPE_INT64:
+    case CPE_CFG_TYPE_UINT64:
+    {
+        int32_t cmd = cfg_as_int32(cfg_respons, -1);
+        if (cmd == -1) {
+            CPE_ERROR(
+                em,
+                "%s: gd_dp_rsp_bind_by_cfg: read bind numeric cmd fail!",
+                gd_dp_rsp_name(dp_rsp));
+            return -1;
+        }
+
+        if (gd_dp_rsp_bind_numeric(dp_rsp, cmd, em) != 0) {
+            CPE_ERROR(
+                em,
+                "%s: gd_dp_rsp_bind_by_cfg: bind numeric cmd %d fail!",
+                gd_dp_rsp_name(dp_rsp), cmd);
+            return -1;
+        }
+
+        break;
+    }
+    default:
+        CPE_ERROR(
+            em,
+            "%s: gd_dp_rsp_bind_by_cfg: not support bind to type %d!",
+            gd_dp_rsp_name(dp_rsp), cfg_type(cfg_respons));
+        return -1;
+    }
+
+    return rv;
+}

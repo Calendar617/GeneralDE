@@ -3,6 +3,7 @@
 #include "cpe/utils/memory.h"
 #include "cpe/utils/hash_string.h"
 #include "cpe/utils/error.h"
+#include "cpe/cfg/cfg_types.h"
 #include "gd/tl/tl_types.h"
 #include "dp_types.h"
 
@@ -19,6 +20,7 @@ int gd_dp_mgr_unbind_string(gd_dp_mgr_t dp, const char * cmd);
 
 int gd_dp_rsp_bind_numeric(gd_dp_rsp_t rsp, int32_t cmd, error_monitor_t em);
 int gd_dp_rsp_bind_string(gd_dp_rsp_t rsp, const char * cmd, error_monitor_t em);
+int gd_dp_rsp_bind_by_cfg(gd_dp_rsp_t dp_rsp, cfg_t cfg_respons, error_monitor_t em);
 
 int gd_dp_rsp_unbind_numeric(gd_dp_rsp_t dp, int32_t cmd);
 int gd_dp_rsp_unbind_string(gd_dp_rsp_t dp, const char * cmd);
