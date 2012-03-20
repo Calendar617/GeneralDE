@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
+#include "cpe/cfg/cfg_read.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "gd/app/app_context.h"
@@ -35,6 +36,7 @@ logic_manage_create(
     mgr->m_app = app;
     mgr->m_context_id = 0;
     mgr->m_require_id = 0;
+    mgr->m_debug = 0;
 
     if (cpe_hash_table_init(
             &mgr->m_require_types,
@@ -169,6 +171,14 @@ int logic_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cf
 
     logic_manage = logic_manage_create(app, gd_app_module_name(module), gd_app_alloc(app));
     if (logic_manage == NULL) return -1;
+
+    logic_manage->m_debug = cfg_get_int32(cfg, "debug", 0);
+
+    if (logic_manage->m_debug) {
+        CPE_INFO(
+            gd_app_em(app), "%s: create: done",
+            logic_manage_name(logic_manage));
+    }
 
     return 0;
 }

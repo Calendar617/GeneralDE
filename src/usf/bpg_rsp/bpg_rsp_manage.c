@@ -32,8 +32,8 @@ bpg_rsp_manage_create(
     gd_nm_node_t mgr_node;
 
     assert(app);
+    assert(logic_mgr);
 
-    if (logic_mgr == 0) logic_mgr = logic_manage_default(app);
     if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_bpg_rsp_manage_default_name);
     if (em == 0) em = gd_app_em(app);
 
