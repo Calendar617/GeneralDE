@@ -9,6 +9,7 @@ extern "C" {
 
 /*agent process*/
 void bpg_net_agent_accept(net_listener_t listener, net_ep_t ep, void * ctx);
+int bpg_net_agent_reply(gd_dp_req_t req, void * ctx, error_monitor_t em);
 bpg_pkg_t bpg_net_agent_req_buf(bpg_net_agent_t mgr);
 
 /*client process*/

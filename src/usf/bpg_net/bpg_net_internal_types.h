@@ -17,6 +17,8 @@ struct bpg_net_agent {
     size_t m_req_max_size;
     bpg_pkg_t m_req_buf;
 
+    gd_dp_rsp_t m_reply_rsp;
+
     int m_debug;
 };
 

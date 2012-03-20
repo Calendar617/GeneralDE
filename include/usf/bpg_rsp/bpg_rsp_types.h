@@ -23,6 +23,7 @@ typedef uint32_t bpg_req_sn_t;
 
 typedef struct bpg_rsp_manage * bpg_rsp_manage_t;
 typedef struct bpg_rsp * bpg_rsp_t;
+typedef struct bpg_rsp_carry_info * bpg_rsp_carry_info_t;
 
 typedef int (*bpg_logic_ctx_init_fun_t)(logic_context_t context, void * ctx);
 typedef void (*bpg_logic_ctx_fini_fun_t)(logic_context_t context, void * ctx);

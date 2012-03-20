@@ -19,83 +19,6 @@ struct gd_nm_node_type s_nm_node_type_bpg_rsp = {
     bpg_rsp_clear
 };
 
-static
-int bpg_rsp_bind_dp_rsp(bpg_rsp_t bpg_rsp, gd_dp_rsp_t dp_rsp, cfg_t cfg_respons) {
-    int rv = 0;
-
-    assert(cfg_respons);
-
-    switch(cfg_type(cfg_respons)) {
-    case CPE_CFG_TYPE_SEQUENCE: {
-        struct cfg_it cfg_it;
-        cfg_t cfg_sub;
-        cfg_it_init(&cfg_it, cfg_respons);
-        while((cfg_sub = cfg_it_next(&cfg_it))) {
-            if (bpg_rsp_bind_dp_rsp(bpg_rsp, dp_rsp, cfg_sub) != 0) {
-                rv = -1;
-            }
-        }
-        break;
-    }
-    case CPE_CFG_TYPE_STRING: {
-        const char * cmd = cfg_as_string(cfg_respons, NULL);
-        if (cmd == NULL) {
-            CPE_ERROR(
-                bpg_rsp->m_mgr->m_em,
-                "%s: create rsp %s: create dp_rsp: not support bind to str cmd NULL!",
-                bpg_rsp_manage_name(bpg_rsp->m_mgr), bpg_rsp_name(bpg_rsp));
-            return -1;
-        }
-
-        if (gd_dp_rsp_bind_string(dp_rsp, cmd, bpg_rsp->m_mgr->m_em) != 0) {
-            CPE_ERROR(
-                bpg_rsp->m_mgr->m_em,
-                "%s: create rsp %s: create dp_rsp: bind to str cmd %s fail!",
-                bpg_rsp_manage_name(bpg_rsp->m_mgr), bpg_rsp_name(bpg_rsp), cmd);
-            return -1;
-        }
-
-        break;
-    }
-    case CPE_CFG_TYPE_INT8:
-    case CPE_CFG_TYPE_UINT8:
-    case CPE_CFG_TYPE_INT16:
-    case CPE_CFG_TYPE_UINT16:
-    case CPE_CFG_TYPE_INT32:
-    case CPE_CFG_TYPE_UINT32:
-    case CPE_CFG_TYPE_INT64:
-    case CPE_CFG_TYPE_UINT64:
-    {
-        int32_t cmd = cfg_as_int32(cfg_respons, -1);
-        if (cmd == -1) {
-            CPE_ERROR(
-                bpg_rsp->m_mgr->m_em,
-                "%s: create rsp %s: create dp_rsp: read bind numeric cmd fail!",
-                bpg_rsp_manage_name(bpg_rsp->m_mgr), bpg_rsp_name(bpg_rsp));
-            return -1;
-        }
-
-        if (gd_dp_rsp_bind_numeric(dp_rsp, cmd, bpg_rsp->m_mgr->m_em) != 0) {
-            CPE_ERROR(
-                bpg_rsp->m_mgr->m_em,
-                "%s: create rsp %s: create dp_rsp: read bind numeric cmd %d fail!",
-                bpg_rsp_manage_name(bpg_rsp->m_mgr), bpg_rsp_name(bpg_rsp), cmd);
-            return -1;
-        }
-
-        break;
-    }
-    default:
-        CPE_ERROR(
-            bpg_rsp->m_mgr->m_em,
-            "%s: create rsp %s: create dp_rsp: not support bind to type %d!",
-            bpg_rsp_manage_name(bpg_rsp->m_mgr), bpg_rsp_name(bpg_rsp), cfg_type(cfg_respons));
-        return -1;
-    }
-
-    return rv;
-}
-
 static int bpg_rsp_create_dp_rsp_and_bind(bpg_rsp_t bpg_rsp, cfg_t cfg) {
     gd_dp_rsp_t dp_rsp;
     cfg_t cfg_respons;
@@ -122,7 +45,11 @@ static int bpg_rsp_create_dp_rsp_and_bind(bpg_rsp_t bpg_rsp, cfg_t cfg) {
 
     gd_dp_rsp_set_processor(dp_rsp, bpg_rsp_execute, bpg_rsp);
 
-    if (bpg_rsp_bind_dp_rsp(bpg_rsp, dp_rsp, cfg_respons) != 0) {
+    if (gd_dp_rsp_bind_by_cfg(dp_rsp, cfg_respons, bpg_rsp->m_mgr->m_em) != 0) {
+        CPE_ERROR(
+            bpg_rsp->m_mgr->m_em,
+            "%s: create rsp %s: bind rsps by cfg fail!",
+            bpg_rsp_manage_name(bpg_rsp->m_mgr), bpg_rsp_name(bpg_rsp));
         gd_dp_rsp_free(dp_rsp);
         return -1;
     }

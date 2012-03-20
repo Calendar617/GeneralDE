@@ -207,7 +207,7 @@ LPDRMETA bpg_pkg_main_data_meta(bpg_pkg_t pkg, error_monitor_t em) {
         return NULL;
     }
 
-    data_meta = dr_entry_self_meta(dr_meta_entry_at(cmd_meta, cmd_entry_idx));
+    data_meta = dr_entry_ref_meta(dr_meta_entry_at(cmd_meta, cmd_entry_idx));
     if (data_meta == NULL) {
         CPE_ERROR(
             em, "%s: bpg_pkg_main_data_meta:  %s[%d] have no associate meta!",
@@ -312,20 +312,19 @@ uint32_t bpg_pkg_append_info_origin_size(bpg_pkg_append_info_t append_info) {
 }
 
 const char * bpg_pkg_dump(bpg_pkg_t req, mem_buffer_t buffer) {
-//    char decode_buf[4 * 1024];
+    char decode_buf[4 * 1024];
     struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
     LPDRMETA meta;
+    struct basepkg * pkg;
 
     mem_buffer_clear_data(buffer);
 
-    /* static Tsf4g::Tdr::Meta const & s_basePkgHeadMeta = metaInBasePkg("basepkg_head"); */
+    pkg = (struct basepkg *)bpg_pkg_pkg_data(req);
+    
+    stream_printf(((write_stream_t)&stream), "head: ");
+    //s_basePkgHeadMeta.dump_data((write_stream_t)&stream, &bq);
 
-    /* pkg = (struct basepkg *)bpg_pkg_pkg_data(req); */
-
-    /* stream_printf(((write_stream_t)&stream), "head: "); */
-    /* s_basePkgHeadMeta.dump_data((write_stream_t)&stream, &bq); */
-
-    /* stream_printf(((write_stream_t)&stream), "\nbody: "); */
+    stream_printf(((write_stream_t)&stream), "\nbody: ");
 
     /* if (Tsf4g::Tdr::Meta const * bodyMeta = metaOfCmd(bq.head.cmd)) { */
     /*     stream_printf(((write_stream_t)&stream), " %s", bodyMeta->name().c_str()); */

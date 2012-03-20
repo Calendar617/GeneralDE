@@ -49,7 +49,7 @@ static int bpg_pkg_manage_app_load_meta(gd_app_context_t app, gd_app_module_t mo
         return -1;
     }
 
-    if ((arg = cfg_get_string(cfg, "meta-name", NULL))) {
+    if ((arg = cfg_get_string(cfg, "cmd-meta-name", NULL))) {
         if (bpg_pkg_manage_set_cmd_meta_name(mgr, arg) != 0) {
             CPE_ERROR(
                 gd_app_em(app), "%s: load meta info: set cmd-meta-name %s fail!",
@@ -59,7 +59,7 @@ static int bpg_pkg_manage_app_load_meta(gd_app_context_t app, gd_app_module_t mo
     }
     else {
         CPE_ERROR(
-            gd_app_em(app), "%s: load meta info: req-type-name not configured!",
+            gd_app_em(app), "%s: load meta info: cmd-meta-name not configured!",
             gd_app_module_name(module));
         return -1;
     }

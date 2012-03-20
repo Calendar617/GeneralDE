@@ -55,7 +55,7 @@ static void bpg_net_client_on_read(bpg_net_client_t client, net_ep_t ep) {
                 bpg_pkg_pkg_data(req_buf),
                 &output_size,
                 buf, &input_size, client->m_em, client->m_debug);
-        if (cvt_result != dr_cvt_result_not_enough_input) {
+        if (cvt_result == dr_cvt_result_not_enough_input) {
             if(client->m_debug) {
                 CPE_ERROR(
                     client->m_em, "%s: ep %d: not enough data, input size is %d!",

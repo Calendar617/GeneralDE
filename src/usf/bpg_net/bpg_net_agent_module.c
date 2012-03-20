@@ -5,6 +5,7 @@
 #include "cpe/net/net_listener.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
+#include "gd/dp/dp_manage.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
@@ -19,6 +20,7 @@ int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t c
     short port;
     int accept_queue_size;
     bpg_pkg_manage_t pkg_manage;
+    cfg_t reply_recv_cfg;
 
     pkg_manage = bpg_pkg_manage_find_nc(app, cfg_get_string(cfg, "pkg-manage", NULL));
     if (pkg_manage == NULL) {
@@ -26,6 +28,14 @@ int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t c
             gd_app_em(app), "%s: create: pkg-manage %s not exist!",
             gd_app_module_name(module),
             cfg_get_string(cfg, "pkg-manage", "default"));
+        return -1;
+    }
+
+    reply_recv_cfg = cfg_find_cfg(cfg, "reply-recv-at");
+    if (reply_recv_cfg == NULL) {
+        CPE_ERROR(
+            gd_app_em(app), "%s: create: reply-recv-at not configured!",
+            gd_app_module_name(module));
         return -1;
     }
 
@@ -44,6 +54,14 @@ int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t c
         cfg_get_uint32(cfg, "req-max-size", bpg_net_agent->m_req_max_size);
 
     bpg_net_agent->m_debug = cfg_get_int32(cfg, "debug", 0);
+
+    if (gd_dp_rsp_bind_by_cfg(bpg_net_agent->m_reply_rsp, reply_recv_cfg, gd_app_em(app)) != 0) {
+        CPE_ERROR(
+            gd_app_em(app), "%s: create: bind rsp by cfg fail!",
+            gd_app_module_name(module));
+        bpg_net_agent_free(bpg_net_agent);
+        return -1;
+    }
 
     if (bpg_net_agent->m_debug) {
         CPE_INFO(

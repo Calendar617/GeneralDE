@@ -1,9 +1,11 @@
 #include <assert.h>
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/net/net_listener.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "gd/app/app_context.h"
+#include "gd/dp/dp_responser.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/bpg_net/bpg_net_agent.h"
 #include "bpg_net_internal_ops.h"
@@ -23,6 +25,7 @@ bpg_net_agent_create(
 {
     bpg_net_agent_t mgr;
     gd_nm_node_t mgr_node;
+    char name_buf[128];
 
     assert(app);
     assert(pkg_manage);
@@ -41,8 +44,14 @@ bpg_net_agent_create(
     mgr->m_em = em;
     mgr->m_req_max_size = 4 * 1024;
     mgr->m_req_buf = NULL;
-
     mgr->m_debug = 0;
+
+    snprintf(name_buf, sizeof(name_buf), "%s.reply-rsp", name);
+    mgr->m_reply_rsp = gd_dp_rsp_create(gd_app_dp_mgr(app), name_buf);
+    if (mgr->m_reply_rsp == NULL) {
+        gd_nm_node_free(mgr_node);
+        return NULL;
+    }
 
     mgr->m_listener =
         net_listener_create(
@@ -54,6 +63,7 @@ bpg_net_agent_create(
             bpg_net_agent_accept,
             mgr);
     if (mgr->m_listener == NULL) {
+        gd_dp_rsp_free(mgr->m_reply_rsp);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
@@ -66,6 +76,9 @@ bpg_net_agent_create(
 static void bpg_net_agent_clear(gd_nm_node_t node) {
     bpg_net_agent_t mgr;
     mgr = (bpg_net_agent_t)gd_nm_node_data(node);
+
+    gd_dp_rsp_free(mgr->m_reply_rsp);
+    mgr->m_reply_rsp = NULL;
 
     if (mgr->m_req_buf) {
         bpg_pkg_free(mgr->m_req_buf);

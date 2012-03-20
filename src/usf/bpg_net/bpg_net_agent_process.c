@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/utils/buffer.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/net/net_chanel.h"
@@ -56,7 +57,7 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
                 bpg_pkg_pkg_data(req_buf),
                 &output_size,
                 buf, &input_size, agent->m_em, agent->m_debug);
-        if (cvt_result != dr_cvt_result_not_enough_input) {
+        if (cvt_result == dr_cvt_result_not_enough_input) {
             if(agent->m_debug) {
                 CPE_ERROR(
                     agent->m_em, "%s: ep %d: not enough data, input size is %d!",
@@ -88,10 +89,19 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
         }
 
         if(agent->m_debug) {
+            struct mem_buffer buffer;
+            mem_buffer_init(&buffer, NULL);
+
             CPE_ERROR(
-                agent->m_em, "%s: ep %d: read one request, cmd=%d, input-size=%d, output-size=%d!",
+                agent->m_em,
+                "\n\n"
+                "%s: ep %d: read one request, cmd=%d, input-size=%d, output-size=%d!\n"
+                "%s",
                 bpg_net_agent_name(agent), (int)net_ep_id(ep),
-                bpg_pkg_cmd(req_buf), (int)input_size, (int)output_size);
+                bpg_pkg_cmd(req_buf), (int)input_size, (int)output_size,
+                bpg_pkg_dump(req_buf, &buffer));
+
+            mem_buffer_clear(&buffer);
         }
 
         if (gd_dp_dispatch_by_numeric(bpg_pkg_cmd(req_buf), bpg_pkg_to_dp_req(req_buf), agent->m_em) != 0) {
