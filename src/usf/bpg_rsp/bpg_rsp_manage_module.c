@@ -10,82 +10,6 @@
 #include "usf/bpg_rsp/bpg_rsp.h"
 #include "bpg_rsp_internal_types.h"
 
-static int bpg_rsp_manage_app_validate_meta(gd_app_context_t app, gd_app_module_t module, bpg_rsp_manage_t mgr) {
-    if (bpg_rsp_manage_metalib(mgr) == NULL) {
-        CPE_ERROR(
-            gd_app_em(app), "%s: validate meta info: meta lib %s not exist!",
-            bpg_rsp_manage_name(mgr), bpg_rsp_manage_metalib_name(mgr));
-        return -1;
-    }
-
-    if (bpg_rsp_manage_request_meta(mgr) == NULL) {
-        CPE_ERROR(
-            gd_app_em(app), "%s: validate meta info: request meta %s not exist in lib %s!",
-            bpg_rsp_manage_name(mgr), bpg_rsp_manage_request_meta_name(mgr), bpg_rsp_manage_metalib_name(mgr));
-        return -1;
-    }
-
-    if (bpg_rsp_manage_response_meta(mgr) == NULL) {
-        CPE_ERROR(
-            gd_app_em(app), "%s: validate meta info: response meta %s not exist in lib %s!",
-            bpg_rsp_manage_name(mgr), bpg_rsp_manage_response_meta_name(mgr), bpg_rsp_manage_metalib_name(mgr));
-        return -1;
-    }
-
-    return 0;
-}
-
-static int bpg_rsp_manage_app_load_meta(gd_app_context_t app, gd_app_module_t module, bpg_rsp_manage_t mgr, cfg_t cfg) {
-    const char * arg;
-    
-    if ((arg = cfg_get_string(cfg, "lib-name", NULL))) {
-        if (bpg_rsp_manage_set_metalib(mgr, arg) != 0) {
-            CPE_ERROR(
-                gd_app_em(app), "%s: load meta info: set meta ref %s fail!",
-                bpg_rsp_manage_name(mgr), arg);
-            return -1;
-        }
-    }
-    else {
-        CPE_ERROR(
-            gd_app_em(app), "%s: load meta info: lib-name not configured!",
-            bpg_rsp_manage_name(mgr));
-        return -1;
-    }
-
-    if ((arg = cfg_get_string(cfg, "req-type-name", NULL))) {
-        if (bpg_rsp_manage_set_request_meta_name(mgr, arg) != 0) {
-            CPE_ERROR(
-                gd_app_em(app), "%s: load meta info: set request-meta-name %s fail!",
-                gd_app_module_name(module), arg);
-            return -1;
-        }
-    }
-    else {
-        CPE_ERROR(
-            gd_app_em(app), "%s: load meta info: req-type-name not configured!",
-            gd_app_module_name(module));
-        return -1;
-    }
-
-    if ((arg = cfg_get_string(cfg, "rsp-type-name", NULL))) {
-        if (bpg_rsp_manage_set_response_meta_name(mgr, arg) != 0) {
-            CPE_ERROR(
-                gd_app_em(app), "%s: load meta info: set response-meta-name %s fail!",
-                gd_app_module_name(module), arg);
-            return -1;
-        }
-    }
-    else {
-        CPE_ERROR(
-            gd_app_em(app), "%s: load meta info: meta.rsp-type-name not configured!",
-            gd_app_module_name(module));
-        return -1;
-    }
-        
-    return 0;
-}
-
 EXPORT_DIRECTIVE
 int bpg_rsp_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
     bpg_rsp_manage_t bpg_rsp_manage;
@@ -97,18 +21,6 @@ int bpg_rsp_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
     bpg_rsp_manage = bpg_rsp_manage_create(app, gd_app_module_name(module), NULL, NULL);
     if (bpg_rsp_manage == NULL) {
         return -1;
-    }
-
-    child_cfg = cfg_find_cfg(cfg, "meta");
-    if (child_cfg) {
-        if (bpg_rsp_manage_app_load_meta(app, module, bpg_rsp_manage, child_cfg) != 0
-            || (
-                cfg_get_int32(child_cfg, "validate", 0) != 0
-                && bpg_rsp_manage_app_validate_meta(app, module, bpg_rsp_manage) != 0))
-        {
-            bpg_rsp_manage_free(bpg_rsp_manage);
-            return -1;
-        }
     }
 
     child_cfg = cfg_find_cfg(cfg, "rsps");

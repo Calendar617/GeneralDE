@@ -67,19 +67,11 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
         return;
     }
 
-    if (bpg_pkg_pkg_capacity(response_buf) < sizeof(struct basepkg_head)) {
-        CPE_ERROR(
-            em, "%s.%s: bpg_rsp_commit: response buf size is too small, head size is %d, but response buf size is %d!",
-            bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp),
-            (int)sizeof(struct basepkg_head), (int)bpg_pkg_pkg_capacity(response_buf))
-        return;
-    }
-
     bpg_pkg_init(response_buf);
-    bpg_pkg_set_sn(logic_context_id(op_context));
-    bpg_pkg_set_client_id(bpg_private->clientId);
-    bpg_pkg_set_errno(logic_context_errno(op_context));
-    pkg_pkg_set_cmd(bpg_private->cmd);
+    bpg_pkg_set_sn(response_buf, logic_context_id(op_context));
+    bpg_pkg_set_client_id(response_buf, bpg_private->clientId);
+    bpg_pkg_set_errno(response_buf, logic_context_errno(op_context));
+    bpg_pkg_set_cmd(response_buf, bpg_private->cmd);
 
     if (bpg_rsp_copy_ctx_to_pkg(bpg_rsp, op_context, bpg_pkg_pkg_capacity(response_buf), em) != 0) return;
 

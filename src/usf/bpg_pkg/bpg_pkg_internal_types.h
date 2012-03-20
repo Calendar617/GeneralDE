@@ -12,7 +12,11 @@ struct bpg_pkg_manage {
     gd_app_context_t m_app;
     mem_allocrator_t m_alloc;
     dr_ref_t m_metalib_basepkg_ref;
+    dr_ref_t m_metalib_ref;
     error_monitor_t m_em;
+
+    char m_cmd_meta_name[64];
+    LPDRMETA m_cmd_meta;
 
     dr_cvt_t m_base_cvt;
     dr_cvt_t m_data_cvt;

@@ -1,11 +1,13 @@
 #include <assert.h>
+#include "cpe/utils/stream_buffer.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cvt.h"
 #include "gd/dp/dp_request.h"
 #include "gd/app/app_context.h"
-#include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/dr_store/dr_ref.h"
 #include "usf/dr_store/dr_store_manage.h"
+#include "usf/bpg_pkg/bpg_pkg.h"
+#include "usf/bpg_pkg/bpg_pkg_manage.h"
 #include "protocol/base/base_package.h"
 #include "bpg_pkg_internal_types.h"
 
@@ -65,6 +67,10 @@ int bpg_pkg_carry_data_set_size(bpg_pkg_t req, size_t size) {
     return 0;
 }
 
+bpg_pkg_manage_t bpg_pkg_mgr(bpg_pkg_t req) {
+    return req->m_mgr;
+}
+
 size_t bpg_pkg_pkg_capacity(bpg_pkg_t req) {
     return gd_dp_req_capacity(req->m_dp_req) - sizeof(struct bpg_pkg) - req->m_carry_data_capacity;
 }
@@ -122,6 +128,20 @@ void bpg_pkg_set_sn(bpg_pkg_t req, uint32_t sn) {
     head->sn = sn;
 }
 
+uint32_t bpg_pkg_errno(bpg_pkg_t req) {
+    struct basepkg_head * head;
+    head = (struct basepkg_head *)bpg_pkg_pkg_data(req);
+
+    return head->errno;
+}
+
+void bpg_pkg_set_errno(bpg_pkg_t req, uint32_t errno) {
+    struct basepkg_head * head;
+    head = (struct basepkg_head *)bpg_pkg_pkg_data(req);
+
+    head->errno = errno;
+}
+
 gd_dp_req_t bpg_pkg_to_dp_req(bpg_pkg_t req) {
     return req->m_dp_req;
 }
@@ -159,6 +179,65 @@ LPDRMETA bpg_pkg_base_meta(bpg_pkg_t pkg) {
 
     metalib = dr_ref_lib(pkg->m_mgr->m_metalib_basepkg_ref);
     return metalib ? dr_lib_find_meta_by_name(metalib, "basepkg") : NULL;
+}
+
+LPDRMETA bpg_pkg_cmd_meta(bpg_pkg_t pkg) {
+    return bpg_pkg_manage_cmd_meta(pkg->m_mgr);
+}
+
+LPDRMETA bpg_pkg_main_data_meta(bpg_pkg_t pkg, error_monitor_t em) {
+    LPDRMETA cmd_meta;
+    int cmd_entry_idx;
+    LPDRMETA data_meta;
+
+    cmd_meta = bpg_pkg_cmd_meta(pkg);
+    if (cmd_meta == NULL) {
+        CPE_ERROR(
+            em, "%s: bpg_pkg_main_data_meta: cmd meta \"%s\" not exist!",
+            bpg_pkg_manage_name(pkg->m_mgr), pkg->m_mgr->m_cmd_meta_name);
+        return NULL;
+    }
+
+    cmd_entry_idx = dr_meta_find_entry_idx_by_id(cmd_meta, bpg_pkg_cmd(pkg));
+    if (cmd_entry_idx < 0) {
+        CPE_ERROR(
+            em, "%s: bpg_pkg_main_data_meta:  meta \"%s\" have no entry associate with cmd %d!",
+            bpg_pkg_manage_name(pkg->m_mgr), dr_meta_name(cmd_meta), bpg_pkg_cmd(pkg));
+        return NULL;
+    }
+
+    data_meta = dr_entry_self_meta(dr_meta_entry_at(cmd_meta, cmd_entry_idx));
+    if (data_meta == NULL) {
+        CPE_ERROR(
+            em, "%s: bpg_pkg_main_data_meta:  %s[%d] have no associate meta!",
+            bpg_pkg_manage_name(pkg->m_mgr), dr_meta_name(cmd_meta), cmd_entry_idx);
+        return NULL;
+    }
+
+    return data_meta;
+}
+
+LPDRMETA bpg_pkg_append_data_meta(bpg_pkg_t pkg, bpg_pkg_append_info_t append_info, error_monitor_t em) {
+    LPDRMETALIB metalib;
+    LPDRMETA data_meta;
+
+    metalib = bpg_pkg_manage_data_metalib(pkg->m_mgr);
+    if (metalib == NULL) {
+        CPE_ERROR(
+            em, "%s: bpg_pkg_append_data_meta:  data meta \"%s\" not exist!",
+            bpg_pkg_manage_name(pkg->m_mgr), pkg->m_mgr->m_cmd_meta_name);
+        return NULL;
+    }
+
+    data_meta = dr_lib_find_meta_by_id(metalib, bpg_pkg_append_info_id(append_info));
+    if (data_meta == NULL) {
+        CPE_ERROR(
+            em, "%s: bpg_pkg_append_data_meta:  meta of id %d not exist in lib %s!",
+            bpg_pkg_manage_name(pkg->m_mgr), bpg_pkg_append_info_id(append_info), pkg->m_mgr->m_cmd_meta_name);
+        return NULL;
+    }
+
+    return data_meta;
 }
 
 void * bpg_pkg_body_data(bpg_pkg_t pkg) {
@@ -231,39 +310,43 @@ uint32_t bpg_pkg_append_info_origin_size(bpg_pkg_append_info_t append_info) {
     return ((struct AppendInfo *)append_info)->originSize;
 }
 
-/* const char * bpg_pkg_dump(bpg_pkg_t req, mem_buffer_t buffer){ */
-/*     write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer); */
-/*     char decode_buf[4 * 1024]; */
+const char * bpg_pkg_dump(bpg_pkg_t req, mem_buffer_t buffer) {
+//    char decode_buf[4 * 1024];
+    struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
+    LPDRMETA meta;
 
-/*     /\* static Tsf4g::Tdr::Meta const & s_basePkgHeadMeta = metaInBasePkg("basepkg_head"); *\/ */
+    mem_buffer_clear_data(buffer);
 
-/*     pkg = (struct basepkg *)bpg_pkg_pkg_data(req); */
+    /* static Tsf4g::Tdr::Meta const & s_basePkgHeadMeta = metaInBasePkg("basepkg_head"); */
 
-/*     stream_printf(((write_stream_t)&stream), "head: "); */
-/*     s_basePkgHeadMeta.dump_data((write_stream_t)&stream, &bq); */
+    /* pkg = (struct basepkg *)bpg_pkg_pkg_data(req); */
 
-/*     stream_printf(((write_stream_t)&stream), "\nbody: "); */
+    /* stream_printf(((write_stream_t)&stream), "head: "); */
+    /* s_basePkgHeadMeta.dump_data((write_stream_t)&stream, &bq); */
 
-/*     if (Tsf4g::Tdr::Meta const * bodyMeta = metaOfCmd(bq.head.cmd)) { */
-/*         stream_printf(((write_stream_t)&stream), " %s", bodyMeta->name().c_str()); */
+    /* stream_printf(((write_stream_t)&stream), "\nbody: "); */
 
-/*         bodyMeta->decode(decode_buf, sizeof(decode_buf), bq.body, bq.head.bodylen); */
-/*         bodyMeta->dump_data((write_stream_t)&stream, decode_buf); */
-/*     } */
+    /* if (Tsf4g::Tdr::Meta const * bodyMeta = metaOfCmd(bq.head.cmd)) { */
+    /*     stream_printf(((write_stream_t)&stream), " %s", bodyMeta->name().c_str()); */
 
-/*     const char * appendBuf = ((const char *)bq.body) + bq.head.bodylen; */
-/*     for(int i = 0; i < bq.head.appendInfoCount; ++i) { */
-/*         Tsf4g::Tdr::Meta const & meta = metaInNetData(bq.head.appendInfos[i].id); */
-/*         stream_printf(((write_stream_t)&stream), "\nappend %d(%s): ", meta.id(), meta.name().c_str()); */
+    /*     bodyMeta->decode(decode_buf, sizeof(decode_buf), bq.body, bq.head.bodylen); */
+    /*     bodyMeta->dump_data((write_stream_t)&stream, decode_buf); */
+    /* } */
 
-/*         meta.decode(decode_buf, sizeof(decode_buf), appendBuf, bq.head.appendInfos[i].size); */
-/*         meta.dump_data((write_stream_t)&stream, decode_buf); */
-/*         appendBuf += bq.head.appendInfos[i].size; */
-/*     } */
+    /* const char * appendBuf = ((const char *)bq.body) + bq.head.bodylen; */
+    /* for(int i = 0; i < bq.head.appendInfoCount; ++i) { */
+    /*     Tsf4g::Tdr::Meta const & meta = metaInNetData(bq.head.appendInfos[i].id); */
+    /*     stream_printf(((write_stream_t)&stream), "\nappend %d(%s): ", meta.id(), meta.name().c_str()); */
 
+    /*     meta.decode(decode_buf, sizeof(decode_buf), appendBuf, bq.head.appendInfos[i].size); */
+    /*     meta.dump_data((write_stream_t)&stream, decode_buf); */
+    /*     appendBuf += bq.head.appendInfos[i].size; */
+    /* } */
 
-/*     return (const char *)mem_buffer_make_continuous(buffer, 0); */
-/* } */
+    stream_putc((write_stream_t)&stream, 0);
+
+    return (const char *)mem_buffer_make_continuous(buffer, 0);
+}
 
 CPE_HS_DEF_VAR(bpg_pkg_type_name, "bpg_pkg_type");
 

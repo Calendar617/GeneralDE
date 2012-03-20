@@ -14,16 +14,9 @@ extern "C" {
 struct bpg_rsp_manage {
     gd_app_context_t m_app;
     mem_allocrator_t m_alloc;
-    dr_ref_t m_metalib_ref;
     logic_manage_t m_logic_mgr;
     error_monitor_t m_em;
     uint32_t m_flags;
-
-    char m_request_meta_name[64];
-    LPDRMETA m_request_meta;
-
-    char m_response_meta_name[64];
-    LPDRMETA m_response_meta;
 
     size_t m_ctx_capacity;
     bpg_logic_ctx_init_fun_t m_ctx_init;

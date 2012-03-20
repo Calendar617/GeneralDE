@@ -6,6 +6,7 @@
 #include "usf/logic/logic_context.h"
 #include "usf/logic/logic_data.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
+#include "usf/bpg_pkg/bpg_pkg_manage.h"
 #include "usf/bpg_rsp/bpg_rsp_manage.h"
 #include "usf/bpg_rsp/bpg_rsp.h"
 #include "protocol/bpg_rsp_carry_info.h"
@@ -90,61 +91,47 @@ int bpg_rsp_execute(gd_dp_req_t dp_req, void * ctx, error_monitor_t em) {
 }
 
 static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t req, error_monitor_t em) {
-    int cmd_entry_idx;
     LPDRMETA data_meta;
     logic_data_t data;
     bpg_rsp_manage_t mgr;
+    size_t output_size;
 
     mgr = rsp->m_mgr;
 
-    cmd_entry_idx = dr_meta_find_entry_idx_by_id(mgr->m_request_meta, bpg_pkg_cmd(req));
-    if (cmd_entry_idx < 0) {
-        if (logic_context_flag_is_enable(op_context, logic_context_flag_debug)) {
-            CPE_INFO(
-                em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: request meta %s have no associate info of cmd %d!",
-                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), mgr->m_request_meta_name, bpg_pkg_cmd(req));
-        }
+    data_meta = bpg_pkg_main_data_meta(req, em);
+    if (data_meta == NULL) {
+        CPE_ERROR(
+            em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: get data meta fail!",
+            bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp));
+        return -1;
     }
-    else {
-        size_t output_size;
 
-        data_meta = dr_entry_self_meta(dr_meta_entry_at(mgr->m_request_meta, cmd_entry_idx));
-        if (data_meta == NULL) {
-            CPE_ERROR(
-                em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: %s.%s have no associate meta!",
-                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), 
-                mgr->m_request_meta_name, dr_entry_name(dr_meta_entry_at(mgr->m_request_meta, cmd_entry_idx)));
-            return -1;
-        }
+    data = logic_data_get_or_create(op_context, data_meta, bpg_pkg_body_origin_len(req));
+    if (data == NULL) {
+        CPE_ERROR(
+            em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: %s create data fail, capacity=%d!",
+            bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), dr_meta_name(data_meta), bpg_pkg_body_origin_len(req));
+        return -1;
+    }
 
-        data = logic_data_get_or_create(op_context, data_meta, bpg_pkg_body_origin_len(req));
-        if (data == NULL) {
-            CPE_ERROR(
-                em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: %s create data fail, capacity=%d!",
-                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), dr_meta_name(data_meta), bpg_pkg_body_origin_len(req));
-            return -1;
-        }
-
-        output_size = logic_data_capacity(data);
-        if (bpg_pkg_get_main_data(
-                req,
-                data_meta,
-                logic_data_data(data), &output_size,
-                em) != 0)
-        {
-            CPE_ERROR(
-                em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: %s decode data fail!",
-                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), 
-                dr_meta_name(data_meta));
-            return -1;
-        }
+    output_size = logic_data_capacity(data);
+    if (bpg_pkg_get_main_data(
+            req,
+            data_meta,
+            logic_data_data(data), &output_size,
+            em) != 0)
+    {
+        CPE_ERROR(
+            em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: %s decode data fail!",
+            bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), 
+            dr_meta_name(data_meta));
+        return -1;
     }
 
     return 0;
 }
 
 static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t req, error_monitor_t em) {
-    LPDRMETALIB metalib;
     LPDRMETA data_meta;
     logic_data_t data;
     int i;
@@ -154,9 +141,6 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
 
     mgr = rsp->m_mgr;
     assert(mgr);
-
-    metalib = bpg_rsp_manage_metalib(mgr);
-    assert(metalib); /*checked in bpg_rsp_copy_pkg_to_ctx*/
 
     append_info_count = bpg_pkg_append_info_count(req);
     for(i = 0; i < append_info_count; ++i) {
@@ -170,11 +154,11 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
             continue;
         }
 
-        data_meta = dr_lib_find_meta_by_id(metalib, bpg_pkg_append_info_id(append_info));
+        data_meta = bpg_pkg_append_data_meta(req, append_info, em);
         if (data_meta == NULL) {
             CPE_ERROR(
-                em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: append %d: meta of id %d not exist in lib!",
-                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), i, bpg_pkg_append_info_id(append_info));
+                em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: append %d: append meta not exist!",
+                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), i);
             return -1;
         }
 
@@ -194,7 +178,7 @@ static int bpg_rsp_copy_append_to_ctx(bpg_rsp_t rsp, logic_context_t op_context,
         {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: append %d: %s decode data fail!",
-                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), i);
+                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), i, dr_meta_name(data_meta));
             return -1;
         }
     }
@@ -206,25 +190,6 @@ int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t
     bpg_rsp_manage_t mgr;
 
     mgr = rsp->m_mgr;
-
-    if (bpg_rsp_manage_metalib(mgr) == NULL) {
-        CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: metalib %s not exist!",
-            bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), 
-            bpg_rsp_manage_metalib_name(mgr));
-        return -1;
-    }
-
-    if (mgr->m_request_meta == NULL) {
-        bpg_rsp_manage_request_meta(mgr);
-        if (mgr->m_request_meta == NULL) {
-            CPE_ERROR(
-                em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: request meta %s not exist in metalib %s!",
-                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp), 
-                bpg_rsp_manage_request_meta_name(mgr), bpg_rsp_manage_metalib_name(mgr));
-            return -1;
-        }    
-    }
 
     if (bpg_rsp_copy_main_to_ctx(rsp, op_context, req, em) != 0) return -1;
     if (bpg_rsp_copy_append_to_ctx(rsp, op_context, req, em) != 0) return -1;
@@ -254,6 +219,8 @@ int bpg_rsp_copy_req_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context
     return 0;
 }
 
+extern char g_metalib_caary_package[];
+
 int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t bpg_req, error_monitor_t em) {
     LPDRMETA bpg_carry_data_meta;
     logic_data_t data;
@@ -262,7 +229,7 @@ int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context
 
     mgr = rsp->m_mgr;
 
-    bpg_carry_data_meta =dr_lib_find_meta_by_name(bpg_metalib(rsp->m_mgr), "bpg_carry_info");
+    bpg_carry_data_meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_caary_package, "bpg_carry_info");
     if (bpg_carry_data_meta == NULL) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_execute: copy_bpg_carry_data: bpg_carry_info meta not exist!",

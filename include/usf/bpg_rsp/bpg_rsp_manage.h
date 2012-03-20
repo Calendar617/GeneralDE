@@ -35,20 +35,8 @@ void bpg_rsp_manage_set_context_op(
     bpg_logic_ctx_fini_fun_t ctx_fini,
     void * ctx_ctx);
 
-LPDRMETA bpg_rsp_manage_request_meta(bpg_rsp_manage_t mgr);
-const char * bpg_rsp_manage_request_meta_name(bpg_rsp_manage_t mgr);
-int bpg_rsp_manage_set_request_meta_name(bpg_rsp_manage_t mgr, const char * name);
-
-LPDRMETA bpg_rsp_manage_response_meta(bpg_rsp_manage_t mgr);
-const char * bpg_rsp_manage_response_meta_name(bpg_rsp_manage_t mgr);
-int bpg_rsp_manage_set_response_meta_name(bpg_rsp_manage_t mgr, const char * name);
-
 const char * bpg_rsp_manage_send_to(bpg_rsp_manage_t mgr);
 int bpg_rsp_manage_set_send_to(bpg_rsp_manage_t mgr, const char * name);
-
-const char * bpg_rsp_manage_metalib_name(bpg_rsp_manage_t mgr);
-LPDRMETALIB bpg_rsp_manage_metalib(bpg_rsp_manage_t mgr);
-int bpg_rsp_manage_set_metalib(bpg_rsp_manage_t mgr, const char * metalib_name);
 
 uint32_t bpg_rsp_manage_flags(bpg_rsp_manage_t mgr);
 void bpg_rsp_manage_flags_set(bpg_rsp_manage_t mgr, uint32_t flag);

@@ -1,6 +1,7 @@
 #ifndef USF_BPG_PKG_TYPES_H
 #define USF_BPG_PKG_TYPES_H
 #include "cpe/utils/error.h"
+#include "cpe/utils/buffer.h"
 #include "cpe/dr/dr_types.h"
 #include "gd/app/app_context.h"
 

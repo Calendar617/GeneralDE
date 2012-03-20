@@ -37,6 +37,14 @@ int bpg_pkg_manage_set_base_cvt(bpg_pkg_manage_t pkg, const char * cvt_name);
 const char * bpg_pkg_manage_base_cvt_name(bpg_pkg_manage_t pkg);
 dr_cvt_t bpg_pkg_manage_base_cvt(bpg_pkg_manage_t pkg);
 
+int bpg_pkg_manage_set_data_metalib(bpg_pkg_manage_t mgr, const char * metalib_name);
+int bpg_pkg_manage_set_cmd_meta_name(bpg_pkg_manage_t mgr, const char * name);
+LPDRMETA bpg_pkg_manage_cmd_meta(bpg_pkg_manage_t mgr);
+const char * bpg_pkg_manage_cmd_meta_name(bpg_pkg_manage_t mgr);
+
+const char * bpg_pkg_manage_data_metalib_name(bpg_pkg_manage_t mgr);
+LPDRMETALIB bpg_pkg_manage_data_metalib(bpg_pkg_manage_t mgr);
+
 #ifdef __cplusplus
 }
 #endif

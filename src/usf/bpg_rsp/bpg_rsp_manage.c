@@ -49,16 +49,9 @@ bpg_rsp_manage_create(
 
     mgr->m_app = app;
     mgr->m_alloc = gd_app_alloc(app);
-    mgr->m_metalib_ref = NULL;
     mgr->m_logic_mgr = logic_mgr;
     mgr->m_em = em;
     mgr->m_flags = 0;
-
-    mgr->m_request_meta_name[0] = 0;
-    mgr->m_request_meta = NULL;
-
-    mgr->m_response_meta_name[0] = 0;
-    mgr->m_response_meta = NULL;
 
     mgr->m_ctx_capacity = 0;
     mgr->m_ctx_init = NULL;
@@ -80,11 +73,6 @@ bpg_rsp_manage_create(
 static void bpg_rsp_manage_clear(gd_nm_node_t node) {
     bpg_rsp_manage_t mgr;
     mgr = (bpg_rsp_manage_t)gd_nm_node_data(node);
-
-    if (mgr->m_metalib_ref) {
-        dr_ref_free(mgr->m_metalib_ref);
-        mgr->m_metalib_ref = NULL;
-    }
 
     if (mgr->m_rsp_buf) {
         bpg_pkg_free(mgr->m_rsp_buf);
@@ -186,102 +174,6 @@ bpg_rsp_manage_rsp_buf(bpg_rsp_manage_t mgr, const char * pkg_mgr_name, LPDRMETA
     }
 
     return mgr->m_rsp_buf;
-}
-
-LPDRMETA bpg_rsp_manage_request_meta(bpg_rsp_manage_t mgr) {
-    if (mgr->m_request_meta == NULL && mgr->m_request_meta_name[0]) {
-        LPDRMETALIB metalib = bpg_rsp_manage_metalib(mgr);
-        if (metalib) {
-            mgr->m_request_meta = dr_lib_find_meta_by_name(metalib, mgr->m_request_meta_name);
-        }
-    }
-
-    return mgr->m_request_meta;
-}
-
-const char *
-bpg_rsp_manage_request_meta_name(bpg_rsp_manage_t mgr) {
-    return mgr->m_request_meta_name;
-}
-
-int bpg_rsp_manage_set_request_meta_name(bpg_rsp_manage_t mgr, const char * name) {
-    size_t name_len;
-
-    name_len = strlen(name) + 1;
-    if (name_len > sizeof(mgr->m_request_meta_name)) {
-        CPE_ERROR(
-            mgr->m_em, "bpg_rsp_manage %s: set request meta name %s, name len overflow!", 
-            bpg_rsp_manage_name(mgr), name);
-        return -1;
-    }
-
-    memcpy(mgr->m_request_meta_name, name, name_len);
-    mgr->m_request_meta = NULL;
-
-    return 0;
-}
-
-LPDRMETA bpg_rsp_manage_response_meta(bpg_rsp_manage_t mgr) {
-    if (mgr->m_response_meta == NULL && mgr->m_response_meta_name[0]) {
-        LPDRMETALIB metalib = bpg_rsp_manage_metalib(mgr);
-        if (metalib) {
-            mgr->m_response_meta = dr_lib_find_meta_by_name(metalib, mgr->m_response_meta_name);
-        }
-    }
-
-    return mgr->m_response_meta;
-}
-
-const char * bpg_rsp_manage_response_meta_name(bpg_rsp_manage_t mgr) {
-    return mgr->m_response_meta_name;
-}
-
-int bpg_rsp_manage_set_response_meta_name(bpg_rsp_manage_t mgr, const char * name) {
-    size_t name_len;
-
-    name_len = strlen(name) + 1;
-    if (name_len > sizeof(mgr->m_response_meta_name)) {
-        CPE_ERROR(
-            mgr->m_em, "bpg_rsp_manage %s: set response meta name %s, name len overflow!", 
-            bpg_rsp_manage_name(mgr), name);
-        return -1;
-    }
-
-    memcpy(mgr->m_response_meta_name, name, name_len);
-    mgr->m_response_meta = NULL;
-
-    return 0;
-}
-
-const char * bpg_rsp_manage_metalib_name(bpg_rsp_manage_t mgr) {
-    return mgr->m_metalib_ref ? dr_ref_lib_name(mgr->m_metalib_ref) : "???";
-}
-
-LPDRMETALIB bpg_rsp_manage_metalib(bpg_rsp_manage_t mgr) {
-    return mgr->m_metalib_ref ? dr_ref_lib(mgr->m_metalib_ref) : NULL;
-}
-
-int bpg_rsp_manage_set_metalib(bpg_rsp_manage_t mgr, const char * metalib_name) {
-    assert(mgr);
-    assert(metalib_name);
-
-    if (mgr->m_metalib_ref) dr_ref_free(mgr->m_metalib_ref);
-
-    mgr->m_metalib_ref =
-        dr_ref_create(
-            dr_store_manage_default(mgr->m_app),
-            metalib_name);
-    if (mgr->m_metalib_ref == NULL) {
-        CPE_ERROR(
-            mgr->m_em, "bpg_rsp_manage %s: set metalib %s, create dr_ref fail!", 
-            bpg_rsp_manage_name(mgr), metalib_name);
-        return -1;
-    }
-
-    mgr->m_request_meta = NULL;
-    mgr->m_response_meta = NULL;
-
-    return 0;
 }
 
 uint32_t bpg_rsp_manage_flags(bpg_rsp_manage_t mgr) {

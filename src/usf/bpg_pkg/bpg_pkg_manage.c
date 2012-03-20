@@ -47,6 +47,10 @@ bpg_pkg_manage_create(
     mgr->m_debug = 0;
     mgr->m_base_cvt = NULL;
     mgr->m_data_cvt = NULL;
+    mgr->m_metalib_ref = NULL;
+
+    mgr->m_cmd_meta_name[0] = 0;
+    mgr->m_cmd_meta = NULL;
 
     mgr->m_metalib_basepkg_ref =
         dr_ref_create(
@@ -80,6 +84,11 @@ static void bpg_pkg_manage_clear(gd_nm_node_t node) {
     if (mgr->m_metalib_basepkg_ref) {
         dr_ref_free(mgr->m_metalib_basepkg_ref);
         mgr->m_metalib_basepkg_ref = NULL;
+    }
+
+    if (mgr->m_metalib_ref) {
+        dr_ref_free(mgr->m_metalib_ref);
+        mgr->m_metalib_ref = NULL;
     }
 }
 
@@ -147,7 +156,6 @@ int bpg_pkg_manage_set_base_cvt(bpg_pkg_manage_t mgr, const char * cvt) {
     return 0;
 }
 
-
 dr_cvt_t bpg_pkg_manage_base_cvt(bpg_pkg_manage_t mgr) {
     return mgr->m_base_cvt;
 }
@@ -178,50 +186,66 @@ const char * bpg_pkg_manage_data_cvt_name(bpg_pkg_manage_t mgr) {
     return mgr->m_data_cvt ? dr_cvt_name(mgr->m_data_cvt) : "";
 }
 
-EXPORT_DIRECTIVE
-int bpg_pkg_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
-    bpg_pkg_manage_t bpg_pkg_manage;
+int bpg_pkg_manage_set_data_metalib(bpg_pkg_manage_t mgr, const char * metalib_name) {
+    assert(mgr);
+    assert(metalib_name);
 
-    bpg_pkg_manage = bpg_pkg_manage_create(app, gd_app_module_name(module), NULL);
-    if (bpg_pkg_manage == NULL) {
-        return -1;
-    }
+    if (mgr->m_metalib_ref) dr_ref_free(mgr->m_metalib_ref);
 
-    if (bpg_pkg_manage_set_base_cvt(bpg_pkg_manage, cfg_get_string(cfg, "base-cvt", NULL)) != 0) {
+    mgr->m_metalib_ref =
+        dr_ref_create(
+            dr_store_manage_default(mgr->m_app),
+            metalib_name);
+    if (mgr->m_metalib_ref == NULL) {
         CPE_ERROR(
-            gd_app_em(app), "%s: create: set base-cvt %s f1il",
-            gd_app_module_name(module), cfg_get_string(cfg, "base-cvt", NULL));
-        bpg_pkg_manage_free(bpg_pkg_manage);
+            mgr->m_em, "bpg_pkg_manage %s: set metalib %s, create dr_ref fail!", 
+            bpg_pkg_manage_name(mgr), metalib_name);
         return -1;
     }
 
-    if (bpg_pkg_manage_set_data_cvt(bpg_pkg_manage, cfg_get_string(cfg, "data-cvt", NULL)) != 0) {
-        CPE_ERROR(
-            gd_app_em(app), "%s: create: set data-cvt %s f1il",
-            gd_app_module_name(module), cfg_get_string(cfg, "data-cvt", NULL));
-        bpg_pkg_manage_free(bpg_pkg_manage);
-        return -1;
-    }
-
-    bpg_pkg_manage->m_debug = cfg_get_int32(cfg, "debug", 0);
-
-    if (bpg_pkg_manage->m_debug) {
-        CPE_INFO(
-            gd_app_em(app), "%s: create: done. base-cvt=%s, data-cvt=%s",
-            gd_app_module_name(module),
-            bpg_pkg_manage_base_cvt_name(bpg_pkg_manage),
-            bpg_pkg_manage_data_cvt_name(bpg_pkg_manage));
-    }
+    mgr->m_cmd_meta = NULL;
 
     return 0;
 }
 
-EXPORT_DIRECTIVE
-void bpg_pkg_manage_app_fini(gd_app_context_t app, gd_app_module_t module) {
-    bpg_pkg_manage_t bpg_pkg_manage;
+int bpg_pkg_manage_set_cmd_meta_name(bpg_pkg_manage_t mgr, const char * name) {
+    size_t name_len;
 
-    bpg_pkg_manage = bpg_pkg_manage_find_nc(app, gd_app_module_name(module));
-    if (bpg_pkg_manage) {
-        bpg_pkg_manage_free(bpg_pkg_manage);
+    name_len = strlen(name) + 1;
+    if (name_len > sizeof(mgr->m_cmd_meta_name)) {
+        CPE_ERROR(
+            mgr->m_em, "bpg_pkg_manage %s: set cmd meta name %s, name len overflow!", 
+            bpg_pkg_manage_name(mgr), name);
+        return -1;
     }
+
+    memcpy(mgr->m_cmd_meta_name, name, name_len);
+    mgr->m_cmd_meta = NULL;
+
+    return 0;
 }
+
+const char * bpg_pkg_manage_data_metalib_name(bpg_pkg_manage_t mgr) {
+    return mgr->m_metalib_ref ? dr_ref_lib_name(mgr->m_metalib_ref) : "???";
+}
+
+LPDRMETALIB bpg_pkg_manage_data_metalib(bpg_pkg_manage_t mgr) {
+    return mgr->m_metalib_ref ? dr_ref_lib(mgr->m_metalib_ref) : NULL;
+}
+
+LPDRMETA bpg_pkg_manage_cmd_meta(bpg_pkg_manage_t mgr) {
+    if (mgr->m_cmd_meta == NULL && mgr->m_cmd_meta_name[0]) {
+        LPDRMETALIB metalib = bpg_pkg_manage_data_metalib(mgr);
+        if (metalib) {
+            mgr->m_cmd_meta = dr_lib_find_meta_by_name(metalib, mgr->m_cmd_meta_name);
+        }
+    }
+
+    return mgr->m_cmd_meta;
+}
+
+const char *
+bpg_pkg_manage_cmd_meta_name(bpg_pkg_manage_t mgr) {
+    return mgr->m_cmd_meta_name;
+}
+
