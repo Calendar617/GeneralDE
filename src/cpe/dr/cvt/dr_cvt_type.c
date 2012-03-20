@@ -11,6 +11,8 @@ struct dr_cvt_type *
 dr_cvt_type_find(const char * name) {
     struct dr_cvt_type * type;
 
+    if (name == NULL) return NULL;
+
     if (TAILQ_EMPTY(&s_cvt_types)) dr_cvt_types_init();
 
     TAILQ_FOREACH(type, &s_cvt_types, m_next) {
