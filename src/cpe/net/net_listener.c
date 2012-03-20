@@ -13,13 +13,13 @@ int net_listener_listen(net_listener_t listener) {
         return -1;
     }
 
-    if(bind(listener->m_fd, (struct sockaddr *)&listener->m_addr, sizeof(listener->m_addr)) != 0) {
-        CPE_ERROR(listener->m_mgr->m_em, "%s: bind error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
+    if (net_socket_set_reuseaddr(listener->m_fd, listener->m_mgr->m_em)) {
         net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
     }
 
-    if (net_socket_set_reuseaddr(listener->m_fd, listener->m_mgr->m_em)) {
+    if(bind(listener->m_fd, (struct sockaddr *)&listener->m_addr, sizeof(listener->m_addr)) != 0) {
+        CPE_ERROR(listener->m_mgr->m_em, "%s: bind error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
     }
