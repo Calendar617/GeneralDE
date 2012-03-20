@@ -11,7 +11,6 @@ $(product).c.flags.ld:=-rdynamic \
                             app_net_runner \
                             dr_store_manage \
                             dr_store_loader \
-                            bpg_manage \
                             bpg_net_client \
                             , -u _$m_app_init -u _$m_app_fini)
 $(eval $(call product-def,$(product),tools))

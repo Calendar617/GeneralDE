@@ -59,7 +59,7 @@ int bpg_pkg_get_main_data(bpg_pkg_t pkg, LPDRMETA meta, void * buf, size_t * cap
     {
         CPE_ERROR(
             em, "bpg_pkg_get_data: %s decode data fail, input len is %d, output len is %d!",
-            dr_meta_name(meta), bpg_pkg_body_len(pkg), *capacity);
+            dr_meta_name(meta), bpg_pkg_body_len(pkg), (int)*capacity);
         return -1;
     }
 
@@ -128,7 +128,7 @@ int bpg_pkg_get_append_data(
     {
         CPE_ERROR(
             em, "bpg_pkg_get_append_info: %s decode data fail, input len is %d, output len is %d!",
-            dr_meta_name(meta), bpg_pkg_append_info_size(append_inf), *capacity);
+            dr_meta_name(meta), bpg_pkg_append_info_size(append_inf), (int)*capacity);
         return -1;
     }
 
