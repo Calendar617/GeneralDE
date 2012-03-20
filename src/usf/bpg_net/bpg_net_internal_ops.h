@@ -9,11 +9,11 @@ extern "C" {
 
 /*agent process*/
 void bpg_net_agent_accept(net_listener_t listener, net_ep_t ep, void * ctx);
-bpg_req_t bpg_net_agent_req_buf(bpg_net_agent_t mgr);
+bpg_pkg_t bpg_net_agent_req_buf(bpg_net_agent_t mgr);
 
 /*client process*/
 int bpg_net_client_ep_init(bpg_net_client_t client, net_ep_t ep);
-bpg_req_t bpg_net_client_req_buf(bpg_net_client_t mgr);
+bpg_pkg_t bpg_net_client_req_buf(bpg_net_client_t mgr);
 
 #ifdef __cplusplus
 }

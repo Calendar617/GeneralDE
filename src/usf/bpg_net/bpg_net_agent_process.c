@@ -5,29 +5,17 @@
 #include "cpe/net/net_endpoint.h"
 #include "gd/dp/dp_manage.h"
 #include "gd/app/app_context.h"
-#include "usf/bpg/bpg_req.h"
-#include "usf/bpg/bpg_manage.h"
+#include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/bpg_net/bpg_net_agent.h"
-#include "usf/dr_store/dr_ref.h"
 #include "bpg_net_internal_ops.h"
 
 static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
-    bpg_req_t req_buf;
-    dr_cvt_t cvt;
+    bpg_pkg_t req_buf;
 
     if(agent->m_debug) {
         CPE_INFO(
             agent->m_em, "%s: ep %d: on read",
             bpg_net_agent_name(agent), (int)net_ep_id(ep));
-    }
-
-    cvt = bpg_net_agent_cvt(agent);
-    if (cvt == NULL) {
-        CPE_ERROR(
-            agent->m_em, "%s: ep %d: get cvt fail!",
-            bpg_net_agent_name(agent), (int)net_ep_id(ep));
-        net_ep_close(ep);
-        return;
     }
 
     req_buf = bpg_net_agent_req_buf(agent);
@@ -59,15 +47,13 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
         }
 
         input_size = buf_size;
-        output_size = bpg_req_pkg_capacity(req_buf);
+        output_size = bpg_pkg_pkg_capacity(req_buf);
 
         cvt_result =
             dr_cvt_decode(
-                bpg_net_agent_cvt(agent),
-                dr_lib_find_meta_by_name(
-                    dr_ref_lib(agent->m_metalib_basepkg_ref),
-                    BPG_BASEPKG_META_NAME),
-                bpg_req_pkg_data(req_buf),
+                bpg_pkg_base_cvt(req_buf),
+                bpg_pkg_base_meta(req_buf),
+                bpg_pkg_pkg_data(req_buf),
                 &output_size,
                 buf, &input_size, agent->m_em, agent->m_debug);
         if (cvt_result != dr_cvt_result_not_enough_input) {
@@ -93,7 +79,7 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
                 bpg_net_agent_name(agent), (int)net_ep_id(ep), (int)output_size, (int)buf_size, (int)net_ep_size(ep));
         }
 
-        if (bpg_req_pkg_data_set_size(req_buf, output_size) != 0) {
+        if (bpg_pkg_pkg_data_set_size(req_buf, output_size) != 0) {
             CPE_ERROR(
                 agent->m_em, "%s: ep %d: bpg set size %d error!",
                 bpg_net_agent_name(agent), (int)net_ep_id(ep), (int)output_size);
@@ -105,13 +91,13 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
             CPE_ERROR(
                 agent->m_em, "%s: ep %d: read one request, cmd=%d, input-size=%d, output-size=%d!",
                 bpg_net_agent_name(agent), (int)net_ep_id(ep),
-                bpg_req_cmd(req_buf), (int)input_size, (int)output_size);
+                bpg_pkg_cmd(req_buf), (int)input_size, (int)output_size);
         }
 
-        if (gd_dp_dispatch_by_numeric(bpg_req_cmd(req_buf), bpg_req_to_dp_req(req_buf), agent->m_em) != 0) {
+        if (gd_dp_dispatch_by_numeric(bpg_pkg_cmd(req_buf), bpg_pkg_to_dp_req(req_buf), agent->m_em) != 0) {
             CPE_ERROR(
                 agent->m_em, "%s: ep %d: dispatch cmd %d error!",
-                bpg_net_agent_name(agent), (int)net_ep_id(ep), bpg_req_cmd(req_buf));
+                bpg_net_agent_name(agent), (int)net_ep_id(ep), bpg_pkg_cmd(req_buf));
         }
     }
 }

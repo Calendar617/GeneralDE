@@ -9,6 +9,7 @@ extern "C" {
 bpg_net_client_t
 bpg_net_client_create(
     gd_app_context_t app,
+    bpg_pkg_manage_t pkg_manage,
     const char * name,
     const char * ip,
     short port,
@@ -26,10 +27,6 @@ bpg_net_client_find_nc(gd_app_context_t app, const char * name);
 gd_app_context_t bpg_net_client_app(bpg_net_client_t client);
 const char * bpg_net_client_name(bpg_net_client_t client);
 cpe_hash_string_t bpg_net_client_name_hs(bpg_net_client_t client);
-
-int bpg_net_client_set_cvt(bpg_net_client_t req, const char * cvt_name);
-const char * bpg_net_client_cvt_name(bpg_net_client_t req);
-dr_cvt_t bpg_net_client_cvt(bpg_net_client_t req);
 
 net_connector_t bpg_net_client_connector(bpg_net_client_t req);
 

@@ -5,6 +5,7 @@
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/bpg_net/bpg_net_client.h"
+#include "usf/bpg_pkg/bpg_pkg_manage.h"
 #include "bpg_net_internal_types.h"
 
 EXPORT_DIRECTIVE
@@ -12,15 +13,23 @@ int bpg_net_client_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
     bpg_net_client_t bpg_net_client;
     const char * ip;
     short port;
-    int accept_queue_size;
+    bpg_pkg_manage_t pkg_manage;
+
+    pkg_manage = bpg_pkg_manage_find_nc(app, cfg_get_string(cfg, "pkg-manage", NULL));
+    if (pkg_manage == NULL) {
+        CPE_ERROR(
+            gd_app_em(app), "%s: create: pkg-manage %s not exist!",
+            gd_app_module_name(module),
+            cfg_get_string(cfg, "pkg-manage", "default"));
+        return -1;
+    }
 
     ip = cfg_get_string(cfg, "ip", "");
     port = cfg_get_int16(cfg, "port", 0);
-    accept_queue_size = cfg_get_int32(cfg, "accept-queue-size", 256);
 
     bpg_net_client =
         bpg_net_client_create(
-            app, gd_app_module_name(module),
+            app, pkg_manage, gd_app_module_name(module),
             ip, port,
             gd_app_alloc(app), gd_app_em(app));
     if (bpg_net_client == NULL) return -1;

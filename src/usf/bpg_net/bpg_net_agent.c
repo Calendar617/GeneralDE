@@ -4,10 +4,8 @@
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
 #include "gd/app/app_context.h"
-#include "usf/bpg/bpg_req.h"
+#include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/bpg_net/bpg_net_agent.h"
-#include "usf/dr_store/dr_ref.h"
-#include "usf/dr_store/dr_store_manage.h"
 #include "bpg_net_internal_ops.h"
 
 struct gd_nm_node_type s_nm_node_type_bpg_net_agent;
@@ -15,6 +13,7 @@ struct gd_nm_node_type s_nm_node_type_bpg_net_agent;
 bpg_net_agent_t
 bpg_net_agent_create(
     gd_app_context_t app,
+    bpg_pkg_manage_t pkg_manage,
     const char * name,
     const char * ip,
     short port,
@@ -25,6 +24,8 @@ bpg_net_agent_create(
     bpg_net_agent_t mgr;
     gd_nm_node_t mgr_node;
 
+    assert(app);
+    assert(pkg_manage);
     assert(name);
     assert(ip);
 
@@ -36,22 +37,12 @@ bpg_net_agent_create(
     mgr = (bpg_net_agent_t)gd_nm_node_data(mgr_node);
     mgr->m_alloc = alloc;
     mgr->m_app = app;
+    mgr->m_pkg_manage = pkg_manage;
     mgr->m_em = em;
     mgr->m_req_max_size = 4 * 1024;
     mgr->m_req_buf = NULL;
-    mgr->m_cvt = NULL;
 
     mgr->m_debug = 0;
-
-    mgr->m_metalib_basepkg_ref =
-        dr_ref_create(
-            dr_store_manage_default(mgr->m_app),
-            BPG_BASEPKG_LIB_NAME);
-    if (mgr->m_metalib_basepkg_ref == NULL) {
-        CPE_ERROR(em, "%s: create: create basepkg_ref fail!", name);
-        gd_nm_node_free(mgr_node);
-        return NULL;
-    }
 
     mgr->m_listener =
         net_listener_create(
@@ -63,7 +54,6 @@ bpg_net_agent_create(
             bpg_net_agent_accept,
             mgr);
     if (mgr->m_listener == NULL) {
-        dr_ref_free(mgr->m_metalib_basepkg_ref);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
@@ -77,19 +67,9 @@ static void bpg_net_agent_clear(gd_nm_node_t node) {
     bpg_net_agent_t mgr;
     mgr = (bpg_net_agent_t)gd_nm_node_data(node);
 
-    if (mgr->m_metalib_basepkg_ref) {
-        dr_ref_free(mgr->m_metalib_basepkg_ref);
-        mgr->m_metalib_basepkg_ref = NULL;
-    }
-
     if (mgr->m_req_buf) {
-        bpg_req_free(mgr->m_req_buf);
+        bpg_pkg_free(mgr->m_req_buf);
         mgr->m_req_buf = NULL;
-    }
-
-    if (mgr->m_cvt) {
-        dr_cvt_free(mgr->m_cvt);
-        mgr->m_cvt = NULL;
     }
 
     net_listener_free(mgr->m_listener);
@@ -135,46 +115,21 @@ bpg_net_agent_name_hs(bpg_net_agent_t mgr) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
 }
 
-int bpg_net_agent_set_cvt(bpg_net_agent_t mgr, const char * cvt_name) {
-    dr_cvt_t new_cvt;
-
-    if (mgr->m_cvt && strcmp(dr_cvt_name(mgr->m_cvt), cvt_name) == 0) return 0;
-
-    new_cvt = NULL;
-    if (cvt_name) {
-        new_cvt = dr_cvt_create(cvt_name);
-        if (new_cvt == NULL) return -1;
-    }
-
-    if (mgr->m_cvt) dr_cvt_free(mgr->m_cvt);
-
-    mgr->m_cvt = new_cvt;
-    return 0;
-}
-
-dr_cvt_t bpg_net_agent_cvt(bpg_net_agent_t mgr) {
-    return mgr->m_cvt;
-}
-
-const char * bpg_net_agent_cvt_name(bpg_net_agent_t mgr) {
-    return mgr->m_cvt ? dr_cvt_name(mgr->m_cvt) : "";
-}
-
 short bpg_net_agent_port(bpg_net_agent_t svr) {
     return net_listener_using_port(svr->m_listener);
 }
 
-bpg_req_t
+bpg_pkg_t
 bpg_net_agent_req_buf(bpg_net_agent_t mgr) {
     if (mgr->m_req_buf) {
-        if (bpg_req_pkg_capacity(mgr->m_req_buf) < mgr->m_req_max_size) {
-            bpg_req_free(mgr->m_req_buf);
+        if (bpg_pkg_pkg_capacity(mgr->m_req_buf) < mgr->m_req_max_size) {
+            bpg_pkg_free(mgr->m_req_buf);
             mgr->m_req_buf = NULL;
         }
     }
 
     if (mgr->m_req_buf == NULL) {
-        mgr->m_req_buf = bpg_req_create(mgr->m_app, mgr->m_req_max_size, NULL, 0);
+        mgr->m_req_buf = bpg_pkg_create(mgr->m_pkg_manage, mgr->m_req_max_size, NULL, 0);
     }
 
     return mgr->m_req_buf;
