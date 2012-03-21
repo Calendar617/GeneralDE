@@ -5,7 +5,7 @@
 #include "protocol/base/base_package.h"
 #include "bpg_pkg_internal_types.h"
 
-int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, void * buf, size_t capacity, error_monitor_t em) {
+int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, void const * buf, size_t capacity, error_monitor_t em) {
     struct basepkg_head * head;
     size_t cur_size;
     size_t use_size;
@@ -70,7 +70,7 @@ int bpg_pkg_get_main_data(bpg_pkg_t pkg, LPDRMETA meta, void * buf, size_t * cap
     return 0;
 }
 
-int bpg_pkg_add_append_data(bpg_pkg_t pkg, LPDRMETA meta, void * buf, size_t capacity, error_monitor_t em) {
+int bpg_pkg_add_append_data(bpg_pkg_t pkg, LPDRMETA meta, const void * buf, size_t capacity, error_monitor_t em) {
     struct basepkg * basepkg;
     struct AppendInfo * appendInfo;
     size_t cur_size;

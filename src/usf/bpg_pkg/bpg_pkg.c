@@ -187,6 +187,10 @@ dr_cvt_t bpg_pkg_base_cvt(bpg_pkg_t pkg) {
     return pkg->m_mgr->m_base_cvt;
 }
 
+LPDRMETALIB bpg_pkg_data_meta_lib(bpg_pkg_t pkg) {
+    return dr_ref_lib(pkg->m_mgr->m_metalib_basepkg_ref);
+}
+
 LPDRMETA bpg_pkg_base_meta(bpg_pkg_t pkg) {
     LPDRMETALIB metalib;
 

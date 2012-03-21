@@ -13,7 +13,9 @@ public:
     operator bpg_pkg_manage_t() const { return (bpg_pkg_manage_t)this; }
 
     Cpe::Utils::CString const & name(void) const { return Cpe::Utils::CString::_cast(bpg_pkg_manage_name(*this)); }
+
     Gd::App::Application & app(void) { return Gd::App::Application::_cast(bpg_pkg_manage_app(*this)); }
+    Gd::App::Application const & app(void) const { return Gd::App::Application::_cast(bpg_pkg_manage_app(*this)); }
     
     bpg_pkg_t createPackage(size_t capacity, LPDRMETA carry_data_meta = NULL, size_t carry_data_capacity = NULL);
 
