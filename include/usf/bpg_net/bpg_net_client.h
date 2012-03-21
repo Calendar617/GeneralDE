@@ -29,6 +29,7 @@ const char * bpg_net_client_name(bpg_net_client_t client);
 cpe_hash_string_t bpg_net_client_name_hs(bpg_net_client_t client);
 
 net_connector_t bpg_net_client_connector(bpg_net_client_t req);
+bpg_pkg_manage_t bpg_net_client_pkg_manage(bpg_net_client_t req);
 
 /* int bpg_net_client_send( */
 /*     bpg_net_client_t client, */

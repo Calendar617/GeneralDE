@@ -137,6 +137,10 @@ net_connector_t bpg_net_client_connector(bpg_net_client_t mgr) {
     return mgr->m_connector;
 }
 
+bpg_pkg_manage_t bpg_net_client_pkg_manage(bpg_net_client_t req) {
+    return req->m_pkg_manage;
+}
+
 static void bpg_net_client_clear(gd_nm_node_t node);
 
 struct gd_nm_node_type s_nm_node_type_bpg_net_client = {
