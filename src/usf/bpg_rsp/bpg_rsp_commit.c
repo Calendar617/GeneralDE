@@ -72,6 +72,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
     bpg_pkg_set_client_id(response_buf, bpg_private->clientId);
     bpg_pkg_set_errno(response_buf, logic_context_errno(op_context));
     bpg_pkg_set_cmd(response_buf, bpg_private->cmd);
+    bpg_pkg_set_connection_id(response_buf, bpg_private->connectionId);
 
     if (bpg_rsp_copy_ctx_to_pkg(bpg_rsp, op_context, bpg_pkg_pkg_capacity(response_buf), em) != 0) return;
 

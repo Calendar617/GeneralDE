@@ -16,6 +16,8 @@ typedef struct bpg_pkg_append_info * bpg_pkg_append_info_t;
 #define BPG_BASEPKG_LIB_NAME "basepkg"
 #define BPG_BASEPKG_META_NAME "basepkg"
 
+#define BPG_INVALID_CONNECTION_ID ((int64_t)-1)
+
 #ifdef __cplusplus
 }
 #endif

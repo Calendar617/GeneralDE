@@ -21,6 +21,9 @@ void bpg_pkg_free(bpg_pkg_t pkg);
 
 bpg_pkg_manage_t bpg_pkg_mgr(bpg_pkg_t pkg);
 
+int64_t bpg_pkg_connection_id(bpg_pkg_t pkg);
+void bpg_pkg_set_connection_id(bpg_pkg_t pkg, int64_t connection_id);
+
 LPDRMETA bpg_pkg_carry_data_meta(bpg_pkg_t pkg);
 size_t bpg_pkg_carry_data_capacity(bpg_pkg_t pkg);
 

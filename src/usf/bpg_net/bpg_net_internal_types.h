@@ -1,5 +1,6 @@
 #ifndef USF_BPG_NET_INTERNAL_TYPES_H
 #define USF_BPG_NET_INTERNAL_TYPES_H
+#include "cpe/utils/hash.h"
 #include "cpe/net/net_types.h"
 #include "usf/bpg_net/bpg_net_types.h"
 
@@ -16,10 +17,22 @@ struct bpg_net_agent {
 
     size_t m_req_max_size;
     bpg_pkg_t m_req_buf;
+    struct mem_buffer m_rsp_buf;
 
     gd_dp_rsp_t m_reply_rsp;
 
+    struct cpe_hash_table m_cliensts;
+    struct cpe_hash_table m_connections;
+
     int m_debug;
+};
+
+struct bpg_net_agent_binding {
+    uint64_t m_client_id;
+    int64_t m_connection_id;
+
+    struct cpe_hash_entry m_hh_client;
+    struct cpe_hash_entry m_hh_connection;
 };
 
 struct bpg_net_client {

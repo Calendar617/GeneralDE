@@ -46,9 +46,37 @@ bpg_net_agent_create(
     mgr->m_req_buf = NULL;
     mgr->m_debug = 0;
 
+    mem_buffer_init(&mgr->m_rsp_buf, alloc);
+
+    if (cpe_hash_table_init(
+            &mgr->m_cliensts,
+            alloc,
+            (cpe_hash_fun_t) bpg_net_agent_binding_client_id_hash,
+            (cpe_hash_cmp_t) bpg_net_agent_binding_client_id_cmp,
+            CPE_HASH_OBJ2ENTRY(bpg_net_agent_binding, m_hh_client),
+            -1) != 0)
+    {
+        gd_nm_node_free(mgr_node);
+        return NULL;
+    }
+
+    if (cpe_hash_table_init(
+            &mgr->m_connections,
+            alloc,
+            (cpe_hash_fun_t) bpg_net_agent_binding_connection_id_hash,
+            (cpe_hash_cmp_t) bpg_net_agent_binding_connection_id_cmp,
+            CPE_HASH_OBJ2ENTRY(bpg_net_agent_binding, m_hh_connection),
+            -1) != 0)
+    {
+        cpe_hash_table_fini(&mgr->m_cliensts);
+        gd_nm_node_free(mgr_node);
+        return NULL;
+    }
+
     snprintf(name_buf, sizeof(name_buf), "%s.reply-rsp", name);
     mgr->m_reply_rsp = gd_dp_rsp_create(gd_app_dp_mgr(app), name_buf);
     if (mgr->m_reply_rsp == NULL) {
+        mem_buffer_clear(&mgr->m_rsp_buf);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
@@ -63,6 +91,7 @@ bpg_net_agent_create(
             bpg_net_agent_accept,
             mgr);
     if (mgr->m_listener == NULL) {
+        mem_buffer_clear(&mgr->m_rsp_buf);
         gd_dp_rsp_free(mgr->m_reply_rsp);
         gd_nm_node_free(mgr_node);
         return NULL;
@@ -76,6 +105,8 @@ bpg_net_agent_create(
 static void bpg_net_agent_clear(gd_nm_node_t node) {
     bpg_net_agent_t mgr;
     mgr = (bpg_net_agent_t)gd_nm_node_data(node);
+
+    mem_buffer_clear(&mgr->m_rsp_buf);
 
     gd_dp_rsp_free(mgr->m_reply_rsp);
     mgr->m_reply_rsp = NULL;

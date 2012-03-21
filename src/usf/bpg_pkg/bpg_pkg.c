@@ -33,6 +33,7 @@ bpg_pkg_create(
     bpg_pkg = (bpg_pkg_t)gd_dp_req_data(dp_req);
 
     bpg_pkg->m_mgr = mgr;
+    bpg_pkg->m_connection_id = BPG_INVALID_CONNECTION_ID;
     bpg_pkg->m_carry_data_meta = carry_data_meta;
     bpg_pkg->m_carry_data_size = 0;
     bpg_pkg->m_carry_data_capacity = carry_data_capacity;
@@ -45,6 +46,14 @@ bpg_pkg_create(
 
 void bpg_pkg_free(bpg_pkg_t req) {
     gd_dp_req_free(req->m_dp_req);
+}
+
+int64_t bpg_pkg_connection_id(bpg_pkg_t pkg) {
+    return pkg->m_connection_id;
+}
+
+void bpg_pkg_set_connection_id(bpg_pkg_t pkg, int64_t connection_id) {
+    pkg->m_connection_id = connection_id;
 }
 
 LPDRMETA bpg_pkg_carry_data_meta(bpg_pkg_t req) {
@@ -95,6 +104,8 @@ void bpg_pkg_init(bpg_pkg_t bpg_pkg) {
     struct basepkg_head * head;
 
     bpg_pkg_pkg_data_set_size(bpg_pkg, sizeof(struct basepkg_head));
+
+    bpg_pkg->m_connection_id = BPG_INVALID_CONNECTION_ID;
 
     head = (struct basepkg_head *)bpg_pkg_pkg_data(bpg_pkg);
     bzero(head, sizeof(struct basepkg_head));
