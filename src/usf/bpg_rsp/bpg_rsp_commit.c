@@ -29,7 +29,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
 
     em = bpg_mgr->m_em;
 
-    if (bpg_mgr->m_send_to == NULL) {
+    if (bpg_mgr->m_commit_to == NULL) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_commit: no send-to configured, ignore commit!",
             bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
@@ -76,7 +76,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
 
     if (bpg_rsp_copy_ctx_to_pkg(bpg_rsp, op_context, bpg_pkg_pkg_capacity(response_buf), em) != 0) return;
 
-    if (gd_dp_dispatch_by_string(bpg_mgr->m_send_to, bpg_pkg_to_dp_req(response_buf), em) != 0) {
+    if (gd_dp_dispatch_by_string(bpg_mgr->m_commit_to, bpg_pkg_to_dp_req(response_buf), em) != 0) {
         CPE_ERROR(em, "%s.%s: bpg_rsp_commit: dispatch fail!", bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
         return;
     }

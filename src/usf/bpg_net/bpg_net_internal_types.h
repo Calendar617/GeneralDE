@@ -48,6 +48,13 @@ struct bpg_net_client {
     int m_debug;
 };
 
+typedef enum bpg_net_pkg_next_step {
+    bpg_net_pkg_next_go_with_connection_id
+    , bpg_net_pkg_next_go_without_connection_id
+    , bpg_net_pkg_next_ignore
+    , bpg_net_pkg_next_close
+} bpg_net_pkg_next_step_t;
+
 #ifdef __cplusplus
 }
 #endif

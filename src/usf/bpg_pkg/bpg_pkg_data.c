@@ -22,6 +22,8 @@ int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, void * buf, size_t capac
     }
 
     cur_size = sizeof(struct basepkg_head);
+    assert(cur_size == bpg_pkg_pkg_data_size(pkg));
+
     use_size = bpg_pkg_pkg_capacity(pkg) - cur_size;
 
     if (dr_cvt_encode(

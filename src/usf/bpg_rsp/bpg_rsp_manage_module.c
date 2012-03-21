@@ -16,9 +16,7 @@ int bpg_rsp_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
     bpg_rsp_manage_t bpg_rsp_manage;
     logic_manage_t logic_mgr;
     cfg_t child_cfg;
-    int debug;
-
-    debug = cfg_get_int32(cfg, "debug", 0);
+    const char * commit_to;
 
     logic_mgr = logic_manage_find_nc(app, cfg_get_string(cfg, "logic-manage", NULL));
     if (logic_mgr == NULL) {
@@ -45,13 +43,16 @@ int bpg_rsp_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
     bpg_rsp_manage->m_rsp_max_size =
         cfg_get_uint32(cfg, "rsp-max-size", bpg_rsp_manage->m_rsp_max_size);
 
-    bpg_rsp_manage->m_debug = debug;
+    bpg_rsp_manage->m_debug = cfg_get_int32(cfg, "debug", 0);
+
+    commit_to = cfg_get_string(cfg, "commit-to", NULL);
+    if (commit_to) bpg_rsp_manage_set_commit_to(bpg_rsp_manage, commit_to);
 
     if (bpg_rsp_manage->m_debug) {
         CPE_INFO(
             gd_app_em(app),
-            "%s: create: done. rsp-max-size=%d",
-            gd_app_module_name(module), (int)bpg_rsp_manage->m_rsp_max_size);
+            "%s: create: done. rsp-max-size=%d, send-to=%s",
+            gd_app_module_name(module), (int)bpg_rsp_manage->m_rsp_max_size, commit_to ? commit_to : "???");
     }
 
     return 0;

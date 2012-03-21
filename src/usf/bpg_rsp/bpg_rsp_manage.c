@@ -63,7 +63,7 @@ bpg_rsp_manage_create(
 
     mgr->m_debug = 0;
 
-    mgr->m_send_to = NULL;
+    mgr->m_commit_to = NULL;
 
     gd_nm_node_set_type(mgr_node, &s_nm_node_type_bpg_rsp_manage);
 
@@ -79,9 +79,9 @@ static void bpg_rsp_manage_clear(gd_nm_node_t node) {
         mgr->m_rsp_buf = NULL;
     }
 
-    if (mgr->m_send_to) {
-        mem_free(mgr->m_alloc, mgr->m_send_to);
-        mgr->m_send_to = NULL;
+    if (mgr->m_commit_to) {
+        mem_free(mgr->m_alloc, mgr->m_commit_to);
+        mgr->m_commit_to = NULL;
     }
 }
 
@@ -134,18 +134,18 @@ bpg_rsp_manage_name_hs(bpg_rsp_manage_t mgr) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
 }
 
-const char * bpg_rsp_manage_send_to(bpg_rsp_manage_t mgr) {
-    return mgr->m_send_to ? cpe_hs_data(mgr->m_send_to) : NULL;
+const char * bpg_rsp_manage_commit_to(bpg_rsp_manage_t mgr) {
+    return mgr->m_commit_to ? cpe_hs_data(mgr->m_commit_to) : NULL;
 }
 
-int bpg_rsp_manage_set_send_to(bpg_rsp_manage_t mgr, const char * name) {
-    cpe_hash_string_t new_send_to;
+int bpg_rsp_manage_set_commit_to(bpg_rsp_manage_t mgr, const char * name) {
+    cpe_hash_string_t new_commit_to;
 
-    new_send_to = cpe_hs_create(mgr->m_alloc, name);
-    if (new_send_to == NULL) return -1;
+    new_commit_to = cpe_hs_create(mgr->m_alloc, name);
+    if (new_commit_to == NULL) return -1;
 
-    if (mgr->m_send_to) mem_free(mgr->m_alloc, mgr->m_send_to);
-    mgr->m_send_to = new_send_to;
+    if (mgr->m_commit_to) mem_free(mgr->m_alloc, mgr->m_commit_to);
+    mgr->m_commit_to = new_commit_to;
 
     return 0;
 }

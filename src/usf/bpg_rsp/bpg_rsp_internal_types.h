@@ -28,7 +28,7 @@ struct bpg_rsp_manage {
 
     int m_debug;
 
-    cpe_hash_string_t m_send_to;
+    cpe_hash_string_t m_commit_to;
 };
 
 struct bpg_rsp_copy_info {

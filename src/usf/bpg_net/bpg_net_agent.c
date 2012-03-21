@@ -56,6 +56,7 @@ bpg_net_agent_create(
             CPE_HASH_OBJ2ENTRY(bpg_net_agent_binding, m_hh_client),
             -1) != 0)
     {
+        mem_buffer_clear(&mgr->m_rsp_buf);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
@@ -69,6 +70,7 @@ bpg_net_agent_create(
             -1) != 0)
     {
         cpe_hash_table_fini(&mgr->m_cliensts);
+        mem_buffer_clear(&mgr->m_rsp_buf);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
@@ -76,10 +78,13 @@ bpg_net_agent_create(
     snprintf(name_buf, sizeof(name_buf), "%s.reply-rsp", name);
     mgr->m_reply_rsp = gd_dp_rsp_create(gd_app_dp_mgr(app), name_buf);
     if (mgr->m_reply_rsp == NULL) {
+        cpe_hash_table_fini(&mgr->m_cliensts);
+        cpe_hash_table_fini(&mgr->m_connections);
         mem_buffer_clear(&mgr->m_rsp_buf);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
+    gd_dp_rsp_set_processor(mgr->m_reply_rsp, bpg_net_agent_reply, mgr);
 
     mgr->m_listener =
         net_listener_create(
@@ -91,6 +96,8 @@ bpg_net_agent_create(
             bpg_net_agent_accept,
             mgr);
     if (mgr->m_listener == NULL) {
+        cpe_hash_table_fini(&mgr->m_cliensts);
+        cpe_hash_table_fini(&mgr->m_connections);
         mem_buffer_clear(&mgr->m_rsp_buf);
         gd_dp_rsp_free(mgr->m_reply_rsp);
         gd_nm_node_free(mgr_node);
@@ -106,7 +113,11 @@ static void bpg_net_agent_clear(gd_nm_node_t node) {
     bpg_net_agent_t mgr;
     mgr = (bpg_net_agent_t)gd_nm_node_data(node);
 
+    bpg_net_agent_binding_free_all(mgr);
+
     mem_buffer_clear(&mgr->m_rsp_buf);
+    cpe_hash_table_fini(&mgr->m_cliensts);
+    cpe_hash_table_fini(&mgr->m_connections);
 
     gd_dp_rsp_free(mgr->m_reply_rsp);
     mgr->m_reply_rsp = NULL;
