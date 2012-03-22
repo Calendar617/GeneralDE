@@ -23,7 +23,6 @@ int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, void const * buf, size_t
     }
 
     cur_size = sizeof(struct basepkg_head);
-    printf("capacity=%d\n", capacity);
 
     use_size = bpg_pkg_pkg_capacity(pkg) - cur_size;
     input_size = capacity;
