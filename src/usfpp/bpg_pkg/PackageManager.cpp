@@ -1,8 +1,37 @@
+#include "cpepp/dr/Meta.hpp"
+#include "cpepp/dr/MetaLib.hpp"
 #include "gdpp/app/Log.hpp"
 #include "usf/bpg_pkg/bpg_pkg.h"
 #include "usfpp/bpg_pkg/PackageManager.hpp"
 
 namespace Usf { namespace Bpg {
+
+Cpe::Dr::MetaLib const & PackageManager::dataMetaLib(void) const {
+    LPDRMETALIB metalib = bpg_pkg_manage_data_metalib(*this);
+    if (metalib == NULL) {
+        APP_CTX_THROW_EXCEPTION(
+            app(),
+            ::std::runtime_error,
+            "bpg_pkg_manage %s: no data metalib",
+            name().c_str());
+    }
+
+    return Cpe::Dr::MetaLib::_cast(metalib);
+}
+
+Cpe::Dr::Meta const &
+PackageManager::cmdMeta(void) const {
+    LPDRMETA meta = bpg_pkg_manage_cmd_meta(*this);
+    if (meta == NULL) {
+        APP_CTX_THROW_EXCEPTION(
+            app(),
+            ::std::runtime_error,
+            "%s: Usf::Bpg::Package::cmdMeta: not cmd meta!",
+            name().c_str());
+    }
+
+    return Cpe::Dr::Meta::_cast(meta);
+}
 
 bpg_pkg_t PackageManager::createPackage(size_t capacity, LPDRMETA carry_data_meta, size_t carry_data_capacity) {
     bpg_pkg_t pkg = bpg_pkg_create(*this, capacity, carry_data_meta, carry_data_capacity);

@@ -16,6 +16,9 @@ public:
 
     Gd::App::Application & app(void) { return Gd::App::Application::_cast(bpg_pkg_manage_app(*this)); }
     Gd::App::Application const & app(void) const { return Gd::App::Application::_cast(bpg_pkg_manage_app(*this)); }
+
+    Cpe::Dr::MetaLib const & dataMetaLib(void) const;
+    Cpe::Dr::Meta const & cmdMeta(void) const;
     
     bpg_pkg_t createPackage(size_t capacity, LPDRMETA carry_data_meta = NULL, size_t carry_data_capacity = NULL);
 
