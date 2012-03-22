@@ -12,6 +12,8 @@ public:
     operator LPDRMETAENTRY (void) const { return (LPDRMETAENTRY)this; }
 
     int version(void) const { return dr_entry_version(*this); }
+    int id(void) const { return dr_entry_id(*this); }
+
     Utils::CString const & name(void) const { return Utils::CString::_cast(dr_entry_name(*this)); }
     Utils::CString const & cname(void) const { return Utils::CString::_cast(dr_entry_cname(*this)); }
     Utils::CString const & desc(void) const { return Utils::CString::_cast(dr_entry_desc(*this)); }
