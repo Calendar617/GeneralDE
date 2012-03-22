@@ -10,6 +10,7 @@
 #include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/bpg_pkg/bpg_pkg_manage.h"
 #include "usf/bpg_rsp/bpg_rsp_manage.h"
+#include "usf/bpg_rsp/bpg_rsp_pkg_builder.h"
 #include "bpg_rsp_internal_ops.h"
 
 static void bpg_rsp_manage_clear(gd_nm_node_t node);
@@ -65,6 +66,8 @@ bpg_rsp_manage_create(
 
     mgr->m_commit_to = NULL;
 
+    TAILQ_INIT(&mgr->m_pkg_builders);
+
     gd_nm_node_set_type(mgr_node, &s_nm_node_type_bpg_rsp_manage);
 
     return mgr;
@@ -73,6 +76,10 @@ bpg_rsp_manage_create(
 static void bpg_rsp_manage_clear(gd_nm_node_t node) {
     bpg_rsp_manage_t mgr;
     mgr = (bpg_rsp_manage_t)gd_nm_node_data(node);
+
+    while(!TAILQ_EMPTY(&mgr->m_pkg_builders)) {
+        bpg_rsp_pkg_builder_free(TAILQ_FIRST(&mgr->m_pkg_builders));
+    }
 
     if (mgr->m_rsp_buf) {
         bpg_pkg_free(mgr->m_rsp_buf);

@@ -1,4 +1,6 @@
 #include <assert.h>
+#include "cpe/dr/dr_metalib_manage.h"
+#include "usf/bpg_pkg/bpg_pkg.h"
 #include "bpg_rsp_internal_ops.h"
 
 struct bpg_rsp_copy_info *
@@ -16,9 +18,9 @@ bpg_rsp_copy_info_create(bpg_rsp_manage_t mgr, const char * data_name) {
 }
 
 void bpg_rsp_copy_info_free(bpg_rsp_manage_t mgr, struct bpg_rsp_copy_info * copy_info) {
-        mem_free(mgr->m_alloc, copy_info);
+    mem_free(mgr->m_alloc, copy_info);
 }
 
-int bpg_rsp_copy_ctx_to_pdu(bpg_rsp_t rsp, logic_context_t op_context, void * pkg) {
-    return 0;
+const char * bpg_rsp_copy_info_data(struct bpg_rsp_copy_info * copy_info) {
+    return (const char *)(copy_info + 1);
 }

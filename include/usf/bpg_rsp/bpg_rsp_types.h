@@ -25,8 +25,18 @@ typedef struct bpg_rsp_manage * bpg_rsp_manage_t;
 typedef struct bpg_rsp * bpg_rsp_t;
 typedef struct bpg_rsp_carry_info * bpg_rsp_carry_info_t;
 
+typedef struct bpg_rsp_pkg_builder * bpg_rsp_pkg_builder_t;
+
 typedef int (*bpg_logic_ctx_init_fun_t)(logic_context_t context, void * ctx);
 typedef void (*bpg_logic_ctx_fini_fun_t)(logic_context_t context, void * ctx);
+
+typedef enum bpg_pkg_build_result {
+    bpg_pkg_build_result_success
+    , bpg_pkg_build_result_fail
+    , bpg_pkg_build_result_unknown
+} bpg_pkg_build_result_t;
+
+typedef bpg_pkg_build_result_t (*bpg_pkg_build_fun_t)(bpg_pkg_t pkg, logic_context_t context, void * ctx);
 
 #ifdef __cplusplus
 }

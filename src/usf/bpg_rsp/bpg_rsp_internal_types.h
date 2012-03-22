@@ -11,6 +11,8 @@
 extern "C" {
 #endif
 
+typedef TAILQ_HEAD(bpg_rsp_pkg_builder_list, bpg_rsp_pkg_builder) bpg_rsp_pkg_builder_list_t;
+
 struct bpg_rsp_manage {
     gd_app_context_t m_app;
     mem_allocrator_t m_alloc;
@@ -25,6 +27,8 @@ struct bpg_rsp_manage {
 
     size_t m_rsp_max_size;
     bpg_pkg_t m_rsp_buf;
+
+    bpg_rsp_pkg_builder_list_t m_pkg_builders;
 
     int m_debug;
 
@@ -43,6 +47,14 @@ struct bpg_rsp {
     uint32_t m_flags;
 
     bpg_rsp_copy_info_list_t m_ctx_to_pdu;
+};
+
+struct bpg_rsp_pkg_builder {
+    bpg_rsp_manage_t m_mgr;
+    bpg_pkg_build_fun_t m_build_fun;
+    void * m_build_ctx;
+
+    TAILQ_ENTRY(bpg_rsp_pkg_builder) m_next;
 };
 
 #ifdef __cplusplus

@@ -20,6 +20,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data);
 /*bpg_rsp_copy_info ops*/
 struct bpg_rsp_copy_info * bpg_rsp_copy_info_create(bpg_rsp_manage_t mgr, const char * data_name);
 void bpg_rsp_copy_info_free(bpg_rsp_manage_t mgr, struct bpg_rsp_copy_info * copy_info);
+const char * bpg_rsp_copy_info_data(struct bpg_rsp_copy_info * copy_info);
 
 #ifdef __cplusplus
 }
