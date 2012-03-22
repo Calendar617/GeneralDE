@@ -13,8 +13,7 @@
 #include "bpg_rsp_internal_ops.h"
 
 static int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t req, error_monitor_t em);
-static int bpg_rsp_copy_req_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t bpg_req, error_monitor_t em);
-static int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t bpg_req, error_monitor_t em);
+static void bpg_rsp_commit_error(bpg_rsp_t rsp, logic_context_t op_context, int err);
 
 int bpg_rsp_execute(gd_dp_req_t dp_req, void * ctx, error_monitor_t em) {
     bpg_rsp_t bpg_rsp;
@@ -43,25 +42,20 @@ int bpg_rsp_execute(gd_dp_req_t dp_req, void * ctx, error_monitor_t em) {
         return 0;
     }
 
-    op_context =
-        logic_context_create(
-            bpg_mgr->m_logic_mgr,
-            bpg_rsp_manage_flag_is_enable(bpg_mgr, bpg_rsp_manage_flag_sn_use_client)
-            ? bpg_pkg_sn(req)
-            : INVALID_LOGIC_CONTEXT_ID,
-            bpg_mgr->m_ctx_capacity);
+    op_context = bpg_rsp_manage_create_context(bpg_mgr, req, em);
     if (op_context == NULL) {
         CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: create context fail, capacity is %d!",
-            bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp), (int)bpg_mgr->m_ctx_capacity);
+            em, "%s.%s: bpg_rsp_execute: create op_context for pkg fail!",
+            bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
         return 0;
     }
 
+    /*aft user init, we should commit any error*/
     if (bpg_rsp_copy_pkg_to_ctx(bpg_rsp, op_context, req, em) != 0) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_execute: copy data from pdu to context!",
             bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
-        logic_context_free(op_context);
+        bpg_rsp_commit_error(bpg_rsp, op_context, -1);
         return 0;
     }
 
@@ -69,17 +63,7 @@ int bpg_rsp_execute(gd_dp_req_t dp_req, void * ctx, error_monitor_t em) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_execute: bind executor to context fail!",
             bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
-        logic_context_free(op_context);
-        return 0;
-    }
-
-    if (bpg_rsp_copy_req_carry_data_to_ctx(bpg_rsp, op_context, req, em) != 0) {
-        logic_context_free(op_context);
-        return 0;
-    }
-
-    if (bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp, op_context, req, em) != 0) {
-        logic_context_free(op_context);
+        bpg_rsp_commit_error(bpg_rsp, op_context, -1);
         return 0;
     }
 
@@ -197,11 +181,9 @@ int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t
     return 0;
 }
 
-int bpg_rsp_copy_req_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t bpg_req, error_monitor_t em) {
+int bpg_rsp_copy_req_carry_data_to_ctx(bpg_rsp_manage_t mgr, logic_context_t op_context, bpg_pkg_t bpg_req, error_monitor_t em) {
     LPDRMETA carry_meta;
     logic_data_t data;
-    bpg_rsp_manage_t mgr;
-    mgr = rsp->m_mgr;
 
     carry_meta = bpg_pkg_carry_data_meta(bpg_req);
     if (carry_meta == NULL) return 0;
@@ -209,8 +191,8 @@ int bpg_rsp_copy_req_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context
     data = logic_data_get_or_create(op_context, carry_meta, bpg_pkg_carry_data_size(bpg_req));
     if (data == NULL) {
         CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: copy_carry_data: %s create data fail, size=%d!",
-            bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp),
+            em, "%s: copy_req_carry_data: %s create data fail, size=%d!",
+            bpg_rsp_manage_name(mgr),
             dr_meta_name(carry_meta), (int)bpg_pkg_carry_data_size(bpg_req));
         return -1;
     }
@@ -221,27 +203,26 @@ int bpg_rsp_copy_req_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context
 
 extern char g_metalib_caary_package[];
 
-int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t bpg_req, error_monitor_t em) {
+int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_manage_t mgr, logic_context_t op_context, bpg_pkg_t bpg_req, error_monitor_t em) {
     LPDRMETA bpg_carry_data_meta;
     logic_data_t data;
     struct bpg_carry_info * buf;
-    bpg_rsp_manage_t mgr;
 
-    mgr = rsp->m_mgr;
+    if (bpg_req == NULL) return 0;
 
     bpg_carry_data_meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_caary_package, "bpg_carry_info");
     if (bpg_carry_data_meta == NULL) {
         CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: copy_bpg_carry_data: bpg_carry_info meta not exist!",
-            bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp));
+            em, "%s: copy_bpg_carry_data: bpg_carry_info meta not exist!",
+            bpg_rsp_manage_name(mgr));
         return -1;
     }
 
     data = logic_data_get_or_create(op_context, bpg_carry_data_meta, dr_meta_size(bpg_carry_data_meta));
     if (data == NULL) {
         CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: copy_bpg_carry_data: %s create data fail, size=%d!",
-            bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp),
+            em, "%s: copy_bpg_carry_data: %s create data fail, size=%d!",
+            bpg_rsp_manage_name(mgr),
             dr_meta_name(bpg_carry_data_meta), (int)dr_meta_size(bpg_carry_data_meta));
         return -1;
     }
@@ -263,3 +244,49 @@ int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_t rsp, logic_context_t op_context
 
     return 0;
 }
+
+static void bpg_rsp_commit_error(bpg_rsp_t rsp, logic_context_t op_context, int err) {
+    logic_context_errno_set(op_context, err);
+    bpg_rsp_commit(op_context, rsp);
+}
+
+logic_context_t bpg_rsp_manage_create_context(bpg_rsp_manage_t bpg_mgr, bpg_pkg_t req, error_monitor_t em) {
+    logic_context_t op_context;
+
+    op_context =
+        logic_context_create(
+            bpg_mgr->m_logic_mgr,
+            bpg_rsp_manage_flag_is_enable(bpg_mgr, bpg_rsp_manage_flag_sn_use_client)
+            ? bpg_pkg_sn(req)
+            : INVALID_LOGIC_CONTEXT_ID,
+            bpg_mgr->m_ctx_capacity);
+    if (op_context == NULL) {
+        CPE_ERROR(
+            em, "%s: create context: fail, capacity is %d!",
+            bpg_rsp_manage_name(bpg_mgr), (int)bpg_mgr->m_ctx_capacity);
+        return NULL;
+    }
+
+    if (bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_mgr, op_context, req, em) != 0) {
+        logic_context_free(op_context);
+        return NULL;
+    }
+
+    if (bpg_rsp_copy_req_carry_data_to_ctx(bpg_mgr, op_context, req, em) != 0) {
+        logic_context_free(op_context);
+        return NULL;
+    }
+
+    if (bpg_mgr->m_ctx_init) {
+        if (bpg_mgr->m_ctx_init(op_context, req, bpg_mgr->m_ctx_ctx) != 0) {
+            CPE_ERROR(
+                em, "%s: create context: use-ctx-init: init fail!",
+                bpg_rsp_manage_name(bpg_mgr));
+            logic_context_free(op_context);
+            return NULL;
+        }
+    }
+    
+    return op_context;
+}
+

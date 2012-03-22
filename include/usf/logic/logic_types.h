@@ -54,7 +54,7 @@ typedef struct logic_executor * logic_executor_t;
 typedef struct logic_executor_type * logic_executor_type_t;
 typedef struct logic_executor_type_group * logic_executor_type_group_t;
 
-typedef int32_t (*logic_op_fun_t) (logic_context_t ctx, void * user_data, cfg_t cfg);
+typedef int32_t (*logic_op_fun_t) (logic_context_t ctx, logic_executor_t executor, void * user_data, cfg_t cfg);
 
 typedef enum logic_context_decorate_tag {
     logic_context_decorate_begin,

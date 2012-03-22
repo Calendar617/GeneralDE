@@ -275,7 +275,7 @@ uint32_t bpg_pkg_body_len(bpg_pkg_t pkg) {
 uint32_t bpg_pkg_body_origin_len(bpg_pkg_t pkg) {
     struct basepkg_head * head;
     head = (struct basepkg_head *)bpg_pkg_pkg_data(pkg);
-    return head->bodylen;
+    return head->originBodyLen;
 }
 
 int32_t bpg_pkg_append_info_count(bpg_pkg_t pkg) {

@@ -85,7 +85,7 @@ void logic_stack_exec(struct logic_stack * stack, int32_t stop_stack_pos, logic_
             if (stack_item->m_executr->m_type->m_category == logic_executor_category_basic) {
                 struct logic_executor_basic * basic = (struct logic_executor_basic *)stack_item->m_executr;
                 if (basic->m_type->m_op) {
-                    rv = ((logic_op_fun_t)basic->m_type->m_op)(ctx, basic->m_type->m_ctx, basic->m_args);
+                    rv = ((logic_op_fun_t)basic->m_type->m_op)(ctx, stack_item->m_executr, basic->m_type->m_ctx, basic->m_args);
                 }
                 else {
                     CPE_ERROR(gd_app_em(ctx->m_mgr->m_app), "logic_stack_exec: basic logic op %s have no op!", basic->m_type->m_name);

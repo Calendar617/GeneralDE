@@ -25,7 +25,7 @@ public:
 private:
     execute_fun m_exec_fun;
 
-    static int32_t logic_op_adapter(logic_context_t ctx, void * user_data, cfg_t cfg);
+    static int32_t logic_op_adapter(logic_context_t ctx, logic_executor_t executor, void * user_data, cfg_t cfg);
 };
 
 template<typename OutT, typename ContextT>

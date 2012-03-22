@@ -34,6 +34,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_commit: no send-to configured, ignore commit!",
             bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
+        bpg_rsp_manage_free_context(bpg_mgr, op_context);
         return;
     }
 
@@ -42,6 +43,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_commit: no bpg_carry_info in context!",
             bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
+        bpg_rsp_manage_free_context(bpg_mgr, op_context);
         return;
     }
 
@@ -53,6 +55,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
             CPE_ERROR(
                 em, "%s.%s: bpg_rsp_commit: no caary data %s in context!",
                 bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp), bpg_private->carry_meta_name);
+            bpg_rsp_manage_free_context(bpg_mgr, op_context);
             return;
         }
     }
@@ -65,6 +68,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
             bpg_carry_data ? logic_data_capacity(bpg_carry_data): 0);
     if (response_buf == NULL) {
         CPE_ERROR(em, "%s: bpg_rsp_commit: response buf is NULL!", bpg_rsp_manage_name(bpg_mgr));
+        bpg_rsp_manage_free_context(bpg_mgr, op_context);
         return;
     }
 
@@ -93,6 +97,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
         return;
     }
 
+    bpg_rsp_manage_free_context(bpg_mgr, op_context);
     return;
 
 SEND_ERROR_RESPONSE:
@@ -105,8 +110,12 @@ SEND_ERROR_RESPONSE:
 
     if (gd_dp_dispatch_by_string(bpg_mgr->m_commit_to, bpg_pkg_to_dp_req(response_buf), em) != 0) {
         CPE_ERROR(em, "%s.%s: bpg_rsp_commit: send error response fail!", bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
+        bpg_rsp_manage_free_context(bpg_mgr, op_context);
         return;
     }
+
+    bpg_rsp_manage_free_context(bpg_mgr, op_context);
+    return;
 }
 
 static int bpg_rsp_commit_build_pkg_append_info_from_ctx(
@@ -286,4 +295,11 @@ int bpg_rsp_commit_build_pkg(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_
     if (bpg_rsp_commit_build_pkg_main_info(rsp, op_context, pkg, em) != 0) return -1;
     if (bpg_rsp_commit_build_pkg_append_info(rsp, op_context, pkg, em) != 0) return -1;
     return 0;
+}
+
+void bpg_rsp_manage_free_context(bpg_rsp_manage_t mgr, logic_context_t op_context) {
+    if (mgr->m_ctx_fini) {
+        mgr->m_ctx_fini(op_context, mgr->m_ctx_ctx);
+    }
+    logic_context_free(op_context);
 }

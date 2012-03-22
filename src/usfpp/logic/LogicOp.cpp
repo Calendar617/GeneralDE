@@ -51,14 +51,21 @@ void LogicOp::regist_to(logic_executor_type_group_t group) {
     logic_executor_type_bind_basic(type, logic_op_adapter, this);
 }
 
-int32_t LogicOp::logic_op_adapter(logic_context_t ctx, void * user_data, cfg_t cfg) {
+int32_t LogicOp::logic_op_adapter(logic_context_t ctx, logic_executor_t executor, void * user_data, cfg_t cfg) {
     LogicOp * op = (LogicOp*)user_data;
     try {
         (op->*(op->m_exec_fun))(*(LogicOpContext*)ctx, Cpe::Cfg::Node::_cast(cfg));
+
+        if (logic_context_flag_is_enable(ctx, logic_context_flag_debug)) {
+            APP_CTX_INFO(
+                logic_context_app(ctx), "execute logic op %s: complete, errno=%d, state=%d",
+                logic_executor_name(executor), logic_context_errno(ctx), logic_context_state(ctx));
+        }
+
         return 0;
     }
-    APP_CTX_CATCH_EXCEPTION(logic_context_app(ctx), "execute logic op: ");
-
+    APP_CTX_CATCH_EXCEPTION(logic_context_app(ctx), "execute logic op %s: ", logic_executor_name(executor));
+    logic_context_errno_set(ctx, -1);
     return -1;
 }
 
