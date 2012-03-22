@@ -5,10 +5,11 @@
 #include "protocol/base/base_package.h"
 #include "bpg_pkg_internal_types.h"
 
-int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, void const * buf, size_t capacity, error_monitor_t em) {
+int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, void const * buf, size_t capacity, size_t * size, error_monitor_t em) {
     struct basepkg_head * head;
     size_t cur_size;
     size_t use_size;
+    size_t input_size;
 
     assert(pkg);
     assert(meta);
@@ -22,14 +23,14 @@ int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, void const * buf, size_t
     }
 
     cur_size = sizeof(struct basepkg_head);
-    assert(cur_size == bpg_pkg_pkg_data_size(pkg));
+    printf("capacity=%d\n", capacity);
 
     use_size = bpg_pkg_pkg_capacity(pkg) - cur_size;
-
+    input_size = capacity;
     if (dr_cvt_encode(
             bpg_pkg_data_cvt(pkg),
             meta, ((char *)bpg_pkg_pkg_data(pkg)) + cur_size, &use_size,
-            buf, &capacity,
+            buf, &input_size,
             em, pkg->m_mgr->m_debug) != 0)
     {
         CPE_ERROR(em, "bpg_pkg_set_data: encode fail!");
@@ -40,9 +41,11 @@ int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, void const * buf, size_t
 
     head->bodylen = use_size;
     head->originBodyLen = capacity;
-    head->bodytotallen = bpg_pkg_pkg_data_size(pkg);
+    head->bodytotallen = use_size;
 
-    return use_size;
+    if (size) *size = use_size;
+
+    return 0;
 }
 
 int bpg_pkg_get_main_data(bpg_pkg_t pkg, LPDRMETA meta, void * buf, size_t * capacity, error_monitor_t em) {
@@ -70,11 +73,12 @@ int bpg_pkg_get_main_data(bpg_pkg_t pkg, LPDRMETA meta, void * buf, size_t * cap
     return 0;
 }
 
-int bpg_pkg_add_append_data(bpg_pkg_t pkg, LPDRMETA meta, const void * buf, size_t capacity, error_monitor_t em) {
+int bpg_pkg_add_append_data(bpg_pkg_t pkg, LPDRMETA meta, const void * buf, size_t capacity, size_t * size, error_monitor_t em) {
     struct basepkg * basepkg;
     struct AppendInfo * appendInfo;
     size_t cur_size;
     size_t use_size;
+    size_t input_size;
 
     assert(pkg);
 
@@ -87,12 +91,13 @@ int bpg_pkg_add_append_data(bpg_pkg_t pkg, LPDRMETA meta, const void * buf, size
 
     cur_size = bpg_pkg_pkg_data_size(pkg);
     use_size = bpg_pkg_pkg_capacity(pkg) - cur_size;
+    input_size = capacity;
 
     if (dr_cvt_encode(
             bpg_pkg_data_cvt(pkg),
             meta,
             ((char *)bpg_pkg_pkg_data(pkg)) + cur_size, &use_size,
-            buf, &capacity,
+            buf, &input_size,
             em, pkg->m_mgr->m_debug) != 0)
     {
         CPE_ERROR(em, "bpg_pkg_pkg_data: encode fail!");
@@ -106,9 +111,10 @@ int bpg_pkg_add_append_data(bpg_pkg_t pkg, LPDRMETA meta, const void * buf, size
 
     bpg_pkg_pkg_data_set_size(pkg, cur_size + use_size);
 
-    basepkg->head.bodytotallen = bpg_pkg_pkg_data_size(pkg);
+    basepkg->head.bodytotallen += use_size;
 
-    return use_size;
+    if (size) *size = use_size;
+    return 0;
 }
 
 int bpg_pkg_get_append_data(

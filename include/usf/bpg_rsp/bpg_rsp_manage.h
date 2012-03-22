@@ -33,6 +33,7 @@ void bpg_rsp_manage_set_context_op(
     size_t ctx_capacity,
     bpg_logic_ctx_init_fun_t ctx_init,
     bpg_logic_ctx_fini_fun_t ctx_fini,
+    bpg_logic_pkg_init_fun_t pkg_init,
     void * ctx_ctx);
 
 const char * bpg_rsp_manage_commit_to(bpg_rsp_manage_t mgr);

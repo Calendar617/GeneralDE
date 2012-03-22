@@ -57,6 +57,7 @@ bpg_rsp_manage_create(
     mgr->m_ctx_capacity = 0;
     mgr->m_ctx_init = NULL;
     mgr->m_ctx_fini = NULL;
+    mgr->m_pkg_init = NULL;
     mgr->m_ctx_ctx = NULL;
 
     mgr->m_rsp_max_size = 4 * 1024;
@@ -208,10 +209,12 @@ void bpg_rsp_manage_set_context_op(
     size_t ctx_capacity,
     bpg_logic_ctx_init_fun_t ctx_init,
     bpg_logic_ctx_fini_fun_t ctx_fini,
+    bpg_logic_pkg_init_fun_t pkg_init,
     void * ctx_ctx)
 {
     mgr->m_ctx_capacity = ctx_capacity;
     mgr->m_ctx_init = ctx_init;
     mgr->m_ctx_fini = ctx_fini;
+    mgr->m_pkg_init = pkg_init;
     mgr->m_ctx_ctx = ctx_ctx;
 }

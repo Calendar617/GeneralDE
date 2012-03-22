@@ -67,7 +67,7 @@ int bpg_net_agent_reply(gd_dp_req_t req, void * ctx, error_monitor_t em) {
             agent->m_em, agent->m_debug);
     if (cvt_result != dr_cvt_result_success) {
         CPE_ERROR(
-            agent->m_em, "%s: bpg_net_agent_reply: decode package fail!",
+            agent->m_em, "%s: bpg_net_agent_reply: encode package for send fail!",
             bpg_net_agent_name(agent));
 
         if (agent->m_debug) {

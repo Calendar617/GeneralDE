@@ -79,8 +79,8 @@ LPDRMETALIB bpg_pkg_data_meta_lib(bpg_pkg_t pkg);
 LPDRMETA bpg_pkg_main_data_meta(bpg_pkg_t pkg, error_monitor_t em);
 LPDRMETA bpg_pkg_append_data_meta(bpg_pkg_t pkg, bpg_pkg_append_info_t append_info, error_monitor_t em);
 
-int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, const void * buf, size_t capacity, error_monitor_t em);
-int bpg_pkg_add_append_data(bpg_pkg_t pkg, LPDRMETA meta, const void * buf, size_t capacity, error_monitor_t em);
+int bpg_pkg_set_main_data(bpg_pkg_t pkg, LPDRMETA meta, const void * buf, size_t capacity, size_t * size, error_monitor_t em);
+int bpg_pkg_add_append_data(bpg_pkg_t pkg, LPDRMETA meta, const void * buf, size_t capacity, size_t * size, error_monitor_t em);
 
 int bpg_pkg_get_main_data(bpg_pkg_t pkg, LPDRMETA meta, void * buf, size_t * capacity, error_monitor_t em);
 int bpg_pkg_get_append_data(bpg_pkg_t pkg, bpg_pkg_append_info_t append_inf, LPDRMETA meta, void * buf, size_t * capacity, error_monitor_t em);

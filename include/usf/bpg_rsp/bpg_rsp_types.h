@@ -29,6 +29,7 @@ typedef struct bpg_rsp_pkg_builder * bpg_rsp_pkg_builder_t;
 
 typedef int (*bpg_logic_ctx_init_fun_t)(logic_context_t context, void * ctx);
 typedef void (*bpg_logic_ctx_fini_fun_t)(logic_context_t context, void * ctx);
+typedef int (*bpg_logic_pkg_init_fun_t)(logic_context_t context, bpg_pkg_t pkg, void * ctx);
 
 typedef enum bpg_pkg_build_result {
     bpg_pkg_build_result_success

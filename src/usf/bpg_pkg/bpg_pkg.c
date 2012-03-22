@@ -91,7 +91,7 @@ void * bpg_pkg_pkg_data(bpg_pkg_t req) {
 }
 
 size_t bpg_pkg_pkg_data_size(bpg_pkg_t req) {
-    return gd_dp_req_capacity(req->m_dp_req) - sizeof(struct bpg_pkg) - req->m_carry_data_capacity;
+    return gd_dp_req_size(req->m_dp_req) - sizeof(struct bpg_pkg) - req->m_carry_data_capacity;
 }
 
 int bpg_pkg_pkg_data_set_size(bpg_pkg_t req, size_t size) {

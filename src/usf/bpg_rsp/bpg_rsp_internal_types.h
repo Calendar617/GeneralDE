@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-typedef TAILQ_HEAD(bpg_rsp_pkg_builder_list, bpg_rsp_pkg_builder) bpg_rsp_pkg_builder_list_t;
+typedef TAILQ_HEAD(bpg_rsp_pkg_builder_list, bpg_rsp_pkg_builder) * bpg_rsp_pkg_builder_list_t;
 
 struct bpg_rsp_manage {
     gd_app_context_t m_app;
@@ -23,12 +23,13 @@ struct bpg_rsp_manage {
     size_t m_ctx_capacity;
     bpg_logic_ctx_init_fun_t m_ctx_init;
     bpg_logic_ctx_fini_fun_t m_ctx_fini;
+    bpg_logic_pkg_init_fun_t m_pkg_init;
     void * m_ctx_ctx;
 
     size_t m_rsp_max_size;
     bpg_pkg_t m_rsp_buf;
 
-    bpg_rsp_pkg_builder_list_t m_pkg_builders;
+    struct bpg_rsp_pkg_builder_list m_pkg_builders;
 
     int m_debug;
 
@@ -39,14 +40,14 @@ struct bpg_rsp_copy_info {
     TAILQ_ENTRY(bpg_rsp_copy_info) m_next;
 };
 
-typedef TAILQ_HEAD(bpg_rsp_copy_info_list, bpg_rsp_copy_info) bpg_rsp_copy_info_list_t;
+typedef TAILQ_HEAD(bpg_rsp_copy_info_list, bpg_rsp_copy_info) * bpg_rsp_copy_info_list_t;
 
 struct bpg_rsp {
     bpg_rsp_manage_t m_mgr;
     logic_executor_t m_executor;
     uint32_t m_flags;
 
-    bpg_rsp_copy_info_list_t m_ctx_to_pdu;
+    struct bpg_rsp_copy_info_list m_ctx_to_pdu;
 };
 
 struct bpg_rsp_pkg_builder {

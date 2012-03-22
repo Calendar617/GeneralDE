@@ -18,8 +18,21 @@ int bpg_rsp_execute(gd_dp_req_t req, void * ctx, error_monitor_t em);
 void bpg_rsp_commit(logic_context_t op_context, void * user_data);
 
 /*bpg_rsp_copy_info ops*/
-struct bpg_rsp_copy_info * bpg_rsp_copy_info_create(bpg_rsp_manage_t mgr, const char * data_name);
-void bpg_rsp_copy_info_free(bpg_rsp_manage_t mgr, struct bpg_rsp_copy_info * copy_info);
+struct bpg_rsp_copy_info *
+bpg_rsp_copy_info_create(
+    bpg_rsp_manage_t mgr,
+    bpg_rsp_copy_info_list_t copy_info_list,
+    const char * data_name);
+
+void bpg_rsp_copy_info_free(
+    bpg_rsp_manage_t mgr,
+    bpg_rsp_copy_info_list_t copy_info_list,
+    struct bpg_rsp_copy_info * copy_info);
+
+void bpg_rsp_copy_info_clear(
+    bpg_rsp_manage_t mgr, 
+    bpg_rsp_copy_info_list_t copy_info_list);
+
 const char * bpg_rsp_copy_info_data(struct bpg_rsp_copy_info * copy_info);
 
 #ifdef __cplusplus

@@ -39,7 +39,7 @@ public:
     void mainData(T & buf) { mainData(&buf, sizeof(buf)); }
 
     /*main data write*/
-    void setMainData(void const * data, size_t size);
+    void setMainData(void const * data, size_t size, size_t * write_size = NULL);
 
     template<typename T>
     void setMainData(int cmd, T const & data) { setMainData(cmd, &data, sizeof(data)); }
@@ -66,9 +66,9 @@ public:
     bool tryGetAppendData(const char * metaName, T & buf) { return tryGetAppendData(metaName, &buf, sizeof(buf)); }
 
     /*append data write*/
-    void addAppendData(const char * metaName, void const * data, size_t size);
-    void addAppendData(int metaid, void const * data, size_t size);
-    void addAppendData(LPDRMETA meta, void const * data, size_t size);
+    void addAppendData(const char * metaName, void const * data, size_t size, size_t * write_size = NULL);
+    void addAppendData(int metaid, void const * data, size_t size, size_t * write_size = NULL);
+    void addAppendData(LPDRMETA meta, void const * data, size_t size, size_t * write_size = NULL);
 
     template<typename T>
     void addAppendData(const char * metaName, T const & data) {

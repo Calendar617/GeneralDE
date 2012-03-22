@@ -42,9 +42,9 @@ Package::mainDataMeta(void) const {
     return Cpe::Dr::Meta::_cast(meta);
 }
         
-void Package::setMainData(void const * data, size_t size) {
+void Package::setMainData(void const * data, size_t size, size_t * write_size) {
     Cpe::Utils::ErrorCollector em;
-    if (bpg_pkg_set_main_data(*this, mainDataMeta(), data, size, em) != 0) {
+    if (bpg_pkg_set_main_data(*this, mainDataMeta(), data, size, write_size, em) != 0) {
         em.checkThrowWithMsg< ::std::runtime_error>();
     }
 }
@@ -59,18 +59,18 @@ void Package::mainData(void * buf, size_t capacity, size_t * size) const {
     if (size) *size = capacity;
 }
 
-void Package::addAppendData(const char * metaName, void const * data, size_t size) {
-    addAppendData(dataMetaLib().meta(metaName), data, size);
+void Package::addAppendData(const char * metaName, void const * data, size_t size, size_t * write_size) {
+    addAppendData(dataMetaLib().meta(metaName), data, size, write_size);
 }
 
-void Package::addAppendData(int metaid, void const * data, size_t size) {
-    addAppendData(dataMetaLib().meta(metaid), data, size);
+void Package::addAppendData(int metaid, void const * data, size_t size, size_t * write_size) {
+    addAppendData(dataMetaLib().meta(metaid), data, size, write_size);
 }
 
-void Package::addAppendData(LPDRMETA meta, void const * data, size_t size) {
+void Package::addAppendData(LPDRMETA meta, void const * data, size_t size, size_t * write_size) {
     Cpe::Utils::ErrorCollector em;
 
-    if (bpg_pkg_add_append_data(*this, meta, data, size, em)) {
+    if (bpg_pkg_add_append_data(*this, meta, data, size, write_size, em)) {
         em.checkThrowWithMsg< ::std::runtime_error>();
     }
 }
@@ -107,20 +107,20 @@ void Package::appendData(LPDRMETA meta, void * buf, size_t capacity, size_t * si
 
 bool Package::tryGetAppendData(int metaId, void * buf, size_t capacity, size_t * size) const {
     LPDRMETALIB metalib = bpg_pkg_data_meta_lib(*this);
-    if (metalib == NULL) return NULL;
+    if (metalib == NULL) return false;
 
     LPDRMETA meta = dr_lib_find_meta_by_id(metalib, metaId);
-    if (meta == NULL) return NULL;
+    if (meta == NULL) return false;
 
     return tryGetAppendData(meta, buf, capacity, size);
 }
 
 bool Package::tryGetAppendData(const char * metaName, void * buf, size_t capacity, size_t * size) const {
     LPDRMETALIB metalib = bpg_pkg_data_meta_lib(*this);
-    if (metalib == NULL) return NULL;
+    if (metalib == NULL) return false;
 
     LPDRMETA meta = dr_lib_find_meta_by_name(metalib, metaName);
-    if (meta == NULL) return NULL;
+    if (meta == NULL) return false;
 
     return tryGetAppendData(meta, buf, capacity, size);
 }

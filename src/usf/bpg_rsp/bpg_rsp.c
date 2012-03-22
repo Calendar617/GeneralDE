@@ -168,11 +168,7 @@ static void bpg_rsp_clear(gd_nm_node_t node) {
 
     bpg_rsp = (bpg_rsp_t)gd_nm_node_data(node);
 
-    while(!TAILQ_EMPTY(&bpg_rsp->m_ctx_to_pdu)) {
-        struct bpg_rsp_copy_info * copy_info = TAILQ_FIRST(&bpg_rsp->m_ctx_to_pdu);
-        TAILQ_REMOVE(&bpg_rsp->m_ctx_to_pdu, copy_info, m_next);
-        bpg_rsp_copy_info_free(bpg_rsp->m_mgr, copy_info);
-    }
+    bpg_rsp_copy_info_clear(bpg_rsp->m_mgr, &bpg_rsp->m_ctx_to_pdu);
 
     if (bpg_rsp->m_executor) {
         logic_executor_free(bpg_rsp->m_executor);
