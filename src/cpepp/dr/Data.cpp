@@ -257,6 +257,19 @@ DataElement & DataElement::operator=(const char * d) {
     return *this;
 }
 
+DataElement & DataElement::operator=(ConstDataElement const & o) {
+    Utils::ErrorCollector em;
+
+    if (dr_entry_set_from_ctype(const_cast<void *>(m_data), o.data(), dr_entry_type(o.entry()), m_entry, em) != 0) {
+        ::std::ostringstream os;
+        os << "set element to " << dr_entry_name(m_entry) << ": ";
+        em.genErrorMsg(os);
+        throw ::std::runtime_error(os.str());
+    }
+
+    return *this;
+}
+
 //class ConstData
 ConstData::ConstData(const void * data, LPDRMETA meta)
     : m_data(data)

@@ -20,6 +20,8 @@ public:
     operator uint64_t(void);
     operator const char *(void);
 
+    const void * data(void) const { return m_data; }
+    LPDRMETAENTRY entry(void) const { return m_entry; }
 protected:
     const void * m_data;
     LPDRMETAENTRY m_entry;
@@ -38,6 +40,7 @@ public:
     DataElement & operator=(int64_t d);
     DataElement & operator=(uint64_t d);
     DataElement & operator=(const char * d);
+    DataElement & operator=(ConstDataElement const & o);
 };
 
 class ConstData {
@@ -45,6 +48,7 @@ public:
     ConstData(const void * data, LPDRMETA meta);
 
     Meta const & meta(void) const { return *((Meta*)m_meta); }
+    const void * data(void) const { return m_data; }
 
     ConstDataElement operator[](const char * name) const;
 
