@@ -140,7 +140,7 @@ static int bpg_rsp_commit_build_pkg_append_info_from_ctx(
 
     if (rsp->m_mgr->m_debug) {
         CPE_INFO(
-            em, "%s.%s: copy_ctx_to_pdu: %s: append data to pkg from context success, write-size=%d!",
+            em, "%s.%s: copy_ctx_to_pdu: %s: append data to pkg from context success, write-size=%zd!",
             bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), dr_meta_name(data_meta), size);
     }
 

@@ -20,7 +20,7 @@ void LogicTest::TearDown() {
     Base::TearDown();
 }
 
-static int32_t execute_fun (logic_context_t ctx, void * user_data, cfg_t cfg) {
+static int32_t execute_fun (logic_context_t ctx, logic_executor_t executor, void * user_data, cfg_t cfg) {
     LogicTest::LogicOpMock * op = (LogicTest::LogicOpMock *)user_data;
     return op->execute(ctx);
 }
