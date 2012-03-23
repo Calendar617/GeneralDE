@@ -8,6 +8,7 @@
 #include "usf/dr_store/dr_ref.h"
 #include "usf/dr_store/dr_store_manage.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
+#include "usf/bpg_pkg/bpg_pkg_dsp.h"
 #include "usf/bpg_pkg/bpg_pkg_manage.h"
 #include "usf/bpg_rsp/bpg_rsp_manage.h"
 #include "usf/bpg_rsp/bpg_rsp_pkg_builder.h"
@@ -65,7 +66,8 @@ bpg_rsp_manage_create(
 
     mgr->m_debug = 0;
 
-    mgr->m_commit_to = NULL;
+    mgr->m_commit_dsp = NULL;
+    mgr->m_forward_dsp = NULL;
 
     TAILQ_INIT(&mgr->m_pkg_builders);
 
@@ -87,9 +89,14 @@ static void bpg_rsp_manage_clear(gd_nm_node_t node) {
         mgr->m_rsp_buf = NULL;
     }
 
-    if (mgr->m_commit_to) {
-        mem_free(mgr->m_alloc, mgr->m_commit_to);
-        mgr->m_commit_to = NULL;
+    if (mgr->m_commit_dsp) {
+        bpg_pkg_dsp_free(mgr->m_commit_dsp);
+        mgr->m_commit_dsp = NULL;
+    }
+
+    if (mgr->m_forward_dsp) {
+        bpg_pkg_dsp_free(mgr->m_forward_dsp);
+        mgr->m_forward_dsp = NULL;
     }
 }
 
@@ -142,20 +149,22 @@ bpg_rsp_manage_name_hs(bpg_rsp_manage_t mgr) {
     return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
 }
 
-const char * bpg_rsp_manage_commit_to(bpg_rsp_manage_t mgr) {
-    return mgr->m_commit_to ? cpe_hs_data(mgr->m_commit_to) : NULL;
+bpg_pkg_dsp_t bpg_rsp_manage_commit_dsp(bpg_rsp_manage_t mgr) {
+    return mgr->m_commit_dsp;
 }
 
-int bpg_rsp_manage_set_commit_to(bpg_rsp_manage_t mgr, const char * name) {
-    cpe_hash_string_t new_commit_to;
+void bpg_rsp_manage_set_commit_dsp(bpg_rsp_manage_t mgr, bpg_pkg_dsp_t dsp) {
+    if (mgr->m_commit_dsp) bpg_pkg_dsp_free(mgr->m_commit_dsp);
+    mgr->m_commit_dsp = dsp;
+}
 
-    new_commit_to = cpe_hs_create(mgr->m_alloc, name);
-    if (new_commit_to == NULL) return -1;
+bpg_pkg_dsp_t bpg_rsp_manage_forward_dsp(bpg_rsp_manage_t mgr) {
+    return mgr->m_forward_dsp;
+}
 
-    if (mgr->m_commit_to) mem_free(mgr->m_alloc, mgr->m_commit_to);
-    mgr->m_commit_to = new_commit_to;
-
-    return 0;
+void bpg_rsp_manage_set_forward_dsp(bpg_rsp_manage_t mgr, bpg_pkg_dsp_t dsp) {
+    if (mgr->m_forward_dsp) bpg_pkg_dsp_free(mgr->m_forward_dsp);
+    mgr->m_forward_dsp = dsp;
 }
 
 bpg_pkg_t

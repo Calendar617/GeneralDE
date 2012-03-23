@@ -7,16 +7,69 @@
 #include "usf/logic/logic_manage.h"
 #include "usf/dr_store/dr_store.h"
 #include "usf/dr_store/dr_store_manage.h"
+#include "usf/bpg_pkg/bpg_pkg_dsp.h"
 #include "usf/bpg_rsp/bpg_rsp_manage.h"
 #include "usf/bpg_rsp/bpg_rsp.h"
 #include "bpg_rsp_internal_types.h"
+
+static int bpg_rsp_manage_load_commit_dsp(
+    gd_app_context_t app, gd_app_module_t module, bpg_rsp_manage_t bpg_rsp_manage, cfg_t cfg)
+{
+    cfg_t commit_to;
+
+    if ((commit_to = cfg_find_cfg(cfg, "commit-to"))) {
+        bpg_pkg_dsp_t dsp = bpg_pkg_dsp_create(gd_app_alloc(app));
+        if (dsp == NULL) {
+            CPE_ERROR(
+                gd_app_em(app), "%s: create: create commit dsp fail",
+                gd_app_module_name(module));
+            return -1;
+        }
+
+        if (bpg_pkg_dsp_load(dsp, commit_to, gd_app_em(app)) != 0) {
+            CPE_ERROR(
+                gd_app_em(app), "%s: create: create commit dsp: load fail",
+                gd_app_module_name(module));
+            bpg_pkg_dsp_free(dsp);
+            return -1;
+        }
+
+        bpg_rsp_manage_set_commit_dsp(bpg_rsp_manage, dsp);
+    }
+
+    return 0;
+}
+
+static int bpg_rsp_manage_load_forward_dsp(
+    gd_app_context_t app, gd_app_module_t module, bpg_rsp_manage_t bpg_rsp_manage, cfg_t cfg)
+{
+    bpg_pkg_dsp_t forward_dsp;
+
+    forward_dsp = bpg_pkg_dsp_create(gd_app_alloc(app));
+    if (forward_dsp == NULL) {
+        CPE_ERROR(
+            gd_app_em(app), "%s: create: create forward forward_dsp fail",
+            gd_app_module_name(module));
+        return -1;
+    }
+
+    if (bpg_pkg_dsp_load(forward_dsp, cfg_find_cfg(cfg, "forward-to"), gd_app_em(app)) != 0) {
+        CPE_ERROR(
+            gd_app_em(app), "%s: create: create forward forward_dsp: load fail",
+            gd_app_module_name(module));
+        bpg_pkg_dsp_free(forward_dsp);
+        return -1;
+    }
+    bpg_rsp_manage_set_forward_dsp(bpg_rsp_manage, forward_dsp);
+
+    return 0;
+}
 
 EXPORT_DIRECTIVE
 int bpg_rsp_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
     bpg_rsp_manage_t bpg_rsp_manage;
     logic_manage_t logic_mgr;
     cfg_t child_cfg;
-    const char * commit_to;
 
     logic_mgr = logic_manage_find_nc(app, cfg_get_string(cfg, "logic-manage", NULL));
     if (logic_mgr == NULL) {
@@ -29,6 +82,16 @@ int bpg_rsp_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
 
     bpg_rsp_manage = bpg_rsp_manage_create(app, gd_app_module_name(module), logic_mgr, NULL);
     if (bpg_rsp_manage == NULL) {
+        return -1;
+    }
+
+    if (bpg_rsp_manage_load_commit_dsp(app, module, bpg_rsp_manage, cfg) != 0) {
+        bpg_rsp_manage_free(bpg_rsp_manage);
+        return -1;
+    }
+
+    if (bpg_rsp_manage_load_forward_dsp(app, module, bpg_rsp_manage, cfg) != 0) {
+        bpg_rsp_manage_free(bpg_rsp_manage);
         return -1;
     }
 
@@ -45,14 +108,11 @@ int bpg_rsp_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
 
     bpg_rsp_manage->m_debug = cfg_get_int32(cfg, "debug", 0);
 
-    commit_to = cfg_get_string(cfg, "commit-to", NULL);
-    if (commit_to) bpg_rsp_manage_set_commit_to(bpg_rsp_manage, commit_to);
-
     if (bpg_rsp_manage->m_debug) {
         CPE_INFO(
             gd_app_em(app),
-            "%s: create: done. rsp-max-size=%d, send-to=%s",
-            gd_app_module_name(module), (int)bpg_rsp_manage->m_rsp_max_size, commit_to ? commit_to : "???");
+            "%s: create: done. rsp-max-size=%d",
+            gd_app_module_name(module), (int)bpg_rsp_manage->m_rsp_max_size);
     }
 
     return 0;

@@ -13,7 +13,7 @@ bpg_rsp_carry_info_t bpg_rsp_carry_info_find(logic_context_t ctx) {
         : (bpg_rsp_carry_info_t)logic_data_data(data);
 }
 
-uint32_t bpt_rsp_context_cmd(bpg_rsp_carry_info_t carry_info) {
+uint32_t bpg_rsp_context_cmd(bpg_rsp_carry_info_t carry_info) {
     assert(carry_info);
     return ((struct bpg_carry_info *)carry_info)->cmd;
 }
@@ -22,7 +22,7 @@ void bpg_rsp_context_set_cmd(bpg_rsp_carry_info_t carry_info, uint32_t cmd) {
     ((struct bpg_carry_info *)carry_info)->cmd = cmd;
 }
 
-uint32_t bpt_rsp_context_client_id(bpg_rsp_carry_info_t carry_info) {
+uint32_t bpg_rsp_context_client_id(bpg_rsp_carry_info_t carry_info) {
     return ((struct bpg_carry_info *)carry_info)->clientId;
 }
 

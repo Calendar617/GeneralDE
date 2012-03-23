@@ -64,7 +64,7 @@ int32_t LogicOp::logic_op_adapter(logic_context_t ctx, logic_executor_t executor
 
         return 0;
     }
-    APP_CTX_CATCH_EXCEPTION(logic_context_app(ctx), "execute logic op %s: ", logic_executor_name(executor));
+    APP_CTX_CATCH_EXCEPTION(logic_context_app(ctx), "%s: execute: ", logic_executor_name(executor));
     logic_context_errno_set(ctx, -1);
     return -1;
 }

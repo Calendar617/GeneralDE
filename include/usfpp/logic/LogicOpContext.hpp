@@ -41,6 +41,9 @@ public:
     void execute(void) { logic_context_execute(*this); }
     void execute(logic_executor_t execute) { bind(execute); logic_context_execute(*this); }
 
+    void cancel(void) { logic_context_cancel(*this); }
+    void timeout(void) { logic_context_timeout(*this); }
+
     Gd::App::Application & app(void) { return Gd::App::Application::_cast(logic_context_app(*this)); }
     Gd::App::Application const & app(void) const { return Gd::App::Application::_cast(logic_context_app(*this)); }
 

@@ -5,6 +5,7 @@
 #include "usf/logic/logic_context.h"
 #include "usf/logic/logic_data.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
+#include "usf/bpg_pkg/bpg_pkg_dsp.h"
 #include "usf/bpg_rsp/bpg_rsp_manage.h"
 #include "usf/bpg_rsp/bpg_rsp_addition.h"
 #include "usf/bpg_rsp/bpg_rsp.h"
@@ -30,7 +31,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
 
     em = bpg_mgr->m_em;
 
-    if (bpg_mgr->m_commit_to == NULL) {
+    if (bpg_mgr->m_commit_dsp == NULL) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_commit: no send-to configured, ignore commit!",
             bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
@@ -92,7 +93,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
         goto SEND_ERROR_RESPONSE;
     }
 
-    if (gd_dp_dispatch_by_string(bpg_mgr->m_commit_to, bpg_pkg_to_dp_req(response_buf), em) != 0) {
+    if (bpg_pkg_dsp_dispatch(bpg_mgr->m_commit_dsp, response_buf, em) != 0) {
         CPE_ERROR(em, "%s.%s: bpg_rsp_commit: dispatch fail!", bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
         return;
     }
@@ -108,7 +109,7 @@ SEND_ERROR_RESPONSE:
     bpg_pkg_set_cmd(response_buf, bpg_private->cmd);
     bpg_pkg_set_connection_id(response_buf, bpg_private->connectionId);
 
-    if (gd_dp_dispatch_by_string(bpg_mgr->m_commit_to, bpg_pkg_to_dp_req(response_buf), em) != 0) {
+    if (bpg_pkg_dsp_dispatch(bpg_mgr->m_commit_dsp, response_buf, em) != 0) {
         CPE_ERROR(em, "%s.%s: bpg_rsp_commit: send error response fail!", bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
         bpg_rsp_manage_free_context(bpg_mgr, op_context);
         return;
@@ -284,7 +285,7 @@ static int bpg_rsp_commit_build_pkg_main_info(bpg_rsp_t rsp, logic_context_t op_
 
     if (rsp->m_mgr->m_debug) {
         CPE_INFO(
-            em, "%s.%s: copy_ctx_to_pdu: main: set data fail, meta = %s, wirte-size=%d!",
+            em, "%s.%s: copy_ctx_to_pdu: main: meta = %s, wirte-size=%d!",
             bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), dr_meta_name(meta), (int)size);
     }
             
