@@ -7,7 +7,7 @@
 
 int16_t bpg_rsp_addition_data_count(logic_context_t ctx) {
     logic_data_t data;
-    data = logic_data_find(ctx, "bpg_pkg_addition_data");
+    data = logic_data_find(ctx, "bpg_rsp_addition_data");
 
     return data == NULL
         ? 0
@@ -18,7 +18,7 @@ uint32_t bpg_rsp_addition_data_at(logic_context_t ctx, int16_t pos) {
     logic_data_t data;
     struct bpg_rsp_addition_data * addition_data;
 
-    data = logic_data_find(ctx, "bpg_pkg_addition_data");
+    data = logic_data_find(ctx, "bpg_rsp_addition_data");
 
     addition_data = data == NULL
         ? NULL
@@ -38,7 +38,7 @@ bpg_rsp_addition_data_create(logic_context_t ctx, size_t capacity) {
     struct bpg_rsp_addition_data * addition_data;
     logic_data_t data;
 
-    meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_caary_package, "bpg_pkg_addition_data");
+    meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_caary_package, "bpg_rsp_addition_data");
     if (meta == NULL) return NULL;
 
     data = logic_data_get_or_create(ctx, meta, sizeof(struct bpg_rsp_addition_data) + (capacity - 1) * sizeof(uint32_t));
@@ -55,7 +55,7 @@ int bpg_rsp_addition_data_add(logic_context_t ctx, uint32_t meta_id) {
     logic_data_t data;
     struct bpg_rsp_addition_data * addition_data;
 
-    data = logic_data_find(ctx, "bpg_pkg_addition_data");
+    data = logic_data_find(ctx, "bpg_rsp_addition_data");
 
     addition_data = data == NULL
         ? NULL
