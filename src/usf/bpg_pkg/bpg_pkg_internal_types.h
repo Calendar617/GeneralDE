@@ -36,6 +36,29 @@ struct bpg_pkg {
     gd_dp_req_t m_dp_req;
 };
 
+enum bpg_pkg_dsp_type {
+    bpg_pkg_dsp_to_cmd
+    , bpg_pkg_dsp_to_str
+};
+
+union bpg_pkg_dsp_target {
+    int32_t m_to_cmd;
+    cpe_hash_string_t m_to_str;
+};
+
+struct bpg_pkg_dsp_node {
+    enum bpg_pkg_dsp_type m_type;
+    int32_t m_cmd;
+    union bpg_pkg_dsp_target m_target;
+    struct cpe_hash_entry m_hh;
+};
+
+struct bpg_pkg_dsp {
+    mem_allocrator_t m_alloc;
+    struct cpe_hash_table m_cmd_dsp;
+    struct bpg_pkg_dsp_node * m_dft_dsp;
+};
+
 #ifdef __cplusplus
 }
 #endif

@@ -12,6 +12,7 @@ extern "C" {
 typedef struct bpg_pkg_manage * bpg_pkg_manage_t;
 typedef struct bpg_pkg * bpg_pkg_t;
 typedef struct bpg_pkg_append_info * bpg_pkg_append_info_t;
+typedef struct bpg_pkg_dsp * bpg_pkg_dsp_t;
 
 #define BPG_BASEPKG_LIB_NAME "basepkg"
 #define BPG_BASEPKG_META_NAME "basepkg"

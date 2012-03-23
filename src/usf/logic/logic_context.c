@@ -49,6 +49,7 @@ logic_context_create(logic_manage_t mgr, logic_context_id_t id, size_t capacity)
     context->m_state = logic_context_state_init;
     context->m_capacity = capacity;
     context->m_flags = 0;
+    context->m_runing = 0;
     context->m_commit_op = NULL;
     context->m_commit_ctx = NULL;
     context->m_require_waiting_count = 0;
@@ -187,9 +188,13 @@ void logic_context_execute(logic_context_t context) {
     logic_context_state_t old_state;
 
     if (context->m_state != logic_context_state_idle) return;
+    assert(context->m_runing == 0);
 
     old_state = logic_context_state_i(context);
+
+    context->m_runing = 1;
     logic_stack_exec(&context->m_stack, -1, context);
+    context->m_runing = 0;
 
     if (context->m_errno == 0 && context->m_stack.m_item_pos == -1) {
         context->m_state = logic_context_state_done; 
@@ -227,6 +232,8 @@ void logic_context_timeout(logic_context_t context) {
 
 void logic_context_do_state_change(logic_context_t context, logic_context_state_t old_sate) {
     logic_context_state_t cur_state;
+
+    if (context->m_runing) return;
 
     if (old_sate > logic_context_state_idle) return;
 

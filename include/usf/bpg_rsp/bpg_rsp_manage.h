@@ -36,8 +36,10 @@ void bpg_rsp_manage_set_context_op(
     bpg_logic_pkg_init_fun_t pkg_init,
     void * ctx_ctx);
 
-const char * bpg_rsp_manage_commit_to(bpg_rsp_manage_t mgr);
-int bpg_rsp_manage_set_commit_to(bpg_rsp_manage_t mgr, const char * name);
+bpg_pkg_dsp_t bpg_rsp_manage_commit_dsp(bpg_rsp_manage_t mgr);
+void bpg_rsp_manage_set_commit_dsp(bpg_rsp_manage_t mgr, bpg_pkg_dsp_t dsp);
+bpg_pkg_dsp_t bpg_rsp_manage_forward_dsp(bpg_rsp_manage_t mgr);
+void bpg_rsp_manage_set_forward_dsp(bpg_rsp_manage_t mgr, bpg_pkg_dsp_t dsp);
 
 uint32_t bpg_rsp_manage_flags(bpg_rsp_manage_t mgr);
 void bpg_rsp_manage_flags_set(bpg_rsp_manage_t mgr, uint32_t flag);
