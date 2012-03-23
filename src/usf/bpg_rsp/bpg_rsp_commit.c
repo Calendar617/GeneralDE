@@ -285,7 +285,7 @@ static int bpg_rsp_commit_build_pkg_main_info(bpg_rsp_t rsp, logic_context_t op_
 
     if (rsp->m_mgr->m_debug) {
         CPE_INFO(
-            em, "%s.%s: copy_ctx_to_pdu: main: set data fail, meta = %s, wirte-size=%d!",
+            em, "%s.%s: copy_ctx_to_pdu: main: meta = %s, wirte-size=%d!",
             bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), dr_meta_name(meta), (int)size);
     }
             
