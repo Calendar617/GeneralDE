@@ -19,6 +19,33 @@ struct gd_nm_node_type s_nm_node_type_bpg_rsp = {
     bpg_rsp_clear
 };
 
+static int bpg_rsp_read_respons_copy_infos(bpg_rsp_t bpg_rsp, cfg_t cfg) {
+    struct cfg_it it;
+    cfg_t child_cfg;
+    cfg_it_init(&it, cfg);
+    
+    while((child_cfg = cfg_it_next(&it))) {
+        const char * write_data_name = cfg_as_string(child_cfg, NULL);
+        if (write_data_name == NULL) {
+            CPE_ERROR(
+                bpg_rsp->m_mgr->m_em,
+                "%s: create rsp %s: read response-data fail!",
+                bpg_rsp_manage_name(bpg_rsp->m_mgr), bpg_rsp_name(bpg_rsp));
+            return -1;
+        }
+
+        if (bpg_rsp_copy_info_create(bpg_rsp->m_mgr, &bpg_rsp->m_ctx_to_pdu, write_data_name) == NULL) {
+            CPE_ERROR(
+                bpg_rsp->m_mgr->m_em,
+                "%s: create rsp %s: crate response-data %s!",
+                bpg_rsp_manage_name(bpg_rsp->m_mgr), bpg_rsp_name(bpg_rsp), write_data_name);
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
 static int bpg_rsp_create_dp_rsp_and_bind(bpg_rsp_t bpg_rsp, cfg_t cfg) {
     gd_dp_rsp_t dp_rsp;
     cfg_t cfg_respons;
@@ -101,6 +128,11 @@ bpg_rsp_t bpg_rsp_create(bpg_rsp_manage_t mgr, cfg_t cfg) {
     rsp->m_flags = 0;
     TAILQ_INIT(&rsp->m_ctx_to_pdu);
 
+    if (bpg_rsp_read_respons_copy_infos(rsp, cfg_find_cfg(cfg, "response-data")) != 0) {
+        gd_nm_node_free(rsp_node);
+        return NULL;
+    }
+
     rsp->m_executor = logic_executor_build(
         mgr->m_logic_mgr,
         cfg_executor,
@@ -108,6 +140,7 @@ bpg_rsp_t bpg_rsp_create(bpg_rsp_manage_t mgr, cfg_t cfg) {
         mgr->m_em);
     if (rsp->m_executor == NULL) {
         CPE_ERROR(mgr->m_em, "%s: create rsp %s: create executor fail!", bpg_rsp_manage_name(mgr), name) ;
+        bpg_rsp_copy_info_clear(rsp->m_mgr, &rsp->m_ctx_to_pdu);
         gd_nm_node_free(rsp_node);
         return NULL;
     }
@@ -116,6 +149,7 @@ bpg_rsp_t bpg_rsp_create(bpg_rsp_manage_t mgr, cfg_t cfg) {
 
     if (bpg_rsp_create_dp_rsp_and_bind(rsp, cfg) != 0) {
         logic_executor_free(rsp->m_executor);
+        bpg_rsp_copy_info_clear(rsp->m_mgr, &rsp->m_ctx_to_pdu);
         gd_nm_node_free(rsp_node);
         return NULL;
     }
