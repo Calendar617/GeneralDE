@@ -7,6 +7,24 @@
 #include "../dr_internal_types.h"
 #include "../dr_ctype_ops.h"
 
+int dr_lib_meta_num(LPDRMETALIB metaLib) {
+    return metaLib->m_meta_count;
+}
+
+LPDRMETA dr_lib_meta_at(LPDRMETALIB metaLib, int idx) {
+    assert(metaLib);
+
+    if (idx >= 0 && idx < metaLib->m_meta_count) {
+        char * base = (char *)(metaLib + 1);
+        struct tagDRMetaIdxByName * idx_start = (struct tagDRMetaIdxByName *)(base + metaLib->m_startpos_meta_by_name);
+
+        return (LPDRMETA)(base + (idx_start + idx)->m_diff_to_base);
+    }
+    else {
+        return NULL;
+    }
+}
+
 LPDRMETA dr_lib_find_meta_by_name(LPDRMETALIB metaLib, const char* name) {
     char * base;
     struct tagDRMetaIdxByName * searchStart;
