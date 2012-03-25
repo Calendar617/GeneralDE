@@ -88,8 +88,8 @@ const char * bpg_use_sp_name(bpg_use_sp_t sp) {
 
 bpg_pkg_t
 bpg_use_sp_pkg_buf(bpg_use_sp_t sp) {
-    if (sp->m_pkg_buf == NULL
-        || bpg_pkg_pkg_capacity(sp->m_pkg_buf) < sp->m_pkg_buf_size)
+    if (sp->m_pkg_buf &&
+        (bpg_pkg_pkg_capacity(sp->m_pkg_buf) < sp->m_pkg_buf_size))
     {
         bpg_pkg_free(sp->m_pkg_buf);
         sp->m_pkg_buf = NULL;

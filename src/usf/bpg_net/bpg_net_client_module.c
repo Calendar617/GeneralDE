@@ -2,6 +2,7 @@
 #include "cpe/pal/pal_external.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/net/net_connector.h"
+#include "gd/dp/dp_manage.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/bpg_net/bpg_net_client.h"
@@ -14,6 +15,7 @@ int bpg_net_client_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
     const char * ip;
     short port;
     bpg_pkg_manage_t pkg_manage;
+    cfg_t send_recv_cfg;
 
     pkg_manage = bpg_pkg_manage_find_nc(app, cfg_get_string(cfg, "pkg-manage", NULL));
     if (pkg_manage == NULL) {
@@ -21,6 +23,14 @@ int bpg_net_client_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
             gd_app_em(app), "%s: create: pkg-manage %s not exist!",
             gd_app_module_name(module),
             cfg_get_string(cfg, "pkg-manage", "default"));
+        return -1;
+    }
+
+    send_recv_cfg = cfg_find_cfg(cfg, "send-recv-at");
+    if (send_recv_cfg == NULL) {
+        CPE_ERROR(
+            gd_app_em(app), "%s: create: send-recv-at not configured!",
+            gd_app_module_name(module));
         return -1;
     }
 
@@ -36,6 +46,14 @@ int bpg_net_client_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
 
     bpg_net_client->m_req_max_size =
         cfg_get_uint32(cfg, "req-max-size", bpg_net_client->m_req_max_size);
+
+    if (gd_dp_rsp_bind_by_cfg(bpg_net_client->m_send_rsp, send_recv_cfg, gd_app_em(app)) != 0) {
+        CPE_ERROR(
+            gd_app_em(app), "%s: create: bind rsp by cfg fail!",
+            gd_app_module_name(module));
+        bpg_net_client_free(bpg_net_client);
+        return -1;
+    }
 
     bpg_net_client->m_debug = cfg_get_int32(cfg, "debug", 0);
 

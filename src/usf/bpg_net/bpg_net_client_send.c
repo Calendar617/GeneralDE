@@ -21,11 +21,6 @@ int bpg_net_client_send(gd_dp_req_t req, void * ctx, error_monitor_t em) {
         CPE_ERROR(
             em, "%s: bpg_net_client_reply: input req is not bpg_pkg!",
             bpg_net_client_name(client));
-
-        if (client->m_debug) {
-            CPE_INFO(client->m_em, "\n\n");
-        }
-
         return 0;
     }
 
@@ -61,11 +56,6 @@ int bpg_net_client_send(gd_dp_req_t req, void * ctx, error_monitor_t em) {
         CPE_ERROR(
             client->m_em, "%s: bpg_net_client_send: encode package for send fail!",
             bpg_net_client_name(client));
-
-        if (client->m_debug) {
-            CPE_INFO(client->m_em, "\n\n");
-        }
-
         return 0;
     }
 
@@ -74,18 +64,13 @@ int bpg_net_client_send(gd_dp_req_t req, void * ctx, error_monitor_t em) {
             client->m_em, "%s: bpg_net_client_send: send data fail, write_size=%zd!",
             bpg_net_client_name(client), write_size);
         net_ep_close(ep);
-
-        if (client->m_debug) {
-            CPE_INFO(client->m_em, "\n\n");
-        }
-
         return 0;
     }
     
     if (client->m_debug) {
         CPE_ERROR(
             client->m_em,
-            "%s: bpg_net_client_send: send one request, write-size=%zd!\n\n",
+            "%s: bpg_net_client_send: send one request, write-size=%zd!",
             bpg_net_client_name(client), write_size);
     }
 
