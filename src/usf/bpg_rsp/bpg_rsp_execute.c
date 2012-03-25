@@ -27,18 +27,18 @@ int bpg_rsp_execute(gd_dp_req_t dp_req, void * ctx, error_monitor_t em) {
     bpg_mgr = bpg_rsp->m_mgr;
     assert(bpg_mgr);
 
-    if (bpg_pkg_pkg_data(req) == NULL) {
-        CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: input dp_req data is NULL!",
-            bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
-        return 0;
-    }
-
     req = bpg_pkg_from_dp_req(dp_req);
     if (req == NULL) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_execute: input req is not a bpg_req, type is %s!",
             bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp), gd_dp_req_type(dp_req));
+        return 0;
+    }
+
+    if (bpg_pkg_pkg_data(req) == NULL) {
+        CPE_ERROR(
+            em, "%s.%s: bpg_rsp_execute: input dp_req data is NULL!",
+            bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
         return 0;
     }
 
