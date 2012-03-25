@@ -92,7 +92,7 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
             struct mem_buffer buffer;
             mem_buffer_init(&buffer, NULL);
 
-            CPE_ERROR(
+            CPE_INFO(
                 agent->m_em,
                 "\n\n"
                 "%s: ep %d: read one request, cmd=%d, input-size=%d, output-size=%d!\n"
@@ -113,6 +113,9 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
                 CPE_ERROR(
                     agent->m_em, "%s: ep %d: dispatch cmd %d error!",
                     bpg_net_agent_name(agent), (int)net_ep_id(ep), bpg_pkg_cmd(req_buf));
+
+                bpg_pkg_set_errno(req_buf, -1);
+                bpg_net_agent_reply(bpg_pkg_to_dp_req(req_buf), agent, agent->m_em);
             }
             break;
         case bpg_net_pkg_next_ignore:

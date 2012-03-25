@@ -5,6 +5,7 @@
 #include "gd/dp/dp_manage.h"
 #include "gd/app/app_context.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
+#include "usf/bpg_pkg/bpg_pkg_dsp.h"
 #include "usf/bpg_net/bpg_net_client.h"
 #include "bpg_net_internal_ops.h"
 
@@ -93,7 +94,7 @@ static void bpg_net_client_on_read(bpg_net_client_t client, net_ep_t ep) {
                 bpg_pkg_cmd(req_buf), (int)input_size, (int)output_size);
         }
 
-        if (gd_dp_dispatch_by_numeric(bpg_pkg_cmd(req_buf), bpg_pkg_to_dp_req(req_buf), client->m_em) != 0) {
+        if (bpg_pkg_dsp_dispatch(client->m_rsp_dsp, req_buf, client->m_em) != 0) {
             CPE_ERROR(
                 client->m_em, "%s: ep %d: dispatch cmd %d error!",
                 bpg_net_client_name(client), (int)net_ep_id(ep), bpg_pkg_cmd(req_buf));

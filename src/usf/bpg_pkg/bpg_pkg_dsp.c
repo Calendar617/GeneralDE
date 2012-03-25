@@ -51,7 +51,7 @@ static void bpg_pkg_dsp_node_free(mem_allocrator_t alloc, struct bpg_pkg_dsp_nod
     case bpg_pkg_dsp_to_cmd:
         break;
     case bpg_pkg_dsp_to_str:
-        mem_free(alloc, (void *)node->m_target.m_to_cmd);
+        mem_free(alloc, (void *)node->m_target.m_to_str);
         break;
     }
 

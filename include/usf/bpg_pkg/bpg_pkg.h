@@ -49,6 +49,7 @@ bpg_pkg_t bpg_pkg_from_dp_req(gd_dp_req_t pkg);
 
 
 void bpg_pkg_init(bpg_pkg_t pkg);
+void bpg_pkg_clear_data(bpg_pkg_t pkg);
 
 /*pkg operations*/
 uint32_t bpg_pkg_cmd(bpg_pkg_t pkg);

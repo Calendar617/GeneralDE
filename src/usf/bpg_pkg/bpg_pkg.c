@@ -113,6 +113,19 @@ void bpg_pkg_init(bpg_pkg_t bpg_pkg) {
     head->version = 1;
 }
 
+void bpg_pkg_clear_data(bpg_pkg_t bpg_pkg) {
+    struct basepkg_head * head;
+
+    bpg_pkg_pkg_data_set_size(bpg_pkg, sizeof(struct basepkg_head));
+
+    head = (struct basepkg_head *)bpg_pkg_pkg_data(bpg_pkg);
+    head->headlen = sizeof(struct basepkg_head);
+    head->bodylen = 0;
+    head->originBodyLen = 0;
+    head->bodytotallen = 0;
+    head->appendInfoCount = 0;
+}
+
 uint32_t bpg_pkg_cmd(bpg_pkg_t req) {
     struct basepkg_head * head;
     head = (struct basepkg_head *)bpg_pkg_pkg_data(req);

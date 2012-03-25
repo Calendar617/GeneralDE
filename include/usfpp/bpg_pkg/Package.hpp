@@ -18,6 +18,7 @@ public:
     Gd::App::Application const & app(void) const;
 
     void init(void) { bpg_pkg_init(*this); }
+    void clearData(void) { bpg_pkg_clear_data(*this); }
 
     uint32_t cmd(void) const { return bpg_pkg_cmd(*this); }
     void setCmd(uint32_t cmd) { bpg_pkg_set_cmd(*this, cmd); }
