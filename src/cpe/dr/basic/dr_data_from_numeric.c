@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <string.h>
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/dr/dr_data.h"
 #include "../dr_internal_types.h"
 
@@ -186,6 +187,46 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, uint64);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, float);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(double, double);
 
+int string_from_int8(void * result, int8_t input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%d", input) < entry->m_size ? 0 : -1;
+}
+
+int string_from_uint8(void * result, uint8_t input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%u", input) < entry->m_size ? 0 : -1;
+}
+
+int string_from_int16(void * result, int16_t input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%d", input) < entry->m_size ? 0 : -1;
+}
+
+int string_from_uint16(void * result, uint16_t input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%u", input) < entry->m_size ? 0 : -1;
+}
+
+int string_from_int32(void * result, int32_t input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%d", input) < entry->m_size ? 0 : -1;
+}
+
+int string_from_uint32(void * result, uint32_t input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%u", input) < entry->m_size ? 0 : -1;
+}
+
+int string_from_int64(void * result, int64_t input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%lld", input) < entry->m_size ? 0 : -1;
+}
+
+int string_from_uint64(void * result, uint64_t input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%llu", input) < entry->m_size ? 0 : -1;
+}
+
+int string_from_float(void * result, float input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%f", input) < entry->m_size ? 0 : -1;
+}
+
+int string_from_double(void * result, double input, LPDRMETAENTRY entry, error_monitor_t em) {
+    return snprintf(result, entry->m_size, "%F", input) < entry->m_size ? 0 : -1;
+}
+
 struct DRCtypeTypeWriteOps g_dr_ctype_write_ops[] = {
      /*CPE_DR_TYPE_UNION*/
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
@@ -299,7 +340,11 @@ struct DRCtypeTypeWriteOps g_dr_ctype_write_ops[] = {
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
     }
     , /*CPE_DR_TYPE_STRING*/
-    { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+    { string_from_int8, string_from_uint8
+      , string_from_int16, string_from_uint16
+      , string_from_int32, string_from_uint32
+      , string_from_int64, string_from_uint64
+      , string_from_float, string_from_double
     }
     , /*CPE_DR_TYPE_WSTRING*/
     { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
