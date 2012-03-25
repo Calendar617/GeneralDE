@@ -194,7 +194,6 @@ static void * net_chanel_queue_peek(net_chanel_t bc, void * buf, size_t size) {
 
 static void net_chanel_queue_erase(net_chanel_t bc, size_t size) {
     struct net_chanel_queue * chanel;
-    ssize_t send_size;
 
     assert(bc);
     assert(bc->m_type == &s_net_chanel_type_queue);
@@ -204,8 +203,8 @@ static void net_chanel_queue_erase(net_chanel_t bc, size_t size) {
     if (size > chanel->m_size) size = chanel->m_size;
 
     if (size != chanel->m_size) {
-        memmove(chanel->m_buf, chanel->m_buf + send_size, chanel->m_size - send_size);
-        chanel->m_size -= send_size;
+        memmove(chanel->m_buf, chanel->m_buf + size, chanel->m_size - size);
+        chanel->m_size -= size;
     }
     else {
         chanel->m_size = 0;
