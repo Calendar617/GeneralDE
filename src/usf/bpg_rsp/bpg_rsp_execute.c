@@ -201,7 +201,7 @@ int bpg_rsp_copy_req_carry_data_to_ctx(bpg_rsp_manage_t mgr, logic_context_t op_
     return 0;
 }
 
-extern char g_metalib_caary_package[];
+extern char g_metalib_carry_package[];
 
 int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_manage_t mgr, logic_context_t op_context, bpg_pkg_t bpg_req, error_monitor_t em) {
     LPDRMETA bpg_carry_data_meta;
@@ -210,13 +210,14 @@ int bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_rsp_manage_t mgr, logic_context_t op_
 
     if (bpg_req == NULL) return 0;
 
-    bpg_carry_data_meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_caary_package, "bpg_carry_info");
+    bpg_carry_data_meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_carry_package, "bpg_carry_info");
     if (bpg_carry_data_meta == NULL) {
         CPE_ERROR(
             em, "%s: copy_bpg_carry_data: bpg_carry_info meta not exist!",
             bpg_rsp_manage_name(mgr));
         return -1;
     }
+
 
     data = logic_data_get_or_create(op_context, bpg_carry_data_meta, dr_meta_size(bpg_carry_data_meta));
     if (data == NULL) {

@@ -30,7 +30,7 @@ uint32_t bpg_rsp_addition_data_at(logic_context_t ctx, int16_t pos) {
 }
 
 #define BPG_RSP_ADDITION_DATA_ONCE_SIZE (16)
-extern char g_metalib_caary_package[];
+extern char g_metalib_carry_package[];
 
 static struct bpg_rsp_addition_data *
 bpg_rsp_addition_data_create(logic_context_t ctx, size_t capacity) {
@@ -38,7 +38,7 @@ bpg_rsp_addition_data_create(logic_context_t ctx, size_t capacity) {
     struct bpg_rsp_addition_data * addition_data;
     logic_data_t data;
 
-    meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_caary_package, "bpg_pkg_addition_data");
+    meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_carry_package, "bpg_pkg_addition_data");
     if (meta == NULL) return NULL;
 
     data = logic_data_get_or_create(ctx, meta, sizeof(struct bpg_rsp_addition_data) + (capacity - 1) * sizeof(uint32_t));
