@@ -95,17 +95,20 @@ int bpg_pkg_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
 
     child_cfg = cfg_find_cfg(cfg, "meta");
     if (child_cfg) {
-        if (bpg_pkg_manage_app_load_meta(app, module, bpg_pkg_manage, child_cfg) != 0
-            || (
-                cfg_get_int32(child_cfg, "validate", 0) != 0
-                && bpg_pkg_manage_app_validate_meta(app, module, bpg_pkg_manage) != 0))
-        {
+        if (bpg_pkg_manage_app_load_meta(app, module, bpg_pkg_manage, child_cfg) != 0) {
             bpg_pkg_manage_free(bpg_pkg_manage);
             return -1;
         }
     }
 
     bpg_pkg_manage->m_debug = cfg_get_int32(cfg, "debug", 0);
+
+    if (cfg_get_int32(child_cfg, "validate", 1) != 0
+        && bpg_pkg_manage_app_validate_meta(app, module, bpg_pkg_manage) != 0)
+    {
+        bpg_pkg_manage_free(bpg_pkg_manage);
+        return -1;
+    }
 
     if (bpg_pkg_manage->m_debug) {
         CPE_INFO(
