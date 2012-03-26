@@ -45,7 +45,7 @@ struct gd_app_context {
 
     char * m_root;
     cfg_t m_cfg;
-    gd_tl_manage_t m_tl_mgr;
+    tl_manage_t m_tl_mgr;
     gd_dp_mgr_t m_dp_mgr;
     gd_nm_mgr_t m_nm_mgr;
     net_mgr_t m_net_mgr;

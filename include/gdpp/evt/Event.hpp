@@ -45,7 +45,7 @@ public:
     void destory(void);
 
     static Event & _cast(gd_evt_t evt);
-    static Event & _cast(gd_tl_event_t tl_evt);
+    static Event & _cast(tl_event_t tl_evt);
 
 };
 

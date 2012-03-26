@@ -24,8 +24,8 @@ public:
     Nm::Manager & nmManager(void) { return *((Nm::Manager *)gd_app_nm_mgr(*this)); }
     Nm::Manager const & nmManager(void) const { return *((Nm::Manager *)gd_app_nm_mgr(*this)); }
 
-    Tl::Manager & tlManager(void) { return *(Tl::Manager *)gd_app_tl_mgr(*this); }
-    Tl::Manager const & tlManager(void) const { return *(Tl::Manager *)gd_app_tl_mgr(*this); }
+    Cpe::Tl::Manager & tlManager(void) { return *(Cpe::Tl::Manager *)gd_app_tl_mgr(*this); }
+    Cpe::Tl::Manager const & tlManager(void) const { return *(Cpe::Tl::Manager *)gd_app_tl_mgr(*this); }
 
     void tick(void) { gd_app_tick(*this); }
 

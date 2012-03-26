@@ -1,5 +1,5 @@
 #include "cpe/dr/dr_metalib_xml.h"
-#include "gd/tl/tl_manage.h"
+#include "cpe/tl/tl_manage.h"
 #include "EvtTest.hpp"
 
 EvtTest::EvtTest()
@@ -13,7 +13,7 @@ void EvtTest::SetUp() {
 
     mem_buffer_init(&m_buffer, t_allocrator());
 
-    m_tl_mgr = gd_tl_manage_create(t_allocrator());
+    m_tl_mgr = tl_manage_create(t_allocrator());
 }
 
 void EvtTest::TearDown() {
@@ -23,7 +23,7 @@ void EvtTest::TearDown() {
     }
     mem_buffer_clear(&m_buffer);
 
-    gd_tl_manage_free(m_tl_mgr);
+    tl_manage_free(m_tl_mgr);
     m_tl_mgr = NULL;
 
     Base::TearDown();
@@ -45,7 +45,7 @@ void EvtTest::createEvtMgr(const char * metalib) {
             NULL));
 
     m_evt_mgr = gd_evt_mgr_create(
-        gd_tl_create(m_tl_mgr),
+        tl_create(m_tl_mgr),
         (LPDRMETALIB)mem_buffer_make_continuous(&m_buffer, 0),
         t_allocrator());
     EXPECT_TRUE(m_evt_mgr);

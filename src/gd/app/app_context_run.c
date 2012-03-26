@@ -4,7 +4,7 @@
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/net/net_manage.h"
-#include "gd/tl/tl_manage.h"
+#include "cpe/tl/tl_manage.h"
 #include "gd/app/app_context.h"
 #include "app_internal_ops.h"
 
@@ -57,7 +57,7 @@ static int gd_app_build_default_tickers(gd_app_context_t context) {
         if (strcmp(ticker_name, "tl") == 0) {
             if (gd_app_tick_add(
                     context,
-                    (gd_app_tick_fun)gd_tl_manage_tick,
+                    (gd_app_tick_fun)tl_manage_tick,
                     context->m_tl_mgr,
                     cfg_get_int32(ticker_cfg, "count", 500)) != 0)
             {

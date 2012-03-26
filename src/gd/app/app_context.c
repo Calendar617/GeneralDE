@@ -26,7 +26,7 @@ cfg_t gd_app_cfg(gd_app_context_t context) {
     return context->m_cfg;
 }
 
-gd_tl_manage_t gd_app_tl_mgr(gd_app_context_t context) {
+tl_manage_t gd_app_tl_mgr(gd_app_context_t context) {
     return context->m_tl_mgr;
 }
 

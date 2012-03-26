@@ -4,7 +4,7 @@
 #include "cpe/utils/hash_string.h"
 #include "cpe/utils/error.h"
 #include "cpe/cfg/cfg_types.h"
-#include "gd/tl/tl_types.h"
+#include "cpe/tl/tl_types.h"
 #include "dp_types.h"
 
 #ifdef __cplusplus
