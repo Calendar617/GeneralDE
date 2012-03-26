@@ -190,6 +190,7 @@ static void bpg_rsp_commit_build_pkg_append_info_for_addition(
             CPE_ERROR(
                 em, "%s.%s: copy_ctx_to_pdu: for addition: meta with id %d not exist!",
                 bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), meta_id);
+            continue;
         }
 
         if (bpg_rsp_commit_build_pkg_append_info_from_ctx(rsp, op_context, pkg, meta, em) == 0) {
@@ -260,13 +261,8 @@ static int bpg_rsp_commit_build_pkg_main_info(bpg_rsp_t rsp, logic_context_t op_
     LPDRMETA meta;
     size_t size;
 
-    meta = bpg_pkg_main_data_meta(pkg, em);
-    if (meta == NULL) {
-        CPE_ERROR(
-            em, "%s.%s: copy_ctx_to_pdu: main: can`t find meta!",
-            bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp));
-        return -1;
-    }
+    meta = bpg_pkg_main_data_meta(pkg, NULL);
+    if (meta == NULL) return 0;
 
     data = logic_data_find(op_context, dr_meta_name(meta));
     if (data == NULL) {

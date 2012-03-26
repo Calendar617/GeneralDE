@@ -24,7 +24,7 @@ uint32_t bpg_rsp_addition_data_at(logic_context_t ctx, int16_t pos) {
         ? NULL
         : (struct bpg_rsp_addition_data *)logic_data_data(data);
 
-    if (addition_data == NULL || addition_data->count >= pos) return 0;
+    if (addition_data == NULL || addition_data->count <= pos) return 0;
 
     return addition_data->pieces[pos];
 }
