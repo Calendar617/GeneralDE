@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
-#include "gd/nm/nm_manage.h"
-#include "gd/nm/nm_read.h"
+#include "cpe/nm/nm_manage.h"
+#include "cpe/nm/nm_read.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/logic/logic_executor_type.h"

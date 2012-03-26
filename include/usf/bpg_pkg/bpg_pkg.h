@@ -44,8 +44,8 @@ LPDRMETA bpg_pkg_base_meta(bpg_pkg_t pkg);
 
 LPDRMETA bpg_pkg_cmd_meta(bpg_pkg_t pkg);
 
-gd_dp_req_t bpg_pkg_to_dp_req(bpg_pkg_t pkg);
-bpg_pkg_t bpg_pkg_from_dp_req(gd_dp_req_t pkg);
+dp_req_t bpg_pkg_to_dp_req(bpg_pkg_t pkg);
+bpg_pkg_t bpg_pkg_from_dp_req(dp_req_t pkg);
 
 
 void bpg_pkg_init(bpg_pkg_t pkg);

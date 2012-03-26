@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/cfg/cfg_read.h"
-#include "gd/dp/dp_manage.h"
+#include "cpe/dp/dp_manage.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/bpg_pkg/bpg_pkg_dsp.h"
 #include "bpg_pkg_internal_types.h"
@@ -61,12 +61,12 @@ static void bpg_pkg_dsp_node_free(mem_allocrator_t alloc, struct bpg_pkg_dsp_nod
 static int bpg_pkg_dsp_node_dispatch(struct bpg_pkg_dsp_node * node, bpg_pkg_t pkg, error_monitor_t em) {
     switch(node->m_type) {
     case bpg_pkg_dsp_to_cmd:
-        return gd_dp_dispatch_by_numeric(
+        return dp_dispatch_by_numeric(
             node->m_target.m_to_cmd, bpg_pkg_to_dp_req(pkg), em) == 0
             ? 0
             : -1;
     case bpg_pkg_dsp_to_str:
-        return gd_dp_dispatch_by_string(
+        return dp_dispatch_by_string(
             node->m_target.m_to_str, bpg_pkg_to_dp_req(pkg), em) == 0
             ? 0
             : -1;
@@ -136,7 +136,7 @@ int bpg_pkg_dsp_dispatch(bpg_pkg_dsp_t dsp, bpg_pkg_t pkg, error_monitor_t em) {
     if (dsp->m_dft_dsp) 
         return bpg_pkg_dsp_node_dispatch(dsp->m_dft_dsp, pkg, em);
 
-    return gd_dp_dispatch_by_numeric(
+    return dp_dispatch_by_numeric(
         bpg_pkg_cmd(pkg), bpg_pkg_to_dp_req(pkg), em) == 0
         ? 0
         : -1;

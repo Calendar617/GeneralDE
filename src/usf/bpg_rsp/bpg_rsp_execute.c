@@ -1,8 +1,8 @@
 #include <assert.h>
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cvt.h"
-#include "gd/dp/dp_request.h"
-#include "gd/dp/dp_manage.h"
+#include "cpe/dp/dp_request.h"
+#include "cpe/dp/dp_manage.h"
 #include "usf/logic/logic_context.h"
 #include "usf/logic/logic_data.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
@@ -15,7 +15,7 @@
 static int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t req, error_monitor_t em);
 static void bpg_rsp_commit_error(bpg_rsp_t rsp, logic_context_t op_context, int err);
 
-int bpg_rsp_execute(gd_dp_req_t dp_req, void * ctx, error_monitor_t em) {
+int bpg_rsp_execute(dp_req_t dp_req, void * ctx, error_monitor_t em) {
     bpg_rsp_t bpg_rsp;
     bpg_rsp_manage_t bpg_mgr;
     logic_context_t op_context;
@@ -31,7 +31,7 @@ int bpg_rsp_execute(gd_dp_req_t dp_req, void * ctx, error_monitor_t em) {
     if (req == NULL) {
         CPE_ERROR(
             em, "%s.%s: bpg_rsp_execute: input req is not a bpg_req, type is %s!",
-            bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp), gd_dp_req_type(dp_req));
+            bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp), dp_req_type(dp_req));
         return 0;
     }
 

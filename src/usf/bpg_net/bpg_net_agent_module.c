@@ -3,9 +3,9 @@
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/net/net_listener.h"
-#include "gd/nm/nm_manage.h"
-#include "gd/nm/nm_read.h"
-#include "gd/dp/dp_manage.h"
+#include "cpe/nm/nm_manage.h"
+#include "cpe/nm/nm_read.h"
+#include "cpe/dp/dp_manage.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
@@ -55,7 +55,7 @@ int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t c
 
     bpg_net_agent->m_debug = cfg_get_int32(cfg, "debug", 0);
 
-    if (gd_dp_rsp_bind_by_cfg(bpg_net_agent->m_reply_rsp, reply_recv_cfg, gd_app_em(app)) != 0) {
+    if (dp_rsp_bind_by_cfg(bpg_net_agent->m_reply_rsp, reply_recv_cfg, gd_app_em(app)) != 0) {
         CPE_ERROR(
             gd_app_em(app), "%s: create: bind rsp by cfg fail!",
             gd_app_module_name(module));

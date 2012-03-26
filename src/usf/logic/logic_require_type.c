@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "gd/nm/nm_manage.h"
+#include "cpe/nm/nm_manage.h"
 #include "usf/logic/logic_require.h"
 #include "usf/logic/logic_require_type.h"
 #include "logic_internal_ops.h"

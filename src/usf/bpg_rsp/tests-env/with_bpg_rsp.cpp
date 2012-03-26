@@ -3,7 +3,7 @@
 #include "cpe/utils/stream_buffer.h"
 #include "cpe/utils/tests-env/with_em.hpp"
 #include "cpe/cfg/tests-env/with_cfg.hpp"
-#include "gd/nm/nm_manage.h"
+#include "cpe/nm/nm_manage.h"
 #include "gd/app/tests-env/with_app.hpp"
 #include "usf/logic/tests-env/with_logic.hpp"
 #include "usf/bpg_rsp/tests-env/with_bpg_rsp.hpp"
@@ -17,7 +17,7 @@ void with_bpg_rsp::SetUp() {
 }
 
 void with_bpg_rsp::TearDown() {
-    gd_nm_mgr_free_nodes_with_type_name(
+    nm_mgr_free_nodes_with_type_name(
         envOf<gd::app::testenv::with_app>().t_nm(),
         "usf_bpg_rsp_manage");
 }

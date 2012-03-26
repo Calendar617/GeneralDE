@@ -1,15 +1,15 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
 #include "cpe/cfg/cfg_read.h"
-#include "gd/nm/nm_manage.h"
-#include "gd/nm/nm_read.h"
+#include "cpe/nm/nm_manage.h"
+#include "cpe/nm/nm_read.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/dr_store/dr_store_manage.h"
 #include "dr_store_internal_ops.h"
 
 cpe_hash_string_t s_dr_store_manage_default_name;
-struct gd_nm_node_type s_nm_node_type_dr_store_manage;
+struct nm_node_type s_nm_node_type_dr_store_manage;
 
 dr_store_manage_t
 dr_store_manage_create(
@@ -19,16 +19,16 @@ dr_store_manage_create(
     error_monitor_t em)
 {
     dr_store_manage_t mgr;
-    gd_nm_node_t mgr_node;
+    nm_node_t mgr_node;
 
     if (name == 0) name = cpe_hs_data(s_dr_store_manage_default_name);
 
     if (em == NULL) em = gd_app_em(app);
 
-    mgr_node = gd_nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct dr_store_manage));
+    mgr_node = nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct dr_store_manage));
     if (mgr_node == NULL) return NULL;
 
-    mgr = (dr_store_manage_t)gd_nm_node_data(mgr_node);
+    mgr = (dr_store_manage_t)nm_node_data(mgr_node);
     mgr->m_alloc = alloc;
     mgr->m_app = app;
     mgr->m_alloc = alloc;
@@ -45,18 +45,18 @@ dr_store_manage_create(
             CPE_HASH_OBJ2ENTRY(dr_store, m_hh),
             -1) != 0)
     {
-        gd_nm_node_free(mgr_node);
+        nm_node_free(mgr_node);
         return NULL;
     }
 
-    gd_nm_node_set_type(mgr_node, &s_nm_node_type_dr_store_manage);
+    nm_node_set_type(mgr_node, &s_nm_node_type_dr_store_manage);
 
     return mgr;
 }
 
-static void dr_store_manage_clear(gd_nm_node_t node) {
+static void dr_store_manage_clear(nm_node_t node) {
     dr_store_manage_t mgr;
-    mgr = (dr_store_manage_t)gd_nm_node_data(node);
+    mgr = (dr_store_manage_t)nm_node_data(node);
 
     dr_store_free_all(mgr);
 
@@ -64,12 +64,12 @@ static void dr_store_manage_clear(gd_nm_node_t node) {
 }
 
 void dr_store_manage_free(dr_store_manage_t mgr) {
-    gd_nm_node_t mgr_node;
+    nm_node_t mgr_node;
     assert(mgr);
 
-    mgr_node = gd_nm_node_from_data(mgr);
-    if (gd_nm_node_type(mgr_node) != &s_nm_node_type_dr_store_manage) return;
-    gd_nm_node_free(mgr_node);
+    mgr_node = nm_node_from_data(mgr);
+    if (nm_node_type(mgr_node) != &s_nm_node_type_dr_store_manage) return;
+    nm_node_free(mgr_node);
 }
 
 dr_store_manage_t
@@ -79,9 +79,9 @@ dr_store_manage_find(
 {
     if (name == NULL) name = s_dr_store_manage_default_name;
 
-    gd_nm_node_t node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_dr_store_manage) return NULL;
-    return (dr_store_manage_t)gd_nm_node_data(node);
+    nm_node_t node = nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_dr_store_manage) return NULL;
+    return (dr_store_manage_t)nm_node_data(node);
 }
 
 dr_store_manage_t
@@ -91,9 +91,9 @@ dr_store_manage_find_nc(
 {
     if (name == NULL) return dr_store_manage_default(app);
 
-    gd_nm_node_t node = gd_nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_dr_store_manage) return NULL;
-    return (dr_store_manage_t)gd_nm_node_data(node);
+    nm_node_t node = nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_dr_store_manage) return NULL;
+    return (dr_store_manage_t)nm_node_data(node);
 }
 
 dr_store_manage_t
@@ -106,12 +106,12 @@ gd_app_context_t dr_store_manage_app(dr_store_manage_t mgr) {
 }
 
 const char * dr_store_manage_name(dr_store_manage_t mgr) {
-    return gd_nm_node_name(gd_nm_node_from_data(mgr));
+    return nm_node_name(nm_node_from_data(mgr));
 }
 
 cpe_hash_string_t
 dr_store_manage_name_hs(dr_store_manage_t mgr) {
-    return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
+    return nm_node_name_hs(nm_node_from_data(mgr));
 }
 
 uint32_t dr_store_hash(const struct dr_store * store) {
@@ -124,7 +124,7 @@ int dr_store_cmp(const struct dr_store * l, const struct dr_store * r) {
 
 CPE_HS_DEF_VAR(s_dr_store_manage_default_name, "dr_store_manage");
 
-struct gd_nm_node_type s_nm_node_type_dr_store_manage = {
+struct nm_node_type s_nm_node_type_dr_store_manage = {
     "usf_dr_store_manage",
     dr_store_manage_clear
 };

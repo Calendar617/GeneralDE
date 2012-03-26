@@ -6,8 +6,8 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cfg.h"
 #include "gd/app/tests-env/with_app.hpp"
-#include "gd/nm/nm_read.h"
-#include "gd/nm/nm_manage.h"
+#include "cpe/nm/nm_read.h"
+#include "cpe/nm/nm_manage.h"
 #include "usf/logic/logic_executor_build.h"
 #include "usf/logic/logic_executor_type.h"
 #include "usf/logic/logic_data.h"
@@ -22,11 +22,11 @@ void with_logic::SetUp() {
 }
 
 void with_logic::TearDown() {
-    gd_nm_mgr_free_nodes_with_type_name(
+    nm_mgr_free_nodes_with_type_name(
         envOf<gd::app::testenv::with_app>().t_nm(),
         "usf_logic_manage");
 
-    gd_nm_mgr_free_nodes_with_type_name(
+    nm_mgr_free_nodes_with_type_name(
         envOf<gd::app::testenv::with_app>().t_nm(),
         "usf_logic_executor_type_group");
 }

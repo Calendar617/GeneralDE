@@ -5,7 +5,7 @@
 #include "usf/bpg_net/bpg_net_agent.h"
 #include "bpg_net_internal_ops.h"
 
-int bpg_net_agent_reply(gd_dp_req_t req, void * ctx, error_monitor_t em) {
+int bpg_net_agent_reply(dp_req_t req, void * ctx, error_monitor_t em) {
     bpg_net_agent_t agent;
     bpg_pkg_t pkg;
     size_t pkg_size;

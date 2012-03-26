@@ -4,7 +4,7 @@
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/net/net_chanel.h"
 #include "cpe/net/net_endpoint.h"
-#include "gd/dp/dp_manage.h"
+#include "cpe/dp/dp_manage.h"
 #include "gd/app/app_context.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/bpg_net/bpg_net_agent.h"
@@ -109,7 +109,7 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
             bpg_pkg_set_connection_id(req_buf, net_ep_id(ep));
             //got to next!!!
         case bpg_net_pkg_next_go_without_connection_id:
-            if (gd_dp_dispatch_by_numeric(bpg_pkg_cmd(req_buf), bpg_pkg_to_dp_req(req_buf), agent->m_em) != 0) {
+            if (dp_dispatch_by_numeric(bpg_pkg_cmd(req_buf), bpg_pkg_to_dp_req(req_buf), agent->m_em) != 0) {
                 CPE_ERROR(
                     agent->m_em, "%s: ep %d: dispatch cmd %d error!",
                     bpg_net_agent_name(agent), (int)net_ep_id(ep), bpg_pkg_cmd(req_buf));

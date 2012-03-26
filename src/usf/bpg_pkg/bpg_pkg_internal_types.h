@@ -33,7 +33,7 @@ struct bpg_pkg {
     size_t m_carry_data_size;
     size_t m_carry_data_capacity;
 
-    gd_dp_req_t m_dp_req;
+    dp_req_t m_dp_req;
 };
 
 enum bpg_pkg_dsp_type {

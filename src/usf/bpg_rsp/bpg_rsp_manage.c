@@ -1,8 +1,8 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
 #include "cpe/dr/dr_metalib_manage.h"
-#include "gd/nm/nm_manage.h"
-#include "gd/nm/nm_read.h"
+#include "cpe/nm/nm_manage.h"
+#include "cpe/nm/nm_read.h"
 #include "gd/app/app_context.h"
 #include "usf/logic/logic_manage.h"
 #include "usf/dr_store/dr_ref.h"
@@ -14,11 +14,11 @@
 #include "usf/bpg_rsp/bpg_rsp_pkg_builder.h"
 #include "bpg_rsp_internal_ops.h"
 
-static void bpg_rsp_manage_clear(gd_nm_node_t node);
+static void bpg_rsp_manage_clear(nm_node_t node);
 
 static cpe_hash_string_buf s_bpg_rsp_manage_default_name = CPE_HS_BUF_MAKE("bpg_rsp_manage");
 
-struct gd_nm_node_type s_nm_node_type_bpg_rsp_manage = {
+struct nm_node_type s_nm_node_type_bpg_rsp_manage = {
     "usf_bpg_rsp_manage",
     bpg_rsp_manage_clear
 };
@@ -31,7 +31,7 @@ bpg_rsp_manage_create(
     error_monitor_t em)
 {
     bpg_rsp_manage_t mgr;
-    gd_nm_node_t mgr_node;
+    nm_node_t mgr_node;
 
     assert(app);
     assert(logic_mgr);
@@ -44,10 +44,10 @@ bpg_rsp_manage_create(
         return NULL;
     }
 
-    mgr_node = gd_nm_group_create(gd_app_nm_mgr(app), name, sizeof(struct bpg_rsp_manage));
+    mgr_node = nm_group_create(gd_app_nm_mgr(app), name, sizeof(struct bpg_rsp_manage));
     if (mgr_node == NULL) return NULL;
 
-    mgr = (bpg_rsp_manage_t)gd_nm_node_data(mgr_node);
+    mgr = (bpg_rsp_manage_t)nm_node_data(mgr_node);
 
     mgr->m_app = app;
     mgr->m_alloc = gd_app_alloc(app);
@@ -71,14 +71,14 @@ bpg_rsp_manage_create(
 
     TAILQ_INIT(&mgr->m_pkg_builders);
 
-    gd_nm_node_set_type(mgr_node, &s_nm_node_type_bpg_rsp_manage);
+    nm_node_set_type(mgr_node, &s_nm_node_type_bpg_rsp_manage);
 
     return mgr;
 }
 
-static void bpg_rsp_manage_clear(gd_nm_node_t node) {
+static void bpg_rsp_manage_clear(nm_node_t node) {
     bpg_rsp_manage_t mgr;
-    mgr = (bpg_rsp_manage_t)gd_nm_node_data(node);
+    mgr = (bpg_rsp_manage_t)nm_node_data(node);
 
     while(!TAILQ_EMPTY(&mgr->m_pkg_builders)) {
         bpg_rsp_pkg_builder_free(TAILQ_FIRST(&mgr->m_pkg_builders));
@@ -101,34 +101,34 @@ static void bpg_rsp_manage_clear(gd_nm_node_t node) {
 }
 
 void bpg_rsp_manage_free(bpg_rsp_manage_t mgr) {
-    gd_nm_node_t mgr_node;
+    nm_node_t mgr_node;
     assert(mgr);
 
-    mgr_node = gd_nm_node_from_data(mgr);
-    if (gd_nm_node_type(mgr_node) != &s_nm_node_type_bpg_rsp_manage) return;
-    gd_nm_node_free(mgr_node);
+    mgr_node = nm_node_from_data(mgr);
+    if (nm_node_type(mgr_node) != &s_nm_node_type_bpg_rsp_manage) return;
+    nm_node_free(mgr_node);
 }
 
 bpg_rsp_manage_t
 bpg_rsp_manage_find(gd_app_context_t app, cpe_hash_string_t name) {
-    gd_nm_node_t node;
+    nm_node_t node;
 
     if (name == NULL) name = (cpe_hash_string_t)&s_bpg_rsp_manage_default_name;
 
-    node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_bpg_rsp_manage) return NULL;
-    return (bpg_rsp_manage_t)gd_nm_node_data(node);
+    node = nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_bpg_rsp_manage) return NULL;
+    return (bpg_rsp_manage_t)nm_node_data(node);
 }
 
 bpg_rsp_manage_t
 bpg_rsp_manage_find_nc(gd_app_context_t app, const char * name) {
-    gd_nm_node_t node;
+    nm_node_t node;
 
     if (name == NULL) return bpg_rsp_manage_default(app);
 
-    node = gd_nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_bpg_rsp_manage) return NULL;
-    return (bpg_rsp_manage_t)gd_nm_node_data(node);
+    node = nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_bpg_rsp_manage) return NULL;
+    return (bpg_rsp_manage_t)nm_node_data(node);
 }
 
 bpg_rsp_manage_t
@@ -141,12 +141,12 @@ gd_app_context_t bpg_rsp_manage_app(bpg_rsp_manage_t mgr) {
 }
 
 const char * bpg_rsp_manage_name(bpg_rsp_manage_t mgr) {
-    return gd_nm_node_name(gd_nm_node_from_data(mgr));
+    return nm_node_name(nm_node_from_data(mgr));
 }
 
 cpe_hash_string_t
 bpg_rsp_manage_name_hs(bpg_rsp_manage_t mgr) {
-    return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
+    return nm_node_name_hs(nm_node_from_data(mgr));
 }
 
 bpg_pkg_dsp_t bpg_rsp_manage_commit_dsp(bpg_rsp_manage_t mgr) {

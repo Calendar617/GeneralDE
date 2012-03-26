@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "gd/dp/dp_manage.h"
+#include "cpe/dp/dp_manage.h"
 #include "usf/bpg/bpg_pkg.h"
 #include "usf/bpg/bpg_manage.h"
 #include "usf/bpg/bpg_running_req.h"
@@ -25,7 +25,7 @@ bpg_running_req_create(bpg_manage_t mgr, bpg_pkg_t req) {
         return NULL;
     }
 
-    if (gd_dp_dispatch_by_string(mgr->m_send_to, bpg_pkg_to_dp_req(req), mgr->m_em) != 0) {
+    if (dp_dispatch_by_string(mgr->m_send_to, bpg_pkg_to_dp_req(req), mgr->m_em) != 0) {
         CPE_ERROR(mgr->m_em, "%s: bpg_running_req_create: dispatch fail!", bpg_manage_name(mgr));
         bpg_running_req_free(running_req);
         return NULL;

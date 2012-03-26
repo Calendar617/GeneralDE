@@ -3,7 +3,7 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/dr/dr_json.h"
-#include "gd/dp/dp_request.h"
+#include "cpe/dp/dp_request.h"
 #include "gd/app/app_context.h"
 #include "usf/dr_store/dr_ref.h"
 #include "usf/dr_store/dr_store_manage.h"
@@ -19,18 +19,18 @@ bpg_pkg_create(
     LPDRMETA carry_data_meta,
     size_t carry_data_capacity)
 {
-    gd_dp_req_t dp_req;
+    dp_req_t dp_req;
     bpg_pkg_t bpg_pkg;
 
     if (pkg_capacity < sizeof (struct basepkg)) return NULL;
 
-    dp_req = gd_dp_req_create(
+    dp_req = dp_req_create(
         gd_app_dp_mgr(mgr->m_app),
         bpg_pkg_type_name,
         sizeof(struct bpg_pkg) + carry_data_capacity + pkg_capacity);
     if (dp_req == NULL) return NULL;
 
-    bpg_pkg = (bpg_pkg_t)gd_dp_req_data(dp_req);
+    bpg_pkg = (bpg_pkg_t)dp_req_data(dp_req);
 
     bpg_pkg->m_mgr = mgr;
     bpg_pkg->m_connection_id = BPG_INVALID_CONNECTION_ID;
@@ -45,7 +45,7 @@ bpg_pkg_create(
 }
 
 void bpg_pkg_free(bpg_pkg_t req) {
-    gd_dp_req_free(req->m_dp_req);
+    dp_req_free(req->m_dp_req);
 }
 
 int64_t bpg_pkg_connection_id(bpg_pkg_t pkg) {
@@ -83,7 +83,7 @@ bpg_pkg_manage_t bpg_pkg_mgr(bpg_pkg_t req) {
 }
 
 size_t bpg_pkg_pkg_capacity(bpg_pkg_t req) {
-    return gd_dp_req_capacity(req->m_dp_req) - sizeof(struct bpg_pkg) - req->m_carry_data_capacity;
+    return dp_req_capacity(req->m_dp_req) - sizeof(struct bpg_pkg) - req->m_carry_data_capacity;
 }
 
 void * bpg_pkg_pkg_data(bpg_pkg_t req) {
@@ -91,13 +91,13 @@ void * bpg_pkg_pkg_data(bpg_pkg_t req) {
 }
 
 size_t bpg_pkg_pkg_data_size(bpg_pkg_t req) {
-    return gd_dp_req_size(req->m_dp_req) - sizeof(struct bpg_pkg) - req->m_carry_data_capacity;
+    return dp_req_size(req->m_dp_req) - sizeof(struct bpg_pkg) - req->m_carry_data_capacity;
 }
 
 int bpg_pkg_pkg_data_set_size(bpg_pkg_t req, size_t size) {
     size_t total_size = size + sizeof(struct bpg_pkg) + req->m_carry_data_capacity;
-    if (total_size > gd_dp_req_capacity(req->m_dp_req)) return -1;
-    return gd_dp_req_set_size(req->m_dp_req, total_size);
+    if (total_size > dp_req_capacity(req->m_dp_req)) return -1;
+    return dp_req_set_size(req->m_dp_req, total_size);
 }
 
 void bpg_pkg_init(bpg_pkg_t bpg_pkg) {
@@ -168,7 +168,7 @@ void bpg_pkg_set_errno(bpg_pkg_t req, uint32_t errno) {
     head->errno = errno;
 }
 
-gd_dp_req_t bpg_pkg_to_dp_req(bpg_pkg_t req) {
+dp_req_t bpg_pkg_to_dp_req(bpg_pkg_t req) {
     return req->m_dp_req;
 }
 
@@ -187,9 +187,9 @@ void bpg_pkg_set_client_id(bpg_pkg_t req, uint32_t client_id) {
 }
 
 
-bpg_pkg_t bpg_pkg_from_dp_req(gd_dp_req_t req) {
-    if (cpe_hs_cmp(gd_dp_req_type_hs(req), bpg_pkg_type_name) != 0) return NULL;
-    return (bpg_pkg_t)gd_dp_req_data(req);
+bpg_pkg_t bpg_pkg_from_dp_req(dp_req_t req) {
+    if (cpe_hs_cmp(dp_req_type_hs(req), bpg_pkg_type_name) != 0) return NULL;
+    return (bpg_pkg_t)dp_req_data(req);
 }
 
 dr_cvt_t bpg_pkg_data_cvt(bpg_pkg_t pkg) {

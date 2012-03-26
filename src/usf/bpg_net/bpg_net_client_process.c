@@ -2,7 +2,7 @@
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/net/net_chanel.h"
 #include "cpe/net/net_endpoint.h"
-#include "gd/dp/dp_manage.h"
+#include "cpe/dp/dp_manage.h"
 #include "gd/app/app_context.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/bpg_pkg/bpg_pkg_dsp.h"

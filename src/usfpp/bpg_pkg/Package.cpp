@@ -173,7 +173,7 @@ Package & Package::_cast(bpg_pkg_t pkg) {
     return *(Package*)pkg;
 }
 
-Package & Package::_cast(gd_dp_req_t req) {
+Package & Package::_cast(dp_req_t req) {
     if (req == NULL) {
         throw ::std::runtime_error("Usf::Bpg::Package::_cast: input req is NULL!");
     }

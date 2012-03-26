@@ -1,11 +1,11 @@
 #ifndef USFPP_LOGIC_LOGICOP_H
 #define USFPP_LOGIC_LOGICOP_H
-#include "gdpp/nm/Object.hpp"
+#include "cpepp/nm/Object.hpp"
 #include "System.hpp"
 
 namespace Usf { namespace Logic {
 
-class LogicOp : public Gd::Nm::Object {
+class LogicOp : public Cpe::Nm::Object {
 public:
     typedef void (LogicOp::*execute_fun)(LogicOpContext & context, Cpe::Cfg::Node const & cfg) const;
 

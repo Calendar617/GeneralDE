@@ -5,8 +5,8 @@
 #include "cpe/utils/error.h"
 #include "cpe/utils/range.h"
 #include "cpe/utils/file.h"
-#include "gd/nm/nm_manage.h"
-#include "gd/nm/nm_read.h"
+#include "cpe/nm/nm_manage.h"
+#include "cpe/nm/nm_read.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/utils/id_generator.h"
@@ -22,10 +22,10 @@ struct usf_id_generator {
     int m_debug;
 };
 
-static void usf_id_generator_clear(gd_nm_node_t node);
+static void usf_id_generator_clear(nm_node_t node);
 static int usf_id_generator_write_back(usf_id_generator_t id_generator, ptr_int_t new_begin);
 
-struct gd_nm_node_type s_nm_node_type_usf_id_generator = {
+struct nm_node_type s_nm_node_type_usf_id_generator = {
     "usf_id_generator",
     usf_id_generator_clear
 };
@@ -38,14 +38,14 @@ usf_id_generator_create(
     error_monitor_t em)
 {
     usf_id_generator_t generator;
-    gd_nm_node_t generator_node;
+    nm_node_t generator_node;
 
     assert(app);
 
-    generator_node = gd_nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct usf_id_generator));
+    generator_node = nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct usf_id_generator));
     if (generator_node == NULL) return NULL;
 
-    generator = (usf_id_generator_t)gd_nm_node_data(generator_node);
+    generator = (usf_id_generator_t)nm_node_data(generator_node);
 
     generator->m_app = app;
     generator->m_alloc = alloc ? alloc : gd_app_alloc(app);
@@ -57,14 +57,14 @@ usf_id_generator_create(
     generator->m_range.m_start = 1;
     generator->m_range.m_end = 1;
 
-    gd_nm_node_set_type(generator_node, &s_nm_node_type_usf_id_generator);
+    nm_node_set_type(generator_node, &s_nm_node_type_usf_id_generator);
 
     return generator;
 }
 
-static void usf_id_generator_clear(gd_nm_node_t node) {
+static void usf_id_generator_clear(nm_node_t node) {
     usf_id_generator_t generator;
-    generator = (usf_id_generator_t)gd_nm_node_data(node);
+    generator = (usf_id_generator_t)nm_node_data(node);
 
     if (generator->m_save_file) {
         mem_free(generator->m_alloc, (void*)generator->m_save_file);
@@ -73,34 +73,34 @@ static void usf_id_generator_clear(gd_nm_node_t node) {
 }
 
 void usf_id_generator_free(usf_id_generator_t generator) {
-    gd_nm_node_t generator_node;
+    nm_node_t generator_node;
     assert(generator);
 
-    generator_node = gd_nm_node_from_data(generator);
-    if (gd_nm_node_type(generator_node) != &s_nm_node_type_usf_id_generator) return;
-    gd_nm_node_free(generator_node);
+    generator_node = nm_node_from_data(generator);
+    if (nm_node_type(generator_node) != &s_nm_node_type_usf_id_generator) return;
+    nm_node_free(generator_node);
 }
 
 usf_id_generator_t
 usf_id_generator_find(gd_app_context_t app, cpe_hash_string_t name) {
-    gd_nm_node_t node;
+    nm_node_t node;
 
     if (name == NULL) return NULL;
 
-    node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_usf_id_generator) return NULL;
-    return (usf_id_generator_t)gd_nm_node_data(node);
+    node = nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_usf_id_generator) return NULL;
+    return (usf_id_generator_t)nm_node_data(node);
 }
 
 usf_id_generator_t
 usf_id_generator_find_nc(gd_app_context_t app, const char * name) {
-    gd_nm_node_t node;
+    nm_node_t node;
 
     if (name == NULL) return NULL;
 
-    node = gd_nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_usf_id_generator) return NULL;
-    return (usf_id_generator_t)gd_nm_node_data(node);
+    node = nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_usf_id_generator) return NULL;
+    return (usf_id_generator_t)nm_node_data(node);
 }
 
 gd_app_context_t usf_id_generator_app(usf_id_generator_t generator) {
@@ -108,12 +108,12 @@ gd_app_context_t usf_id_generator_app(usf_id_generator_t generator) {
 }
 
 const char * usf_id_generator_name(usf_id_generator_t generator) {
-    return gd_nm_node_name(gd_nm_node_from_data(generator));
+    return nm_node_name(nm_node_from_data(generator));
 }
 
 cpe_hash_string_t
 usf_id_generator_name_hs(usf_id_generator_t generator) {
-    return gd_nm_node_name_hs(gd_nm_node_from_data(generator));
+    return nm_node_name_hs(nm_node_from_data(generator));
 }
 
 const char * usf_id_generator_save_file(usf_id_generator_t generator) {

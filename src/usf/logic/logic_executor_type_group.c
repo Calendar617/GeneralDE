@@ -1,17 +1,17 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
-#include "gd/nm/nm_manage.h"
-#include "gd/nm/nm_read.h"
+#include "cpe/nm/nm_manage.h"
+#include "cpe/nm/nm_read.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/logic/logic_executor_type.h"
 #include "logic_internal_ops.h"
 
-static void logic_executor_type_group_clear(gd_nm_node_t node);
+static void logic_executor_type_group_clear(nm_node_t node);
 
 CPE_HS_DEF_VAR(logic_executor_type_group_dft_name, "logic_executor_type_group");
 
-struct gd_nm_node_type s_nm_node_type_logic_executor_type_group = {
+struct nm_node_type s_nm_node_type_logic_executor_type_group = {
     "usf_logic_executor_type_group",
     logic_executor_type_group_clear
 };
@@ -23,17 +23,17 @@ logic_executor_type_group_create(
     mem_allocrator_t alloc)
 {
     logic_executor_type_group_t group;
-    gd_nm_node_t group_node;
+    nm_node_t group_node;
 
     if (name == 0) name = cpe_hs_data(logic_executor_type_group_dft_name);
 
-    group_node = gd_nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct logic_executor_type_group));
+    group_node = nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct logic_executor_type_group));
     if (group_node == NULL) return NULL;
 
-    group = (logic_executor_type_group_t)gd_nm_node_data(group_node);
+    group = (logic_executor_type_group_t)nm_node_data(group_node);
     group->m_alloc = alloc;
     group->m_app = app;
-    gd_nm_node_set_type(group_node, &s_nm_node_type_logic_executor_type_group);
+    nm_node_set_type(group_node, &s_nm_node_type_logic_executor_type_group);
 
     if (cpe_hash_table_init(
             &group->m_types,
@@ -43,7 +43,7 @@ logic_executor_type_group_create(
             CPE_HASH_OBJ2ENTRY(logic_executor_type, m_hh),
             -1) != 0)
     {
-        gd_nm_node_free(group_node);
+        nm_node_free(group_node);
         return NULL;
     }
 
@@ -52,21 +52,21 @@ logic_executor_type_group_create(
     return group;
 }
 
-static void logic_executor_type_group_clear(gd_nm_node_t node) {
+static void logic_executor_type_group_clear(nm_node_t node) {
     logic_executor_type_group_t group;
-    group = (logic_executor_type_group_t)gd_nm_node_data(node);
+    group = (logic_executor_type_group_t)nm_node_data(node);
 
     logic_executor_type_free_all(group);
     cpe_hash_table_fini(&group->m_types);
 }
 
 void logic_executor_type_group_free(logic_executor_type_group_t group) {
-    gd_nm_node_t group_node;
+    nm_node_t group_node;
     assert(group);
 
-    group_node = gd_nm_node_from_data(group);
-    if (gd_nm_node_type(group_node) != &s_nm_node_type_logic_executor_type_group) return;
-    gd_nm_node_free(group_node);
+    group_node = nm_node_from_data(group);
+    if (nm_node_type(group_node) != &s_nm_node_type_logic_executor_type_group) return;
+    nm_node_free(group_node);
 }
 
 logic_executor_type_group_t
@@ -74,24 +74,24 @@ logic_executor_type_group_find(
     gd_app_context_t app,
     cpe_hash_string_t name)
 {
-    gd_nm_node_t node;
+    nm_node_t node;
 
     if (name == NULL) name = logic_executor_type_group_dft_name;
 
-    node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_executor_type_group) return NULL;
-    return (logic_executor_type_group_t)gd_nm_node_data(node);
+    node = nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_logic_executor_type_group) return NULL;
+    return (logic_executor_type_group_t)nm_node_data(node);
 }
 
 logic_executor_type_group_t
 logic_executor_type_group_find_nc(gd_app_context_t app, const char * name) {
-    gd_nm_node_t node;
+    nm_node_t node;
 
     if (name == NULL) return logic_executor_type_group_default(app);
 
-    node = gd_nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_executor_type_group) return NULL;
-    return (logic_executor_type_group_t)gd_nm_node_data(node);
+    node = nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_logic_executor_type_group) return NULL;
+    return (logic_executor_type_group_t)nm_node_data(node);
 }
 
 logic_executor_type_group_t
@@ -104,7 +104,7 @@ gd_app_context_t logic_executor_type_group_app(logic_executor_type_group_t group
 }
 
 const char * logic_executor_type_group_name(logic_executor_type_group_t group) {
-    return gd_nm_node_name(gd_nm_node_from_data(group));
+    return nm_node_name(nm_node_from_data(group));
 }
 
 static
@@ -132,7 +132,7 @@ void logic_executor_type_group_types(logic_executor_type_it_t it, logic_executor
 
 cpe_hash_string_t
 logic_executor_type_group_name_hs(logic_executor_type_group_t group) {
-    return gd_nm_node_name_hs(gd_nm_node_from_data(group));
+    return nm_node_name_hs(nm_node_from_data(group));
 }
 
 EXPORT_DIRECTIVE

@@ -1,6 +1,6 @@
 #include "cpepp/utils/CString.hpp"
 #include "cpepp/cfg/Node.hpp"
-#include "gdpp/nm/Manager.hpp"
+#include "cpepp/nm/Manager.hpp"
 #include "gdpp/app/Log.hpp"
 #include "gdpp/app/Module.hpp"
 #include "gdpp/app/Application.hpp"

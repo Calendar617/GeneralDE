@@ -6,7 +6,7 @@
 #include "usf/bpg_net/bpg_net_client.h"
 #include "bpg_net_internal_ops.h"
 
-int bpg_net_client_send(gd_dp_req_t req, void * ctx, error_monitor_t em) {
+int bpg_net_client_send(dp_req_t req, void * ctx, error_monitor_t em) {
     bpg_net_client_t client;
     bpg_pkg_t pkg;
     size_t pkg_size;

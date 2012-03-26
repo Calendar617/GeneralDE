@@ -1,6 +1,6 @@
 #ifndef USF_BPG_INTERNAL_OPS_H
 #define USF_BPG_INTERNAL_OPS_H
-#include "gd/dp/dp_types.h"
+#include "cpe/dp/dp_types.h"
 #include "bpg_internal_types.h"
 
 #ifdef __cplusplus
@@ -11,7 +11,7 @@ extern "C" {
 bpg_pkg_t bpg_manage_rsp_buf(bpg_manage_t mgr, LPDRMETA carry_meta, size_t caary_capacity);
 
 /*bpg_rsp ops*/
-int bpg_rsp_execute(gd_dp_req_t req, void * ctx, error_monitor_t em);
+int bpg_rsp_execute(dp_req_t req, void * ctx, error_monitor_t em);
 void bpg_rsp_commit(logic_context_t op_context, void * user_data);
 
 /*bpg_rsp_copy_info ops*/

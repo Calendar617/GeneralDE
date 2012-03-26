@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "cpe/dr/dr_metalib_manage.h"
-#include "gd/dp/dp_request.h"
-#include "gd/dp/dp_manage.h"
+#include "cpe/dp/dp_request.h"
+#include "cpe/dp/dp_manage.h"
 #include "usf/logic/logic_context.h"
 #include "usf/logic/logic_data.h"
 #include "usf/bpg_pkg/bpg_pkg.h"

@@ -19,7 +19,7 @@ struct bpg_net_agent {
     bpg_pkg_t m_req_buf;
     struct mem_buffer m_rsp_buf;
 
-    gd_dp_rsp_t m_reply_rsp;
+    dp_rsp_t m_reply_rsp;
 
     struct cpe_hash_table m_cliensts;
     struct cpe_hash_table m_connections;
@@ -48,7 +48,7 @@ struct bpg_net_client {
 
     bpg_pkg_dsp_t m_rsp_dsp;
 
-    gd_dp_rsp_t m_send_rsp;
+    dp_rsp_t m_send_rsp;
 
     int m_debug;
 };

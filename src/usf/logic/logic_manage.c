@@ -1,18 +1,18 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
 #include "cpe/cfg/cfg_read.h"
-#include "gd/nm/nm_manage.h"
-#include "gd/nm/nm_read.h"
+#include "cpe/nm/nm_manage.h"
+#include "cpe/nm/nm_read.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "usf/logic/logic_manage.h"
 #include "logic_internal_ops.h"
 
-static void logic_manage_clear(gd_nm_node_t node);
+static void logic_manage_clear(nm_node_t node);
 
 static cpe_hash_string_buf s_logic_manage_default_name = CPE_HS_BUF_MAKE("logic_manage");
 
-struct gd_nm_node_type s_nm_node_type_logic_manage = {
+struct nm_node_type s_nm_node_type_logic_manage = {
     "usf_logic_manage",
     logic_manage_clear
 };
@@ -24,14 +24,14 @@ logic_manage_create(
     mem_allocrator_t alloc)
 {
     logic_manage_t mgr;
-    gd_nm_node_t mgr_node;
+    nm_node_t mgr_node;
 
     if (name == 0) name = cpe_hs_data((cpe_hash_string_t)&s_logic_manage_default_name);
 
-    mgr_node = gd_nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct logic_manage));
+    mgr_node = nm_instance_create(gd_app_nm_mgr(app), name, sizeof(struct logic_manage));
     if (mgr_node == NULL) return NULL;
 
-    mgr = (logic_manage_t)gd_nm_node_data(mgr_node);
+    mgr = (logic_manage_t)nm_node_data(mgr_node);
     mgr->m_alloc = alloc;
     mgr->m_app = app;
     mgr->m_context_id = 0;
@@ -46,7 +46,7 @@ logic_manage_create(
             CPE_HASH_OBJ2ENTRY(logic_require_type, m_hh),
             -1) != 0)
     {
-        gd_nm_node_free(mgr_node);
+        nm_node_free(mgr_node);
         return NULL;
     }
 
@@ -59,7 +59,7 @@ logic_manage_create(
             -1) != 0)
     {
         cpe_hash_table_fini(&mgr->m_require_types);
-        gd_nm_node_free(mgr_node);
+        nm_node_free(mgr_node);
         return NULL;
     }
 
@@ -73,7 +73,7 @@ logic_manage_create(
     {
         cpe_hash_table_fini(&mgr->m_require_types);
         cpe_hash_table_fini(&mgr->m_requires);
-        gd_nm_node_free(mgr_node);
+        nm_node_free(mgr_node);
         return NULL;
     }
 
@@ -88,18 +88,18 @@ logic_manage_create(
         cpe_hash_table_fini(&mgr->m_require_types);
         cpe_hash_table_fini(&mgr->m_requires);
         cpe_hash_table_fini(&mgr->m_datas);
-        gd_nm_node_free(mgr_node);
+        nm_node_free(mgr_node);
         return NULL;
     }
 
-    gd_nm_node_set_type(mgr_node, &s_nm_node_type_logic_manage);
+    nm_node_set_type(mgr_node, &s_nm_node_type_logic_manage);
 
     return mgr;
 }
 
-static void logic_manage_clear(gd_nm_node_t node) {
+static void logic_manage_clear(nm_node_t node) {
     logic_manage_t mgr;
-    mgr = (logic_manage_t)gd_nm_node_data(node);
+    mgr = (logic_manage_t)nm_node_data(node);
 
     logic_context_free_all(mgr);
     logic_require_free_all(mgr);
@@ -113,12 +113,12 @@ static void logic_manage_clear(gd_nm_node_t node) {
 }
 
 void logic_manage_free(logic_manage_t mgr) {
-    gd_nm_node_t mgr_node;
+    nm_node_t mgr_node;
     assert(mgr);
 
-    mgr_node = gd_nm_node_from_data(mgr);
-    if (gd_nm_node_type(mgr_node) != &s_nm_node_type_logic_manage) return;
-    gd_nm_node_free(mgr_node);
+    mgr_node = nm_node_from_data(mgr);
+    if (nm_node_type(mgr_node) != &s_nm_node_type_logic_manage) return;
+    nm_node_free(mgr_node);
 }
 
 logic_manage_t
@@ -128,9 +128,9 @@ logic_manage_find(
 {
     if (name == NULL) name = (cpe_hash_string_t)&s_logic_manage_default_name;
 
-    gd_nm_node_t node = gd_nm_mgr_find_node(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
-    return (logic_manage_t)gd_nm_node_data(node);
+    nm_node_t node = nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
+    return (logic_manage_t)nm_node_data(node);
 }
 
 logic_manage_t
@@ -140,9 +140,9 @@ logic_manage_find_nc(
 {
     if (name == NULL) return logic_manage_default(app);
 
-    gd_nm_node_t node = gd_nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
-    if (node == NULL || gd_nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
-    return (logic_manage_t)gd_nm_node_data(node);
+    nm_node_t node = nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
+    if (node == NULL || nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
+    return (logic_manage_t)nm_node_data(node);
 }
 
 logic_manage_t
@@ -157,12 +157,12 @@ gd_app_context_t logic_manage_app(logic_manage_t mgr) {
 }
 
 const char * logic_manage_name(logic_manage_t mgr) {
-    return gd_nm_node_name(gd_nm_node_from_data(mgr));
+    return nm_node_name(nm_node_from_data(mgr));
 }
 
 cpe_hash_string_t
 logic_manage_name_hs(logic_manage_t mgr) {
-    return gd_nm_node_name_hs(gd_nm_node_from_data(mgr));
+    return nm_node_name_hs(nm_node_from_data(mgr));
 }
 
 EXPORT_DIRECTIVE

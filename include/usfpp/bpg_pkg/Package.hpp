@@ -94,7 +94,7 @@ public:
     const char * dump_data(mem_buffer_t buffer) const { return bpg_pkg_dump(*this, buffer); }
 
     static Package & _cast(bpg_pkg_t pkg);
-    static Package & _cast(gd_dp_req_t req);
+    static Package & _cast(dp_req_t req);
 };
 
 }}
