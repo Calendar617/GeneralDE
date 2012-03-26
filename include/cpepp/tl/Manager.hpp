@@ -1,5 +1,6 @@
 #ifndef CPEPP_TL_MANAGER_H
 #define CPEPP_TL_MANAGER_H
+#include "cpepp/utils/ClassCategory.hpp"
 #include "cpe/tl/tl_manage.h"
 #include "System.hpp"
 
