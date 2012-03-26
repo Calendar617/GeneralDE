@@ -4,7 +4,7 @@
 #include "cpe/utils/memory.h"
 #include "cpe/utils/hash.h"
 #include "cpe/utils/hash_string.h"
-#include "usf/dr_store/dr_store_types.h"
+#include "gd/dr_store/dr_store_types.h"
 #include "usf/bpg_rsp/bpg_rsp_types.h"
 
 #ifdef __cplusplus
