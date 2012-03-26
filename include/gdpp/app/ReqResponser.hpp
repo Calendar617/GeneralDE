@@ -17,7 +17,7 @@ public:
 
 }}
 
-#define CPE_DP_RESPONSER_REG(__rsp_name, __rsp_type)         \
+#define GD_DP_RESPONSER_REG(__rsp_name, __rsp_type)         \
     extern "C"                                              \
     int rsp_ ## __rsp_name ## _init(                        \
         dp_rsp_t rsp, gd_app_context_t context,          \
