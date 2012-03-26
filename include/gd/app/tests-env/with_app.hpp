@@ -41,8 +41,8 @@ public:
         const char * moduleName,
         const char * cfg);
 
-    gd_dp_mgr_t t_dp(void);
-    gd_nm_mgr_t t_nm(void);
+    dp_mgr_t t_dp(void);
+    nm_mgr_t t_nm(void);
 
     gd_app_module_t t_app_find_module(const char * moduleName);
 

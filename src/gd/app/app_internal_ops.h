@@ -36,7 +36,7 @@ struct gd_app_module_type *
 gd_app_module_type_find(const char * moduleName);
 
 /*module data operations*/
-gd_nm_node_t
+nm_node_t
 gd_app_module_data_load(
     gd_app_context_t context,
     const char * moduleName);

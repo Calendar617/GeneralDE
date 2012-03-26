@@ -1,13 +1,13 @@
 #ifndef GDPP_APP_EVENTCENTER_H
 #define GDPP_APP_EVENTCENTER_H
 #include "gdpp/app/System.hpp"
-#include "gdpp/nm/Object.hpp"
+#include "cpepp/nm/Object.hpp"
 #include "Event.hpp"
 #include "EventResponser.hpp"
 
 namespace Gd { namespace App {
 
-class EventCenter : public Gd::Nm::Object {
+class EventCenter : public Cpe::Nm::Object {
 public:
     virtual Event & createEvent(const char * typeName, ssize_t capacity = -1) = 0;
 	virtual void sendEvent(const char * oid, Event & event) = 0;

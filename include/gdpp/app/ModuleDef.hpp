@@ -1,6 +1,6 @@
 #ifndef GDPP_APP_MODULE_DEF_H
 #define GDPP_APP_MODULE_DEF_H
-#include "gdpp/nm/Manager.hpp"
+#include "cpepp/nm/Manager.hpp"
 #include "Application.hpp"
 #include "Module.hpp"
 #include "Log.hpp"

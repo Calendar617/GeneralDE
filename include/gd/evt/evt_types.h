@@ -1,5 +1,5 @@
-#ifndef GD_DP_EVT_TYPES_H
-#define GD_DP_EVT_TYPES_H
+#ifndef CPE_DP_EVT_TYPES_H
+#define CPE_DP_EVT_TYPES_H
 #include "cpe/dr/dr_types.h"
 #include "cpe/tl/tl_types.h"
 

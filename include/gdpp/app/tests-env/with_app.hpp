@@ -3,8 +3,8 @@
 #include "cpe/utils/hash_string.h"
 #include "gd/app/tests-env/with_app.hpp"
 #include "cpepp/utils/System.hpp"
-#include "gdpp/nm/Object.hpp"
-#include "gdpp/nm/Manager.hpp"
+#include "cpepp/nm/Object.hpp"
+#include "cpepp/nm/Manager.hpp"
 #include "../Application.hpp"
 
 namespace Gd { namespace App { namespace testenv {

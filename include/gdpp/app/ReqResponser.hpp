@@ -1,6 +1,6 @@
 #ifndef GDPP_APP_RESPONSER_H
 #define GDPP_APP_RESPONSER_H
-#include "gd/dp/dp_responser.h"
+#include "cpe/dp/dp_responser.h"
 #include "Log.hpp"
 #include "System.hpp"
 
@@ -8,19 +8,19 @@ namespace Gd { namespace App {
 
 class ReqResponser {
 public:
-    virtual int process(Dp::Request & req, error_monitor_t em) = 0;
+    virtual int process(Cpe::Dp::Request & req, error_monitor_t em) = 0;
     virtual ~ReqResponser();
 
-    static int _process(gd_dp_req_t req, void * ctx, error_monitor_t em);
-    static gd_dp_rsp_type_t _type;
+    static int _process(dp_req_t req, void * ctx, error_monitor_t em);
+    static dp_rsp_type_t _type;
 };
 
 }}
 
-#define GD_DP_RESPONSER_REG(__rsp_name, __rsp_type)         \
+#define CPE_DP_RESPONSER_REG(__rsp_name, __rsp_type)         \
     extern "C"                                              \
     int rsp_ ## __rsp_name ## _init(                        \
-        gd_dp_rsp_t rsp, gd_app_context_t context,          \
+        dp_rsp_t rsp, gd_app_context_t context,          \
         gd_app_module_t module,                             \
         cfg_t cfg)                                          \
     {                                                       \
@@ -32,12 +32,12 @@ public:
                     *((::Cpe::Cfg::Node*)cfg));             \
             if (processor == NULL) {return -1;}             \
                                                             \
-            gd_dp_rsp_set_processor(                        \
+            dp_rsp_set_processor(                        \
                 rsp,                                        \
                 &::Gd::App::ReqResponser::_process,         \
                 processor);                                 \
                                                             \
-            gd_dp_rsp_set_type(                             \
+            dp_rsp_set_type(                             \
                 rsp,                                        \
                 ::Gd::App::ReqResponser::_type);            \
                                                             \

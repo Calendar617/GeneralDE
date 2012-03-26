@@ -1,6 +1,6 @@
 product:=gdpp_app
 $(product).type:=lib
-$(product).depends:=cpepp_utils cpepp_cfg gd_app gdpp_nm gdpp_evt gdpp_dp
+$(product).depends:=cpepp_utils cpepp_cfg gd_app cpepp_nm gdpp_evt cpepp_dp
 $(product).c.flags.ld:=
 $(product).c.sources:=$(wildcard $(product-base)/*.cpp)
 

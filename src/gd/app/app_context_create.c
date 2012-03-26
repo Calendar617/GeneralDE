@@ -5,8 +5,8 @@
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/net/net_manage.h"
 #include "gd/app/app_context.h"
-#include "gd/nm/nm_manage.h"
-#include "gd/dp/dp_manage.h"
+#include "cpe/nm/nm_manage.h"
+#include "cpe/dp/dp_manage.h"
 #include "cpe/tl/tl_manage.h"
 #include "app_internal_ops.h"
 
@@ -76,13 +76,13 @@ gd_app_context_create(
         return NULL;
     }
 
-    context->m_nm_mgr = gd_nm_mgr_create(alloc);
+    context->m_nm_mgr = nm_mgr_create(alloc);
     if (context->m_nm_mgr == NULL) {
         gd_app_context_free(context);
         return NULL;
     }
 
-    context->m_dp_mgr = gd_dp_mgr_create(alloc);
+    context->m_dp_mgr = dp_mgr_create(alloc);
     if (context->m_dp_mgr == NULL) {
         gd_app_context_free(context);
         return NULL;
@@ -112,12 +112,12 @@ void gd_app_context_free(gd_app_context_t context) {
     }
 
     if (context->m_nm_mgr) {
-        gd_nm_mgr_free(context->m_nm_mgr);
+        nm_mgr_free(context->m_nm_mgr);
         context->m_nm_mgr = NULL;
     }
 
     if (context->m_dp_mgr) {
-        gd_dp_mgr_free(context->m_dp_mgr);
+        dp_mgr_free(context->m_dp_mgr);
         context->m_dp_mgr = NULL;
     }
 
