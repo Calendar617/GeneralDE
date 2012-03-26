@@ -1,5 +1,5 @@
-#ifndef USF_DR_STORE_TYPES_H
-#define USF_DR_STORE_TYPES_H
+#ifndef GD_DR_STORE_TYPES_H
+#define GD_DR_STORE_TYPES_H
 #include "cpe/pal/pal_types.h"
 #include "cpe/utils/error.h"
 #include "cpe/utils/memory.h"

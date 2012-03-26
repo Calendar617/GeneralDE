@@ -1,5 +1,5 @@
-#ifndef USF_DR_STORE_MANAGE_H
-#define USF_DR_STORE_MANAGE_H
+#ifndef GD_DR_STORE_MANAGE_H
+#define GD_DR_STORE_MANAGE_H
 #include "dr_store_types.h"
 
 #ifdef __cplusplus

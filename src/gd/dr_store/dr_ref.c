@@ -2,8 +2,8 @@
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cfg.h"
-#include "usf/dr_store/dr_ref.h"
-#include "usf/dr_store/dr_store.h"
+#include "gd/dr_store/dr_ref.h"
+#include "gd/dr_store/dr_store.h"
 #include "dr_store_internal_ops.h"
 
 dr_ref_t

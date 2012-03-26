@@ -5,7 +5,7 @@
 #include "cpe/nm/nm_read.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
-#include "usf/dr_store/dr_store_manage.h"
+#include "gd/dr_store/dr_store_manage.h"
 #include "dr_store_internal_ops.h"
 
 cpe_hash_string_t s_dr_store_manage_default_name;

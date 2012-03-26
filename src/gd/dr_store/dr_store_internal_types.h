@@ -1,10 +1,10 @@
-#ifndef USF_DR_STORE_INTERNAL_TYPES_H
-#define USF_DR_STORE_INTERNAL_TYPES_H
+#ifndef GD_DR_STORE_INTERNAL_TYPES_H
+#define GD_DR_STORE_INTERNAL_TYPES_H
 #include "cpe/pal/pal_queue.h"
 #include "cpe/utils/memory.h"
 #include "cpe/utils/hash.h"
 #include "cpe/utils/hash_string.h"
-#include "usf/dr_store/dr_store_types.h"
+#include "gd/dr_store/dr_store_types.h"
 
 #ifdef __cplusplus
 extern "C" {

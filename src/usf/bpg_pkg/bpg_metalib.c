@@ -4,8 +4,8 @@
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "gd/app/app_library.h"
-#include "usf/dr_store/dr_store.h"
-#include "usf/dr_store/dr_store_manage.h"
+#include "gd/dr_store/dr_store.h"
+#include "gd/dr_store/dr_store_manage.h"
 #include "usf/bpg_pkg/bpg_pkg_types.h"
 
 EXPORT_DIRECTIVE

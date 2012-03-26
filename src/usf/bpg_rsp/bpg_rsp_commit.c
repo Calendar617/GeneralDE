@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/dr/dr_metalib_init.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dp/dp_request.h"
 #include "cpe/dp/dp_manage.h"
@@ -156,7 +157,7 @@ static int bpg_rsp_commit_build_pkg_append_info_from_builder(
 
     TAILQ_FOREACH(pkg_builder, &rsp->m_mgr->m_pkg_builders, m_next) {
         if (pkg_builder->m_build_fun) {
-            switch(pkg_builder->m_build_fun(pkg, op_context, pkg_builder->m_build_ctx)) {
+            switch(pkg_builder->m_build_fun(pkg, op_context, data_name, pkg_builder->m_build_ctx)) {
             case bpg_pkg_build_result_success: {
                 if (rsp->m_mgr->m_debug) {
                     CPE_INFO(
@@ -188,8 +189,8 @@ static void bpg_rsp_commit_build_pkg_append_info_for_addition(
         LPDRMETA meta = dr_lib_find_meta_by_id(metalib, meta_id);
         if (meta == NULL) {
             CPE_ERROR(
-                em, "%s.%s: copy_ctx_to_pdu: for addition: meta with id %d not exist!",
-                bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), meta_id);
+                em, "%s.%s: copy_ctx_to_pdu: for addition: meta with id %d not exist in lib \"%s\"!",
+                bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), meta_id, dr_lib_name(metalib));
             continue;
         }
 

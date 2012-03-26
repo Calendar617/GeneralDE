@@ -13,6 +13,8 @@ bpg_rsp_pkg_builder_create(bpg_rsp_manage_t mgr) {
     pkg_builder->m_build_fun = NULL;
     pkg_builder->m_build_ctx = NULL;
 
+    TAILQ_INSERT_TAIL(&pkg_builder->m_mgr->m_pkg_builders, pkg_builder, m_next);
+
     return pkg_builder;
 }
 

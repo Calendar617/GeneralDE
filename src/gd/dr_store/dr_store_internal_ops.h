@@ -1,5 +1,5 @@
-#ifndef USF_DR_STORE_INTERNAL_OPS_H
-#define USF_DR_STORE_INTERNAL_OPS_H
+#ifndef GD_DR_STORE_INTERNAL_OPS_H
+#define GD_DR_STORE_INTERNAL_OPS_H
 #include "dr_store_internal_types.h"
 
 #ifdef __cplusplus

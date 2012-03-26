@@ -11,8 +11,8 @@
 #include "gd/app/app_module.h"
 #include "gd/app/app_library.h"
 #include "gd/app/app_context.h"
-#include "usf/dr_store/dr_store.h"
-#include "usf/dr_store/dr_store_manage.h"
+#include "gd/dr_store/dr_store.h"
+#include "gd/dr_store/dr_store_manage.h"
 #include "dr_store_internal_types.h"
 
 static int dr_store_loader_load_from_symbol(

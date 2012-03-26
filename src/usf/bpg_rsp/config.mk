@@ -1,6 +1,6 @@
 product:=usf_bpg_rsp
 $(product).type:=cpe-dr lib
-$(product).depends:=cpe_utils cpe_dr_cvt gd_app usf_logic usf_dr_store usf_bpg_pkg
+$(product).depends:=cpe_utils cpe_dr_cvt gd_app usf_logic gd_dr_store usf_bpg_pkg
 $(product).c.flags.ld:=
 $(product).c.sources:=$(wildcard $(product-base)/*.c)
 
