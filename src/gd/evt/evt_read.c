@@ -1,12 +1,12 @@
 #include <assert.h>
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_data.h"
-#include "gd/tl/tl_action.h"
+#include "cpe/tl/tl_action.h"
 #include "gd/evt/evt_read.h"
 #include "evt_internal_types.h"
 
 gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * typeName, ssize_t data_capacity, error_monitor_t em) {
-    gd_tl_event_t tl_evt;
+    tl_event_t tl_evt;
     LPDRMETA meta;
     gd_evt_t evt;
 
@@ -26,7 +26,7 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * ty
         return NULL;
     }
 
-    tl_evt = gd_tl_event_create(
+    tl_evt = tl_event_create(
         evm->m_tl,
         sizeof(struct gd_evt) + data_capacity + attach_capacity);
     if (tl_evt == NULL) {
@@ -46,17 +46,17 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * ty
 
 int gd_evt_send(
     gd_evt_t evt,
-    gd_tl_time_span_t delay,
-    gd_tl_time_span_t span,
+    tl_time_span_t delay,
+    tl_time_span_t span,
     int repeatCount)
 {
-    gd_tl_event_t tl_evt;
+    tl_event_t tl_evt;
 
     assert(evt);
 
-    tl_evt = gd_tl_event_from_data(evt);
+    tl_evt = tl_event_from_data(evt);
 
-    return gd_tl_event_send_ex(tl_evt, delay, span, repeatCount);
+    return tl_event_send_ex(tl_evt, delay, span, repeatCount);
 }
 
 void * gd_evt_data(gd_evt_t evt) {
@@ -71,12 +71,12 @@ void * gd_evt_attach(gd_evt_t evt) {
     return ((char*)(evt + 1)) + evt->m_data_capacity;
 }
 
-gd_evt_t gd_evt_cvt(gd_tl_event_t tl_evt) {
-    return (gd_evt_t)gd_tl_event_data(tl_evt);
+gd_evt_t gd_evt_cvt(tl_event_t tl_evt) {
+    return (gd_evt_t)tl_event_data(tl_evt);
 }
 
 size_t gd_evt_attach_capacity(gd_evt_t evt) {
-    size_t total = gd_tl_event_capacity(gd_tl_event_from_data(evt));
+    size_t total = tl_event_capacity(tl_event_from_data(evt));
     assert(total >= (sizeof(struct gd_evt) + evt->m_data_capacity));
     return total - sizeof(struct gd_evt) - evt->m_data_capacity;
 }

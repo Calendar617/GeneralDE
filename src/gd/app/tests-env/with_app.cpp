@@ -1,7 +1,7 @@
 #include "cpe/utils/stream_mem.h"
 #include "cpe/utils/error.h"
 #include "cpe/cfg/cfg_manage.h"
-#include "gd/tl/tl_manage.h"
+#include "cpe/tl/tl_manage.h"
 #include "gd/app/tests-env/with_app.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
 
@@ -146,19 +146,19 @@ gd_nm_mgr_t with_app::t_nm(void) {
 }
 
 void with_app::t_app_set_timer_source_last_event(void) {
-    gd_tl_manage_set_opt(
+    tl_manage_set_opt(
         gd_app_tl_mgr(t_app()),
-        gd_tl_set_time_source_context,
+        tl_set_time_source_context,
         gd_app_tl_mgr(t_app()));
 
-    gd_tl_manage_set_opt(
+    tl_manage_set_opt(
         gd_app_tl_mgr(t_app()),
-        gd_tl_set_time_source,
-        gd_tl_time_source_last_event);
+        tl_set_time_source,
+        tl_time_source_last_event);
 }
 
 int with_app::t_app_tick(int count) {
-    return gd_tl_manage_tick(gd_app_tl_mgr(t_app()), count);
+    return tl_manage_tick(gd_app_tl_mgr(t_app()), count);
 }
 
 }}}

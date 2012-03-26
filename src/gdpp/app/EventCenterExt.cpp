@@ -13,11 +13,11 @@
 #include "cpepp/utils/MemBuffer.hpp"
 #include "cpepp/cfg/Node.hpp"
 #include "cpepp/dr/MetaLib.hpp"
+#include "cpepp/tl/Manager.hpp"
 #include "gdpp/dp/Manager.hpp"
 #include "gdpp/dp/Request.hpp"
 #include "gdpp/dp/Responser.hpp"
 #include "gdpp/nm/Manager.hpp"
-#include "gdpp/tl/Manager.hpp"
 #include "gdpp/app/Log.hpp"
 #include "gdpp/app/Application.hpp"
 #include "gdpp/evt/EventCenter.hpp"
@@ -92,7 +92,7 @@ public:
         return e;
     }
 
-    virtual gd_tl_t tl(void) {
+    virtual tl_t tl(void) {
         return _tl;
     }
 
@@ -182,7 +182,7 @@ private:
     }
 
     void freeTl(void) {
-        gd_tl_free(_tl);
+        tl_free(_tl);
     }
 
     void freeEvtMgr(void) {
@@ -203,7 +203,7 @@ private:
         ProcessorData * pn = (ProcessorData*)ctx;
 
         try {
-            gd_tl_event_t input = (gd_tl_event_t)gd_dp_req_data(req);
+            tl_event_t input = (tl_event_t)gd_dp_req_data(req);
             Event & e = Event::_cast(input);
 
             (pn->_useResponser->*(pn->_fun))(cpe_hs_data((cpe_hash_string_t)e.attach_buf()), e);
@@ -213,7 +213,7 @@ private:
         return 0;
     }
 
-    static void dispatch_evt(gd_tl_event_t input, void * context) {
+    static void dispatch_evt(tl_event_t input, void * context) {
         EventCenterImpl * ec = (EventCenterImpl*)context;
         Event * evt = NULL;
         try {
@@ -258,19 +258,19 @@ private:
         }
     }
 
-    static gd_tl_t createTl(Gd::App::Application & app, EventCenterImpl & self) {
-        gd_tl_t tl = gd_tl_create(app.tlManager());
+    static tl_t createTl(Gd::App::Application & app, EventCenterImpl & self) {
+        tl_t tl = tl_create(app.tlManager());
         if (tl == NULL) {
             APP_CTX_THROW_EXCEPTION(app, ::std::runtime_error, "create tl fail!");
         }
 
-        gd_tl_set_opt(tl, gd_tl_set_event_dispatcher, dispatch_evt);
-        gd_tl_set_opt(tl, gd_tl_set_event_op_context, &self);
+        tl_set_opt(tl, tl_set_event_dispatcher, dispatch_evt);
+        tl_set_opt(tl, tl_set_event_op_context, &self);
 
         return tl;
     }
 
-    static gd_evt_mgr_t createEvtMgr(gd_tl_t _tl, Gd::App::Application & app, Cpe::Dr::MetaLib const & metaLib) {
+    static gd_evt_mgr_t createEvtMgr(tl_t _tl, Gd::App::Application & app, Cpe::Dr::MetaLib const & metaLib) {
         gd_evt_mgr_t evm = gd_evt_mgr_create(_tl, metaLib, app.allocrator());
         if (evm == NULL) {
             APP_CTX_THROW_EXCEPTION(app, ::std::runtime_error, "create event mgr fail!");
@@ -415,7 +415,7 @@ private:
     Gd::App::Application & _app;
     mem_allocrator_t _alloc;
     int _is_debug;
-    gd_tl_t _tl;
+    tl_t _tl;
     gd_evt_mgr_t _emm;
     gd_dp_req_t _req;
     size_t _oid_max_len;

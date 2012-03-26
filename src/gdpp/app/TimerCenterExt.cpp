@@ -8,9 +8,9 @@
 #include "cpepp/dr/MetaLib.hpp"
 #include "cpepp/utils/RangeMgr.hpp"
 #include "cpepp/utils/MemBuffer.hpp"
+#include "cpepp/tl/Manager.hpp"
 #include "gdpp/nm/Manager.hpp"
-#include "gd/tl/tl_action.h"
-#include "gdpp/tl/Manager.hpp"
+#include "cpe/tl/tl_action.h"
 #include "gdpp/app/Log.hpp"
 #include "gdpp/app/Application.hpp"
 #include "TimerCenterExt.hpp"
@@ -27,7 +27,7 @@ public:
     struct TimerData {
         TimerID _id;
         TimerDataState _state;
-        gd_tl_event_t _tl_event;
+        tl_event_t _tl_event;
         TimerProcessor * _realProcessor;
         TimerProcessor * _useProcessor;
         TimerProcessFun _fun;
@@ -68,7 +68,7 @@ public:
 
 	virtual TimerID registerTimer(
         TimerProcessor& realProcessor, TimerProcessor & useProcessor, TimerProcessFun fun,
-        gd_tl_time_span_t delay, gd_tl_time_span_t span, int repeatCount)
+        tl_time_span_t delay, tl_time_span_t span, int repeatCount)
     {
         TimerID newTimerId = allocTimer();
         TimerData * newTimerData = getTimer(newTimerId);
@@ -80,7 +80,7 @@ public:
         newTimerData->_realProcessor = &realProcessor;
         newTimerData->_useProcessor = &useProcessor;
         newTimerData->_fun = fun;
-        newTimerData->_tl_event = gd_tl_event_create(_tl, sizeof(TimerID));
+        newTimerData->_tl_event = tl_event_create(_tl, sizeof(TimerID));
         if (newTimerData->_tl_event == NULL) {
             clearTimerData(*newTimerData);
             freeTimerId(newTimerId);
@@ -90,7 +90,7 @@ public:
                 ::std::runtime_error,
                 "registerTimer: create tl event fail!");
         }
-        *(TimerID*)gd_tl_event_data(newTimerData->_tl_event) = newTimerId;
+        *(TimerID*)tl_event_data(newTimerData->_tl_event) = newTimerId;
 
         int r = cpe_hash_table_insert(&_responser_to_timer, newTimerData);
         if (r != 0) {
@@ -103,7 +103,7 @@ public:
         }
         newTimerData->_state = TimerDataState_InResponserHash;
 
-        r = gd_tl_event_send_ex(newTimerData->_tl_event, delay, span, repeatCount);
+        r = tl_event_send_ex(newTimerData->_tl_event, delay, span, repeatCount);
         if (r != 0) {
             clearTimerData(*newTimerData);
             freeTimerId(newTimerId);
@@ -155,7 +155,7 @@ public:
 
 private:
     void freeTl(void) {
-        gd_tl_free(_tl);
+        tl_free(_tl);
         _tl = NULL;
     }
 
@@ -227,9 +227,9 @@ private:
         _timer_page_capacity = 0;
     }
 
-    static void destory_timer(gd_tl_event_t event, void * context) {
+    static void destory_timer(tl_event_t event, void * context) {
         TimerCenterImpl * ec = (TimerCenterImpl*)context;
-        TimerID timerId = *reinterpret_cast<TimerID*>(gd_tl_event_data(event));
+        TimerID timerId = *reinterpret_cast<TimerID*>(tl_event_data(event));
 
         TimerData * timerData = ec->getTimer(timerId);
         if (timerData == NULL) {
@@ -247,9 +247,9 @@ private:
         ec->freeTimerId(timerId);
     }
 
-    static void dispatch_timer(gd_tl_event_t input, void * context) {
+    static void dispatch_timer(tl_event_t input, void * context) {
         TimerCenterImpl * ec = (TimerCenterImpl*)context;
-        TimerID timerId = *reinterpret_cast<TimerID*>(gd_tl_event_data(input));
+        TimerID timerId = *reinterpret_cast<TimerID*>(tl_event_data(input));
 
         try {
             TimerData * timerData = ec->getTimer(timerId);
@@ -274,15 +274,15 @@ private:
         }
     }
 
-    static gd_tl_t createTl(Gd::App::Application & app, TimerCenterImpl & self) {
-        gd_tl_t tl = gd_tl_create(app.tlManager());
+    static tl_t createTl(Gd::App::Application & app, TimerCenterImpl & self) {
+        tl_t tl = tl_create(app.tlManager());
         if (tl == NULL) {
             APP_CTX_THROW_EXCEPTION(app, ::std::runtime_error, "create tl fail!");
         }
 
-        gd_tl_set_opt(tl, gd_tl_set_event_dispatcher, dispatch_timer);
-        gd_tl_set_opt(tl, gd_tl_set_event_destory, destory_timer);
-        gd_tl_set_opt(tl, gd_tl_set_event_op_context, &self);
+        tl_set_opt(tl, tl_set_event_dispatcher, dispatch_timer);
+        tl_set_opt(tl, tl_set_event_destory, destory_timer);
+        tl_set_opt(tl, tl_set_event_op_context, &self);
 
         return tl;
     }
@@ -301,7 +301,7 @@ private:
     
     void clearTimerData(TimerData & data) {
         if (data._tl_event) {
-            gd_tl_event_free(data._tl_event);
+            tl_event_free(data._tl_event);
             data._tl_event = NULL;
         }
         else {
@@ -355,7 +355,7 @@ private:
     Gd::App::Application & _app;
     int _debug;
     mem_allocrator_t _alloc;
-    gd_tl_t _tl;
+    tl_t _tl;
     size_t _timer_count_in_page;
     size_t _timer_page_count;
     size_t _timer_page_capacity;

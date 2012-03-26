@@ -12,8 +12,8 @@ public:
     TimerID registerTimer(
         T & r,
         void (T::*fun)(TimerID timerId),
-        gd_tl_time_span_t delay,
-        gd_tl_time_span_t span,
+        tl_time_span_t delay,
+        tl_time_span_t span,
         int repeatCount = -1)
     {
 #ifdef _MSC_VER
@@ -32,7 +32,7 @@ public:
      */
 	virtual TimerID registerTimer(
         TimerProcessor& realResponser, TimerProcessor& useResponser, TimerProcessFun fun,
-        gd_tl_time_span_t delay, gd_tl_time_span_t span, int repeatCount = -1) = 0;
+        tl_time_span_t delay, tl_time_span_t span, int repeatCount = -1) = 0;
 
 	virtual void unregisterTimer(TimerProcessor & r) = 0;
 	virtual void unregisterTimer(TimerID timerId) = 0;

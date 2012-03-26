@@ -7,7 +7,7 @@
 #include "gd/app/app_context.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/dp/dp_manage.h"
-#include "gd/tl/tl_manage.h"
+#include "cpe/tl/tl_manage.h"
 #include "app_internal_ops.h"
 
 static int gd_app_parse_args(gd_app_context_t context, int argc, char * argv[]) {
@@ -70,7 +70,7 @@ gd_app_context_create(
         return NULL;
     }
 
-    context->m_tl_mgr = gd_tl_manage_create(alloc);
+    context->m_tl_mgr = tl_manage_create(alloc);
     if (context->m_tl_mgr == NULL) {
         gd_app_context_free(context);
         return NULL;
@@ -122,7 +122,7 @@ void gd_app_context_free(gd_app_context_t context) {
     }
 
     if (context->m_tl_mgr) {
-        gd_tl_manage_free(context->m_tl_mgr);
+        tl_manage_free(context->m_tl_mgr);
         context->m_tl_mgr = NULL;
     }
 
