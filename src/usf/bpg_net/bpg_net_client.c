@@ -1,12 +1,15 @@
 #include <assert.h>
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/pal/pal_external.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/net/net_connector.h"
 #include "gd/nm/nm_manage.h"
 #include "gd/nm/nm_read.h"
+#include "gd/dp/dp_responser.h"
 #include "gd/app/app_context.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
+#include "usf/bpg_pkg/bpg_pkg_dsp.h"
 #include "usf/bpg_net/bpg_net_client.h"
 #include "bpg_net_internal_ops.h"
 
@@ -24,6 +27,7 @@ bpg_net_client_create(
 {
     bpg_net_client_t mgr;
     gd_nm_node_t mgr_node;
+    char name_buf[128];
 
     assert(name);
     assert(ip);
@@ -43,6 +47,25 @@ bpg_net_client_create(
 
     mgr->m_debug = 0;
 
+    mem_buffer_init(&mgr->m_send_encode_buf, alloc);
+
+    mgr->m_rsp_dsp = bpg_pkg_dsp_create(alloc);
+    if (mgr->m_rsp_dsp == NULL) {
+        mem_buffer_clear(&mgr->m_send_encode_buf);
+        gd_nm_node_free(mgr_node);
+        return NULL;
+    }
+
+    snprintf(name_buf, sizeof(name_buf), "%s.send-rsp", name);
+    mgr->m_send_rsp = gd_dp_rsp_create(gd_app_dp_mgr(app), name_buf);
+    if (mgr->m_send_rsp == NULL) {
+        bpg_pkg_dsp_free(mgr->m_rsp_dsp);
+        mem_buffer_clear(&mgr->m_send_encode_buf);
+        gd_nm_node_free(mgr_node);
+        return NULL;
+    }
+    gd_dp_rsp_set_processor(mgr->m_send_rsp, bpg_net_client_send, mgr);
+
     mgr->m_connector =
         net_connector_create_with_ep(
             gd_app_net_mgr(app),
@@ -50,12 +73,18 @@ bpg_net_client_create(
             ip,
             port);
     if (mgr->m_connector == NULL) {
+        gd_dp_rsp_free(mgr->m_send_rsp);
+        bpg_pkg_dsp_free(mgr->m_rsp_dsp);
+        mem_buffer_clear(&mgr->m_send_encode_buf);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
 
     if (bpg_net_client_ep_init(mgr, net_connector_ep(mgr->m_connector)) != 0) {
         net_connector_free(mgr->m_connector);
+        gd_dp_rsp_free(mgr->m_send_rsp);
+        bpg_pkg_dsp_free(mgr->m_rsp_dsp);
+        mem_buffer_clear(&mgr->m_send_encode_buf);
         gd_nm_node_free(mgr_node);
         return NULL;
     }
@@ -73,6 +102,18 @@ static void bpg_net_client_clear(gd_nm_node_t node) {
         bpg_pkg_free(mgr->m_req_buf);
         mgr->m_req_buf = NULL;
     }
+
+    if (mgr->m_rsp_dsp) {
+        bpg_pkg_dsp_free(mgr->m_rsp_dsp);
+        mgr->m_rsp_dsp = NULL;
+    }
+
+    if (mgr->m_send_rsp) {
+        gd_dp_rsp_free(mgr->m_send_rsp);
+        mgr->m_send_rsp = NULL;
+    }
+
+    mem_buffer_clear(&mgr->m_send_encode_buf);
 
     net_connector_free(mgr->m_connector);
 }

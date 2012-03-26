@@ -44,6 +44,11 @@ struct bpg_net_client {
 
     size_t m_req_max_size;
     bpg_pkg_t m_req_buf;
+    struct mem_buffer m_send_encode_buf;
+
+    bpg_pkg_dsp_t m_rsp_dsp;
+
+    gd_dp_rsp_t m_send_rsp;
 
     int m_debug;
 };

@@ -18,6 +18,9 @@ int stream_do_write_to_error(struct write_stream * stream, const void * buf, siz
 int stream_do_flush_to_error(struct write_stream * stream);
 void write_stream_error_init(struct write_stream_error * stream, error_monitor_t em, error_level_t level);
 
+#define CPE_WRITE_STREAM_ERROR_INITIALIZER(__em)                  \
+    { CPE_WRITE_STREAM_INITIALIZER(stream_do_write_to_error, stream_do_flush_to_error), __em }
+
 #ifdef __cplusplus
 }
 #endif

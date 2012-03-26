@@ -1,8 +1,11 @@
+#include <assert.h>
 #include "cpe/pal/pal_external.h"
 #include "cpe/utils/file.h"
+#include "cpe/utils/stream_error.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/dr/dr_metalib_builder.h"
 #include "cpe/dr/dr_metalib_build.h"
+#include "cpe/dr/dr_metalib_manage.h"
 #include "gd/app/app_log.h"
 #include "gd/app/app_library.h"
 #include "gd/app/app_module.h"
@@ -258,6 +261,7 @@ int dr_store_loader_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t
     const char * arg;
     cfg_t child_cfg;
     dr_store_manage_t mgr = NULL;
+    int rv;
 
     mgr = dr_store_manage_default(app);
     if (mgr == NULL) {
@@ -266,19 +270,32 @@ int dr_store_loader_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t
     }
 
     if ((arg = cfg_get_string(cfg, "load-from-symbol", NULL))) {
-        return dr_store_loader_load_from_symbol(app, module, mgr, arg);
+        rv = dr_store_loader_load_from_symbol(app, module, mgr, arg);
+    }
+    else if ((arg = cfg_get_string(cfg, "load-from-bin", NULL))) {
+        rv = dr_store_loader_load_from_bin(app, module, mgr, arg);
+    }
+    else if ((child_cfg = cfg_find_cfg(cfg, "load-from-file"))) {
+        rv = dr_store_loader_load_from_file(app, module, mgr, child_cfg);
+    }
+    else {
+        APP_CTX_ERROR(app, "%s: no any load way!", gd_app_module_name(module));
+        rv = -1;
     }
 
-    if ((arg = cfg_get_string(cfg, "load-from-bin", NULL))) {
-        return dr_store_loader_load_from_bin(app, module, mgr, arg);
+    if (rv == 0 && cfg_get_int32(cfg, "dump", 0)) {
+        struct write_stream_error stream = CPE_WRITE_STREAM_ERROR_INITIALIZER(gd_app_em(app));
+        dr_store_t store = dr_store_find(mgr, gd_app_module_name(module));
+        assert(store);
+
+        stream_printf((write_stream_t)&stream, "*** dump meta lib of %s ***\n", gd_app_module_name(module));
+
+        dr_lib_dump((write_stream_t)&stream, dr_store_lib(store), 4);
+
+        stream_do_flush_to_error((write_stream_t)&stream);
     }
 
-    if ((child_cfg = cfg_find_cfg(cfg, "load-from-file"))) {
-        return dr_store_loader_load_from_file(app, module, mgr, child_cfg);
-    }
-
-    APP_CTX_ERROR(app, "%s: no any load way!", gd_app_module_name(module));
-    return -1;
+    return rv;
 }
 
 EXPORT_DIRECTIVE
@@ -287,6 +304,7 @@ void dr_store_loader_app_fini(gd_app_context_t app, gd_app_module_t module) {
 
     mgr = dr_store_manage_default(app);
     if (mgr) {
+
         dr_store_t store;
         store = dr_store_find(mgr, gd_app_module_name(module));
         if (store) {

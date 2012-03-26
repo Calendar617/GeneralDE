@@ -33,7 +33,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
 
     if (bpg_mgr->m_commit_dsp == NULL) {
         CPE_ERROR(
-            em, "%s.%s: bpg_rsp_commit: no send-to configured, ignore commit!",
+            em, "%s.%s: bpg_rsp_commit: no commit-to configured, ignore commit!",
             bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
         bpg_rsp_manage_free_context(bpg_mgr, op_context);
         return;
@@ -54,7 +54,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
         bpg_carry_data = logic_data_find(op_context, bpg_private->carry_meta_name);
         if (bpg_carry_data == NULL) {
             CPE_ERROR(
-                em, "%s.%s: bpg_rsp_commit: no caary data %s in context!",
+                em, "%s.%s: bpg_rsp_commit: no carry data %s in context!",
                 bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp), bpg_private->carry_meta_name);
             bpg_rsp_manage_free_context(bpg_mgr, op_context);
             return;

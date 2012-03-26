@@ -18,6 +18,7 @@ public:
     Gd::App::Application const & app(void) const;
 
     void init(void) { bpg_pkg_init(*this); }
+    void clearData(void) { bpg_pkg_clear_data(*this); }
 
     uint32_t cmd(void) const { return bpg_pkg_cmd(*this); }
     void setCmd(uint32_t cmd) { bpg_pkg_set_cmd(*this, cmd); }
@@ -29,6 +30,15 @@ public:
     void setClientId(uint32_t client_id) { bpg_pkg_set_client_id(*this, client_id); }
 
     Cpe::Dr::MetaLib const & dataMetaLib(void) const;
+    Cpe::Dr::Meta const & cmdMeta(void) const;
+
+    /*main data and cmd write*/
+    void setCmdAndData(Cpe::Dr::ConstData const & data, size_t * write_size = NULL);
+    void setCmdAndData(Cpe::Dr::ConstData const & data, size_t size, size_t * write_size = NULL);
+    void setCmdAndData(int cmd, const void * data, size_t data_size, size_t * write_size = NULL);
+
+    template<typename T>
+    void setCmdAndData(int cmd, T const & data, size_t * write_size = NULL) { setCmdAndData(cmd, &data, sizeof(data), write_size); }
 
     /*main data read*/
     Cpe::Dr::Meta const & mainDataMeta(void) const;
@@ -42,7 +52,7 @@ public:
     void setMainData(void const * data, size_t size, size_t * write_size = NULL);
 
     template<typename T>
-    void setMainData(int cmd, T const & data) { setMainData(cmd, &data, sizeof(data)); }
+    void setMainData(T const & data) { setMainData(&data, sizeof(data)); }
 
     /*append data read*/
     void appendData(int metaId, void * buf, size_t capacity, size_t * size = NULL) const;
