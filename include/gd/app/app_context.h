@@ -32,7 +32,7 @@ int gd_app_cfg_reload(gd_app_context_t context);
 cfg_t gd_app_cfg(gd_app_context_t context);
 
 /*extern module operations*/
-gd_tl_manage_t gd_app_tl_mgr(gd_app_context_t context);
+tl_manage_t gd_app_tl_mgr(gd_app_context_t context);
 gd_dp_mgr_t gd_app_dp_mgr(gd_app_context_t context);
 gd_nm_mgr_t gd_app_nm_mgr(gd_app_context_t context);
 net_mgr_t gd_app_net_mgr(gd_app_context_t context);

@@ -1,6 +1,6 @@
-product:=gd_evt
+product:=cpe_tl
 $(product).type:=lib
-$(product).depends:=cpe_tl cpe_dr cpe_dr_data_basic
+$(product).depends:=cpe_utils
 $(product).c.libraries:=
 $(product).c.sources:=$(wildcard $(product-base)/*.c)
 

@@ -1,7 +1,7 @@
 #ifndef GD_DP_EVT_MANAGE_H
 #define GD_DP_EVT_MANAGE_H
 #include "cpe/utils/memory.h"
-#include "gd/tl/tl_types.h"
+#include "cpe/tl/tl_types.h"
 #include "evt_types.h"
 
 #ifdef __cplusplus
@@ -10,7 +10,7 @@ extern "C" {
 
 gd_evt_mgr_t
 gd_evt_mgr_create(
-    gd_tl_t tl,
+    tl_t tl,
     LPDRMETALIB metalib,
     mem_allocrator_t alloc);
 

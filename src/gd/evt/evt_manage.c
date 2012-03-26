@@ -4,7 +4,7 @@
 
 gd_evt_mgr_t
 gd_evt_mgr_create(
-    gd_tl_t tl,
+    tl_t tl,
     LPDRMETALIB metalib,
     mem_allocrator_t alloc)
 {
