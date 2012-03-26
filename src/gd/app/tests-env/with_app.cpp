@@ -137,11 +137,11 @@ with_app::t_app_find_module(const char * moduleName) {
     return gd_app_find_module(t_app(), moduleName);
 }
 
-gd_dp_mgr_t with_app::t_dp(void) {
+dp_mgr_t with_app::t_dp(void) {
     return gd_app_dp_mgr(t_app());
 }
 
-gd_nm_mgr_t with_app::t_nm(void) {
+nm_mgr_t with_app::t_nm(void) {
     return gd_app_nm_mgr(t_app());
 }
 

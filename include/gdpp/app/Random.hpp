@@ -1,12 +1,12 @@
 #ifndef GDPP_APP_RANDOM_H
 #define GDPP_APP_RANDOM_H
 #include "cpepp/utils/Random.hpp"
-#include "gdpp/nm/Object.hpp"
+#include "cpepp/nm/Object.hpp"
 #include "System.hpp"
 
 namespace Gd { namespace App {
 
-class Random : public Gd::Nm::Object, public Cpe::Utils::Random {
+class Random : public Cpe::Nm::Object, public Cpe::Utils::Random {
 public:
     static cpe_hash_string_t DEFAULT_NAME;
 

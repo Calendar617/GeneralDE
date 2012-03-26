@@ -28,7 +28,7 @@ gd_app_module_create_i(
 {
     struct gd_app_module_type * module;
     struct gd_app_module * runing_module;
-    gd_nm_node_t moduleDataGroup;
+    nm_node_t moduleDataGroup;
     size_t name_len;
 
     assert(module_name);

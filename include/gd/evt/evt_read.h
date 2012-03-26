@@ -1,5 +1,5 @@
-#ifndef GD_DP_EVT_READ_H
-#define GD_DP_EVT_READ_H
+#ifndef CPE_DP_EVT_READ_H
+#define CPE_DP_EVT_READ_H
 #include "cpe/utils/error.h"
 #include "cpe/utils/memory.h"
 #include "evt_types.h"

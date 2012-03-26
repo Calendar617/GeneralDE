@@ -1,12 +1,12 @@
 #ifndef GDPP_APP_TIMEERCENTER_H
 #define GDPP_APP_TIMEERCENTER_H
-#include "gdpp/nm/Object.hpp"
+#include "cpepp/nm/Object.hpp"
 #include "System.hpp"
 #include "TimerProcessor.hpp"
 
 namespace Gd { namespace App {
 
-class TimerCenter : public Gd::Nm::Object {
+class TimerCenter : public Cpe::Nm::Object {
 public:
     template<typename T>
     TimerID registerTimer(

@@ -30,11 +30,11 @@ tl_manage_t gd_app_tl_mgr(gd_app_context_t context) {
     return context->m_tl_mgr;
 }
 
-gd_dp_mgr_t gd_app_dp_mgr(gd_app_context_t context) {
+dp_mgr_t gd_app_dp_mgr(gd_app_context_t context) {
     return context->m_dp_mgr;
 }
 
-gd_nm_mgr_t gd_app_nm_mgr(gd_app_context_t context) {
+nm_mgr_t gd_app_nm_mgr(gd_app_context_t context) {
     return context->m_nm_mgr;
 }
 
