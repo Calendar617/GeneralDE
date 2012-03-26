@@ -38,7 +38,7 @@ bpg_rsp_addition_data_create(logic_context_t ctx, size_t capacity) {
     struct bpg_rsp_addition_data * addition_data;
     logic_data_t data;
 
-    meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_carry_package, "bpg_pkg_addition_data");
+    meta = dr_lib_find_meta_by_name((LPDRMETALIB)g_metalib_carry_package, "bpg_rsp_addition_data");
     if (meta == NULL) return NULL;
 
     data = logic_data_get_or_create(ctx, meta, sizeof(struct bpg_rsp_addition_data) + (capacity - 1) * sizeof(uint32_t));
@@ -73,7 +73,7 @@ int bpg_rsp_addition_data_add(logic_context_t ctx, uint32_t meta_id) {
         if (addition_data == NULL) return -1;
     }
 
-    addition_data->pieces[++addition_data->count] = meta_id;
+    addition_data->pieces[addition_data->count++] = meta_id;
 
     return 0;
 }

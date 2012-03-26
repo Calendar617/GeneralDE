@@ -37,7 +37,7 @@ typedef enum bpg_pkg_build_result {
     , bpg_pkg_build_result_unknown
 } bpg_pkg_build_result_t;
 
-typedef bpg_pkg_build_result_t (*bpg_pkg_build_fun_t)(bpg_pkg_t pkg, logic_context_t context, void * ctx);
+typedef bpg_pkg_build_result_t (*bpg_pkg_build_fun_t)(bpg_pkg_t pkg, logic_context_t context, const char * data_name, void * ctx);
 
 #ifdef __cplusplus
 }
