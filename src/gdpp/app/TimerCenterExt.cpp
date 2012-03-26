@@ -9,7 +9,7 @@
 #include "cpepp/utils/RangeMgr.hpp"
 #include "cpepp/utils/MemBuffer.hpp"
 #include "cpepp/tl/Manager.hpp"
-#include "gdpp/nm/Manager.hpp"
+#include "cpepp/nm/Manager.hpp"
 #include "cpe/tl/tl_action.h"
 #include "gdpp/app/Log.hpp"
 #include "gdpp/app/Application.hpp"

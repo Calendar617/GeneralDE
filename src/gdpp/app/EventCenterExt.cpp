@@ -14,10 +14,10 @@
 #include "cpepp/cfg/Node.hpp"
 #include "cpepp/dr/MetaLib.hpp"
 #include "cpepp/tl/Manager.hpp"
-#include "gdpp/dp/Manager.hpp"
-#include "gdpp/dp/Request.hpp"
-#include "gdpp/dp/Responser.hpp"
-#include "gdpp/nm/Manager.hpp"
+#include "cpepp/dp/Manager.hpp"
+#include "cpepp/dp/Request.hpp"
+#include "cpepp/dp/Responser.hpp"
+#include "cpepp/nm/Manager.hpp"
 #include "gdpp/app/Log.hpp"
 #include "gdpp/app/Application.hpp"
 #include "gdpp/evt/EventCenter.hpp"
@@ -131,7 +131,7 @@ public:
             char rspNameBuf[32];
             snprintf(rspNameBuf, sizeof(rspNameBuf), "rsp.%d", newProcessorId);
             try {
-                Gd::Dp::Responser & rsp = _app.dpManager().createResponser(rspNameBuf);
+                Cpe::Dp::Responser & rsp = _app.dpManager().createResponser(rspNameBuf);
 
                 rsp.setProcessor(apply_evt, newProcessorData);
 
@@ -194,16 +194,16 @@ private:
 
     void freeReq(void) {
         if (_req) {
-            gd_dp_req_free(_req);
+            dp_req_free(_req);
             _req = NULL;
         }
     }
 
-    static int apply_evt(gd_dp_req_t req, void * ctx, error_monitor_t em) {
+    static int apply_evt(dp_req_t req, void * ctx, error_monitor_t em) {
         ProcessorData * pn = (ProcessorData*)ctx;
 
         try {
-            tl_event_t input = (tl_event_t)gd_dp_req_data(req);
+            tl_event_t input = (tl_event_t)dp_req_data(req);
             Event & e = Event::_cast(input);
 
             (pn->_useResponser->*(pn->_fun))(cpe_hs_data((cpe_hash_string_t)e.attach_buf()), e);
@@ -219,7 +219,7 @@ private:
         try {
             evt = &Event::_cast(input);
 
-            gd_dp_req_set_buf(ec->_req, (void*)input, (size_t)0);
+            dp_req_set_buf(ec->_req, (void*)input, (size_t)0);
 
             ec->_app.dpManager().dispatch((cpe_hash_string_t)evt->attach_buf(), ec->_req);
 
@@ -278,8 +278,8 @@ private:
         return evm;
     }
 
-    static gd_dp_req_t createReq(Gd::App::Application & app) {
-        gd_dp_req_t r = gd_dp_req_create(app.dpManager(), req_type_name, 0);
+    static dp_req_t createReq(Gd::App::Application & app) {
+        dp_req_t r = dp_req_create(app.dpManager(), req_type_name, 0);
         if (r == NULL) {
             APP_CTX_THROW_EXCEPTION(app, ::std::runtime_error, "create req fail!");
         }
@@ -417,7 +417,7 @@ private:
     int _is_debug;
     tl_t _tl;
     gd_evt_mgr_t _emm;
-    gd_dp_req_t _req;
+    dp_req_t _req;
     size_t _oid_max_len;
     Cpe::Utils::MemBuffer _metaLibBuf;
 

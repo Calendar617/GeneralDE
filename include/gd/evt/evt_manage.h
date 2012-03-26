@@ -1,5 +1,5 @@
-#ifndef GD_DP_EVT_MANAGE_H
-#define GD_DP_EVT_MANAGE_H
+#ifndef CPE_DP_EVT_MANAGE_H
+#define CPE_DP_EVT_MANAGE_H
 #include "cpe/utils/memory.h"
 #include "cpe/tl/tl_types.h"
 #include "evt_types.h"
