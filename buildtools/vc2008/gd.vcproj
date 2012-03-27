@@ -196,35 +196,31 @@
 			<Filter
 				Name="dp"
 				>
-				<File
-					RelativePath="..\..\include\gd\dp\dp.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\dp\dp_manage.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\dp\dp_node.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\dp\dp_request.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\dp\dp_responser.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\dp\dp_types.h"
-					>
-				</File>
 				<Filter
 					Name="tests-env"
 					>
 					<File
 						RelativePath="..\..\include\gd\dp\tests-env\with_dp.hpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="dr_store"
+					>
+					<File
+						RelativePath="..\..\include\gd\dr_store\dr_ref.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\gd\dr_store\dr_store.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\gd\dr_store\dr_store_manage.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\include\gd\dr_store\dr_store_types.h"
 						>
 					</File>
 				</Filter>
@@ -250,34 +246,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="nm"
-				>
-				<File
-					RelativePath="..\..\include\gd\nm\nm.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\nm\nm_manage.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\nm\nm_read.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\nm\nm_types.h"
-					>
-				</File>
-				<Filter
-					Name="tests-env"
-					>
-					<File
-						RelativePath="..\..\include\gd\nm\tests-env\with_nm.hpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
 				Name="om"
 				>
 				<File
@@ -298,30 +266,6 @@
 				</File>
 				<File
 					RelativePath="..\..\include\gd\om\om_types.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="tl"
-				>
-				<File
-					RelativePath="..\..\include\gd\tl\tl.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\tl\tl_action.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\tl\tl_errno.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\tl\tl_manage.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gd\tl\tl_types.h"
 					>
 				</File>
 			</Filter>
@@ -369,6 +313,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\gd\app\app_module_type.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\gd\app\app_rsp.c"
 					>
 				</File>
@@ -376,38 +324,6 @@
 			<Filter
 				Name="dp"
 				>
-				<File
-					RelativePath="..\..\src\gd\dp\dp_binding.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\dp\dp_internal_ops.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\dp\dp_internal_types.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\dp\dp_manage.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\dp\dp_node.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\dp\dp_pbuf.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\dp\dp_request.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\dp\dp_responser.c"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="evt"
@@ -422,38 +338,6 @@
 				</File>
 				<File
 					RelativePath="..\..\src\gd\evt\evt_read.c"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="nm"
-				>
-				<File
-					RelativePath="..\..\src\gd\nm\nm_binding.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\nm\nm_internal_ops.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\nm\nm_internal_types.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\nm\nm_manage.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\nm\nm_node.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\nm\nm_node_group.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\nm\nm_node_instance.c"
 					>
 				</File>
 			</Filter>
@@ -498,34 +382,30 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="tl"
+				Name="dr_store"
 				>
 				<File
-					RelativePath="..\..\src\gd\tl\tl_action.c"
+					RelativePath="..\..\src\gd\dr_store\dr_ref.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\gd\tl\tl_dispatch.c"
+					RelativePath="..\..\src\gd\dr_store\dr_store.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\gd\tl\tl_event.c"
+					RelativePath="..\..\src\gd\dr_store\dr_store_internal_ops.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\gd\tl\tl_internal_ops.h"
+					RelativePath="..\..\src\gd\dr_store\dr_store_internal_types.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\gd\tl\tl_internal_types.h"
+					RelativePath="..\..\src\gd\dr_store\dr_store_loader.c"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\gd\tl\tl_manage.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gd\tl\tl_time.c"
+					RelativePath="..\..\src\gd\dr_store\dr_store_manage.c"
 					>
 				</File>
 			</Filter>
