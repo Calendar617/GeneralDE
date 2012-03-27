@@ -225,6 +225,54 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="dp"
+				>
+				<File
+					RelativePath="..\..\include\cpepp\dp\Manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\dp\Request.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\dp\Responser.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\dp\ResponserAdp.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\dp\ResponserIterator.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\dp\System.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="tl"
+				>
+				<File
+					RelativePath="..\..\include\cpepp\tl\Manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\tl\System.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\tl\TimeLine.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\tl\Timer.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -281,11 +329,35 @@
 				Name="dp"
 				>
 				<File
-					RelativePath="..\..\src\gdpp\dp\Manager.cpp"
+					RelativePath="..\..\src\cpepp\dp\Manager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\gdpp\dp\Request.cpp"
+					RelativePath="..\..\src\cpepp\dp\Request.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\cpepp\dp\Responser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\cpepp\dp\ResponserAdp.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="nm"
+				>
+				<File
+					RelativePath="..\..\src\cpepp\nm\Group.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\cpepp\nm\Manager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\cpepp\nm\Object.cpp"
 					>
 				</File>
 			</Filter>
