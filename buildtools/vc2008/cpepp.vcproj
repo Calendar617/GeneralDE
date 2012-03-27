@@ -273,6 +273,30 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="nm"
+				>
+				<File
+					RelativePath="..\..\include\cpepp\nm\Group.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\nm\Manager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\nm\Object.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\nm\ObjectIterator.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpepp\nm\System.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
