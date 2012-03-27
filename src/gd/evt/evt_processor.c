@@ -96,7 +96,7 @@ void gd_evt_mgr_free_processor_buf(gd_evt_mgr_t mgr) {
 
 void gd_evt_processor_free_basic(gd_evt_mgr_t mgr, struct gd_evt_processor * data) {
     if (data->m_state == evt_processor_state_InResponserHash) {
-        cpe_hash_table_remove_by_ins(&mgr->m_responser_to_processor, &data);
+        cpe_hash_table_remove_by_ins(&mgr->m_responser_to_processor, data);
         data->m_state = evt_processor_state_NotInResponserHash;
     }
 
