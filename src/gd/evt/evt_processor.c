@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/pal_strings.h"
 #include "gd/evt/evt_manage.h"
 #include "evt_internal_ops.h"
 

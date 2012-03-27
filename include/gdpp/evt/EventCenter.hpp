@@ -26,11 +26,11 @@ public:
     tl_t tl(void) const { return  gd_evt_mgr_tl(*this); }
 
     template<typename T>
-    void registerResponser(const char * oid, T & r, void (T::*fun)(const char * oid, Event const & e)) {
+    ProcessorID registerResponser(const char * oid, T & r, void (T::*fun)(const char * oid, Event const & e)) {
 #ifdef _MSC_VER
-        this->registerResponser(oid, r, static_cast<EventProcessFun>(fun), *((EventResponser*)((void*)&r)));
+        return this->registerResponser(oid, r, static_cast<EventProcessFun>(fun), *((EventResponser*)((void*)&r)));
 #else
-        this->registerResponser(oid, static_cast<EventResponser&>(r), static_cast<EventProcessFun>(fun));
+        return this->registerResponser(oid, static_cast<EventResponser&>(r), static_cast<EventProcessFun>(fun));
 #endif
     }
 
