@@ -596,6 +596,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\cpe\dr\basic\dr_metalib_dump.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\cpe\dr\basic\dr_metalib_init.c"
 						>
 					</File>
