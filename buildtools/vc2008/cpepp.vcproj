@@ -379,6 +379,14 @@
 				<File
 					RelativePath="..\..\src\cpepp\nm\Manager.cpp"
 					>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\NmManager.obj"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\cpepp\nm\Object.cpp"
