@@ -16,7 +16,7 @@ logic_executor_type_create(
 {
     logic_executor_type_t type;
     size_t name_len;
-    void * buf;
+    char * buf;
 
     name_len = strlen(name) + 1;
 

@@ -27,9 +27,9 @@ public:
     void setFlags(uint32_t flag) { logic_context_flags_set(*this, flag); }
     void enableFlag(logic_context_flag_t flag) { logic_context_flag_enable(*this, flag); }
     void disableFlag(logic_context_flag_t flag) { logic_context_flag_disable(*this, flag); }
-    bool isFlagEnable(logic_context_flag_t flag) const { return logic_context_flag_is_enable(*this, flag); }
+    bool isFlagEnable(logic_context_flag_t flag) const { return logic_context_flag_is_enable(*this, flag) ? true : false; }
 
-    bool debug(void) const  { return logic_context_flag_is_enable(*this, logic_context_flag_debug); }
+    bool debug(void) const  { return logic_context_flag_is_enable(*this, logic_context_flag_debug) ? true : false; }
     void setErrno(int32_t err) { logic_context_errno_set(*this, err); }
 
     LogicOpManager & mgr(void) { return *(LogicOpManager*)logic_context_mgr(*this); }

@@ -126,9 +126,10 @@ logic_manage_find(
     gd_app_context_t app,
     cpe_hash_string_t name)
 {
+    nm_node_t node;
     if (name == NULL) name = (cpe_hash_string_t)&s_logic_manage_default_name;
 
-    nm_node_t node = nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    node = nm_mgr_find_node(gd_app_nm_mgr(app), name);
     if (node == NULL || nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
     return (logic_manage_t)nm_node_data(node);
 }
@@ -138,9 +139,11 @@ logic_manage_find_nc(
     gd_app_context_t app,
     const char * name)
 {
+    nm_node_t node;
+
     if (name == NULL) return logic_manage_default(app);
 
-    nm_node_t node = nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
+    node = nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
     if (node == NULL || nm_node_type(node) != &s_nm_node_type_logic_manage) return NULL;
     return (logic_manage_t)nm_node_data(node);
 }
