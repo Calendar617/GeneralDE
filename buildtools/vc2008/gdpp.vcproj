@@ -185,19 +185,31 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\gdpp\app\ModuleDef.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\app\Random.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\app\ReqResponser.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\gdpp\app\System.hpp"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="dp"
-				>
 				<File
-					RelativePath="..\..\include\gdpp\dp\Request.hpp"
+					RelativePath="..\..\include\gdpp\app\TimerCenter.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\gdpp\dp\System.hpp"
+					RelativePath="..\..\include\gdpp\app\TimerProcessor.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\app\TimerProcessorBase.hpp"
 					>
 				</File>
 			</Filter>
@@ -213,31 +225,11 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\gdpp\evt\Exceptions.hpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\gdpp\evt\System.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="nm"
-				>
-				<File
-					RelativePath="..\..\include\gdpp\nm\Group.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\nm\Manager.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\nm\Object.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\nm\ObjectIterator.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\nm\System.hpp"
 					>
 				</File>
 			</Filter>
@@ -254,18 +246,6 @@
 				</File>
 				<File
 					RelativePath="..\..\include\gdpp\om\System.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="tl"
-				>
-				<File
-					RelativePath="..\..\include\gdpp\tl\System.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\tl\Timer.hpp"
 					>
 				</File>
 			</Filter>
@@ -293,6 +273,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\gdpp\app\Random.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\gdpp\app\ReqResponser.cpp"
 					>
 				</File>
@@ -310,14 +294,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="dp"
-				>
-				<File
-					RelativePath="..\..\src\gdpp\dp\Request.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="evt"
 				>
 				<File
@@ -328,110 +304,6 @@
 					RelativePath="..\..\src\gdpp\evt\EventCenter.cpp"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="nm"
-				>
-				<File
-					RelativePath="..\..\src\gdpp\nm\Group.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gdpp\nm\Manager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gdpp\nm\Object.cpp"
-					>
-				</File>
-				<Filter
-					Name="tests-ut"
-					>
-					<File
-						RelativePath="..\..\src\gdpp\nm\tests-ut\NmTest.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\..\src\gdpp\nm\tests-ut\NmTest.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\src\gdpp\nm\tests-ut\test_group_basic.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\..\src\gdpp\nm\tests-ut\test_manager_basic.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\..\src\gdpp\nm\tests-ut\test_object_basic.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							ExcludedFromBuild="true"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-							/>
-						</FileConfiguration>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="om"
