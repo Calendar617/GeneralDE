@@ -24,8 +24,7 @@ void EventCenterTest::TearDown() {
     Base::TearDown();
 }
 
-Gd::App::EventCenterExt &
+Gd::Evt::EventCenter &
 EventCenterTest::eventCenter(void) {
-    return dynamic_cast<Gd::App::EventCenterExt &>(
-        Gd::App::EventCenter::instance(t_app_ex()));
+    return Gd::Evt::EventCenter::instance(t_app_ex());
 }

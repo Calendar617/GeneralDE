@@ -1,32 +1,98 @@
 #include "cpepp/utils/ErrorCollector.hpp"
+#include "gdpp/app/Log.hpp"
 #include "gdpp/evt/Event.hpp"
 #include "gdpp/evt/EventCenter.hpp"
 #include "gdpp/evt/Exceptions.hpp"
 
 namespace Gd { namespace Evt {
 
-Event & EventCenter::createEvent(size_t attach_capacity, const char * typeName, ssize_t data_capacity) {
+Event & EventCenter::createEvent(const char * typeName, ssize_t data_capacity) {
     Cpe::Utils::ErrorCollector em;
-    gd_evt_t r = gd_evt_create(*this, attach_capacity, typeName, data_capacity, em);
+    gd_evt_t r = gd_evt_create(*this, typeName, data_capacity, em);
     if (r == NULL) {
         em.checkThrowWithMsg< no_responser_error>();
     }
     return *(Event *)r;
 }
 
-void EventCenter::sendEvent(Event & event) {
+void EventCenter::sendEvent(const char * target, Event & event) {
+    event.setTarget(target);
+
     int r = gd_evt_send(event, 0, 0, 1);
     if (r != 0) {
         throw ::std::runtime_error("send event fail!");
     }
 }
 
-EventCenter & EventCenter::_cast(gd_evt_mgr_t evm) {
-    if (evm == NULL) {
-        throw ::std::runtime_error("cast to EventCenter: input is NULL!");
+struct EventCenterProcessCtx {
+    EventResponser * m_realResponser;
+    EventProcessFun m_fun;
+#ifdef _MSC_VER
+    EventResponser * m_useResponser;
+#endif
+};
+
+void evt_process_fun(gd_evt_t evt, void * ctx) {
+}
+
+void evt_ctx_free(void * ctx) {
+    delete (EventCenterProcessCtx *)ctx;
+}
+
+ProcessorID
+EventCenter::registerResponser(
+        const char * oid,
+        EventResponser& realResponser, EventProcessFun fun
+#ifdef _MSC_VER
+        ,EventResponser& useResponser
+#endif
+        )
+{
+    EventCenterProcessCtx * ctx = new EventCenterProcessCtx;
+    ctx->m_realResponser = &realResponser;
+    ctx->m_fun = fun;
+#ifdef _MSC_VER
+    ctx->m_useResponser = &useResponser;
+#endif
+
+    evt_processor_id_t id;
+    if (gd_evt_mgr_regist_responser(
+            *this, &id,
+            oid, evt_process_fun, ctx, evt_ctx_free) != 0)
+    {
+        delete ctx;
+
+        APP_CTX_THROW_EXCEPTION(
+            app(),
+            ::std::runtime_error,
+            "%s: EventCenter::realResponser: regist fail!",
+            name());
     }
 
-    return *(EventCenter*)evm;
+    return id;
+}
+
+void EventCenter::unregisterResponser(EventResponser & r) {
+}
+
+EventCenter & EventCenter::_cast(gd_evt_mgr_t mgr) {
+    if (mgr == NULL) {
+        throw ::std::runtime_error("Gd::Evt::EventCenter::_cast: input mgr is NULL!");
+    }
+
+    return *(EventCenter*)mgr;
+}
+
+EventCenter & EventCenter::instance(gd_app_context_t app, const char * name) {
+    gd_evt_mgr_t mgr = gd_evt_mgr_find_nc(app, name);
+    if (mgr == NULL) {
+        APP_CTX_THROW_EXCEPTION(
+            app,
+            ::std::runtime_error,
+            "gd_evt_mgr %s not exist!", name ? name : "default");
+    }
+
+    return *(EventCenter*)mgr;
 }
 
 }}

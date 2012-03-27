@@ -1,20 +1,35 @@
 #include <assert.h>
+#include "cpe/pal/pal_strings.h"
+#include "cpe/dr/dr_metalib_init.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_data.h"
+#include "cpe/dr/dr_json.h"
 #include "cpe/tl/tl_action.h"
 #include "gd/evt/evt_read.h"
+#include "gd/evt/evt_manage.h"
 #include "evt_internal_types.h"
 
-gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * typeName, ssize_t data_capacity, error_monitor_t em) {
+gd_evt_t gd_evt_create(gd_evt_mgr_t evm, const char * typeName, ssize_t data_capacity, error_monitor_t em) {
     tl_event_t tl_evt;
+    LPDRMETALIB metalib;
     LPDRMETA meta;
     gd_evt_t evt;
 
     assert(evm);
-    
-    meta = dr_lib_find_meta_by_name(evm->m_metalib, typeName);
+
+    if (em == NULL) em = evm->m_em;
+
+    metalib = gd_evt_mgr_metalib(evm);
+    if (metalib == NULL) {
+        CPE_ERROR(em, "%s: create event: metalib not exist", gd_evt_mgr_name(evm));
+        return NULL;
+    }
+
+    meta = dr_lib_find_meta_by_name(metalib, typeName);
     if (meta == NULL) {
-        CPE_ERROR(em, "type %s not in metalib!", typeName);
+        CPE_ERROR(
+            em, "%s: create event: meta %s not in metalib %s!", 
+            gd_evt_mgr_name(evm), typeName, dr_lib_name(metalib));
         return NULL;
     }
 
@@ -22,24 +37,31 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, size_t attach_capacity, const char * ty
         data_capacity = dr_meta_size(meta);
     }
     else if (data_capacity < (ssize_t)dr_meta_size(meta)) {
-        CPE_ERROR(em, "data_capacity %zd is to small to contain type %s!", data_capacity, typeName);
+        CPE_ERROR(
+            em, "%s: create event: data_capacity %zd is to small to contain type %s!",
+            gd_evt_mgr_name(evm), data_capacity, typeName);
         return NULL;
     }
 
     tl_evt = tl_event_create(
-        evm->m_tl,
-        sizeof(struct gd_evt) + data_capacity + attach_capacity);
+        evm->m_tl, sizeof(struct gd_evt) + data_capacity + evm->m_oid_max_len + evm->m_carry_size);
     if (tl_evt == NULL) {
-        CPE_ERROR(em, "create tl_event fail!");
+        CPE_ERROR(
+            em, "%s: crate event: create tl event fail!",
+            gd_evt_mgr_name(evm));
         return NULL;
     }
 
     evt = gd_evt_cvt(tl_evt);
 
+    evm->m_oid_max_len = evm->m_oid_max_len;
+    evt->m_carry_meta = evm->m_carry_meta;
+    evt->m_carry_capacity = evm->m_carry_size;
     evt->m_meta = meta;
     evt->m_data_capacity = data_capacity;
 
-    dr_meta_set_defaults(evt + 1, data_capacity, meta, 0);
+    bzero(evt + 1, evt->m_oid_max_len);
+    dr_meta_set_defaults(gd_evt_data(evt), data_capacity, meta, 0);
 
     return evt;
 }
@@ -59,26 +81,48 @@ int gd_evt_send(
     return tl_event_send_ex(tl_evt, delay, span, repeatCount);
 }
 
+const char * gd_evt_target(gd_evt_t evt) {
+    return cpe_hs_data((cpe_hash_string_t)(evt + 1));
+}
+
+cpe_hash_string_t gd_evt_target_hs(gd_evt_t evt) {
+    return (cpe_hash_string_t)(evt + 1);
+}
+
+int gd_evt_set_target(gd_evt_t evt, const char * target) {
+    size_t name_len = cpe_hs_len_to_binary_len(strlen(target));
+    if (name_len > evt->m_oid_max_len) return -1;
+
+    cpe_hs_init(
+        (cpe_hash_string_t)(evt + 1),
+        evt->m_oid_max_len,
+        target);
+
+    return 0;
+}
+
 void * gd_evt_data(gd_evt_t evt) {
-    return evt + 1;
+    return ((char *)(evt + 1)) + evt->m_oid_max_len + evt->m_carry_capacity;
 }
 
 size_t gd_evt_data_capacity(gd_evt_t evt) {
     return evt->m_data_capacity;
 }
 
-void * gd_evt_attach(gd_evt_t evt) {
-    return ((char*)(evt + 1)) + evt->m_data_capacity;
+void * gd_evt_carry_data(gd_evt_t evt) {
+    return ((char*)(evt + 1)) + evt->m_oid_max_len;
+}
+
+LPDRMETA gd_evt_carry_meta(gd_evt_t evt) {
+    return evt->m_carry_meta;
+}
+
+size_t gd_evt_carry_data_capacity(gd_evt_t evt) {
+    return evt->m_carry_capacity;
 }
 
 gd_evt_t gd_evt_cvt(tl_event_t tl_evt) {
     return (gd_evt_t)tl_event_data(tl_evt);
-}
-
-size_t gd_evt_attach_capacity(gd_evt_t evt) {
-    size_t total = tl_event_capacity(tl_event_from_data(evt));
-    assert(total >= (sizeof(struct gd_evt) + evt->m_data_capacity));
-    return total - sizeof(struct gd_evt) - evt->m_data_capacity;
 }
 
 LPDRMETA gd_evt_meta(gd_evt_t evt) {
@@ -87,6 +131,10 @@ LPDRMETA gd_evt_meta(gd_evt_t evt) {
 
 const char * gd_evt_type(gd_evt_t evt) {
     return dr_meta_name(evt->m_meta);
+}
+
+void gd_evt_dump(write_stream_t stream, gd_evt_t evt) {
+    dr_json_print(stream, gd_evt_data(evt), gd_evt_meta(evt), DR_JSON_PRINT_MINIMIZE, NULL);
 }
 
 int gd_evt_set_from_string(gd_evt_t evt, const char * arg, const char * data, error_monitor_t em) {

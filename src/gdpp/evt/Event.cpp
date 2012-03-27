@@ -1,9 +1,14 @@
 #include <stdexcept>
-#include "cpe/dr/dr_json.h"
 #include "cpe/tl/tl_action.h"
 #include "gdpp/evt/Event.hpp"
 
 namespace Gd { namespace Evt {
+
+void Event::setTarget(const char * target) {
+    if (gd_evt_set_target(*this, target) != 0) {
+        throw ::std::runtime_error("Gd::Evt::Event set target fail!");
+    }
+}
 
 Event & Event::_cast(gd_evt_t evt) {
     if (evt == NULL) {
@@ -31,10 +36,6 @@ Event * Event::clone(mem_allocrator_t alloc) const {
 void Event::destory(void) {
     tl_event_t tl_evt = tl_event_from_data((void*)(gd_evt_t)this);
     tl_event_free(tl_evt);
-}
-
-void Event::dump(write_stream_t stream) const {
-    dr_json_print(stream, gd_evt_data(*this), gd_evt_meta(*this), DR_JSON_PRINT_MINIMIZE, NULL);
 }
 
 }}

@@ -44,14 +44,12 @@ void EvtTest::createEvtMgr(const char * metalib) {
             strlen(metalib),
             NULL));
 
-    m_evt_mgr = gd_evt_mgr_create(
-        tl_create(m_tl_mgr),
-        (LPDRMETALIB)mem_buffer_make_continuous(&m_buffer, 0),
-        t_allocrator());
+    m_evt_mgr = gd_evt_mgr_create(t_app(), "test_evt_mgr", t_allocrator(), t_em());
     EXPECT_TRUE(m_evt_mgr);
 }
 
-gd_evt_t EvtTest::createEvt(const char * typeName, size_t attach_capacity, ssize_t data_capacity) {
+gd_evt_t EvtTest::createEvt(const char * typeName, size_t carry_size, ssize_t data_capacity) {
     EXPECT_TRUE(m_evt_mgr);
-    return gd_evt_create(m_evt_mgr, attach_capacity, typeName, data_capacity, t_em());
+    gd_evg_mgr_set_carry_info(m_evt_mgr, NULL, carry_size);
+    return gd_evt_create(m_evt_mgr, typeName, data_capacity, t_em());
 }

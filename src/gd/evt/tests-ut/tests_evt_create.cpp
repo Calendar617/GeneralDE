@@ -19,9 +19,7 @@ TEST_F(EvtCreateTest, create_basic) {
     ASSERT_TRUE(evt);
 
     EXPECT_EQ((size_t)25, gd_evt_data_capacity(evt));
-    EXPECT_EQ((size_t)12, gd_evt_attach_capacity(evt));
-
-    EXPECT_EQ(25, (char*)gd_evt_attach(evt) - (char*)gd_evt_data(evt));
+    EXPECT_EQ((size_t)12, gd_evt_carry_data_capacity(evt));
 }
 
 TEST_F(EvtCreateTest, create_data_capacity_auto_calc) {
@@ -29,7 +27,7 @@ TEST_F(EvtCreateTest, create_data_capacity_auto_calc) {
     ASSERT_TRUE(evt);
 
     EXPECT_EQ((size_t)4, gd_evt_data_capacity(evt));
-    EXPECT_EQ((size_t)12, gd_evt_attach_capacity(evt));
+    EXPECT_EQ((size_t)12, gd_evt_carry_data_capacity(evt));
 }
 
 TEST_F(EvtCreateTest, create_data_capacity_too_small) {
@@ -42,7 +40,7 @@ TEST_F(EvtCreateTest, create_data_capacity_eq) {
     ASSERT_TRUE(evt);
 
     EXPECT_EQ((size_t)4, gd_evt_data_capacity(evt));
-    EXPECT_EQ((size_t)12, gd_evt_attach_capacity(evt));
+    EXPECT_EQ((size_t)12, gd_evt_carry_data_capacity(evt));
 }
 
 TEST_F(EvtCreateTest, create_data_capacity_bg) {
@@ -50,13 +48,12 @@ TEST_F(EvtCreateTest, create_data_capacity_bg) {
     ASSERT_TRUE(evt);
 
     EXPECT_EQ((size_t)5, gd_evt_data_capacity(evt));
-    EXPECT_EQ((size_t)12, gd_evt_attach_capacity(evt));
+    EXPECT_EQ((size_t)12, gd_evt_carry_data_capacity(evt));
 }
 
-TEST_F(EvtCreateTest, create_attach_capacity_zero) {
+TEST_F(EvtCreateTest, create_carry_capacity_zero) {
     gd_evt_t evt = createEvt("Evt1", 0);
     ASSERT_TRUE(evt);
 
-    EXPECT_EQ((size_t)0, gd_evt_attach_capacity(evt));
-    EXPECT_EQ(4, (char*)gd_evt_attach(evt) - (char*)gd_evt_data(evt));
+    EXPECT_EQ((size_t)0, gd_evt_carry_data_capacity(evt));
 }

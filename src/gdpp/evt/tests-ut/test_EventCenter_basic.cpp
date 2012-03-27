@@ -9,7 +9,7 @@ TEST_F(EventCenterTest, basic) {
         eventResponser, 
         &EventResponserMock::on_event1);
 
-    Gd::App::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = eventCenter().createEvent("event1");
     event["a"] = 1;
     eventCenter().sendEvent("oid-1", event);
     
@@ -31,7 +31,7 @@ TEST_F(EventCenterTest, remove_by_responser) {
 
     eventCenter().unregisterResponser(eventResponser);
 
-    Gd::App::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = eventCenter().createEvent("event1");
     event["a"] = 1;
     eventCenter().sendEvent("oid-1", event);
 
@@ -50,7 +50,7 @@ TEST_F(EventCenterTest, many_registe) {
             &EventResponserMock::on_event1);
     }
 
-    Gd::App::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = eventCenter().createEvent("event1");
     event["a"] = 1;
     eventCenter().sendEvent("oid-1", event);
     
@@ -76,7 +76,7 @@ TEST_F(EventCenterTest, many_responser) {
             &EventResponserMock::on_event1);
     }
 
-    Gd::App::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = eventCenter().createEvent("event1");
     event["a"] = 1;
     eventCenter().sendEvent("oid-1", event);
 

@@ -1,6 +1,6 @@
-#include "gdpp/app/EventResponserBase.hpp"
+#include "gdpp/evt/EventResponserBase.hpp"
 
-namespace Gd { namespace App {
+namespace Gd { namespace Evt {
 
 EventResponser::~EventResponser() {
 }
