@@ -54,7 +54,7 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, const char * typeName, ssize_t data_cap
 
     evt = gd_evt_cvt(tl_evt);
 
-    evm->m_oid_max_len = evm->m_oid_max_len;
+    evt->m_oid_max_len = evm->m_oid_max_len;
     evt->m_carry_meta = evm->m_carry_meta;
     evt->m_carry_capacity = evm->m_carry_size;
     evt->m_meta = meta;
