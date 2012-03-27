@@ -801,6 +801,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\cpe\utils\stream_error.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\cpe\utils\stream_file.c"
 					>
 				</File>
