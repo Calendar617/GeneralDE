@@ -13,6 +13,7 @@ public:
     void TearDown();
 
     void t_dr_store_install(const char * libname, const char * def);
+    void t_dr_store_reset(const char * libname, const char * def);
 
     LPDRMETALIB t_metalib(const char * libname);
     LPDRMETA t_meta(const char * libname, const char * metaname);

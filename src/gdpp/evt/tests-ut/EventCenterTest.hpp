@@ -4,13 +4,17 @@
 #include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
 #include "gdpp/app/tests-env/with_app.hpp"
+#include "gd/dr_store/tests-env/with_dr_store.hpp"
+#include "gdpp/evt/tests-env/with_evt.hpp"
 #include "gdpp/evt/EventResponser.hpp"
 #include "gdpp/evt/Event.hpp"
 #include "gdpp/evt/EventCenter.hpp"
 
-typedef LOKI_TYPELIST_2(
+typedef LOKI_TYPELIST_4(
     utils::testenv::with_em,
-    Gd::App::testenv::with_app) EventCenterTestBase;
+    Gd::App::testenv::with_app,
+    gd::dr_store::testenv::with_dr_store,
+    Gd::Evt::testenv::with_evt) EventCenterTestBase;
 
 class EventCenterTest : public testenv::fixture<EventCenterTestBase> {
 public:
@@ -23,7 +27,6 @@ public:
     virtual void SetUp();
     virtual void TearDown();
 
-    Gd::Evt::EventCenter &  eventCenter(void);
     void tick(void);
 };
 

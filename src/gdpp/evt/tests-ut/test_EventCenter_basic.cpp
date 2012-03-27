@@ -4,14 +4,14 @@
 TEST_F(EventCenterTest, basic) {
     EventResponserMock eventResponser;
 
-    eventCenter().registerResponser(
+    t_evt_mgr_ex().registerResponser(
         "oid-1",
         eventResponser, 
         &EventResponserMock::on_event1);
 
-    Gd::Evt::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = t_evt_mgr_ex().createEvent("event1");
     event["a"] = 1;
-    eventCenter().sendEvent("oid-1", event);
+    t_evt_mgr_ex().sendEvent("oid-1", event);
     
     EXPECT_CALL(eventResponser, on_event1(::testing::StrEq("oid-1"), ::testing::Ref(event)))
         .WillOnce(::testing::Return());
@@ -24,16 +24,16 @@ TEST_F(EventCenterTest, basic) {
 TEST_F(EventCenterTest, remove_by_responser) {
     EventResponserMock eventResponser;
 
-    eventCenter().registerResponser(
+    t_evt_mgr_ex().registerResponser(
         "oid-1",
         eventResponser, 
         &EventResponserMock::on_event1);
 
-    eventCenter().unregisterResponser(eventResponser);
+    t_evt_mgr_ex().unregisterResponser(eventResponser);
 
-    Gd::Evt::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = t_evt_mgr_ex().createEvent("event1");
     event["a"] = 1;
-    eventCenter().sendEvent("oid-1", event);
+    t_evt_mgr_ex().sendEvent("oid-1", event);
 
     t_app_tick();
 
@@ -44,15 +44,15 @@ TEST_F(EventCenterTest, many_registe) {
     EventResponserMock eventResponser;
 
     for(int i = 0; i < 2000; ++i) {
-        eventCenter().registerResponser(
+        t_evt_mgr_ex().registerResponser(
             "oid-1",
             eventResponser, 
             &EventResponserMock::on_event1);
     }
 
-    Gd::Evt::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = t_evt_mgr_ex().createEvent("event1");
     event["a"] = 1;
-    eventCenter().sendEvent("oid-1", event);
+    t_evt_mgr_ex().sendEvent("oid-1", event);
     
     EXPECT_CALL(eventResponser, on_event1(::testing::StrEq("oid-1"), ::testing::Ref(event)))
         .Times(2000)
@@ -70,15 +70,15 @@ TEST_F(EventCenterTest, many_responser) {
     }
 
     for(size_t i = 0; i < eventResponsers.size(); ++i) {
-        eventCenter().registerResponser(
+        t_evt_mgr_ex().registerResponser(
             "oid-1",
             *eventResponsers[i], 
             &EventResponserMock::on_event1);
     }
 
-    Gd::Evt::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = t_evt_mgr_ex().createEvent("event1");
     event["a"] = 1;
-    eventCenter().sendEvent("oid-1", event);
+    t_evt_mgr_ex().sendEvent("oid-1", event);
 
 
     for(size_t i = 0; i < eventResponsers.size(); ++i) {

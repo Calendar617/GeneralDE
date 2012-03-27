@@ -25,14 +25,18 @@ void EventCenter::sendEvent(const char * target, Event & event) {
 }
 
 struct EventCenterProcessCtx {
-    EventResponser * m_realResponser;
+    gd_app_context_t m_app;
     EventProcessFun m_fun;
-#ifdef _MSC_VER
     EventResponser * m_useResponser;
-#endif
 };
 
-void evt_process_fun(gd_evt_t evt, void * ctx) {
+void evt_process_fun(gd_evt_t evt, void * ctx, void * arg) {
+    EventCenterProcessCtx * processCtx = (EventCenterProcessCtx *)arg;
+
+    try {
+        (processCtx->m_useResponser->*(processCtx->m_fun))(gd_evt_target(evt), Event::_cast(evt));
+    }
+    APP_CTX_CATCH_EXCEPTION(processCtx->m_app, "process event:"); //TODO: record to app
 }
 
 void evt_ctx_free(void * ctx) {
@@ -49,16 +53,18 @@ EventCenter::registerResponser(
         )
 {
     EventCenterProcessCtx * ctx = new EventCenterProcessCtx;
-    ctx->m_realResponser = &realResponser;
+    ctx->m_app = app();
     ctx->m_fun = fun;
 #ifdef _MSC_VER
     ctx->m_useResponser = &useResponser;
+#else
+    ctx->m_useResponser = &realResponser;
 #endif
 
     evt_processor_id_t id;
     if (gd_evt_mgr_regist_responser(
             *this, &id,
-            oid, evt_process_fun, ctx, evt_ctx_free) != 0)
+            oid, evt_process_fun, &realResponser, ctx, evt_ctx_free) != 0)
     {
         delete ctx;
 
@@ -73,6 +79,7 @@ EventCenter::registerResponser(
 }
 
 void EventCenter::unregisterResponser(EventResponser & r) {
+    gd_evt_mgr_unregist_responser(*this, &r);
 }
 
 EventCenter & EventCenter::_cast(gd_evt_mgr_t mgr) {

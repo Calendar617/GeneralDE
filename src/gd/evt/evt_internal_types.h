@@ -15,7 +15,8 @@ struct gd_evt_processor {
     evt_processor_id_t m_id;
     enum evt_processor_state m_state;
     void * m_process_ctx;
-    void (*m_process_ctx_free)(void *);
+    void * m_process_arg;
+    void (*m_process_arg_free)(void *);
     gd_evt_process_fun_t m_process_fun;
     struct cpe_hash_entry m_hh_for_responser_to_processor;
 };

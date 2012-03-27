@@ -35,10 +35,13 @@ tl_t gd_evt_mgr_tl(gd_evt_mgr_t mgr);
 
 void gd_evg_mgr_set_carry_info(gd_evt_mgr_t em, LPDRMETA carry_meta, size_t carry_size);
 
+int gd_evt_mgr_set_metalib(gd_evt_mgr_t mgr, const char * libname);
+
 int gd_evt_mgr_regist_responser(
     gd_evt_mgr_t mgr,
     evt_processor_id_t * id,
-    const char * oid, gd_evt_process_fun_t fun, void * ctx, void (*ctx_fini)(void *));
+    const char * oid, gd_evt_process_fun_t fun, void * ctx,
+    void * arg, void (*arg_fini)(void *));
 
 void gd_evt_mgr_unregist_responser(gd_evt_mgr_t mgr, void * ctx);
 

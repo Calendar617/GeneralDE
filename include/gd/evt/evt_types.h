@@ -16,7 +16,7 @@ typedef struct gd_evt * gd_evt_t;
 typedef struct gd_evt_dsp * gd_evt_dsp_t;
 typedef struct gd_evt_processor * gd_evt_responser_t;
 
-typedef void (*gd_evt_process_fun_t)(gd_evt_t evt, void * ctx);
+typedef void (*gd_evt_process_fun_t)(gd_evt_t evt, void * ctx, void * arg);
 
 #ifdef __cplusplus
 }

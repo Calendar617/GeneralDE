@@ -9,27 +9,27 @@ public:
     }
 
     void on_event(const char * oid, Gd::Evt::Event const & e) {
-        m_ec.registerResponser(
-            "oid-1",
-            *this, 
-            &EventResponser_RegistInEvent::on_event);
+        // m_ec.registerResponser(
+        //     "oid-1",
+        //     *this, 
+        //     &EventResponser_RegistInEvent::on_event);
     }
 
     Gd::Evt::EventCenter & m_ec;
 };
 
 TEST_F(EventCenterTest, register_in_process) {
-    EventResponser_RegistInEvent eventResponser(eventCenter());
+    EventResponser_RegistInEvent eventResponser(t_evt_mgr_ex());
 
-    eventCenter().registerResponser(
+    t_evt_mgr_ex().registerResponser(
         "oid-1",
         eventResponser, 
         &EventResponser_RegistInEvent::on_event);
 
-    Gd::Evt::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = t_evt_mgr_ex().createEvent("event1");
     event["a"] = 1;
-    eventCenter().sendEvent("oid-1", event);
-    
+    t_evt_mgr_ex().sendEvent("oid-1", event);
+
     t_app_tick();
 }
 
@@ -50,23 +50,23 @@ public:
 
 TEST_F(EventCenterTest, unregister_in_process) {
     EventResponserMock otherResponser;
-    eventCenter().registerResponser(
+    t_evt_mgr_ex().registerResponser(
         "oid-1",
         otherResponser, 
         &EventResponserMock::on_event1);
     EXPECT_CALL(otherResponser, on_event1(::testing::StrEq("oid-1"), ::testing::_ ))
         .WillOnce(::testing::Return());
 
-    EventResponser_UnregistInEvent eventResponser(eventCenter(), otherResponser);
+    EventResponser_UnregistInEvent eventResponser(t_evt_mgr_ex(), otherResponser);
 
-    eventCenter().registerResponser(
+    t_evt_mgr_ex().registerResponser(
         "oid-1",
         eventResponser, 
         &EventResponser_UnregistInEvent::on_event);
 
-    Gd::Evt::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = t_evt_mgr_ex().createEvent("event1");
     event["a"] = 1;
-    eventCenter().sendEvent("oid-1", event);
+    t_evt_mgr_ex().sendEvent("oid-1", event);
     
     t_app_tick();
 }
@@ -85,31 +85,31 @@ public:
 
 TEST_F(EventCenterTest, unregister_self_in_process) {
     EventResponserMock er1;
-    eventCenter().registerResponser(
+    t_evt_mgr_ex().registerResponser(
         "oid-1",
         er1, 
         &EventResponserMock::on_event1);
     EXPECT_CALL(er1, on_event1(::testing::StrEq("oid-1"), ::testing::_))
         .WillOnce(::testing::Return());
 
-    EventResponser_UnregistSelfInEvent eventResponser(eventCenter());
+    EventResponser_UnregistSelfInEvent eventResponser(t_evt_mgr_ex());
 
-    eventCenter().registerResponser(
+    t_evt_mgr_ex().registerResponser(
         "oid-1",
         eventResponser, 
         &EventResponser_UnregistSelfInEvent::on_event);
     
     EventResponserMock er2;
-    eventCenter().registerResponser(
+    t_evt_mgr_ex().registerResponser(
         "oid-1",
         er2, 
         &EventResponserMock::on_event1);
     EXPECT_CALL(er2, on_event1(::testing::StrEq("oid-1"), ::testing::_))
         .WillOnce(::testing::Return());
 
-    Gd::Evt::Event & event = eventCenter().createEvent("event1");
+    Gd::Evt::Event & event = t_evt_mgr_ex().createEvent("event1");
     event["a"] = 1;
-    eventCenter().sendEvent("oid-1", event);
+    t_evt_mgr_ex().sendEvent("oid-1", event);
 
     t_app_tick();
 }

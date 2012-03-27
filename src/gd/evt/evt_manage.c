@@ -12,6 +12,7 @@
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "gd/dr_store/dr_ref.h"
+#include "gd/dr_store/dr_store_manage.h"
 #include "gd/evt/evt_manage.h"
 #include "gd/evt/evt_read.h"
 #include "evt_internal_ops.h"
@@ -108,7 +109,9 @@ static void gd_evt_mgr_clear(nm_node_t node) {
 
     cpe_range_mgr_fini(&mgr->m_ids);
 
-    dp_req_free(mgr->m_req);
+    if (mgr->m_req) dp_req_free(mgr->m_req);
+
+    if (mgr->m_metalib) dr_ref_free(mgr->m_metalib);
 
     tl_free(mgr->m_tl);
 
@@ -157,6 +160,22 @@ gd_evt_mgr_name_hs(gd_evt_mgr_t mgr) {
     return nm_node_name_hs(nm_node_from_data(mgr));
 }
 
+int gd_evt_mgr_set_metalib(gd_evt_mgr_t mgr, const char * libname) {
+    dr_store_manage_t dr_store_mgr;
+    dr_store_mgr = dr_store_manage_default(mgr->m_app);
+    if (dr_store_mgr == NULL) {
+        CPE_ERROR(
+            mgr->m_em, "%s: set metalib %s: default dr_store_manage not exist!",
+            gd_evt_mgr_name(mgr), libname);
+        return -1;
+    }
+
+    if (mgr->m_metalib) dr_ref_free(mgr->m_metalib);
+
+    mgr->m_metalib = dr_ref_create(dr_store_mgr, libname);
+    return mgr->m_metalib == NULL ? -1 : 0;
+}
+
 LPDRMETALIB gd_evt_mgr_metalib(gd_evt_mgr_t mgr) {
     return mgr->m_metalib ? dr_ref_lib(mgr->m_metalib) : NULL;
 }
@@ -173,7 +192,8 @@ void gd_evg_mgr_set_carry_info(gd_evt_mgr_t mgr, LPDRMETA carry_meta, size_t car
 int gd_evt_mgr_regist_responser(
     gd_evt_mgr_t mgr, 
     evt_processor_id_t * id,
-    const char * oid, gd_evt_process_fun_t fun, void * ctx, void (*ctx_fini)(void *))
+    const char * oid, gd_evt_process_fun_t fun, void * ctx,
+    void * arg, void (*arg_fini)(void *))
 {
     evt_processor_id_t newProcessorId;
     struct gd_evt_processor * newProcessorData;
@@ -190,7 +210,8 @@ int gd_evt_mgr_regist_responser(
     assert(newProcessorData->m_state == evt_processor_state_NotInResponserHash);
 
     newProcessorData->m_process_ctx = ctx;
-    newProcessorData->m_process_ctx_free = ctx_fini;
+    newProcessorData->m_process_arg = arg;
+    newProcessorData->m_process_arg_free = arg_fini;
     newProcessorData->m_process_fun = fun;
 
     if (cpe_hash_table_insert(&mgr->m_responser_to_processor, newProcessorData) != 0) {
@@ -261,7 +282,7 @@ static int gd_evt_mgr_apply_evt(dp_req_t req, void * ctx, error_monitor_t em) {
     struct gd_evt_processor * pn = (struct gd_evt_processor *)ctx;
     tl_event_t input = (tl_event_t)dp_req_data(req);
     
-    pn->m_process_fun(gd_evt_cvt(input), pn->m_process_ctx);
+    pn->m_process_fun(gd_evt_cvt(input), pn->m_process_ctx, pn->m_process_arg);
 
     return 0;
 }

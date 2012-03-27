@@ -125,7 +125,7 @@ int dr_store_cmp(const struct dr_store * l, const struct dr_store * r) {
 CPE_HS_DEF_VAR(s_dr_store_manage_default_name, "dr_store_manage");
 
 struct nm_node_type s_nm_node_type_dr_store_manage = {
-    "usf_dr_store_manage",
+    "gd_dr_store_manage",
     dr_store_manage_clear
 };
 

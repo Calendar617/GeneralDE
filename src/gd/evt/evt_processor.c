@@ -87,7 +87,9 @@ void gd_evt_mgr_free_processor_buf(gd_evt_mgr_t mgr) {
         mem_free(mgr->m_alloc, mgr->m_processor_buf[i]);
     }
 
-    mem_free(mgr->m_alloc, mgr->m_processor_buf);
+    if (mgr->m_processor_buf)
+        mem_free(mgr->m_alloc, mgr->m_processor_buf);
+
     mgr->m_processor_page_count = 0;
     mgr->m_processor_page_capacity = 0;
 }
@@ -98,10 +100,11 @@ void gd_evt_processor_free_basic(gd_evt_mgr_t mgr, struct gd_evt_processor * dat
         data->m_state = evt_processor_state_NotInResponserHash;
     }
 
-    if (data->m_process_ctx_free) data->m_process_ctx_free(data->m_process_ctx);
+    if (data->m_process_arg_free) data->m_process_arg_free(data->m_process_arg);
 
     data->m_process_ctx = NULL;
-    data->m_process_ctx_free = NULL;
+    data->m_process_arg = NULL;
+    data->m_process_arg_free = NULL;
     data->m_process_fun = NULL;
 }
 

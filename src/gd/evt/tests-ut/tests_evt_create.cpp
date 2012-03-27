@@ -4,7 +4,7 @@ class EvtCreateTest : public EvtTest {
     virtual void SetUp() {
         EvtTest::SetUp();
         
-        createEvtMgr(
+        t_evt_mgr_set_metalib(
             "<metalib tagsetversion='1' name='net'  version='1'>"
             "    <struct name='Evt1' version='1'>"
             "	     <entry name='a1' type='int16'/>"
