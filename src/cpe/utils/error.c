@@ -80,8 +80,8 @@ void cpe_error_log_to_consol(struct error_info * info, void * context, const cha
     size_t s;
     s = 0;
 
-    if (info->m_file) s += vsnprintf(buf, sizeof(buf), "%s:%d: ", info->m_file, info->m_line > 0 ? info->m_line : 0);
-    else if (info->m_line >= 0) s += vsnprintf(buf + s, sizeof(buf) - s, "%d: ", info->m_line);
+    if (info->m_file) s += snprintf(buf, sizeof(buf), "%s:%d: ", info->m_file, info->m_line > 0 ? info->m_line : 0);
+    else if (info->m_line >= 0) s += snprintf(buf + s, sizeof(buf) - s, "%d: ", info->m_line);
 
 	vsnprintf(buf + s, sizeof(buf) - s, fmt, args);
 	OutputDebugStringA(buf);

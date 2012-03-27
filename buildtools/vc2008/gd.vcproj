@@ -337,6 +337,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\gd\evt\evt_processor.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\gd\evt\evt_read.c"
 					>
 				</File>

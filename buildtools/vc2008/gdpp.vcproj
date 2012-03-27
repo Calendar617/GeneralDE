@@ -161,22 +161,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\gdpp\app\Event.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\app\EventCenter.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\app\EventResponser.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\app\EventResponserBase.hpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\include\gdpp\app\Log.hpp"
 					>
 				</File>
@@ -261,18 +245,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\gdpp\app\EventCenterExt.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gdpp\app\EventCenterExt.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gdpp\app\EventResponser.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\src\gdpp\app\Random.cpp"
 					>
 				</File>
@@ -302,6 +274,10 @@
 				</File>
 				<File
 					RelativePath="..\..\src\gdpp\evt\EventCenter.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gdpp\evt\EventResponser.cpp"
 					>
 				</File>
 			</Filter>
