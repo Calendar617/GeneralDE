@@ -16,32 +16,29 @@ public:
 
     Cpe::Utils::CString const & type(void) const { return Cpe::Utils::CString::_cast(gd_evt_type(*this)); }
 
-    Cpe::Dr::Meta const & meta(void) const {
-        return Cpe::Dr::Meta::_cast(gd_evt_meta(*this));
-    }
+    Cpe::Utils::CString const & target(void) const { return Cpe::Utils::CString::_cast(gd_evt_target(*this)); }
+    cpe_hash_string_t targetHs(void) const { return gd_evt_target_hs(*this); }
+    void setTarget(const char * target);
 
-    void * attach_buf(void) { return gd_evt_attach(*this); }
-    size_t attach_capacity(void) { return gd_evt_attach_capacity(*this); }
+    /*carry operations*/
+    Cpe::Dr::Meta const * carryDataMeta(void) const { return (Cpe::Dr::Meta const *)gd_evt_carry_meta(*this); }
+    size_t carryDataCapacity(void) const { return gd_evt_carry_data_capacity(*this); }
+    void * carryData(void) { return gd_evt_carry_data(*this); }
+    void const * carryData(void) const { return gd_evt_carry_data(*this); }
 
-    Cpe::Dr::ConstData args(void) const { 
-        return Cpe::Dr::ConstData(gd_evt_data(*this), meta());
-    }
+    /*data operations*/
+    Cpe::Dr::Meta const & meta(void) const { return Cpe::Dr::Meta::_cast(gd_evt_meta(*this)); }
 
-    Cpe::Dr::Data args(void) {
-        return Cpe::Dr::Data(gd_evt_data(*this), meta());
-    }
+    Cpe::Dr::ConstData args(void) const { return Cpe::Dr::ConstData(gd_evt_data(*this), meta()); }
+    Cpe::Dr::Data args(void) {return Cpe::Dr::Data(gd_evt_data(*this), meta()); }
 
-    Cpe::Dr::ConstDataElement operator[] (const char * name) const {
-        return args()[name];
-    }
+    Cpe::Dr::ConstDataElement operator[] (const char * name) const { return args()[name]; }
+    Cpe::Dr::DataElement operator[] (const char * name) { return args()[name]; }
 
-    Cpe::Dr::DataElement operator[] (const char * name) {
-        return args()[name];
-    }
-
-    void dump(write_stream_t stream) const;
+    void dump(write_stream_t stream) const { gd_evt_dump(stream, *this); }
 
     Event * clone(mem_allocrator_t alloc = NULL) const;
+
     void destory(void);
 
     static Event & _cast(gd_evt_t evt);

@@ -1,5 +1,6 @@
 #ifndef CPE_DP_EVT_READ_H
 #define CPE_DP_EVT_READ_H
+#include "cpe/utils/stream.h"
 #include "cpe/utils/error.h"
 #include "cpe/utils/memory.h"
 #include "evt_types.h"
@@ -10,7 +11,6 @@ extern "C" {
 
 gd_evt_t gd_evt_create(
     gd_evt_mgr_t evm,
-    size_t attach_capacity,
     const char * typeName,
     ssize_t data_capacity,
     error_monitor_t em);
@@ -24,13 +24,20 @@ int gd_evt_send(
 const char * gd_evt_type(gd_evt_t evt);
 LPDRMETA gd_evt_meta(gd_evt_t evt);
 
+const char * gd_evt_target(gd_evt_t evt);
+cpe_hash_string_t gd_evt_target_hs(gd_evt_t evt);
+int gd_evt_set_target(gd_evt_t evt, const char * target);
+
 size_t gd_evt_data_capacity(gd_evt_t evt);
 void * gd_evt_data(gd_evt_t evt);
 
-size_t gd_evt_attach_capacity(gd_evt_t evt);
-void * gd_evt_attach(gd_evt_t evt);
+void * gd_evt_carry_data(gd_evt_t evt);
+size_t gd_evt_carry_data_capacity(gd_evt_t evt);
+LPDRMETA gd_evt_carry_meta(gd_evt_t evt);
 
 gd_evt_t gd_evt_cvt(tl_event_t tl_evt);
+
+void gd_evt_dump(write_stream_t stream, gd_evt_t evt);
 
 int gd_evt_set_from_string(gd_evt_t evt, const char * arg, const char * data, error_monitor_t em);
 int gd_evt_set_from_int8(gd_evt_t evt, const char * arg, int8_t data, error_monitor_t em);

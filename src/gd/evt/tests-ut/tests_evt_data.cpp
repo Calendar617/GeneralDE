@@ -1,7 +1,7 @@
 #include "EvtTest.hpp"
 
 TEST_F(EvtTest, data_set_from_string_basic) {
-    createEvtMgr(
+    t_evt_mgr_set_metalib(
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='Evt1' version='1'>"
         "	     <entry name='a1' type='int16'/>"
@@ -26,7 +26,7 @@ TEST_F(EvtTest, data_set_from_string_basic) {
 }
 
 TEST_F(EvtTest, data_set_from_int32_basic) {
-    createEvtMgr(
+    t_evt_mgr_set_metalib(
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='Evt1' version='1'>"
         "	     <entry name='a1' type='int16'/>"

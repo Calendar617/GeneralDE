@@ -15,13 +15,6 @@ class Library;
 class ReqResponser;
 class Random;
 
-typedef int32_t ProcessorID;
-typedef ::Gd::Evt::Event Event;
-class EventCenter;
-class EventResponser;
-class EventResponserBase;
-typedef void (EventResponser::*EventProcessFun)(const char * oid, Event const & e);
-
 typedef int32_t TimerID;
 class TimerCenter;
 class TimerProcessor;
