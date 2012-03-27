@@ -1,7 +1,7 @@
-product:=gdpp_app
+product:=testenv.gd_evt
 $(product).type:=lib
-$(product).depends:=cpepp_utils cpepp_cfg gd_app cpepp_nm cpepp_dp
-$(product).c.flags.ld:=
+$(product).buildfor:=dev
+$(product).depends:=testenv.gd_dr_store gd_evt 
 $(product).c.sources:=$(wildcard $(product-base)/*.cpp)
 
 $(eval $(call product-def,$(product)))
