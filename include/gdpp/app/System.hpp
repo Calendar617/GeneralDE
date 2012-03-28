@@ -15,12 +15,6 @@ class Library;
 class ReqResponser;
 class Random;
 
-typedef int32_t TimerID;
-class TimerCenter;
-class TimerProcessor;
-class TimerProcessorBase;
-typedef void (TimerProcessor::*TimerProcessFun)(TimerID id);
-
 }}
 
 #endif
