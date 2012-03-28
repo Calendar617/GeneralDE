@@ -1,4 +1,5 @@
 #include "argtable2.h"
+#include "cpe/pal/pal_strings.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/utils/file.h"
 #include "cpe/utils/stream_file.h"
@@ -15,10 +16,30 @@ struct arg_file * o_lib_bin;
 struct arg_lit * help;
 struct arg_end *end;
 
+dir_visit_next_op_t
+accept_input_file(const char * full, const char * base, void * ctx) {
+    if (strcasecmp(file_name_suffix(base), "xml") == 0) {
+        dr_metalib_builder_add_file((dr_metalib_builder_t)ctx, NULL, full);
+    }
+    return dir_visit_next_go;
+}
+
+struct dir_visitor g_input_search_visitor = {
+    NULL, NULL, accept_input_file
+};
+
 void prepare_input(dr_metalib_builder_t builder, error_monitor_t em) {
     int i;
     for(i = 0; i < input->count; ++i) {
-        dr_metalib_builder_add_file(builder, NULL, input->filename[i]);
+        if (dir_exist(input->filename[i], em)) {
+            dir_search(&g_input_search_visitor, builder, input->filename[i], 5, em, NULL);
+        }
+        else if (file_exist(input->filename[i], em)) {
+            dr_metalib_builder_add_file(builder, NULL, input->filename[i]);
+        }
+        else {
+            CPE_ERROR(em, "input %s not exist!", input->filename[i]);
+        }
     }
 }
 
