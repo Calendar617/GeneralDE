@@ -5,6 +5,7 @@
 #include "gdpp/app/Application.hpp"
 #include "gd/evt/evt_manage.h"
 #include "System.hpp"
+#include "EventResponser.hpp"
 
 namespace Gd { namespace Evt {
 
