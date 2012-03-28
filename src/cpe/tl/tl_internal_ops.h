@@ -12,11 +12,10 @@ void tl_event_node_free(struct tl_event_node * node);
 int tl_event_node_insert(struct tl_event_node * node);
 int tl_event_queue_clear(struct tl_event_node_queue * queue);
 
-#define tl_event_to_node(e)                  \
-    ((struct tl_event_node *)                \
-     ((char *)(e)                               \
-      - (sizeof(struct tl_event_node)        \
-         - sizeof(struct tl_event))))
+#define tl_event_to_node(e)                                             \
+    ((struct tl_event_node *)                                           \
+     (((char *)e)                                                       \
+      + (10000 - ((ptr_int_t)(&((struct tl_event_node *)10000)->m_event)))))
 
 #define tl_event_node_remove_from_building_queue(i)  \
     TAILQ_REMOVE(                                       \
