@@ -224,7 +224,22 @@ const char * file_name_suffix(const char * input) {
     while(len > 0) {
         char c = input[--len];
         if (c == '.') return input + len + 1;
-        if (c == '/') return "";
+        if (c == '/' || c == '\\') return "";
+    }
+
+    return input;
+}
+
+const char * file_name_no_dir(const char * input) {
+    int len;
+
+    if (input == NULL) return NULL;
+
+    len = strlen(input);
+
+    while(len > 0) {
+        char c = input[--len];
+        if (c == '/' || c == '\\') return input + len + 1;
     }
 
     return input;
@@ -253,7 +268,7 @@ file_name_base(const char * input, mem_buffer_t tbuf) {
             }
         }
 
-        if (c == '/') {
+        if (c == '/' || c == '\\') {
             beginPos = pos + 1;
             break;
         }
