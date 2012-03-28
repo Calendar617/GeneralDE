@@ -70,3 +70,11 @@ TEST_F(FileNameTest, base_basic) {
     EXPECT_EQ(1, t_alloc_count());
 }
 
+TEST_F(FileNameTest, no_dir_basic) {
+    EXPECT_STREQ("c.d", file_name_no_dir("a.b/c.d"));
+}
+
+TEST_F(FileNameTest, no_dir_no_dir) {
+    EXPECT_STREQ("c.d", file_name_no_dir("c.d"));
+}
+
