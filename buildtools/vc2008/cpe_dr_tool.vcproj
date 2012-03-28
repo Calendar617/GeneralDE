@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../include;../3rdTools/argtable2/include"
+				AdditionalIncludeDirectories="../../include;../../3rdTools/argtable2/include"
 				PreprocessorDefinitions="WIN32;_WINDOWS;STRICT;NDEBUG;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,6 +61,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="iconv.lib Ws2_32.lib libzlib.lib"
+				AdditionalLibraryDirectories="../../3rdTools/cocos2dx/cocos2dx/platform/third_party/win32/libraries;../../3rdTools/iconv/vc/lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -133,6 +135,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="iconv.lib Ws2_32.lib libzlib.lib"
+				AdditionalLibraryDirectories="&quot;../../3rdTools/cocos2dx/cocos2dx/platform/third_party/win32/libraries;../../3rdTools/iconv/vc/lib&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

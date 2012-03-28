@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="..\..\3rdTools\argtable2\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -185,10 +186,6 @@
 			</File>
 			<File
 				RelativePath="..\..\3rdTools\argtable2\src\arg_rem.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\3rdTools\argtable2\src\arg_rex.c"
 				>
 			</File>
 			<File
