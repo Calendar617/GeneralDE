@@ -198,26 +198,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="evt"
-				>
-				<File
-					RelativePath="..\..\include\gdpp\evt\Event.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\evt\EventCenter.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\evt\Exceptions.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\evt\System.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="om"
 				>
 				<File
@@ -230,6 +210,30 @@
 				</File>
 				<File
 					RelativePath="..\..\include\gdpp\om\System.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="evt"
+				>
+				<File
+					RelativePath="..\..\include\gdpp\evt\Event.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\evt\EventCenter.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\evt\EventResponser.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\evt\EventResponserBase.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\evt\System.hpp"
 					>
 				</File>
 			</Filter>
