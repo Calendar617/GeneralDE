@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/pal/pal_strings.h"
+#include "cpe/tl/tl_action.h"
 #include "gd/timer/timer_manage.h"
 #include "timer_internal_ops.h"
 
@@ -96,17 +97,23 @@ void gd_timer_mgr_free_processor_buf(gd_timer_mgr_t mgr) {
 }
 
 void gd_timer_processor_free_basic(gd_timer_mgr_t mgr, struct gd_timer_processor * data) {
-    if (data->m_state == timer_processor_state_InResponserHash) {
-        cpe_hash_table_remove_by_ins(&mgr->m_responser_to_processor, data);
-        data->m_state = timer_processor_state_NotInResponserHash;
+    if (data->m_tl_event) {
+        tl_event_free(data->m_tl_event);
+        data->m_tl_event = NULL;
     }
+    else {
+        if (data->m_state == timer_processor_state_InResponserHash) {
+            cpe_hash_table_remove_by_ins(&mgr->m_responser_to_processor, data);
+            data->m_state = timer_processor_state_NotInResponserHash;
+        }
 
-    if (data->m_process_arg_free) data->m_process_arg_free(data->m_process_arg);
+        if (data->m_process_arg_free) data->m_process_arg_free(data->m_process_arg);
 
-    data->m_process_ctx = NULL;
-    data->m_process_arg = NULL;
-    data->m_process_arg_free = NULL;
-    data->m_process_fun = NULL;
+        data->m_process_ctx = NULL;
+        data->m_process_arg = NULL;
+        data->m_process_arg_free = NULL;
+        data->m_process_fun = NULL;
+    }
 }
 
 uint32_t gd_timer_processor_hash_fun(const struct gd_timer_processor * o) {
