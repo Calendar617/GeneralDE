@@ -184,18 +184,6 @@
 					RelativePath="..\..\include\gdpp\app\System.hpp"
 					>
 				</File>
-				<File
-					RelativePath="..\..\include\gdpp\app\TimerCenter.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\app\TimerProcessor.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\gdpp\app\TimerProcessorBase.hpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="om"
@@ -237,6 +225,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="timer"
+				>
+				<File
+					RelativePath="..\..\include\gdpp\timer\System.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\timer\TimerCenter.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\timer\TimerProcessor.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\timer\TimerProcessorBase.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -254,18 +262,6 @@
 				</File>
 				<File
 					RelativePath="..\..\src\gdpp\app\ReqResponser.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gdpp\app\TimerCenterExt.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gdpp\app\TimerCenterExt.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\gdpp\app\TimerProcessor.cpp"
 					>
 				</File>
 			</Filter>
@@ -290,6 +286,18 @@
 				>
 				<File
 					RelativePath="..\..\src\gdpp\om\Manager.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="timer"
+				>
+				<File
+					RelativePath="..\..\src\gdpp\timer\TimerCenter.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gdpp\timer\TimerProcessor.cpp"
 					>
 				</File>
 			</Filter>
