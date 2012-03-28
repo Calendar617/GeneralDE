@@ -5,13 +5,13 @@ TEST_F(TimerCenterTest, basic) {
 
     EXPECT_EQ(
         0,
-        timerCenter().registerTimer(
+        t_timer_mgr_ex().registerTimer(
             timerProcessor, 
             &TimerProcessorMock::on_timer1,
             0,
             1));
 
-    EXPECT_CALL(timerProcessor, on_timer1(::testing::Eq((Gd::App::TimerID)0)))
+    EXPECT_CALL(timerProcessor, on_timer1(::testing::Eq((Gd::Timer::TimerID)0)))
         .WillOnce(::testing::Return());
 
     t_app_tick();
@@ -24,14 +24,14 @@ TEST_F(TimerCenterTest, multi_times) {
 
     EXPECT_EQ(
         0,
-        timerCenter().registerTimer(
+        t_timer_mgr_ex().registerTimer(
             timerProcessor, 
             &TimerProcessorMock::on_timer1,
             0,
             1,
             -1));
 
-    EXPECT_CALL(timerProcessor, on_timer1(::testing::Eq((Gd::App::TimerID)0)))
+    EXPECT_CALL(timerProcessor, on_timer1(::testing::Eq((Gd::Timer::TimerID)0)))
         .Times(3)
         .WillRepeatedly(::testing::Return());
 
@@ -48,13 +48,13 @@ TEST_F(TimerCenterTest, remove_by_id) {
 
     EXPECT_EQ(
         0,
-        timerCenter().registerTimer(
+        t_timer_mgr_ex().registerTimer(
             timerProcessor, 
             &TimerProcessorMock::on_timer1,
             0,
             1));
 
-    timerCenter().unregisterTimer(0);
+    t_timer_mgr_ex().unregisterTimer(0);
 
     t_app_tick();
 
@@ -66,21 +66,21 @@ TEST_F(TimerCenterTest, remove_by_tl) {
 
     EXPECT_EQ(
         0,
-        timerCenter().registerTimer(
+        t_timer_mgr_ex().registerTimer(
             timerProcessor, 
             &TimerProcessorMock::on_timer1,
             0,
             1,
             1));
 
-    EXPECT_TRUE(timerCenter().haveTimer(0));
+    EXPECT_TRUE(t_timer_mgr_ex().haveTimer(0));
 
-    EXPECT_CALL(timerProcessor, on_timer1(::testing::Eq((Gd::App::TimerID)0)))
+    EXPECT_CALL(timerProcessor, on_timer1(::testing::Eq((Gd::Timer::TimerID)0)))
         .WillOnce(::testing::Return());
 
     t_app_tick();
 
-    EXPECT_TRUE(!timerCenter().haveTimer(0));
+    EXPECT_TRUE(!t_timer_mgr_ex().haveTimer(0));
 
     ::testing::Mock::VerifyAndClear(&timerProcessor);
 }
@@ -90,13 +90,13 @@ TEST_F(TimerCenterTest, remove_by_responser) {
 
     EXPECT_EQ(
         0,
-        timerCenter().registerTimer(
+        t_timer_mgr_ex().registerTimer(
             timerProcessor, 
             &TimerProcessorMock::on_timer1,
             0,
             1));
 
-    timerCenter().unregisterTimer(timerProcessor);
+    t_timer_mgr_ex().unregisterTimer(timerProcessor);
 
     t_app_tick();
 
@@ -108,7 +108,7 @@ TEST_F(TimerCenterTest, remove_by_responser_multi) {
 
     EXPECT_EQ(
         0,
-        timerCenter().registerTimer(
+        t_timer_mgr_ex().registerTimer(
             timerProcessor, 
             &TimerProcessorMock::on_timer1,
             0,
@@ -116,13 +116,13 @@ TEST_F(TimerCenterTest, remove_by_responser_multi) {
 
     EXPECT_EQ(
         1,
-        timerCenter().registerTimer(
+        t_timer_mgr_ex().registerTimer(
             timerProcessor, 
             &TimerProcessorMock::on_timer1,
             0,
             1));
 
-    timerCenter().unregisterTimer(timerProcessor);
+    t_timer_mgr_ex().unregisterTimer(timerProcessor);
 
     t_app_tick();
 
@@ -134,23 +134,23 @@ TEST_F(TimerCenterTest, register_after_remove) {
 
     EXPECT_EQ(
         0,
-        timerCenter().registerTimer(
+        t_timer_mgr_ex().registerTimer(
             timerProcessor, 
             &TimerProcessorMock::on_timer1,
             0,
             1));
 
-    timerCenter().unregisterTimer(0);
+    t_timer_mgr_ex().unregisterTimer(0);
 
     EXPECT_EQ(
         0,
-        timerCenter().registerTimer(
+        t_timer_mgr_ex().registerTimer(
             timerProcessor, 
             &TimerProcessorMock::on_timer2,
             0,
             1));
 
-    EXPECT_CALL(timerProcessor, on_timer2(::testing::Eq((Gd::App::TimerID)0)))
+    EXPECT_CALL(timerProcessor, on_timer2(::testing::Eq((Gd::Timer::TimerID)0)))
         .WillOnce(::testing::Return());
 
     t_app_tick();

@@ -1,9 +1,9 @@
-#ifndef GDPP_APP_TIMERRESPONSER_BASE_H
-#define GDPP_APP_TIMERRESPONSER_BASE_H
+#ifndef GDPP_TIMER_PROCESSOR_BASE_H
+#define GDPP_TIMER_PROCESSOR_BASE_H
 #include "TimerProcessor.hpp"
 #include "TimerCenter.hpp"
 
-namespace Gd { namespace App {
+namespace Gd { namespace Timer {
 
 class TimerProcessorBase : public TimerProcessor {
 public:
@@ -11,7 +11,7 @@ public:
 	~TimerProcessorBase();
 
 private:	
-	TimerCenter & _timerCenter;
+	TimerCenter & _eventCenter;
 };
 
 }}
