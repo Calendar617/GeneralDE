@@ -16,6 +16,7 @@
 cpe_hash_string_t s_gd_timer_mgr_default_name;
 struct nm_node_type s_nm_node_type_gd_timer_mgr;
 static void gd_timer_mgr_dispatch_timer(tl_event_t input, void * context);
+static void gd_timer_mgr_destory_timer(tl_event_t event, void * context);
 
 gd_timer_mgr_t
 gd_timer_mgr_create(
@@ -60,6 +61,7 @@ gd_timer_mgr_create(
 
     tl_set_opt(mgr->m_tl, tl_set_event_dispatcher, gd_timer_mgr_dispatch_timer);
     tl_set_opt(mgr->m_tl, tl_set_event_op_context, mgr);
+    tl_set_opt(mgr->m_tl, tl_set_event_destory, gd_timer_mgr_destory_timer);
 
     if (cpe_hash_table_init(
             &mgr->m_responser_to_processor,
@@ -85,11 +87,11 @@ static void gd_timer_mgr_clear(nm_node_t node) {
     gd_timer_mgr_t mgr;
     mgr = (gd_timer_mgr_t)nm_node_data(node);
 
+    tl_free(mgr->m_tl);
+
     gd_timer_mgr_free_processor_buf(mgr);
 
     cpe_range_mgr_fini(&mgr->m_ids);
-
-    tl_free(mgr->m_tl);
 
     cpe_hash_table_fini(&mgr->m_responser_to_processor);
 }
@@ -252,6 +254,31 @@ int gd_timer_mgr_have_timer(gd_timer_mgr_t mgr, gd_timer_id_t timer_id) {
     timerPage = mgr->m_timer_buf[pagePos];
 
     return timerPage[timer_id % mgr->m_timer_count_in_page].m_process_ctx ? 1 : 0;
+}
+
+static void gd_timer_mgr_destory_timer(tl_event_t event, void * context) {
+    gd_timer_mgr_t mgr;
+    gd_timer_id_t timerId;
+    struct gd_timer_processor * timer;
+
+    mgr = (gd_timer_mgr_t)context;
+
+    timerId = *(gd_timer_id_t*)tl_event_data(event);
+
+    timer = gd_timer_processor_get(mgr, timerId);
+    if (timer == NULL) {
+        CPE_ERROR(mgr->m_em, "%s: destory timer: timer(id=%d) not exist!", gd_timer_mgr_name(mgr), timerId);
+        return;
+    }
+
+    if (timer->m_tl_event != event) {
+        CPE_ERROR(mgr->m_em, "%s: destory timer: timer(id=%d) tl_event mismatch!", gd_timer_mgr_name(mgr), timerId);
+        return;
+    }
+
+    timer->m_tl_event = NULL;
+    gd_timer_processor_free_basic(mgr, timer);
+    gd_timer_processor_free_id(mgr, timerId);
 }
 
 static void gd_timer_mgr_dispatch_timer(tl_event_t input, void * context) {
