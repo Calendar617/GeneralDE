@@ -269,6 +269,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="timer"
+				>
+				<File
+					RelativePath="..\..\include\gd\timer\timer_manage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gd\timer\timer_types.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -322,8 +334,24 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="dp"
+				Name="timer"
 				>
+				<File
+					RelativePath="..\..\src\gd\timer\timer_internal_ops.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\timer\timer_internal_types.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\timer\timer_manage.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\timer\timer_processor.c"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="evt"
