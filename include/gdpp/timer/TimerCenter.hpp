@@ -4,6 +4,7 @@
 #include "gdpp/app/Application.hpp"
 #include "gd/timer/timer_manage.h"
 #include "System.hpp"
+#include "TimerProcessor.hpp"
 
 namespace Gd { namespace Timer {
 
