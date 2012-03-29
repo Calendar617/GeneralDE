@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/pal_strings.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_data.h"
 #include "usf/logic/logic_data.h"

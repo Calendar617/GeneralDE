@@ -2,7 +2,7 @@
 #include "usf/logic/logic_data.h"
 #include "usf/logic/logic_context.h"
 #include "usf/bpg_rsp/bpg_rsp_carry_info.h"
-#include "protocol/bpg_rsp_carry_info.h"
+#include "protocol/bpg_rsp/bpg_rsp_carry_info.h"
 
 bpg_rsp_carry_info_t bpg_rsp_carry_info_find(logic_context_t ctx) {
     logic_data_t data;
@@ -22,10 +22,10 @@ void bpg_rsp_context_set_cmd(bpg_rsp_carry_info_t carry_info, uint32_t cmd) {
     ((struct bpg_carry_info *)carry_info)->cmd = cmd;
 }
 
-uint32_t bpg_rsp_context_client_id(bpg_rsp_carry_info_t carry_info) {
+uint64_t bpg_rsp_context_client_id(bpg_rsp_carry_info_t carry_info) {
     return ((struct bpg_carry_info *)carry_info)->clientId;
 }
 
-void bpg_rsp_context_set_client_id(bpg_rsp_carry_info_t carry_info, uint32_t client_id) {
+void bpg_rsp_context_set_client_id(bpg_rsp_carry_info_t carry_info, uint64_t client_id) {
     ((struct bpg_carry_info *)carry_info)->clientId = client_id;
 }

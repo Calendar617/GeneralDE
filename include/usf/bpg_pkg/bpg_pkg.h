@@ -58,8 +58,8 @@ void bpg_pkg_set_cmd(bpg_pkg_t pkg, uint32_t cmd);
 uint32_t bpg_pkg_errno(bpg_pkg_t pkg);
 void bpg_pkg_set_errno(bpg_pkg_t pkg, uint32_t en);
 
-uint32_t bpg_pkg_client_id(bpg_pkg_t pkg);
-void bpg_pkg_set_client_id(bpg_pkg_t pkg, uint32_t client_id);
+uint64_t bpg_pkg_client_id(bpg_pkg_t pkg);
+void bpg_pkg_set_client_id(bpg_pkg_t pkg, uint64_t client_id);
 
 uint32_t bpg_pkg_sn(bpg_pkg_t pkg);
 void bpg_pkg_set_sn(bpg_pkg_t pkg, uint32_t cmd);

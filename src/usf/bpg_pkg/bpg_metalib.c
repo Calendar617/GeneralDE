@@ -8,6 +8,8 @@
 #include "gd/dr_store/dr_store_manage.h"
 #include "usf/bpg_pkg/bpg_pkg_types.h"
 
+extern char g_metalib_base_package[];
+
 EXPORT_DIRECTIVE
 int bpg_metalib_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
     dr_store_manage_t dr_store_mgr;
@@ -43,15 +45,7 @@ int bpg_metalib_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg
         return 0;
     }
 
-    metalib = (LPDRMETALIB)gd_app_lib_sym(
-        gd_app_module_lib(module), "g_metalib_base_package", gd_app_em(app));
-    if (metalib == NULL) {
-        CPE_ERROR(
-            gd_app_em(app), "%s: find default metalib symbol fail!",
-            gd_app_module_name(module));
-        return -1;
-    }
-
+    metalib = (LPDRMETALIB)g_metalib_base_package;
     if (dr_store_set_lib(dr_store, metalib, NULL, NULL) != 0) {
         CPE_ERROR(
             gd_app_em(app), "%s: set default metalib fail!",
@@ -82,10 +76,7 @@ void bpg_metalib_app_fini(gd_app_context_t app, gd_app_module_t module) {
 
     if (dr_store_lib(dr_store) == NULL) return;
 
-    metalib = (LPDRMETALIB)gd_app_lib_sym(
-        gd_app_module_lib(module), "g_metalib_base_package", gd_app_em(app));
-    if (metalib == NULL) return;
-
+    metalib = (LPDRMETALIB)g_metalib_base_package;
     if (dr_store_lib(dr_store) == metalib) {
         dr_store_reset_lib(dr_store, NULL, NULL, NULL);
     }

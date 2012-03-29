@@ -15,7 +15,7 @@
         <entry name="version" type="uint16" />
         <entry name="sn" type="uint32" />
         <entry name="cmd" type="uint32" />
-        <entry name="errno" type="uint32" />
+        <entry name="errorNo" type="uint32" />
         <entry name="clientId" type="uint64" />
         <entry name="flags" type="uint16" />
         <entry name="headlen" type="uint16" />

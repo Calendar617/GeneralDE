@@ -3,7 +3,7 @@
 #include "usf/logic/logic_data.h"
 #include "usf/logic/logic_context.h"
 #include "usf/bpg_rsp/bpg_rsp_addition.h"
-#include "protocol/bpg_rsp_addition.h"
+#include "protocol/bpg_rsp/bpg_rsp_addition.h"
 
 int16_t bpg_rsp_addition_data_count(logic_context_t ctx) {
     logic_data_t data;

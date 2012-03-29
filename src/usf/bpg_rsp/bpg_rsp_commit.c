@@ -10,7 +10,7 @@
 #include "usf/bpg_rsp/bpg_rsp_manage.h"
 #include "usf/bpg_rsp/bpg_rsp_addition.h"
 #include "usf/bpg_rsp/bpg_rsp.h"
-#include "protocol/bpg_rsp_carry_info.h"
+#include "protocol/bpg_rsp/bpg_rsp_carry_info.h"
 #include "bpg_rsp_internal_ops.h"
 
 static int bpg_rsp_commit_build_pkg(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t pkg, error_monitor_t em);

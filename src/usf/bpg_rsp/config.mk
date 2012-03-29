@@ -8,8 +8,8 @@ $(product).cpe-dr.modules:=carry
 $(product).cpe-dr.carry.generate:=h c
 $(product).cpe-dr.carry.source:=$(product-base)/bpg_rsp_carry_info.xml \
                                 $(product-base)/bpg_rsp_addition.xml
-$(product).cpe-dr.carry.h.output:=protocol
-$(product).cpe-dr.carry.c.output:=protocol/carry_package.c
+$(product).cpe-dr.carry.h.output:=protocol/bpg_rsp
+$(product).cpe-dr.carry.c.output:=protocol/bpg_rsp/carry_package.c
 $(product).cpe-dr.carry.c.arg-name:=g_metalib_carry_package
 
 $(eval $(call product-def,$(product)))

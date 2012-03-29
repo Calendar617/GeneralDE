@@ -189,6 +189,70 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="bpg_pkg"
+				>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_pkg\Package.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_pkg\PackageManager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_pkg\System.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="bpg_net"
+				>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_net\NetClient.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_net\System.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="bpg_rsp"
+				>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_rsp\RspManager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_rsp\RspOpContext.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_rsp\System.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="bpg_use"
+				>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_use\SendPoint.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\usfpp\bpg_use\System.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\..\include\usfpp\utils\IdGenerator.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -214,6 +278,46 @@
 				</File>
 				<File
 					RelativePath="..\..\src\usfpp\logic\LogicOpTypeGroup.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="bpg_pkg"
+				>
+				<File
+					RelativePath="..\..\src\usfpp\bpg_pkg\Package.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\usfpp\bpg_pkg\PackageManager.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="bpg_net"
+				>
+				<File
+					RelativePath="..\..\src\usfpp\bpg_net\NetClient.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="bpg_rsp"
+				>
+				<File
+					RelativePath="..\..\src\usfpp\bpg_rsp\RspManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\usfpp\bpg_rsp\RspOpContext.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="bpg_use"
+				>
+				<File
+					RelativePath="..\..\src\usfpp\bpg_use\SendPoint.cpp"
 					>
 				</File>
 			</Filter>

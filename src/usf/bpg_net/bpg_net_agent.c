@@ -141,18 +141,22 @@ void bpg_net_agent_free(bpg_net_agent_t mgr) {
 
 bpg_net_agent_t
 bpg_net_agent_find(gd_app_context_t app, cpe_hash_string_t name) {
+    nm_node_t node;
+
     if (name == NULL) return NULL;
 
-    nm_node_t node = nm_mgr_find_node(gd_app_nm_mgr(app), name);
+    node = nm_mgr_find_node(gd_app_nm_mgr(app), name);
     if (node == NULL || nm_node_type(node) != &s_nm_node_type_bpg_net_agent) return NULL;
     return (bpg_net_agent_t)nm_node_data(node);
 }
 
 bpg_net_agent_t
 bpg_net_agent_find_nc(gd_app_context_t app, const char * name) {
+    nm_node_t node;
+
     if (name == NULL) return NULL;
 
-    nm_node_t node = nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
+    node = nm_mgr_find_node_nc(gd_app_nm_mgr(app), name);
     if (node == NULL || nm_node_type(node) != &s_nm_node_type_bpg_net_agent) return NULL;
     return (bpg_net_agent_t)nm_node_data(node);
 }

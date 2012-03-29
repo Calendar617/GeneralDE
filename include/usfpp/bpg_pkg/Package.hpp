@@ -26,8 +26,8 @@ public:
     uint32_t errCode(void) const { return bpg_pkg_errno(*this); }
     void setErrCode(uint32_t en) { bpg_pkg_set_errno(*this, en); }
 
-    uint32_t clientId(void) const { return bpg_pkg_client_id(*this); }
-    void setClientId(uint32_t client_id) { bpg_pkg_set_client_id(*this, client_id); }
+    uint64_t clientId(void) const { return bpg_pkg_client_id(*this); }
+    void setClientId(uint64_t client_id) { bpg_pkg_set_client_id(*this, client_id); }
 
     Cpe::Dr::MetaLib const & dataMetaLib(void) const;
     Cpe::Dr::Meta const & cmdMeta(void) const;

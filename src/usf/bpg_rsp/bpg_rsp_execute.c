@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/pal_string.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/dp/dp_request.h"
@@ -9,7 +10,7 @@
 #include "usf/bpg_pkg/bpg_pkg_manage.h"
 #include "usf/bpg_rsp/bpg_rsp_manage.h"
 #include "usf/bpg_rsp/bpg_rsp.h"
-#include "protocol/bpg_rsp_carry_info.h"
+#include "protocol/bpg_rsp/bpg_rsp_carry_info.h"
 #include "bpg_rsp_internal_ops.h"
 
 static int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t req, error_monitor_t em);

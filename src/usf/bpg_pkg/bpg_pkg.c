@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/pal_strings.h"
 #include "cpe/utils/stream_buffer.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_cvt.h"
@@ -158,28 +159,28 @@ uint32_t bpg_pkg_errno(bpg_pkg_t req) {
     struct basepkg_head * head;
     head = (struct basepkg_head *)bpg_pkg_pkg_data(req);
 
-    return head->errno;
+    return head->errorNo;
 }
 
-void bpg_pkg_set_errno(bpg_pkg_t req, uint32_t errno) {
+void bpg_pkg_set_errno(bpg_pkg_t req, uint32_t errorNo) {
     struct basepkg_head * head;
     head = (struct basepkg_head *)bpg_pkg_pkg_data(req);
 
-    head->errno = errno;
+    head->errorNo = errorNo;
 }
 
 dp_req_t bpg_pkg_to_dp_req(bpg_pkg_t req) {
     return req->m_dp_req;
 }
 
-uint32_t bpg_pkg_client_id(bpg_pkg_t req) {
+uint64_t bpg_pkg_client_id(bpg_pkg_t req) {
     struct basepkg_head * head;
     head = (struct basepkg_head *)bpg_pkg_pkg_data(req);
 
     return head->clientId;
 }
 
-void bpg_pkg_set_client_id(bpg_pkg_t req, uint32_t client_id) {
+void bpg_pkg_set_client_id(bpg_pkg_t req, uint64_t client_id) {
     struct basepkg_head * head;
     head = (struct basepkg_head *)bpg_pkg_pkg_data(req);
 
