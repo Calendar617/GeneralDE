@@ -252,7 +252,10 @@ static int bpg_rsp_commit_build_pkg_append_info(bpg_rsp_t rsp, logic_context_t o
     }
 
     bpg_rsp_commit_build_pkg_append_info_for_addition(rsp, op_context, pkg, metalib, em);
-    bpg_rsp_commit_build_pkg_append_info_for_copy_info(rsp, op_context, pkg, metalib, em);
+
+    if (logic_context_errno(op_context) == 0) {
+        bpg_rsp_commit_build_pkg_append_info_for_copy_info(rsp, op_context, pkg, metalib, em);
+    }
 
     return 0;
 }
@@ -270,7 +273,7 @@ static int bpg_rsp_commit_build_pkg_main_info(bpg_rsp_t rsp, logic_context_t op_
         CPE_ERROR(
             em, "%s.%s: copy_ctx_to_pdu: main: can`t find %s from ctx!",
             bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), dr_meta_name(meta));
-        return -1;
+        return 0;
     }
 
     if (bpg_pkg_set_main_data(pkg, meta, logic_data_data(data), logic_data_capacity(data), &size, em) != 0) {

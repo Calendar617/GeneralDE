@@ -30,7 +30,8 @@ public:
     bool isFlagEnable(logic_context_flag_t flag) const { return logic_context_flag_is_enable(*this, flag) ? true : false; }
 
     bool debug(void) const  { return logic_context_flag_is_enable(*this, logic_context_flag_debug) ? true : false; }
-    void setErrno(int32_t err) { logic_context_errno_set(*this, err); }
+    void setErrorNo(int32_t err) { logic_context_errno_set(*this, err); }
+    int32_t errorNo(void) { return logic_context_errno(*this); }
 
     LogicOpManager & mgr(void) { return *(LogicOpManager*)logic_context_mgr(*this); }
     LogicOpManager const & mgr(void) const { return *(LogicOpManager*)logic_context_mgr(*this); }
