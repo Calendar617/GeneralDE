@@ -193,6 +193,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\cpe\dr\dr_cvt.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\cpe\dr\dr_data.h"
 					>
 				</File>
@@ -214,6 +218,10 @@
 				</File>
 				<File
 					RelativePath="..\..\include\cpe\dr\dr_metalib_build.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\cpe\dr\dr_metalib_builder.h"
 					>
 				</File>
 				<File
@@ -701,6 +709,30 @@
 					</File>
 					<File
 						RelativePath="..\..\src\cpe\dr\data-cfg\dr_cfg_write.c"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="cvt"
+					>
+					<File
+						RelativePath="..\..\src\cpe\dr\cvt\dr_cvt.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\cpe\dr\cvt\dr_cvt_def_copy.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\cpe\dr\cvt\dr_cvt_internal_ops.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\cpe\dr\cvt\dr_cvt_internal_types.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\cpe\dr\cvt\dr_cvt_type.c"
 						>
 					</File>
 				</Filter>
