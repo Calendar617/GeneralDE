@@ -8,7 +8,7 @@
 #include "usf/logic/tests-env/with_logic.hpp"
 #include "usf/bpg_rsp/tests-env/with_bpg_rsp.hpp"
 
-namespace usf { namespace bpg_rsp { namespace testenv {
+namespace usf { namespace bpg { namespace testenv {
 
 with_bpg_rsp::with_bpg_rsp() {
 }
@@ -40,6 +40,19 @@ with_bpg_rsp::t_bpg_rsp_manage(const char * name, const char * logic_name) {
     }
 
     return mgr;
+}
+
+logic_context_t
+with_bpg_rsp::t_bpg_context_create(bpg_pkg_t pkg, const char * rsp_manage_name) {
+    error_monitor_t em = 0;
+    if (utils::testenv::with_em * with_em = tryEnvOf<utils::testenv::with_em>()) {
+        em = with_em->t_em();
+    }
+
+    logic_context_t r =  bpg_rsp_manage_create_context(
+        t_bpg_rsp_manage(rsp_manage_name), pkg, em);
+
+    return r;
 }
 
 }}}

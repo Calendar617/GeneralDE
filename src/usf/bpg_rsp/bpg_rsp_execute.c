@@ -255,6 +255,13 @@ static void bpg_rsp_commit_error(bpg_rsp_t rsp, logic_context_t op_context, int 
 logic_context_t bpg_rsp_manage_create_context(bpg_rsp_manage_t bpg_mgr, bpg_pkg_t req, error_monitor_t em) {
     logic_context_t op_context;
 
+    if (req == NULL) {
+        return logic_context_create(
+            bpg_mgr->m_logic_mgr,
+            INVALID_LOGIC_CONTEXT_ID,
+            bpg_mgr->m_ctx_capacity);
+    }
+
     op_context =
         logic_context_create(
             bpg_mgr->m_logic_mgr,

@@ -4,7 +4,7 @@
 #include "../bpg_rsp_manage.h"
 #include "../bpg_rsp.h"
 
-namespace usf { namespace bpg_rsp { namespace testenv {
+namespace usf { namespace bpg { namespace testenv {
 
 class with_bpg_rsp : public ::testenv::env<> {
 public:
@@ -14,6 +14,8 @@ public:
     void TearDown();
 
     bpg_rsp_manage_t t_bpg_rsp_manage(const char * name = NULL, const char * logic_name = NULL);
+
+    logic_context_t t_bpg_context_create(bpg_pkg_t pkg = NULL, const char * rsp_manage_name = NULL);
 };
 
 }}}
