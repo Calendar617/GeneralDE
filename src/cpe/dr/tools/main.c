@@ -1,4 +1,5 @@
 #include "argtable2.h"
+#include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/utils/file.h"
