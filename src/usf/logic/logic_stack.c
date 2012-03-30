@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "gd/app/app_context.h"
 #include "usf/logic/logic_context.h"
+#include "usf/logic/logic_manage.h"
 #include "logic_internal_ops.h"
 
 #define LOGIC_STACK_INLINE_ITEM_COUNT \

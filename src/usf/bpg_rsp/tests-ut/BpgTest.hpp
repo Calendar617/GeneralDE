@@ -14,7 +14,7 @@ typedef LOKI_TYPELIST_5(
     , gd::app::testenv::with_app
     , cpe::cfg::testenv::with_cfg
     , usf::logic::testenv::with_logic
-    , usf::bpg_rsp::testenv::with_bpg_rsp
+    , usf::bpg::testenv::with_bpg_rsp
     ) BpgTestBase;
 
 class BpgTest : public testenv::fixture<BpgTestBase> {

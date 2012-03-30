@@ -51,6 +51,10 @@ int bpg_rsp_execute(dp_req_t dp_req, void * ctx, error_monitor_t em) {
         return 0;
     }
 
+    if (bpg_rsp_flag_is_enable(bpg_rsp, bpg_rsp_flag_debug)) {
+        logic_context_flag_enable(op_context, logic_context_flag_debug);
+    }
+
     /*aft user init, we should commit any error*/
     if (bpg_rsp_copy_pkg_to_ctx(bpg_rsp, op_context, req, em) != 0) {
         CPE_ERROR(
@@ -256,34 +260,39 @@ logic_context_t bpg_rsp_manage_create_context(bpg_rsp_manage_t bpg_mgr, bpg_pkg_
     logic_context_t op_context;
 
     if (req == NULL) {
-        return logic_context_create(
+        op_context = logic_context_create(
             bpg_mgr->m_logic_mgr,
             INVALID_LOGIC_CONTEXT_ID,
             bpg_mgr->m_ctx_capacity);
     }
+    else {
+        op_context =
+            logic_context_create(
+                bpg_mgr->m_logic_mgr,
+                bpg_rsp_manage_flag_is_enable(bpg_mgr, bpg_rsp_manage_flag_sn_use_client)
+                ? bpg_pkg_sn(req)
+                : INVALID_LOGIC_CONTEXT_ID,
+                bpg_mgr->m_ctx_capacity);
+        if (op_context == NULL) {
+            CPE_ERROR(
+                em, "%s: create context: fail, capacity is %d!",
+                bpg_rsp_manage_name(bpg_mgr), (int)bpg_mgr->m_ctx_capacity);
+            return NULL;
+        }
 
-    op_context =
-        logic_context_create(
-            bpg_mgr->m_logic_mgr,
-            bpg_rsp_manage_flag_is_enable(bpg_mgr, bpg_rsp_manage_flag_sn_use_client)
-            ? bpg_pkg_sn(req)
-            : INVALID_LOGIC_CONTEXT_ID,
-            bpg_mgr->m_ctx_capacity);
-    if (op_context == NULL) {
-        CPE_ERROR(
-            em, "%s: create context: fail, capacity is %d!",
-            bpg_rsp_manage_name(bpg_mgr), (int)bpg_mgr->m_ctx_capacity);
-        return NULL;
+        if (bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_mgr, op_context, req, em) != 0) {
+            logic_context_free(op_context);
+            return NULL;
+        }
+
+        if (bpg_rsp_copy_req_carry_data_to_ctx(bpg_mgr, op_context, req, em) != 0) {
+            logic_context_free(op_context);
+            return NULL;
+        }
     }
 
-    if (bpg_rsp_copy_bpg_carry_data_to_ctx(bpg_mgr, op_context, req, em) != 0) {
-        logic_context_free(op_context);
-        return NULL;
-    }
-
-    if (bpg_rsp_copy_req_carry_data_to_ctx(bpg_mgr, op_context, req, em) != 0) {
-        logic_context_free(op_context);
-        return NULL;
+    if (bpg_mgr->m_debug) {
+        logic_context_flag_enable(op_context, logic_context_flag_debug);
     }
 
     if (bpg_mgr->m_ctx_init) {
