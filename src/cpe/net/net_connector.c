@@ -235,6 +235,9 @@ static void net_connector_do_connect_i(net_connector_t connector) {
 };
 
 static void net_connector_on_connected(net_connector_t connector) {
+    int fd = connector->m_ep->m_fd;
+    connector->m_ep->m_fd = -1;
+    net_ep_set_fd(connector->m_ep, fd);
 }
 
 static void net_connector_check_connect_result(net_connector_t connector) {
@@ -277,7 +280,13 @@ static void net_connector_io_cb_connect(EV_P_ ev_io *w, int revents) {
     assert(connector);
 
     net_connector_check_connect_result(connector);
-    net_connector_cb_prepaire(connector);
+
+    if (connector->m_state == net_connector_state_connected) {
+        net_connector_on_connected(connector);
+    }
+    else {
+        net_connector_cb_prepaire(connector);
+    }
 
     if (connector->m_monitor_fun) {
         connector->m_monitor_fun(connector, connector->m_monitor_ctx);
