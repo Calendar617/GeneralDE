@@ -1,6 +1,9 @@
 #include <assert.h>
 #include "cpe/pal/pal_string.h"
 #include "cpe/dr/dr_ctypes_op.h"
+#include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/dr/dr_data.h"
+#include "../dr_internal_types.h"
 
 #define __value(t, v) (*(t const *)v)
 #define __value_cast(ct, t, v) ((ct)__value(t, v))
@@ -533,5 +536,67 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
     }
     else {
         return l_type - r_type;
+    }
+}
+
+int dr_entry_cmp(const void * l, const void * r, LPDRMETAENTRY entry) {
+    const char * l_data;
+    const char * r_data;
+
+    l_data = ((const char *)l) + entry->m_data_start_pos;
+    r_data = ((const char *)l) + entry->m_data_start_pos;
+
+    switch(entry->m_type) {
+    case CPE_DR_TYPE_UNION: {
+        LPDRMETAENTRY select_entry;
+        select_entry = dr_entry_select_entry(entry);
+        if (select_entry) {
+            int32_t l_union_entry_id;
+            int32_t r_union_entry_id;
+            int32_t use_entry_pos;
+
+            dr_entry_try_read_int32(
+                &l_union_entry_id,
+                ((const char *)l) + entry->m_select_data_start_pos,
+                select_entry,
+                NULL);
+
+            dr_entry_try_read_int32(
+                &r_union_entry_id,
+                ((const char *)r) + entry->m_select_data_start_pos,
+                select_entry,
+                NULL);
+
+            if (l_union_entry_id != r_union_entry_id) {
+                return l_union_entry_id - r_union_entry_id;
+            }
+
+            use_entry_pos = dr_meta_find_entry_idx_by_id(dr_entry_self_meta(entry), l_union_entry_id);
+            if (use_entry_pos >= 0) {
+                return dr_entry_cmp(l_data, r_data, dr_meta_entry_at(dr_entry_self_meta(entry), use_entry_pos));
+            }
+        }
+
+        return memcmp(l_data, r_data, dr_entry_size(entry));
+    }
+    case CPE_DR_TYPE_STRUCT: {
+        LPDRMETA meta;
+        size_t i;
+        size_t count;
+        int r;
+
+        meta = dr_entry_ref_meta(entry);
+        if (meta == NULL) return memcmp(l_data, r_data, dr_entry_size(entry));
+
+        count = dr_meta_entry_num(meta);
+        for(i = 0; i < count; ++i) {
+            r = dr_entry_cmp(l_data, r_data, dr_meta_entry_at(meta, i));
+            if (r != 0) return r;
+        }
+
+        return 0;
+    }
+    default:
+        return dr_ctype_cmp(l_data, entry->m_type, r_data, entry->m_type);
     }
 }

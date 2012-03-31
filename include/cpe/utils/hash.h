@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-typedef uint32_t (*cpe_hash_fun_t)(const void *);
-typedef int (*cpe_hash_cmp_t)(const void *, const void *);
+typedef uint32_t (*cpe_hash_fun_t)(const void * obj, void * user_data);
+typedef int (*cpe_hash_cmp_t)(const void * obj_l, const void * obj_r, void * user_data);
 typedef void (*cpe_hash_destory_t)(void * obj, void * context);
 
 struct cpe_hash_entry {
@@ -23,6 +23,7 @@ typedef struct cpe_hash_table {
     mem_allocrator_t m_alloc;
     cpe_hash_fun_t m_hash_fun;
     cpe_hash_cmp_t  m_compare_fun;
+    void * m_user_data;
 
      /*delta between object end entry*/
     int32_t m_obj2Entry;
@@ -52,6 +53,9 @@ int cpe_hash_table_init(
     cpe_hash_cmp_t cmp_fun,
     int32_t obj2Entry,
     int32_t suggestCapacity);
+
+void * cpe_hash_table_user_data(cpe_hash_table_t hstable);
+void cpe_hash_table_set_user_data(cpe_hash_table_t hstable, void * ctx);
 
 void cpe_hash_table_set_destory_fun(
     cpe_hash_table_t hstable,
