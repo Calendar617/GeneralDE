@@ -14,8 +14,8 @@ public:
     virtual void TearDown();
 
     /*utils function for hstable */
-    static uint32_t hash_fun(const void *);
-    static int hash_cmp(const void * l, const void * r);
+    static uint32_t hash_fun(const void *, void * user_data);
+    static int hash_cmp(const void * l, const void * r, void * user_data);
     static void hash_destory(void * obj, void * context);
 
     struct cpe_hash_table m_hash_table;
