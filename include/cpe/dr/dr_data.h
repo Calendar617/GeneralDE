@@ -81,6 +81,9 @@ void dr_meta_copy_same_entry(
     void const * srcData, size_t srcCapacity, LPDRMETA srcMeta,
     int policy, error_monitor_t em);
 
+uint32_t dr_entry_hash(const void * input, LPDRMETAENTRY entry);
+int dr_entry_cmp(const void * l, const void * r, LPDRMETAENTRY entry);
+
 #ifdef __cplusplus
 }
 #endif

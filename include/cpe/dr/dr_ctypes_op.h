@@ -44,6 +44,7 @@ int dr_ctype_set_from_uint64(void * output, uint64_t input, int type, error_moni
 int dr_ctype_set_from_float(void * output, float input, int type, error_monitor_t em);
 int dr_ctype_set_from_double(void * output, float input, int type, error_monitor_t em);
 
+uint32_t dr_ctype_hash(const void * input, int type);
 int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type);
 
 #ifdef __cplusplus
