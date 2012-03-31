@@ -1,4 +1,5 @@
 #include "argtable2.h"
+#include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/utils/file.h"
@@ -18,7 +19,7 @@ struct arg_end *end;
 
 dir_visit_next_op_t
 accept_input_file(const char * full, const char * base, void * ctx) {
-    if (strcasecmp(file_name_suffix(base), "xml") == 0) {
+    if (strcmp(file_name_suffix(base), "xml") == 0) {
         dr_metalib_builder_add_file((dr_metalib_builder_t)ctx, NULL, full);
     }
     return dir_visit_next_go;
@@ -31,14 +32,23 @@ struct dir_visitor g_input_search_visitor = {
 void prepare_input(dr_metalib_builder_t builder, error_monitor_t em) {
     int i;
     for(i = 0; i < input->count; ++i) {
-        if (dir_exist(input->filename[i], em)) {
-            dir_search(&g_input_search_visitor, builder, input->filename[i], 5, em, NULL);
+        const char * filename;
+        size_t filename_len;
+
+        filename = input->filename[i];
+        filename_len = strlen(filename);
+        if (filename[filename_len - 1] == '\\' || filename[filename_len - 1] == '/') {
+            ((char *)filename)[filename_len - 1] = 0;
+        }
+
+        if (dir_exist(filename, em)) {
+            dir_search(&g_input_search_visitor, builder, filename, 5, em, NULL);
         }
         else if (file_exist(input->filename[i], em)) {
-            dr_metalib_builder_add_file(builder, NULL, input->filename[i]);
+            dr_metalib_builder_add_file(builder, NULL, filename);
         }
         else {
-            CPE_ERROR(em, "input %s not exist!", input->filename[i]);
+            CPE_ERROR(em, "input %s not exist!", filename);
         }
     }
 }
