@@ -75,8 +75,14 @@ public:
         return d ? (T*)dr_dm_data_data((dr_dm_data_t)d) : NULL;
     }
 
+    template<typename T>
+    T * findData(dr_dm_data_id_t id) { 
+        Data * d = DataManager::findData(id);
+        return d ? (T*)dr_dm_data_data((dr_dm_data_t)d) : NULL;
+    }
+
     static DataManager & _cast(dr_dm_manage_t data_manage);
-    static DataManager & instance(gd_app_context_t app, const char * name = NULL);
+    static DataManager & instance(gd_app_context_t app, const char * name);
 };
 
 }}
