@@ -13,21 +13,16 @@ static int dm_role_hash_cmp(struct dm_role * obj_l, struct dm_role * obj_r, stru
 }
 
 struct dm_role_index *
-dm_role_index_create(dm_role_manage_t mgr, const char * name, int is_unique, LPDRMETAENTRY entry) {
+dm_role_index_create(dm_role_manage_t mgr, LPDRMETAENTRY entry, int is_unique) {
     struct dm_role_index * index;
-    char * buf;
-    size_t name_len;
 
-    name_len = strlen(name) + 1;
-    buf = mem_alloc(mgr->m_alloc, sizeof(struct dm_role_index) + name_len);
-    if (buf == NULL) return NULL;
+    assert(entry);
 
-    memcpy(buf, name, name_len);
+    index = (struct dm_role_index*)mem_alloc(mgr->m_alloc, sizeof(struct dm_role_index));
+    if (index == NULL) return NULL;
 
-    index = (struct dm_role_index *)(buf + name_len);
-
-    index->m_name = buf;
     index->m_id = cpe_hash_table_count(&mgr->m_indexes);
+    index->m_name = dr_entry_name(entry);
     index->m_entry = entry;
     index->m_insert_fun = is_unique ? cpe_hash_table_insert_unique : cpe_hash_table_insert;
 
@@ -39,14 +34,14 @@ dm_role_index_create(dm_role_manage_t mgr, const char * name, int is_unique, LPD
             - (sizeof(struct cpe_hash_entry) * (index->m_id + 1)),
             -1) != 0)
     {
-        mem_free(mgr->m_alloc, buf);
+        mem_free(mgr->m_alloc, index);
         return NULL;
     }
 
     cpe_hash_entry_init(&index->m_hh);
     if (cpe_hash_table_insert_unique(&mgr->m_indexes, index) != 0) {
         cpe_hash_table_fini(&index->m_roles);
-        mem_free(mgr->m_alloc, buf);
+        mem_free(mgr->m_alloc, index);
         return NULL;
     }
 
@@ -54,9 +49,14 @@ dm_role_index_create(dm_role_manage_t mgr, const char * name, int is_unique, LPD
 }
 
 void dm_role_index_free(dm_role_manage_t mgr, struct dm_role_index * index) {
+    if (index == mgr->m_id_index) mgr->m_id_index = NULL;
     cpe_hash_table_remove_by_ins(&mgr->m_indexes, index);
     cpe_hash_table_fini(&index->m_roles);
-    mem_free(mgr->m_alloc, index->m_name);
+    mem_free(mgr->m_alloc, index);
+}
+
+const char * dm_role_index_name(struct dm_role_index * index) {
+    return dr_entry_name(index->m_entry);
 }
 
 int dm_role_index_add(struct dm_role_index * index,  dm_role_t role) {

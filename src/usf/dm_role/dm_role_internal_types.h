@@ -19,8 +19,8 @@ struct dm_role_manage {
 
     dr_ref_t m_metalib;
     LPDRMETA m_role_meta;
-    LPDRMETAENTRY m_role_id_entry;
 
+    dm_role_t m_key_buf;
     struct dm_role_index * m_id_index;
     struct cpe_hash_table m_indexes;
 };
@@ -30,8 +30,8 @@ struct dm_role {
 };
 
 struct dm_role_index {
-    char * m_name;
     int m_id;
+    const char * m_name;
     LPDRMETAENTRY m_entry;
     struct cpe_hash_table m_roles;
     int (*m_insert_fun)(cpe_hash_table_t hstable, void * obj);
