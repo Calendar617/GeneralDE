@@ -1,6 +1,7 @@
 #ifndef USFPP_LOGIC_DATA_H
 #define USFPP_LOGIC_DATA_H
 #include "cpepp/utils/ClassCategory.hpp"
+#include "cpe/dr/dr_data.h"
 #include "cpepp/dr/Meta.hpp"
 #include "usf/logic/logic_data.h"
 #include "System.hpp"
@@ -15,6 +16,18 @@ public:
     void * data(void) { return logic_data_data(*this); }
     const void * data(void) const { return logic_data_data(*this); }
     size_t capacity(void) const { return logic_data_capacity(*this); }
+
+    void copy_same_entries(const void * src, LPDRMETA src_meta, size_t srcCapacity = 0, int policy = 0) {
+        dr_meta_copy_same_entry(
+            data(), capacity(), meta(),
+            src, srcCapacity, src_meta,
+            policy, 0);
+    }
+
+    template<typename T>
+    void copy_same_entries(T const & data, LPDRMETA src_meta = T::META, int policy = 0) {
+        copy_same_entries(&data, src_meta, sizeof(data), policy);
+    }
 
     template<typename T>
     T & as(void) { return *(T *)data(); }
