@@ -17,7 +17,7 @@ public:
     const void * data(void) const { return logic_data_data(*this); }
     size_t capacity(void) const { return logic_data_capacity(*this); }
 
-    void copy_same_entries(const void * src, LPDRMETA src_meta, size_t srcCapacity = 0, int policy = 0) {
+    void copy_same_entries_from(const void * src, LPDRMETA src_meta, size_t srcCapacity = 0, int policy = 0) {
         dr_meta_copy_same_entry(
             data(), capacity(), meta(),
             src, srcCapacity, src_meta,
@@ -25,8 +25,20 @@ public:
     }
 
     template<typename T>
-    void copy_same_entries(T const & data, LPDRMETA src_meta = T::META, int policy = 0) {
-        copy_same_entries(&data, src_meta, sizeof(data), policy);
+    void copy_same_entries_from(T const & data, LPDRMETA src_meta = T::META, int policy = 0) {
+        copy_same_entries_from(&data, src_meta, sizeof(data), policy);
+    }
+
+    void copy_same_entries_to(void * desc, LPDRMETA desc_meta, size_t descCapacity = 0, int policy = 0) const {
+        dr_meta_copy_same_entry(
+            desc, descCapacity, desc_meta,
+            data(), capacity(), meta(),
+            policy, 0);
+    }
+
+    template<typename T>
+    void copy_same_entries_to(T & data, LPDRMETA src_meta = T::META, int policy = 0) {
+        copy_same_entries_to(&data, src_meta, sizeof(data), policy);
     }
 
     template<typename T>
