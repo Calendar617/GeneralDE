@@ -1,7 +1,30 @@
 #include "gdpp/app/Log.hpp"
+#include "gdpp/dr_dm/Data.hpp"
 #include "gdpp/dr_dm/DataManager.hpp"
 
 namespace Gd { namespace Dr {
+
+Data & DataManager::createData(const void * data, size_t size) {
+    const char * duplicate_index;
+    dr_dm_data_t r = dr_dm_data_create(*this, data, size, &duplicate_index);
+
+    if (r == NULL) {
+        if (duplicate_index) {
+            APP_CTX_THROW_EXCEPTION(
+                app(),
+                ::std::runtime_error,
+                "%s: create data: %s duplicate!", name().c_str(), duplicate_index);
+        }
+        else {
+            APP_CTX_THROW_EXCEPTION(
+                app(),
+                ::std::runtime_error,
+                "%s: create data: unknown error!", name().c_str());
+        }
+    }
+
+    return *(Data*)r;
+}
 
 DataManager & DataManager::_cast(dr_dm_manage_t role_manage) {
     if (role_manage == NULL) {

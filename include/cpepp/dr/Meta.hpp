@@ -46,6 +46,10 @@ public:
     const char * dump_data(mem_buffer_t buffer, const void * data) const;
 
     void set_defaults(void * data, size_t capacity, int policy = 0) const;
+
+    template<typename T>
+    void set_defaults(T & data, int policy = 0) const { set_defaults(&data, sizeof(data), policy); }
+
     void copy_same_entries(
         void * data, size_t capacity, const void * src, LPDRMETA srcMeta,
         size_t srcCapacity = 0, int policy = 0, error_monitor_t em = 0) const;

@@ -6,7 +6,7 @@
 #include "dr_dm_internal_ops.h"
 
 dr_dm_data_t
-dr_dm_data_create(dr_dm_manage_t mgr, void * data, size_t data_size, const char ** duplicate_index) {
+dr_dm_data_create(dr_dm_manage_t mgr, const void * data, size_t data_size, const char ** duplicate_index) {
     char * buf;
     dr_dm_data_t role;
     size_t data_capacity;
