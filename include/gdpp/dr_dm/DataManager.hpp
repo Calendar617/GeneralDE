@@ -21,6 +21,26 @@ public:
 
     Cpe::Dr::Meta const & dataMeta(void) const { return Cpe::Dr::Meta::_cast(dr_dm_manage_meta(*this)); }
 
+    /*create*/
+    Data * createData(const void * data, size_t size, const char ** duplicate_index) {
+        dr_dm_data_t r = dr_dm_data_create(*this, (void*)data, size, duplicate_index);
+        return (Data *)r;
+    }
+
+    Data & createData(const void * data, size_t size);
+
+    template<typename T>
+    T * createData(T const & input, const char ** duplicate_index) { 
+        Data * d = DataManager::createData(&input, sizeof(input), duplicate_index);
+        return d ? (T*)dr_dm_data_data((dr_dm_data_t)d) : NULL;
+    }
+
+    template<typename T>
+    T & createData(T const & input) { 
+        Data & d = DataManager::createData(&input, sizeof(input));
+        return *(T*)dr_dm_data_data((dr_dm_data_t)&d);
+    }
+    
     /*by id*/
     Data const * findData(dr_dm_data_id_t id) const { return (Data*)dr_dm_data_find_by_id(*this, id); }
     Data * findData(dr_dm_data_id_t id) { return (Data*)dr_dm_data_find_by_id(*this, id); }

@@ -1,7 +1,7 @@
 #ifndef GDPP_DR_DM_ROLE_H
 #define GDPP_DR_DM_ROLE_H
 #include "cpepp/utils/ClassCategory.hpp"
-#include "usf/dm_role/dm_role.h"
+#include "gd/dr_dm/dr_dm_data.h"
 #include "System.hpp"
 
 namespace Gd { namespace Dr {
