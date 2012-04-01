@@ -11,7 +11,7 @@ public:
         return static_cast<OuterT&>(DataManager::_cast(data_manage));
     }
 
-    static OuterT & instance(gd_app_context_t app, const char * name = NULL) { 
+    static OuterT & instance(gd_app_context_t app, const char * name = OuterT::NAME) { 
         return static_cast<OuterT&>(DataManager::instance(app, name));
     }
 };
