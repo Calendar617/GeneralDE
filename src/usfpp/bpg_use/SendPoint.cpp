@@ -7,10 +7,11 @@
 
 namespace Usf { namespace Bpg {
 
-SendPoint::SendPoint(gd_app_context_t app, bpg_pkg_manage_t pkg_manage, cfg_t cfg) 
+
+SendPoint::SendPoint(gd_app_context_t app, cfg_t cfg) 
     : m_sp(0)
 {
-    m_sp = bpg_use_sp_create(app, pkg_manage, cfg, gd_app_em(app));
+    m_sp = bpg_use_sp_create(app, cfg, gd_app_em(app));
     if (m_sp == NULL) {
         APP_CTX_THROW_EXCEPTION(
             app, ::std::runtime_error,

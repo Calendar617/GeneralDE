@@ -11,14 +11,15 @@
 #include "bpg_use_internal_types.h"
 
 bpg_use_sp_t
-bpg_use_sp_create(gd_app_context_t app, bpg_pkg_manage_t pkg_manage, cfg_t cfg, error_monitor_t em) {
+bpg_use_sp_create(gd_app_context_t app, cfg_t cfg, error_monitor_t em) {
     char * buf;
     const char * name;
     size_t name_len;
     bpg_use_sp_t sp;
+    const char * pkg_manage_name;
+    bpg_pkg_manage_t pkg_manage;
 
     assert(app);
-    assert(pkg_manage);
 
     if (em  == NULL) em = gd_app_em(app);
 
@@ -27,8 +28,18 @@ bpg_use_sp_create(gd_app_context_t app, bpg_pkg_manage_t pkg_manage, cfg_t cfg, 
         CPE_ERROR(em, "bpg_use_sp_create: no name configured");
         return NULL;
     }
-
     name_len = strlen(name) + 1 + 3/*.sp*/;
+
+    pkg_manage_name = cfg_get_string(cfg, "pkg-manage", 0);
+    if (pkg_manage_name == NULL) {
+        CPE_ERROR(em, "bpg_use_sp_create: pkg-manage not configured");
+        return NULL;
+    }
+    pkg_manage = bpg_pkg_manage_find_nc(app, pkg_manage_name);
+    if (pkg_manage == NULL) {
+        CPE_ERROR(em, "bpg_use_sp_create: pkg-manage %s not exist", pkg_manage_name);
+        return NULL;
+    }
 
     buf = mem_alloc(gd_app_alloc(app), sizeof(struct bpg_use_sp) + name_len);
     if (buf == NULL) return NULL;

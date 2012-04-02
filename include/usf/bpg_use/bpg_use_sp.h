@@ -10,7 +10,6 @@ extern "C" {
 bpg_use_sp_t
 bpg_use_sp_create(
     gd_app_context_t app,
-    bpg_pkg_manage_t pkg_manage,
     cfg_t cfg,
     error_monitor_t em);
 

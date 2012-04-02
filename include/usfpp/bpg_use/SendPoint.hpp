@@ -11,7 +11,7 @@ namespace Usf { namespace Bpg {
 
 class SendPoint : public Cpe::Utils::Noncopyable {
 public:
-    SendPoint(gd_app_context_t app, bpg_pkg_manage_t pkg_manage, cfg_t cfg);
+    SendPoint(gd_app_context_t app, cfg_t cfg);
     ~SendPoint();
 
     Cpe::Utils::CString const & name(void) const { return Cpe::Utils::CString::_cast(bpg_use_sp_name(m_sp)); }
