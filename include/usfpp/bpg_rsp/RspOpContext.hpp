@@ -14,6 +14,8 @@ public:
 
     void setCmd(uint32_t cmd);
     uint32_t cmd(void) const;
+
+    void setNoResponse(void);
 };
 
 }}

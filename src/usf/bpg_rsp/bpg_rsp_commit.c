@@ -50,6 +50,16 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
     }
 
     bpg_private = (struct bpg_carry_info *)logic_data_data(bpg_private_data);
+    if (bpg_private->clientId == 0) {
+        if (bpg_rsp->m_mgr->m_debug) {
+            CPE_INFO(
+                em, "%s.%s: bpg_rsp_commit: ignore send response!",
+                bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
+        }
+        bpg_rsp_manage_free_context(bpg_mgr, op_context);
+        return;
+    }
+
     bpg_carry_data = NULL;
     if (bpg_private->carry_meta_name[0] != 0) {
         bpg_carry_data = logic_data_find(op_context, bpg_private->carry_meta_name);

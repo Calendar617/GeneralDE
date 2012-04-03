@@ -29,3 +29,7 @@ uint64_t bpg_rsp_context_client_id(bpg_rsp_carry_info_t carry_info) {
 void bpg_rsp_context_set_client_id(bpg_rsp_carry_info_t carry_info, uint64_t client_id) {
     ((struct bpg_carry_info *)carry_info)->clientId = client_id;
 }
+
+void bpg_rsp_context_set_no_response(bpg_rsp_carry_info_t carry_info) {
+    ((struct bpg_carry_info *)carry_info)->clientId = 0;
+}
