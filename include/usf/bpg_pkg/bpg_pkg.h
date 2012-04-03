@@ -87,6 +87,7 @@ int bpg_pkg_get_main_data(bpg_pkg_t pkg, LPDRMETA meta, void * buf, size_t * cap
 int bpg_pkg_get_append_data(bpg_pkg_t pkg, bpg_pkg_append_info_t append_inf, LPDRMETA meta, void * buf, size_t * capacity, error_monitor_t em);
 
 const char * bpg_pkg_dump(bpg_pkg_t req, mem_buffer_t buffer);
+int bpg_pkg_build_from_cfg(bpg_pkg_t req, cfg_t cfg, error_monitor_t em);
 
 #ifdef __cplusplus
 }

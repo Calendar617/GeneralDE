@@ -244,6 +244,18 @@ LPDRMETA bpg_pkg_manage_cmd_meta(bpg_pkg_manage_t mgr) {
     return mgr->m_cmd_meta;
 }
 
+LPDRMETALIB bpg_pkg_manage_basepkg_metalib(bpg_pkg_manage_t mgr) {
+    return mgr->m_metalib_basepkg_ref ? dr_ref_lib(mgr->m_metalib_basepkg_ref) : NULL;
+}
+
+LPDRMETA bpg_pkg_manage_basepkg_head_meta(bpg_pkg_manage_t mgr) {
+    LPDRMETA metalib;
+    LPDRMETAENTRY entry;
+
+    metalib = bpg_pkg_manage_basepkg_metalib(mgr);
+    return metalib ? dr_lib_find_meta_by_name(metalib, "basepkg_head") : NULL;
+}
+
 const char *
 bpg_pkg_manage_cmd_meta_name(bpg_pkg_manage_t mgr) {
     return mgr->m_cmd_meta_name;
