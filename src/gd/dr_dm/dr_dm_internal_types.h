@@ -19,6 +19,7 @@ struct dr_dm_manage {
 
     dr_ref_t m_metalib;
     LPDRMETA m_role_meta;
+    gd_id_generator_t m_id_generate;
 
     dr_dm_data_t m_key_buf;
     struct dr_dm_data_index * m_id_index;

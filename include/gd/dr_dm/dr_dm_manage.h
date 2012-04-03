@@ -34,6 +34,10 @@ LPDRMETA dr_dm_manage_meta(dr_dm_manage_t mgr);
 int dr_dm_manage_set_meta(dr_dm_manage_t mgr, LPDRMETA meta, dr_ref_t metalib);
 
 int dr_dm_manage_set_id_attr(dr_dm_manage_t mgr, const char * id_attr_name);
+LPDRMETAENTRY dr_dm_manage_id_attr(dr_dm_manage_t mgr);
+
+void dr_dm_manage_set_id_generate(dr_dm_manage_t mgr, gd_id_generator_t id_generate);
+gd_id_generator_t dr_dm_manage_id_generate(dr_dm_manage_t mgr);
 
 int dr_dm_manage_create_index(dr_dm_manage_t mgr, const char * name, int is_uniqure);
 

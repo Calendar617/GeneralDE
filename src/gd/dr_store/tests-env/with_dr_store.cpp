@@ -70,4 +70,23 @@ void with_dr_store::t_dr_store_reset(const char * name, const char * def) {
         dr_store_set_lib(dr_store, (LPDRMETALIB)mem_buffer_make_continuous(&buffer, 0), NULL, NULL));
 }
 
+LPDRMETALIB with_dr_store::t_metalib(const char * libname) {
+    dr_store_t store = dr_store_find(m_dr_store_mgr, libname);
+    EXPECT_TRUE(store) << "dr_store " << libname << " not exist!";
+    if (store == NULL) return NULL;
+
+    LPDRMETALIB lib = dr_store_lib(store);
+    EXPECT_TRUE(lib) << "dr_store " << libname << " have no lib!";
+    return lib;
+}
+
+LPDRMETA with_dr_store::t_meta(const char * libname, const char * metaname) {
+    LPDRMETALIB lib = t_metalib(libname);
+    if (lib == NULL) return NULL;
+
+    LPDRMETA meta = dr_lib_find_meta_by_name(lib, metaname);
+    EXPECT_TRUE(meta) << "dr_store " << libname << " have no meta " << metaname;
+    return meta;
+}
+
 }}}

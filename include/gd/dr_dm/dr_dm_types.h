@@ -3,13 +3,13 @@
 #include "cpe/utils/memory.h"
 #include "cpe/utils/error.h"
 #include "gd/app/app_types.h"
-#include "usf/utils/utils_types.h"
+#include "gd/utils/utils_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef usf_id_t dr_dm_data_id_t;
+typedef gd_id_t dr_dm_data_id_t;
 typedef struct dr_dm_data * dr_dm_data_t;
 typedef struct dr_dm_manage * dr_dm_manage_t;
 

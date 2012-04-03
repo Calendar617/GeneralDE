@@ -40,7 +40,7 @@ dr_dm_manage_create(
 
     mgr->m_metalib = NULL;
     mgr->m_role_meta = NULL;
-
+    mgr->m_id_generate = NULL;
     mgr->m_id_index = NULL;
 
     if (cpe_hash_table_init(
@@ -194,6 +194,18 @@ int dr_dm_manage_set_id_attr(dr_dm_manage_t mgr, const char * id_attr_name) {
     }
 }
 
+LPDRMETAENTRY dr_dm_manage_id_attr(dr_dm_manage_t mgr) {
+    return mgr->m_id_index ? mgr->m_id_index->m_entry : NULL;
+}
+
+void dr_dm_manage_set_id_generate(dr_dm_manage_t mgr, gd_id_generator_t id_generate) {
+    mgr->m_id_generate = id_generate; 
+}
+
+gd_id_generator_t dr_dm_manage_id_generate(dr_dm_manage_t mgr) {
+    return mgr->m_id_generate;
+}
+
 int dr_dm_manage_create_index(dr_dm_manage_t mgr, const char * name, int is_uniqure) {
     LPDRMETAENTRY entry;
 
@@ -251,35 +263,3 @@ struct nm_node_type s_nm_node_type_dr_dm_manage = {
     dr_dm_manage_clear
 };
 
-EXPORT_DIRECTIVE
-int dr_dm_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
-    dr_dm_manage_t dr_dm_manage;
-
-    dr_dm_manage = dr_dm_manage_create(
-        app,
-        gd_app_module_name(module),
-        gd_app_alloc(app),
-        gd_app_em(app));
-    if (dr_dm_manage == NULL) return -1;
-
-    dr_dm_manage->m_debug = cfg_get_int32(cfg, "debug", 0);
-
-    if (dr_dm_manage->m_debug) {
-        CPE_INFO(
-            gd_app_em(app),
-            "%s: create: done.",
-            gd_app_module_name(module));
-    }
-
-    return 0;
-}
-
-EXPORT_DIRECTIVE
-void dr_dm_manage_app_fini(gd_app_context_t app, gd_app_module_t module) {
-    dr_dm_manage_t dr_dm_manage;
-
-    dr_dm_manage = dr_dm_manage_find_nc(app, gd_app_module_name(module));
-    if (dr_dm_manage) {
-        dr_dm_manage_free(dr_dm_manage);
-    }
-}
