@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "cpe/dr/dr_data.h"
 #include "cpe/dr/dr_metalib_manage.h"
+#include "gd/utils/id_generator.h"
 #include "gd/dr_dm/dr_dm_data.h"
 #include "gd/dr_dm/dr_dm_manage.h"
 #include "dr_dm_internal_ops.h"
@@ -11,6 +12,7 @@ dr_dm_data_create(dr_dm_manage_t mgr, const void * data, size_t data_size, const
     dr_dm_data_t role;
     size_t data_capacity;
     dr_dm_data_id_t role_id;
+    int generate_role_id;
     size_t index_count;
     struct cpe_hash_it index_it;
     struct dr_dm_data_index * index;
@@ -42,9 +44,20 @@ dr_dm_data_create(dr_dm_manage_t mgr, const void * data, size_t data_size, const
         return NULL;
     }
 
+    generate_role_id = 0;
     role_id = dr_entry_read_int64(data, mgr->m_id_index->m_entry);
     if (role_id == 0) {
-        //TODO
+        if (mgr->m_id_generate) {
+            if (gd_id_generator_generate(&role_id, mgr->m_id_generate) != 0) {
+                CPE_ERROR(
+                    mgr->m_em, "%s: dr_dm_data_create: generate id from %s fail!",
+                    dr_dm_manage_name(mgr), gd_id_generator_name(mgr->m_id_generate));
+                return NULL;
+            }
+            else {
+                generate_role_id = 1;
+            }
+        }
     }
 
     buf = (char *)mem_alloc(
@@ -59,6 +72,16 @@ dr_dm_data_create(dr_dm_manage_t mgr, const void * data, size_t data_size, const
     role->m_mgr = mgr;
 
     memcpy(dr_dm_data_data(role), data, data_capacity);
+
+    if (generate_role_id) {
+        if (dr_entry_set_from_int64(dr_dm_data_data(role), role_id, mgr->m_id_index->m_entry, NULL) != 0) {
+            CPE_ERROR(
+                mgr->m_em, "%s: dr_dm_data_create: set generated id to data fail!",
+                dr_dm_manage_name(mgr));
+            mem_free(mgr->m_alloc, buf);
+            return NULL;
+        }
+    }
 
     for(i = 0; i < index_count; ++i) {
         cpe_hash_entry_init(((struct cpe_hash_entry*)buf) + i);
