@@ -193,15 +193,17 @@ int dp_rsp_bind_string(dp_rsp_t rsp, const char * cmd, error_monitor_t em) {
     cmdLen = strlen(cmd);
 
     binding = (struct dp_binding_string *)
-        mem_alloc(dp->m_alloc, sizeof(struct dp_binding_string));
+        mem_alloc(dp->m_alloc, sizeof(struct dp_binding_string) + cmdLen + 1);
     if (binding == NULL) {
         CPE_ERROR(em, "binding cmd %s to %s: no memory", cmd, dp_rsp_name(rsp));
         return -1;
     }
 
     binding->m_head.m_kt = dp_key_string;
-    binding->m_value = cmd;
+    binding->m_value = (binding + 1);
     binding->m_value_len = cmdLen;
+
+    memcpy(binding + 1, cmd, cmdLen + 1);
 
     if (dp_binding_add((struct dp_binding *)binding, rsp) != 0) {
         CPE_ERROR(em, "binding cmd %s to %s: binding already exist", cmd, dp_rsp_name(rsp));
