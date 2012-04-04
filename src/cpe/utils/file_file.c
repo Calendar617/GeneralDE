@@ -283,7 +283,7 @@ file_name_base(const char * input, mem_buffer_t tbuf) {
         if (resultLen <= 0) return "";
 
         assert(beginPos < endPos);
-        r = mem_buffer_alloc(tbuf, resultLen + 1);
+        r = (char *)mem_buffer_alloc(tbuf, resultLen + 1);
         memcpy(r, input + beginPos, resultLen);
         r[resultLen] = 0;
         return r;

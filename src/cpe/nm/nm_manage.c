@@ -6,7 +6,7 @@
 
 nm_mgr_t nm_mgr_create(mem_allocrator_t alloc) {
     nm_mgr_t nmm =
-        (nm_mgr_t)mem_alloc(
+        mem_alloc(
             alloc,
             sizeof(struct nm_mgr));
 
@@ -38,9 +38,9 @@ void nm_mgr_free(nm_mgr_t nmm) {
     if (nmm == NULL) return;
 
     cpe_hash_it_init(&node_it, &nmm->m_nodes);
-    node = cpe_hash_it_next(&node_it);
+    node = (nm_node_t)cpe_hash_it_next(&node_it);
     while(node) {
-        nm_node_t next = cpe_hash_it_next(&node_it);
+        nm_node_t next = (nm_node_t)cpe_hash_it_next(&node_it);
         nm_node_free(node);
         node = next;
     }
