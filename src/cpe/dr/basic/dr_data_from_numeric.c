@@ -33,10 +33,10 @@ int __to ## _from_ ## __from(void * result, __from ## _t  input,          \
 int __to ## _from_ ## __from(void * result, __from ## _t input, \
                            LPDRMETAENTRY entry, error_monitor_t em) {   \
     int r = 0;                                                          \
-    if (input < __min) {                                                  \
+    if (input < __min) {                                                \
         CPE_ERROR(em, "write %s from %s, value(" __valuefmt ") "        \
                   "less than " __valuefmt,                              \
-                  #__to, #__from, input, __min);                          \
+                  #__to, #__from, input, (__from ## _t)__min);          \
         r = -1;                                                         \
     }                                                                   \
     *((__to ## _t *)result)= (__to ## _t)input;                         \
@@ -50,13 +50,13 @@ int __to ## _from_ ## __from(void * result, __from ## _t input,                 
     if (input < __min) {                                                \
         CPE_ERROR(em, "write %s from %s, value(" __valuefmt ") "        \
                   "less than " __valuefmt,                              \
-                  #__to, #__from, input, __min);                        \
+                  #__to, #__from, input, (__from ## _t)__min);          \
         r = -1;                                                         \
     }                                                                   \
     if (input > __max) {                                                \
         CPE_ERROR(em, "write %s from %s, value(" __valuefmt ") "        \
                   "bigger than " __valuefmt,                            \
-                  #__to, #__from, input, __max);                        \
+                  #__to, #__from, input, (__from ## _t)__max);          \
         r = -1;                                                         \
     }                                                                   \
     *(( __to ## _t *)result) = (__to ## _t)input;                       \
@@ -70,7 +70,7 @@ int __to ## _from_ ## __from(void * result, __from ## _t input,                 
     if (input > __max) {                                                \
         CPE_ERROR(em, "write %s from %s, value(" __valuefmt ") "        \
                   "bigger than " __valuefmt,                            \
-                  #__to, #__from, input, __max);                        \
+                  #__to, #__from, input, (__from ## _t)__max);          \
         r = -1;                                                         \
     }                                                                   \
     *((__to ## _t *)result) = (__to ## _t)input;                        \
@@ -83,8 +83,8 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int8, int16, SCHAR_MIN, SCHAR_MAX, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int8, uint16, SCHAR_MAX, "%u");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int8, int32, SCHAR_MIN, SCHAR_MAX, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int8, uint32, SCHAR_MAX, "%u");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int8, int64, SCHAR_MIN, SCHAR_MAX, "%I64d");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int8, uint64, SCHAR_MAX, "%I64u");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int8, int64, SCHAR_MIN, SCHAR_MAX, "%lld");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int8, uint64, SCHAR_MAX, "%llu");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int8, float, SCHAR_MIN, SCHAR_MAX, "%f");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int8, double, SCHAR_MIN, SCHAR_MAX, "%f");
 
@@ -94,8 +94,8 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint8, int16, 0, UCHAR_MAX, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(uint8, uint16, UCHAR_MAX, "%u");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint8, int32, 0, UCHAR_MAX, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(uint8, uint32, UCHAR_MAX, "%u");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint8, int64, 0, UCHAR_MAX, "%I64d");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(uint8, uint64, UCHAR_MAX, "%I64u");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint8, int64, 0, UCHAR_MAX, "%lld");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(uint8, uint64, UCHAR_MAX, "%llu");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint8, float, 0, UCHAR_MAX, "%f");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint8, double, 0, UCHAR_MAX, "%f");
 
@@ -105,8 +105,8 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(int16, int16);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int16, uint16, SHRT_MAX, "%u");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int16, int32, SHRT_MIN, SHRT_MAX, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int16, uint32, SHRT_MAX, "%u");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int16, int64, SHRT_MIN, SHRT_MAX, "%I64d");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int16, uint64, SHRT_MAX, "%I64u");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int16, int64, SHRT_MIN, SHRT_MAX, "%lld");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int16, uint64, SHRT_MAX, "%llu");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int16, float, SHRT_MIN, SHRT_MAX, "%f");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int16, double, SHRT_MIN, SHRT_MAX, "%f");
 
@@ -116,8 +116,8 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MIN(uint16, int16, 0, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(uint16, uint16);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint16, int32, 0, USHRT_MAX, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(uint16, uint32, USHRT_MAX, "%u");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint16, int64, 0, USHRT_MAX, "%d");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(uint16, uint64, USHRT_MAX, "%u");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint16, int64, 0, USHRT_MAX, "%lld");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(uint16, uint64, USHRT_MAX, "%llu");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint16, float, 0, USHRT_MAX, "%f");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint16, double, 0, USHRT_MAX, "%f");
 
@@ -127,8 +127,8 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(int32, int16);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(int32, uint16);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(int32, int32);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int32, uint32, INT_MAX, "%u");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int32, int64, INT_MIN, INT_MAX, "I64d");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int32, uint64, INT_MAX, "I64u");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int32, int64, INT_MIN, INT_MAX, "%lld");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(int32, uint64, INT_MAX, "%llu");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int32, float, INT_MIN, INT_MAX, "%f");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int32, double, INT_MIN, INT_MAX, "%f");
 
@@ -138,8 +138,8 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MIN(uint32, int16, 0, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(uint32, uint16);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MIN(uint32, int32, 0, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(uint32, uint32);
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint32, int64, 0, UINT_MAX, "I64d");
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(uint32, uint64, UINT_MAX, "I64u");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint32, int64, 0, UINT_MAX, "%lld");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MAX(uint32, uint64, UINT_MAX, "%llu");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint32, float, 0, UINT_MAX, "%f");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint32, double, 0, UINT_MAX, "%f");
 
@@ -150,7 +150,7 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(int64, uint16);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(int64, int32);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(int64, uint32);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(int64, int64);
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int64, uint64, 0, 9223372036854775807LL, "%I64u");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int64, uint64, 0, 9223372036854775807LL, "%llu");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int64, float, -9223372036854775806LL, 9223372036854775807LL, "%f");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(int64, double, -9223372036854775806LL, 9223372036854775807LL, "%f");
 
@@ -160,7 +160,7 @@ DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MIN(uint64, int16, 0, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(uint64, uint16);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MIN(uint64, int32, 0, "%d");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(uint64, uint32);
-DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MIN(uint64, int64, 0, "%I64d");
+DEF_WRITE_FUN_FROM_NUMERIC_CHECK_MIN(uint64, int64, 0, "%lld");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_NONE(uint64, uint64);
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint64, float, 0, 18446744073709551615ULL, "%f");
 DEF_WRITE_FUN_FROM_NUMERIC_CHECK_RANGE(uint64, double, 0, 18446744073709551615ULL, "%f");
@@ -375,10 +375,10 @@ struct DRCtypeTypeWriteOps g_dr_ctype_write_ops[] = {
         else {                                                          \
             if (g_dr_ctype_write_ops[type].from_ ## __from) {           \
                 return g_dr_ctype_write_ops[type].from_ ## __from (     \
-                    result, input, NULL, em);                          \
+                    result, input, NULL, em);                           \
             }                                                           \
             else {                                                      \
-                CPE_ERROR(em, "write from %d, type not support to %d"   \
+                CPE_ERROR(em, "write from %s, type not support to %d",  \
                           #__from, type);                               \
                 return -1;                                              \
             }                                                           \
@@ -391,8 +391,8 @@ struct DRCtypeTypeWriteOps g_dr_ctype_write_ops[] = {
         if (entry == NULL) {                                            \
             return -1;                                                  \
         }                                                               \
-        if (entry->m_type < 0 || entry->m_type > CPE_WRITEOPS_COUNT) {   \
-            CPE_ERROR(em, "write from %d, type is unknown",              \
+        if (entry->m_type < 0 || entry->m_type > CPE_WRITEOPS_COUNT) {  \
+            CPE_ERROR(em, "write from %d, type is unknown",             \
                       entry->m_type);                                   \
             return -1;                                                  \
         }                                                               \
@@ -402,7 +402,7 @@ struct DRCtypeTypeWriteOps g_dr_ctype_write_ops[] = {
                     result, input, entry, em);                          \
             }                                                           \
             else {                                                      \
-                CPE_ERROR(em, "write from %d, type not support to %d"   \
+                CPE_ERROR(em, "write from %s, type not support to %d",  \
                           #__from, entry->m_type);                      \
                 return -1;                                              \
             }                                                           \

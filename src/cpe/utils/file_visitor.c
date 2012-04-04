@@ -21,7 +21,7 @@ dir_search_i(
 
     if (maxLevel == 0) return dir_visit_next_go;
 
-    path = mem_buffer_make_continuous(buffer, 0);
+    path = (char *)mem_buffer_make_continuous(buffer, 0);
     bufSize = mem_buffer_size(buffer);
 
     dirp = dir_open(path, 0, em);
@@ -39,7 +39,7 @@ dir_search_i(
         if (S_ISDIR(DTTOIF(dp->d_type))) {
             if (visitor->on_dir_enter) {
                 nextOp = visitor->on_dir_enter(
-                    mem_buffer_make_continuous(buffer, 0),
+                    (const char *)mem_buffer_make_continuous(buffer, 0),
                     dp->d_name,
                     ctx);
 
@@ -60,7 +60,7 @@ dir_search_i(
 
             if (visitor->on_dir_leave) {
                 nextOp = visitor->on_dir_leave(
-                    mem_buffer_make_continuous(buffer, 0),
+                    (const char *)mem_buffer_make_continuous(buffer, 0),
                     dp->d_name,
                     ctx);
 
@@ -70,7 +70,7 @@ dir_search_i(
         else if (S_ISREG(DTTOIF(dp->d_type))) {
             if (visitor->on_file) {
                 nextOp = visitor->on_file(
-                    mem_buffer_make_continuous(buffer, 0),
+                    (const char *)mem_buffer_make_continuous(buffer, 0),
                     dp->d_name,
                     ctx);
 
@@ -80,7 +80,7 @@ dir_search_i(
 
         /*restore curent path*/
         mem_buffer_set_size(buffer, bufSize);
-        path = mem_buffer_make_continuous(buffer, 0);
+        path = (char *)mem_buffer_make_continuous(buffer, 0);
         if (path == NULL) {
             CPE_ERROR_EX(em, ENOMEM, "no memory for dir search path");
             nextOp = dir_visit_next_exit;

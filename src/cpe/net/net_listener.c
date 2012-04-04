@@ -7,7 +7,7 @@
 
 static
 int net_listener_listen(net_listener_t listener) {
-    listener->m_fd = socket(AF_INET, SOCK_STREAM, 0);
+    listener->m_fd = cpe_socket_open(AF_INET, SOCK_STREAM, 0);
     if (listener->m_fd == -1) {
         CPE_ERROR(listener->m_mgr->m_em, "%s: socket call fail, errno=%d (%s)!", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         return -1;
@@ -18,13 +18,13 @@ int net_listener_listen(net_listener_t listener) {
         return -1;
     }
 
-    if(bind(listener->m_fd, (struct sockaddr *)&listener->m_addr, sizeof(listener->m_addr)) != 0) {
+    if(cpe_bind(listener->m_fd, (struct sockaddr *)&listener->m_addr, sizeof(listener->m_addr)) != 0) {
         CPE_ERROR(listener->m_mgr->m_em, "%s: bind error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
     }
 
-    if (listen(listener->m_fd, listener->m_acceptQueueSize) != 0) {
+    if (cpe_listen(listener->m_fd, listener->m_acceptQueueSize) != 0) {
         CPE_ERROR(listener->m_mgr->m_em, "%s: listen error, errno=%d (%s)", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         net_socket_close(&listener->m_fd, listener->m_mgr->m_em);
         return -1;
@@ -47,7 +47,7 @@ static void net_listener_cb_accept(EV_P_ ev_io *w, int revents) {
     listener = w->data;
     assert(listener);
 
-    new_fd = accept(listener->m_fd, 0, 0);
+    new_fd = cpe_accept(listener->m_fd, 0, 0);
     if (new_fd == -1) {
         CPE_ERROR(
             listener->m_mgr->m_em,
@@ -165,7 +165,7 @@ short net_listener_using_port(net_listener_t listener) {
     }
 
     len = sizeof(addr);
-    if (getsockname(listener->m_fd, (struct sockaddr *)&addr, &len) != 0) {
+    if (cpe_getsockname(listener->m_fd, (struct sockaddr *)&addr, &len) != 0) {
         CPE_ERROR(
             listener->m_mgr->m_em,
             "%s: getsockname fail, errno=%d (%s)!",

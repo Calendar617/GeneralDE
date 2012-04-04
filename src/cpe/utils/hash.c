@@ -93,7 +93,7 @@ int cpe_hash_table_init(
     if (hashtable->m_bucket_capacity < 0) return -1;
 
     bucketsBufSize = sizeof(struct cpe_hash_bucket) * hashtable->m_bucket_capacity;
-    hashtable->m_buckets = mem_alloc(alloc, bucketsBufSize);
+    hashtable->m_buckets = (struct cpe_hash_bucket *)mem_alloc(alloc, bucketsBufSize);
     if (hashtable->m_buckets == NULL) return -1;
     bzero(hashtable->m_buckets, bucketsBufSize);
 
@@ -144,7 +144,7 @@ int cpe_hash_table_resize(cpe_hash_table_t hstable, int32_t suggestCapacity) {
     if (newCapacity < 0) return -1;
 
     newBucketsBufSize = sizeof(struct cpe_hash_bucket) * newCapacity;
-    newBuckets = mem_alloc(hstable->m_alloc, newBucketsBufSize);
+    newBuckets = (struct cpe_hash_bucket *)mem_alloc(hstable->m_alloc, newBucketsBufSize);
     if (newBuckets == NULL) return -1;
     bzero(newBuckets, newBucketsBufSize);
 
