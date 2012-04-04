@@ -1,12 +1,21 @@
 #include <fcntl.h>
 #include "cpe/pal/pal_socket.h"
 
+#ifdef _MSC_VER
+#ifdef _DEBUG
+int cpe_sock_close(int fd)
+{
+    return closesocket(_get_osfhandle(fd));
+}
+#endif
+#endif
+
 int cpe_sock_set_none_block(int fd, int is_non_block) {
-#if _MSC_VER
+#ifdef _MSC_VER
     u_long flag;
 
     flag = is_non_block ? 1 : 0;
-    return ioctlsocket(fd, FIONBIO, &flag);
+    return ioctlsocket(_get_osfhandle(fd), FIONBIO, &flag);
 #else
     int flags;
     if ((flags = fcntl(fd, F_GETFL)) == -1) {
@@ -36,12 +45,12 @@ int cpe_sock_set_none_block(int fd, int is_non_block) {
 
 
 int cpe_sock_set_reuseaddr(int fd, int is_reuseaddr) {
-#if _MSC_VER
+#ifdef _MSC_VER
     BOOL flag;
 
     flag = is_reuseaddr ? TRUE : FALSE;
     //return setsockopt(fd,  SOL_SOCKET, SO_EXCLUSIVEADDRUSE, &flag, sizeof(flag));
-    return setsockopt(fd,  SOL_SOCKET, 0, &flag, sizeof(flag));
+    return setsockopt(_get_osfhandle(fd),  SOL_SOCKET, 0, &flag, sizeof(flag));
 #else
     int flags;
     if ((flags = fcntl(fd, F_GETFL)) == -1) {

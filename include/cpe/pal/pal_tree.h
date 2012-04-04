@@ -349,7 +349,7 @@ struct {								\
 	RB_PARENT(elm, field) = (tmp);					\
 	RB_AUGMENT(tmp);						\
 	if ((RB_PARENT(tmp, field)))					\
-		RB_AUGMENT(RB_PARENT(tmp, field));			\
+	{	RB_AUGMENT(RB_PARENT(tmp, field));}			\
 } while (0)
 
 #define RB_ROTATE_RIGHT(head, elm, tmp, field) do {			\
@@ -369,7 +369,7 @@ struct {								\
 	RB_PARENT(elm, field) = (tmp);					\
 	RB_AUGMENT(tmp);						\
 	if ((RB_PARENT(tmp, field)))					\
-		RB_AUGMENT(RB_PARENT(tmp, field));			\
+	{	RB_AUGMENT(RB_PARENT(tmp, field));}			\
 } while (0)
 
 /* Generates prototypes and inline functions */
