@@ -7,5 +7,6 @@
         <entry name="carry_data_size" type="uint16"/>
         <entry name="carry_meta_name" type="string" size='64'/>
         <entry name="pkg_mgr_name" type="string" size='32'/>
+        <entry name="no_response" type="uint16"/>
     </struct>
 </metalib>

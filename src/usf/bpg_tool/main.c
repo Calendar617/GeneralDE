@@ -6,6 +6,8 @@
 #include "cpe/utils/stream_file.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/cfg/cfg_manage.h"
+#include "cpe/dp/dp_manage.h"
+#include "cpe/dp/dp_responser.h"
 #include "cpe/net/net_connector.h"
 #include "gd/app/app_log.h"
 #include "gd/app/app_context.h"
@@ -27,6 +29,35 @@ struct arg_str * a_data_cvt;
 struct arg_end * a_end;
 
 int debug_level(void) { return a_app_debug->count > 0 ? a_app_debug->ival[0] : 0; }
+
+int recv_rsp(dp_req_t req, void * ctx, error_monitor_t em) {
+    gd_app_context_t app;
+    bpg_pkg_t pkg;
+
+    app = (gd_app_context_t)ctx;
+    gd_app_stop(app);
+
+    pkg = bpg_pkg_from_dp_req(req);
+
+    return 0;
+}
+
+int create_recv_rsp(gd_app_context_t app) {
+    dp_rsp_t rsp = dp_rsp_create(gd_app_dp_mgr(app), "recv-rsp");
+    if (rsp == NULL) {
+        CPE_ERROR(gd_app_em(app), "create recv rsp fail!");
+        return -1;
+    }
+
+    if (dp_rsp_bind_string(rsp, "recv-from-server", NULL) != 0) {
+        CPE_ERROR(gd_app_em(app), "bind recv rsp fail!");
+        dp_rsp_free(rsp);
+        return -1;
+    }
+
+    dp_rsp_set_processor(rsp, recv_rsp, app);
+    return 0;
+}
 
 cfg_t read_pkg_cfg(gd_app_context_t app) {
     struct read_stream_file stream;
@@ -122,7 +153,9 @@ void net_connector_state_monitor(net_connector_t connector, void * ctx) {
             net_connector_disable(connector);
         }
         else {
-            net_connector_disable(connector);
+            if (create_recv_rsp(app) != 0) {
+                net_connector_disable(connector);
+            }
         }
         break;
     case net_connector_state_connecting:

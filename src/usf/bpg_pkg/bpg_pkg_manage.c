@@ -249,8 +249,7 @@ LPDRMETALIB bpg_pkg_manage_basepkg_metalib(bpg_pkg_manage_t mgr) {
 }
 
 LPDRMETA bpg_pkg_manage_basepkg_head_meta(bpg_pkg_manage_t mgr) {
-    LPDRMETA metalib;
-    LPDRMETAENTRY entry;
+    LPDRMETALIB metalib;
 
     metalib = bpg_pkg_manage_basepkg_metalib(mgr);
     return metalib ? dr_lib_find_meta_by_name(metalib, "basepkg_head") : NULL;

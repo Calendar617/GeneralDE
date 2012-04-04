@@ -50,7 +50,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
     }
 
     bpg_private = (struct bpg_carry_info *)logic_data_data(bpg_private_data);
-    if (bpg_private->clientId == 0) {
+    if (bpg_private->no_response) {
         if (bpg_rsp->m_mgr->m_debug) {
             CPE_INFO(
                 em, "%s.%s: bpg_rsp_commit: ignore send response!",
