@@ -1,6 +1,8 @@
 #ifndef GD_NET_INTERNAL_TYPES_H
 #define GD_NET_INTERNAL_TYPES_H
+
 #include "ev.h"
+
 #include "cpe/pal/pal_queue.h"
 #include "cpe/utils/error.h"
 #include "cpe/utils/memory.h"

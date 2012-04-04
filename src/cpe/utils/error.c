@@ -2,6 +2,10 @@
 #include "cpe/pal/pal_strings.h"
 #include "cpe/utils/error.h"
 
+#ifdef _MSC_VER
+#include <windows.h>
+#endif
+
 void cpe_error_do_notify(error_monitor_t monitor, const char * fmt, ...) {
     struct error_monitor_node * node = &monitor->m_node;
     va_list args;
