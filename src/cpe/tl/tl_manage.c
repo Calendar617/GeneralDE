@@ -9,7 +9,7 @@
 tl_manage_t tl_manage_create(mem_allocrator_t alloc) {
     int i;
 
-    tl_manage_t tm = (tl_manage_t)mem_alloc(alloc, sizeof(struct tl_manage));
+    tl_manage_t tm = mem_alloc(alloc, sizeof(struct tl_manage));
     if (tm == NULL) return NULL;
 
     tm->m_alloc = alloc;

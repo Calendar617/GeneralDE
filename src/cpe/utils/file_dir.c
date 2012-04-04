@@ -3,7 +3,7 @@
 
 int dir_mk_recursion(const char * path, mode_t mode, error_monitor_t em, mem_allocrator_t talloc) {
     size_t path_len = strlen(path) + 1;
-    char * path_buf = mem_alloc(talloc, path_len);
+    char * path_buf = (char *)mem_alloc(talloc, path_len);
     char * nextSepPos;
     int rv = 0;
 
@@ -56,7 +56,7 @@ int dir_rm_recursion(const char * path, error_monitor_t em, mem_allocrator_t tal
         if (strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0) continue;
 
         if (subPath == NULL) {
-            subPath = mem_alloc(talloc, pathSize + 1/*path sep*/ + MAXNAMLEN + 1);
+            subPath = (char *)mem_alloc(talloc, pathSize + 1/*path sep*/ + MAXNAMLEN + 1);
             if (subPath == NULL) {
                 CPE_ERROR_EX(em, ENOMEM, "alloc for path buf fail!");
                 rv = -1;

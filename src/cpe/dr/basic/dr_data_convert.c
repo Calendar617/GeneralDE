@@ -38,7 +38,7 @@ int __from ## _to_ ## __to(__to ## _t * result, const void * input,     \
     if (tmp < __min) {                                                  \
         CPE_ERROR(em, "convert %s to %s, value(" __valuefmt ") "        \
                   "less than " __valuefmt,                              \
-                  #__from, #__to, tmp, __min);                          \
+                  #__from, #__to, tmp, (__from ## _t)__min);            \
         r = -1;                                                         \
     }                                                                   \
     *result = *(const __from ## _t *)input;                             \
@@ -53,13 +53,13 @@ int __from ## _to_ ## __to(__to ## _t * result, const void * input,     \
     if (tmp < __min) {                                                  \
         CPE_ERROR(em, "convert %s to %s, value(" __valuefmt ") "        \
                   "less than " __valuefmt,                              \
-                  #__from, #__to, tmp, __min);                          \
+                  #__from, #__to, tmp, (__from ## _t)__min);            \
         r = -1;                                                         \
     }                                                                   \
     if (tmp > __max) {                                                  \
         CPE_ERROR(em, "convert %s to %s, value(" __valuefmt ") "        \
                   "bigger than " __valuefmt,                            \
-                  #__from, #__to, tmp, __max);                          \
+                  #__from, #__to, tmp, (__from ## _t)__max);            \
         r = -1;                                                         \
     }                                                                   \
     *result = *(const __from ## _t *)input;                             \
@@ -74,7 +74,7 @@ int __from ## _to_ ## __to(__to ## _t * result, const void * input,     \
     if (tmp > __max) {                                                  \
         CPE_ERROR(em, "convert %s to %s, value(" __valuefmt ") "        \
                   "bigger than " __valuefmt,                            \
-                  #__from, #__to, tmp, __max);                          \
+                  #__from, #__to, tmp, (__from ## _t)__max);            \
         r = -1;                                                         \
     }                                                                   \
     *result = *(const __from ## _t *)input;                             \
@@ -147,24 +147,24 @@ DEF_CVT_FUN_ASSIGN_CHECK_NONE(uint32, uint64);
 DEF_CVT_FUN_ASSIGN_CHECK_NONE(uint32, float);
 DEF_CVT_FUN_ASSIGN_CHECK_NONE(uint32, double);
 
-DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, int8, SCHAR_MIN, SCHAR_MAX, "%I64d");
-DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, uint8, 0, UCHAR_MAX, "%I64d");
-DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, int16, SHRT_MIN, SHRT_MAX, "%I64d");
-DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, uint16, 0, USHRT_MAX, "%I64d");
-DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, int32, INT_MIN, INT_MAX, "%I64d");
-DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, uint32, 0, UINT_MAX, "%I64d");
+DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, int8, SCHAR_MIN, SCHAR_MAX, "%lld");
+DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, uint8, 0, UCHAR_MAX, "%lld");
+DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, int16, SHRT_MIN, SHRT_MAX, "%lld");
+DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, uint16, 0, USHRT_MAX, "%lld");
+DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, int32, INT_MIN, INT_MAX, "%lld");
+DEF_CVT_FUN_ASSIGN_CHECK_RANGE(int64, uint32, 0, UINT_MAX, "%lld");
 DEF_CVT_FUN_ASSIGN_CHECK_NONE(int64, int64);
-DEF_CVT_FUN_ASSIGN_CHECK_MIN(int64, uint64, 0, "%I64d");
+DEF_CVT_FUN_ASSIGN_CHECK_MIN(int64, uint64, 0, "%lld");
 DEF_CVT_FUN_ASSIGN_CHECK_NONE(int64, float);
 DEF_CVT_FUN_ASSIGN_CHECK_NONE(int64, double);
 
-DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, int8, SCHAR_MAX, "%I64u");
-DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, uint8, UCHAR_MAX, "%I64u");
-DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, int16, SHRT_MAX, "%I64u");
-DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, uint16, USHRT_MAX, "%I64u");
-DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, int32, INT_MAX, "%I64u");
-DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, uint32, UINT_MAX, "%I64u");
-DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, int64, 9223372036854775807LL, "%I64u");
+DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, int8, SCHAR_MAX, "%llu");
+DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, uint8, UCHAR_MAX, "%llu");
+DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, int16, SHRT_MAX, "%llu");
+DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, uint16, USHRT_MAX, "%llu");
+DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, int32, INT_MAX, "%llu");
+DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, uint32, UINT_MAX, "%llu");
+DEF_CVT_FUN_ASSIGN_CHECK_MAX(uint64, int64, 9223372036854775807LL, "%llu");
 DEF_CVT_FUN_ASSIGN_CHECK_NONE(uint64, uint64);
 DEF_CVT_FUN_ASSIGN_CHECK_NONE(uint64, float);
 DEF_CVT_FUN_ASSIGN_CHECK_NONE(uint64, double);

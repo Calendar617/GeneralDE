@@ -148,14 +148,14 @@ void net_ep_close_i(net_ep_t ep, net_ep_event_t ev) {
     if (ep->m_fd < 0) return;
 
 #ifdef _MSC_VER
-    if (ep->m_type = net_ep_socket) {
+    //if (ep->m_type = net_ep_socket) {
         net_socket_close(&ep->m_fd, ep->m_mgr->m_em);
-    }
-    else {
-        CPE_ERROR(
-            ep->m_mgr->m_em, "net_ep_close: close fail, errno=%d (%s)",
-            cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
-    }
+    //}
+    //else {
+    //    CPE_ERROR(
+    //        ep->m_mgr->m_em, "net_ep_close: close fail, errno=%d (%s)",
+    //        cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
+    //}
 #else
     if (close(ep->m_fd) != 0) {
         CPE_ERROR(
