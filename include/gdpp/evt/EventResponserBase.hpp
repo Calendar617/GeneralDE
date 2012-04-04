@@ -10,6 +10,10 @@ public:
 	EventResponserBase(EventCenter & eventCenter);
 	~EventResponserBase();
 
+    template<typename T>
+    void registerResponser(const char * oid, T & r, void (T::*fun)(const char * oid, Event const & e)) {
+        _eventCenter.registerResponser(oid, r, fun);
+    }
 private:	
 	EventCenter & _eventCenter;
 };

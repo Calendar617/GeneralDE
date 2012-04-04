@@ -16,6 +16,7 @@
         &s_ ## __module_name ## _Name;                                  \
                                                                         \
     extern "C"                                                          \
+    EXPORT_DIRECTIVE                                                    \
     int __module_name ## _app_init(                                     \
         Gd::App::Application & app,                                     \
         Gd::App::Module & module,                                       \
@@ -36,6 +37,7 @@
     }                                                                   \
                                                                         \
     extern "C"                                                          \
+    EXPORT_DIRECTIVE                                                    \
     void __module_name ## _app_fini(                                    \
         Gd::App::Application & app,                                     \
         Gd::App::Module & module)                                       \
