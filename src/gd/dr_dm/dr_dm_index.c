@@ -37,6 +37,7 @@ dr_dm_data_index_create(dr_dm_manage_t mgr, LPDRMETAENTRY entry, int is_unique) 
         mem_free(mgr->m_alloc, index);
         return NULL;
     }
+    cpe_hash_table_set_user_data(&index->m_roles, index);
 
     cpe_hash_entry_init(&index->m_hh);
     if (cpe_hash_table_insert_unique(&mgr->m_indexes, index) != 0) {

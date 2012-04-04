@@ -200,7 +200,7 @@ int dp_rsp_bind_string(dp_rsp_t rsp, const char * cmd, error_monitor_t em) {
     }
 
     binding->m_head.m_kt = dp_key_string;
-    binding->m_value = (binding + 1);
+    binding->m_value = (char*)(binding + 1);
     binding->m_value_len = cmdLen;
 
     memcpy(binding + 1, cmd, cmdLen + 1);
