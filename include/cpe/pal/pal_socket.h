@@ -35,7 +35,7 @@ extern int cpe_sock_close (int fd);
 
 #endif
 #define cpe_sock_errno() WSAGetLastError()
-#define cpe_sock_errstr(n) ""
+extern const char *cpe_sock_errstr(int n);
 
 #else
 
