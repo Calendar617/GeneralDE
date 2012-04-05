@@ -67,6 +67,8 @@ public:
 
     using ConstData::operator[];
     DataElement operator[](const char * name);
+
+    void copy_same_entries_from(ConstData const & o);
 };
 
 }}
