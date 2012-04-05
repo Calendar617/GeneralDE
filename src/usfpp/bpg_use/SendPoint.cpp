@@ -45,7 +45,8 @@ void SendPoint::send(Usf::Bpg::Package & pkg) {
 
 void SendPoint::send(Cpe::Dr::Data const & data) {
     Usf::Bpg::Package & pkg = pkgBuf() ;
-    pkg.init();
+    pkg.clearData();
+    pkg.setErrCode(0);
     pkg.setCmdAndData(data);
     send(pkg);
 }
