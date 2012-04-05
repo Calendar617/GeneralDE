@@ -189,7 +189,7 @@ static void net_connector_do_connect_i(net_connector_t connector) {
     ep = connector->m_ep;
     assert(ep);
 
-    ep->m_fd = socket(AF_INET, SOCK_STREAM, 0);
+    ep->m_fd = cpe_socket_open(AF_INET, SOCK_STREAM, 0);
     if (ep->m_fd == -1) {
         CPE_ERROR(
             connector->m_mgr->m_em,
@@ -205,8 +205,12 @@ static void net_connector_do_connect_i(net_connector_t connector) {
         return;
     }
 
-    if (connect(ep->m_fd, (struct sockaddr *)&connector->m_addr, sizeof(connector->m_addr)) == -1) {
+    if (cpe_connect(ep->m_fd, (struct sockaddr *)&connector->m_addr, sizeof(connector->m_addr)) == -1) {
+#ifdef _MSC_VER
+        if (cpe_sock_errno() == WSAEWOULDBLOCK) {
+#else
         if (cpe_sock_errno() == EINPROGRESS) {
+#endif
             CPE_INFO(
                 connector->m_mgr->m_em,
                 "connector %s: connecting!",
@@ -243,7 +247,7 @@ static void net_connector_check_connect_result(net_connector_t connector) {
 
     err_len = sizeof(err);
 
-    if (getsockopt(connector->m_ep->m_fd, SOL_SOCKET, SO_ERROR, &err, &err_len) == -1) {
+    if (cpe_getsockopt(connector->m_ep->m_fd, SOL_SOCKET, SO_ERROR, &err, &err_len) == -1) {
         CPE_ERROR(
             connector->m_mgr->m_em,
             "connector %s: check state, getsockopt error, errno=%d (%s)",

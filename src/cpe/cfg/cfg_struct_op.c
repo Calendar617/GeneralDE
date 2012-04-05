@@ -87,18 +87,24 @@ static int cfg_struct_decide_do_old(int oldType, int newType, cfg_policy_t polic
 cfg_t cfg_struct_item_do_create(struct cfg_struct * s, const char * name, int type, size_t capacity) {
     int nameLen;
     int allocSize;
+    int paddingLen;
     void * data;
     struct cfg_struct_item * item;
 
     nameLen = strlen(name) + 1;
-    allocSize = nameLen + sizeof(struct cfg_struct_item) + capacity;
+    paddingLen = nameLen % sizeof(struct cfg_struct_item);
+    if (paddingLen)
+    {
+        paddingLen = sizeof(struct cfg_struct_item) - paddingLen;
+    }
+    allocSize = nameLen + paddingLen + sizeof(struct cfg_struct_item) + capacity;
 
     data = mem_alloc(s->m_manage->m_alloc, allocSize);
     if (data == NULL) return NULL;
 
     memcpy(data, name, nameLen);
 
-    item = (struct cfg_struct_item *)(((char*)data) + nameLen);
+    item = (struct cfg_struct_item *)(((char*)data) + nameLen + paddingLen);
 
     item->m_data.m_manage = s->m_manage;
     item->m_data.m_parent = (cfg_t)s;

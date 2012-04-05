@@ -3,6 +3,7 @@
 #include "cpe/nm/nm_manage.h"
 #include "cpe/nm/nm_read.h"
 #include "nm_internal_ops.h"
+//#include "nm_internal_types.h"
 
 nm_node_t
 nm_node_alloc(
@@ -21,7 +22,7 @@ nm_node_alloc(
 
     nameLen = cpe_hs_len_to_binary_len(strlen(name));
 
-    buf = (char*)mem_alloc(nmm->m_alloc, nameLen + bodyLen + capacity);
+    buf = mem_alloc(nmm->m_alloc, nameLen + bodyLen + capacity);
     if (buf == NULL) return NULL;
 
     cpe_hs_init((cpe_hash_string_t)buf, nameLen, name);
@@ -82,7 +83,7 @@ void nm_node_free(nm_node_t node) {
         group = nm_group_from_node(node);
 
         cpe_hash_it_init(&member_it, &group->m_members);
-        member = cpe_hash_it_next(&member_it);
+        member = cpe_hash_it_next((&member_it));
         while(member) {
             struct nm_binding * next = cpe_hash_it_next(&member_it);
             nm_binding_free(member);

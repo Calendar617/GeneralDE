@@ -127,7 +127,7 @@ static ssize_t net_chanel_queue_write_to_buf(net_chanel_t bc, void * buf, size_t
     memcpy(buf, chanel->m_buf, size);
     chanel->m_size -= size;
     if (chanel->m_size) {
-        memmove(buf, buf + size, chanel->m_size);
+        memmove(buf, (char *)buf + size, chanel->m_size);
     }
 
     chanel->m_state = net_chanel_queue_calac_state(chanel);
@@ -144,7 +144,7 @@ static ssize_t net_chanel_queue_read_from_net(net_chanel_t bc, int fd) {
 
     chanel = (struct net_chanel_queue *)bc;
 
-    recv_size = recv(fd, chanel->m_buf + chanel->m_size, chanel->m_capacity - chanel->m_size, 0);
+    recv_size = cpe_recv(fd, chanel->m_buf + chanel->m_size, chanel->m_capacity - chanel->m_size, 0);
     if (recv_size < 0) return -1;
 
     chanel->m_size += recv_size;
@@ -163,7 +163,7 @@ static ssize_t net_chanel_queue_write_to_net(net_chanel_t bc, int fd) {
     chanel = (struct net_chanel_queue *)bc;
     if (chanel->m_size == 0) return 0;
 
-    send_size = send(fd, chanel->m_buf, chanel->m_size, 0);
+    send_size = cpe_send(fd, chanel->m_buf, chanel->m_size, 0);
     if (send_size < 0) return send_size;
 
     if (send_size != chanel->m_size) {
