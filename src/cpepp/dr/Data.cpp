@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include "cpepp/utils/ErrorCollector.hpp"
 #include "cpe/dr/dr_data.h"
+#include "cpepp/dr/Meta.hpp"
 #include "cpepp/dr/Data.hpp"
 
 namespace Cpe { namespace Dr {
@@ -297,6 +298,10 @@ ConstDataElement ConstData::operator[](const char * name) const {
 Data::Data(void * data, LPDRMETA meta)
     : ConstData(data, meta)
 {
+}
+
+void Data::copy_same_entries_from(ConstData const & o) {
+    meta().copy_same_entries(data(), capacity(), o.data(), o.meta(), o.capacity());
 }
 
 DataElement Data::operator[](const char * name) {
