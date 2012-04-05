@@ -92,7 +92,7 @@ Cpe::Dr::Data SendPoint::dataBuf(const char * metaName) {
             "%s: data-buf is NULL!", name().c_str());
     }
 
-    return Cpe::Dr::Data(buf, meta(metaName));
+    return Cpe::Dr::Data(buf, meta(metaName), bpg_use_sp_buf_capacity(m_sp));
 }
 
 }}
