@@ -49,6 +49,7 @@ public:
 
     Meta const & meta(void) const { return *((Meta*)m_meta); }
     const void * data(void) const { return m_data; }
+    size_t capacity(void) const;
 
     ConstDataElement operator[](const char * name) const;
 
@@ -60,6 +61,9 @@ protected:
 class Data : public ConstData {
 public:
     Data(void * data, LPDRMETA meta);
+
+    using ConstData::data;
+    void * data(void)  { return const_cast<void*>(m_data); }
 
     using ConstData::operator[];
     DataElement operator[](const char * name);
