@@ -32,22 +32,24 @@ domain-target-product-dep-def=\
 $(if $(r.$1.depends),$(if $(r.$1.$2.product),\
 $(addprefix $(CPDE_OUTPUT_ROOT)/,$(r.$1.$2.product)): $(foreach p,$(r.$1.depends),$(addprefix $(CPDE_OUTPUT_ROOT)/,$(r.$p.$2.product)))))
 
-$(foreach domain,$(sort $(domain-list)),\
+using-domain-list?=$(sort $(domain-list) tools)
+
+$(foreach domain,$(using-domain-list),\
     $(eval $(call domain-auto-def-product,$(domain))) \
 	$(eval $(call domain-target-def,$(domain)))\
 )
 
-$(if $(filter-out tools,$(domain-list))\
+$(if $(filter-out tools,$(using-domain-list))\
     , \
     , $(foreach p,$(project_repository),\
           $(eval $(call product-def-for-domain,$p,default))) \
       $(eval $(call domain-target-def,default)) \
 	)
 
-$(foreach env,$(sort $(foreach domain,$(sort $(domain-list)),$($(domain).env))), \
+$(foreach env,$(sort $(foreach domain,$(using-domain-list),$($(domain).env))), \
     $(call $(env).check))
 
-$(foreach domain,$(sort $(domain-list)),\
+$(foreach domain,$(using-domain-list),\
     $(foreach p,$($(domain).product-list),\
 	    $(eval $(call domain-target-product-dep-def,$p,$(domain)))\
 ))
