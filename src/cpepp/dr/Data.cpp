@@ -277,6 +277,10 @@ ConstData::ConstData(const void * data, LPDRMETA meta)
 {
 }
 
+size_t ConstData::capacity(void) const {
+    return dr_meta_size(m_meta);
+}
+
 ConstDataElement ConstData::operator[](const char * name) const {
     LPDRMETAENTRY entry;
     int32_t off = dr_meta_path_to_off(m_meta, name, &entry);
