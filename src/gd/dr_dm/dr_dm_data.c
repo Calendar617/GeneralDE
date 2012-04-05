@@ -157,7 +157,8 @@ dr_dm_data_t dr_dm_data_find_by_id(dr_dm_manage_t mgr, dr_dm_data_id_t id) {
     key = dr_dm_manage_key_buf(mgr);
 
     if (dr_entry_set_from_uint64(
-            dr_dm_data_data(key), id, mgr->m_id_index->m_entry, NULL) != 0) 
+            (char*)dr_dm_data_data(key) + dr_entry_data_start_pos(mgr->m_id_index->m_entry)
+            , id, mgr->m_id_index->m_entry, NULL) != 0)
         return NULL;
 
     return (dr_dm_data_t)cpe_hash_table_find(&mgr->m_id_index->m_roles, key);
@@ -178,7 +179,9 @@ dr_dm_data_t dr_dm_data_find_by_id(dr_dm_manage_t mgr, dr_dm_data_id_t id) {
                                                                         \
         key = dr_dm_manage_key_buf(mgr);                              \
         if (dr_entry_set_from_ ## __type_name(                          \
-                dr_dm_data_data(key), input, index->m_entry, NULL) != 0)   \
+                (char *)dr_dm_data_data(key)                            \
+                + dr_entry_data_start_pos(index->m_entry),              \
+                input, index->m_entry, NULL) != 0)                      \
         {                                                               \
             return NULL;                                                \
         }                                                               \
