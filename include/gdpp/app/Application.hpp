@@ -14,6 +14,7 @@ public:
     char ** argv(void) const { return gd_app_argv(*this); }
 
     mem_allocrator_t allocrator(void) { return gd_app_alloc(*this); }
+    error_monitor_t em(void) const { return gd_app_em(*this); }
 
     Cpe::Cfg::Node & cfg(void) { return *(Cpe::Cfg::Node *)gd_app_cfg(*this); }
     Cpe::Cfg::Node const & cfg(void) const { return *(Cpe::Cfg::Node *)gd_app_cfg(*this); }
