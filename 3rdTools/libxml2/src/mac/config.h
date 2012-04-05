@@ -9,7 +9,7 @@
 /* #undef HAVE_LIBHISTORY */
 /* #undef HAVE_LIBREADLINE */
 #define HAVE_LIBPTHREAD /**/
-#define HAVE_PTHREAD_H /**/
+/* #undef HAVE_PTHREAD_H */
 
 /* Define if IPV6 support is there */
 #define SUPPORT_IP6 /**/
@@ -144,7 +144,7 @@
 #define HAVE_PRINTF 1
 
 /* Define if <pthread.h> is there */
-#define HAVE_PTHREAD_H /**/
+/* #define HAVE_PTHREAD_H */
 
 /* Define to 1 if you have the <resolv.h> header file. */
 #define HAVE_RESOLV_H 1
@@ -254,7 +254,7 @@
 /* #undef HAVE___VA_COPY */
 
 /* Define as const if the declaration of iconv() needs const. */
-#define ICONV_CONST 
+#define ICONV_CONST
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */

@@ -974,7 +974,6 @@ xmlCopyError(xmlErrorPtr from, xmlErrorPtr to) {
     to->node = from->node;
     to->int1 = from->int1;
     to->int2 = from->int2;
-    to->node = from->node;
     to->ctxt = from->ctxt;
     to->message = message;
     to->file = file;
