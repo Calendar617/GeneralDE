@@ -7,8 +7,9 @@
 namespace Cpe { namespace Dr {
 
 //class ConstDataElement
-ConstDataElement::ConstDataElement(const void * data, LPDRMETAENTRY entry)
+ConstDataElement::ConstDataElement(const void * data, LPDRMETAENTRY entry, size_t capacity)
     : m_data(data)
+    , m_capacity(capacity > 0 ? capacity : dr_entry_size(entry))
     , m_entry(entry)
 {
 }
@@ -136,8 +137,8 @@ ConstDataElement::operator const char *(void) {
 }
 
 //class DataElement
-DataElement::DataElement(void * data, LPDRMETAENTRY entry) 
-    : ConstDataElement(data, entry)
+DataElement::DataElement(void * data, LPDRMETAENTRY entry, size_t capacity) 
+    : ConstDataElement(data, entry, capacity)
 {
 }
 
@@ -272,14 +273,11 @@ DataElement & DataElement::operator=(ConstDataElement const & o) {
 }
 
 //class ConstData
-ConstData::ConstData(const void * data, LPDRMETA meta)
+ConstData::ConstData(const void * data, LPDRMETA meta, size_t capacity)
     : m_data(data)
+    , m_capacity(capacity > 0 ? capacity : dr_meta_size(meta))
     , m_meta(meta)
 {
-}
-
-size_t ConstData::capacity(void) const {
-    return dr_meta_size(m_meta);
 }
 
 ConstDataElement ConstData::operator[](const char * name) const {
@@ -291,12 +289,24 @@ ConstDataElement ConstData::operator[](const char * name) const {
         throw ::std::runtime_error(os.str());
     }
 
-    return ConstDataElement(((const char *)m_data) + off, entry);
+    if ((size_t)off >= m_capacity) {
+        ::std::ostringstream os;
+        os << "meta " << dr_meta_name(m_meta) << " entry " << name
+           << " off " << off << " overflow, capacity is " << m_capacity << "!";
+        throw ::std::runtime_error(os.str());
+    }
+
+    if (entry == dr_meta_entry_at(m_meta, dr_meta_entry_num(m_meta) - 1)) {
+        return ConstDataElement(((char *)const_cast<void*>(m_data)) + off, entry, m_capacity - (size_t)off);
+    }
+    else {
+        return ConstDataElement(((char *)const_cast<void*>(m_data)) + off, entry);
+    }
 }
 
 //class Data
-Data::Data(void * data, LPDRMETA meta)
-    : ConstData(data, meta)
+Data::Data(void * data, LPDRMETA meta, size_t capacity)
+    : ConstData(data, meta, capacity)
 {
 }
 
@@ -313,7 +323,19 @@ DataElement Data::operator[](const char * name) {
         throw ::std::runtime_error(os.str());
     }
 
-    return DataElement(((char *)const_cast<void*>(m_data)) + off, entry);
+    if ((size_t)off >= m_capacity) {
+        ::std::ostringstream os;
+        os << "meta " << dr_meta_name(m_meta) << " entry " << name
+           << " off " << off << " overflow, capacity is " << m_capacity << "!";
+        throw ::std::runtime_error(os.str());
+    }
+
+    if (entry == dr_meta_entry_at(m_meta, dr_meta_entry_num(m_meta) - 1)) {
+        return DataElement(((char *)const_cast<void*>(m_data)) + off, entry, m_capacity - (size_t)off);
+    }
+    else {
+        return DataElement(((char *)const_cast<void*>(m_data)) + off, entry);
+    }
 }
 
 }}
