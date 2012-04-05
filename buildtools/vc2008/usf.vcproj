@@ -338,7 +338,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="mkdir $(OutDir)\..\protocol&#x0D;&#x0A;mkdir $(OutDir)\..\protocol\base&#x0D;&#x0A;cd $(SolutionDir)..\..\Resources&#x0D;&#x0A;$(SolutionDir)..\..\build\tools\bin\cpe_dr_tool.exe -i $(InputPath) --output-h $(OutDir)\..\protocol\base --output-lib-c $(OutDir)\..\protocol\base\$(InputName).c --output-lib-c-arg g_metalib_base_package&#x0D;&#x0A;&#x0D;&#x0A;"
+							CommandLine="mkdir $(OutDir)\..\protocol&#x0D;&#x0A;mkdir $(OutDir)\..\protocol\base&#x0D;&#x0A;set PATH=$(SolutionDir)..\..\3rdTools\iconv\vc\bin;$(SolutionDir)..\..\3rdTools\zlib\vc\bin;%PATH%&#x0D;&#x0A;$(SolutionDir)..\..\build\tools\bin\cpe_dr_tool.exe -i $(InputPath) --output-h $(OutDir)\..\protocol\base --output-lib-c $(OutDir)\..\protocol\base\$(InputName).c --output-lib-c-arg g_metalib_base_package&#x0D;&#x0A;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\..\protocol\base\$(InputName).c"
 						/>
 					</FileConfiguration>
@@ -347,7 +347,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="mkdir $(OutDir)\..\protocol&#x0D;&#x0A;mkdir $(OutDir)\..\protocol\base&#x0D;&#x0A;cd $(SolutionDir)..\..\Resources&#x0D;&#x0A;$(SolutionDir)..\..\build\tools\bin\cpe_dr_tool.exe -i $(InputPath) --output-h $(OutDir)\..\protocol\base --output-lib-c $(OutDir)\..\protocol\base\$(InputName).c --output-lib-c-arg g_metalib_base_package&#x0D;&#x0A;&#x0D;&#x0A;"
+							CommandLine="mkdir $(OutDir)\..\protocol&#x0D;&#x0A;mkdir $(OutDir)\..\protocol\base&#x0D;&#x0A;set PATH=$(SolutionDir)..\..\3rdTools\iconv\vc\bin;$(SolutionDir)..\..\3rdTools\zlib\vc\bin;%PATH%&#x0D;&#x0A;$(SolutionDir)..\..\build\tools\bin\cpe_dr_tool.exe -i $(InputPath) --output-h $(OutDir)\..\protocol\base --output-lib-c $(OutDir)\..\protocol\base\$(InputName).c --output-lib-c-arg g_metalib_base_package&#x0D;&#x0A;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\..\protocol\base\$(InputName).c"
 						/>
 					</FileConfiguration>
@@ -412,8 +412,16 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="mkdir $(OutDir)\..\protocol&#x0D;&#x0A;mkdir $(OutDir)\..\protocol\bpg_rsp&#x0D;&#x0A;cd $(SolutionDir)..\..\Resources&#x0D;&#x0A;$(SolutionDir)..\..\build\tools\bin\cpe_dr_tool.exe -i $(InputDir) --output-h $(OutDir)\..\protocol\bpg_rsp --output-lib-c $(OutDir)\..\protocol\bpg_rsp\carry_package.c --output-lib-c-arg g_metalib_carry_package&#x0D;&#x0A;&#x0D;&#x0A;"
+							CommandLine="mkdir $(OutDir)\..\protocol&#x0D;&#x0A;mkdir $(OutDir)\..\protocol\base&#x0D;&#x0A;set PATH=$(SolutionDir)..\..\3rdTools\iconv\vc\bin;$(SolutionDir)..\..\3rdTools\zlib\vc\bin;%PATH%&#x0D;&#x0A;$(SolutionDir)..\..\build\tools\bin\cpe_dr_tool.exe  -i $(InputDir) --output-h $(OutDir)\..\protocol\bpg_rsp --output-lib-c $(OutDir)\..\protocol\bpg_rsp\carry_package.c --output-lib-c-arg g_metalib_carry_package&#x0D;&#x0A;&#x0D;&#x0A;"
 							Outputs="$(OutDir)\..\protocol\bpg_rsp\carry_package.c"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="mkdir $(OutDir)\..\protocol&#x0D;&#x0A;mkdir $(OutDir)\..\protocol\base&#x0D;&#x0A;set PATH=$(SolutionDir)..\..\3rdTools\iconv\vc\bin;$(SolutionDir)..\..\3rdTools\zlib\vc\bin;%PATH%&#x0D;&#x0A;$(SolutionDir)..\..\build\tools\bin\cpe_dr_tool.exe  -i $(InputDir) --output-h $(OutDir)\..\protocol\bpg_rsp --output-lib-c $(OutDir)\..\protocol\bpg_rsp\carry_package.c --output-lib-c-arg g_metalib_carry_package&#x0D;&#x0A;&#x0D;&#x0A;"
 						/>
 					</FileConfiguration>
 				</File>
