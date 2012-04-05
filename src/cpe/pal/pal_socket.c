@@ -2,12 +2,41 @@
 #include "cpe/pal/pal_socket.h"
 
 #ifdef _MSC_VER
+#include <string.h>
 #ifdef _DEBUG
 int cpe_sock_close(int fd)
 {
     return closesocket(_get_osfhandle(fd));
 }
 #endif
+
+const char* cpe_sock_errstr(int n)
+{
+    /// <FIXME> not thread safe
+    static char buf[1024];
+    LPSTR errorText = NULL;
+
+    FormatMessageA(
+        FORMAT_MESSAGE_FROM_SYSTEM|FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_IGNORE_INSERTS,  
+        NULL,
+        n,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPSTR)&errorText,  // output 
+        0, // minimum size for output buffer
+        NULL);   // arguments - see note 
+    if ( NULL != errorText )
+    {
+        // ... do something with the string - log it, display it to the user, etc.
+        strncpy_s(buf, sizeof(buf), errorText, strlen(errorText) + 1);
+        // release memory allocated by FormatMessage()
+        LocalFree(errorText);
+        errorText = NULL;
+        return buf;
+    }
+
+    return 0;
+}
+
 #endif
 
 int cpe_sock_set_none_block(int fd, int is_non_block) {
