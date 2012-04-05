@@ -1,3 +1,4 @@
+#include "cpe/pal/pal_string.h"
 #include "app_internal_ops.h"
 
 static
