@@ -86,3 +86,19 @@ TEST_F(ManageBasicTest, find_by_id_basic) {
     EXPECT_EQ(0, (int)output->id);
 }
 
+TEST_F(ManageBasicTest, find_by_index_basic) {
+    t_em_set_print();
+    EXPECT_EQ(0, dr_dm_manage_create_index(m_manage, "attr1", 1));
+
+    S input1 = { 1, 3, "ab"};
+    EXPECT_TRUE(dr_dm_data_create(m_manage, &input1, sizeof(input1), NULL));
+
+    S input2 = { 2, 4, "cd"};
+    EXPECT_TRUE(dr_dm_data_create(m_manage, &input2, sizeof(input2), NULL));
+
+    dr_dm_data_t data = dr_dm_data_find_by_index_int32(m_manage, "attr1", 3);
+    ASSERT_TRUE(data);
+    S * output = (S*) dr_dm_data_data(data);
+    EXPECT_EQ(1, (int)output->id);
+}
+
