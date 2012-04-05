@@ -15,8 +15,8 @@ bpg_pkg_t bpg_net_agent_req_buf(bpg_net_agent_t mgr);
 /*binding operations*/
 int bpg_net_agent_binding_create(
     bpg_net_agent_t mgr,
-    uint64_t m_client_id,
-    int64_t m_connection_id);
+    uint64_t client_id,
+    int64_t connection_id);
 
 void bpg_net_agent_binding_free(bpg_net_agent_t mgr, struct bpg_net_agent_binding * binding);
 

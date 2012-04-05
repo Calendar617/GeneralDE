@@ -72,7 +72,7 @@ void RspOpContext::setNoResponse(void) {
             "RspOpContext[%d]: carry info not exist!", id());
     }
 
-    bpg_rsp_context_set_client_id(carryInfo, 0);
+    bpg_rsp_context_set_no_response(carryInfo);
 }
 
 }}
