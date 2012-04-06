@@ -49,11 +49,11 @@ void bpg_pkg_free(bpg_pkg_t req) {
     dp_req_free(req->m_dp_req);
 }
 
-int64_t bpg_pkg_connection_id(bpg_pkg_t pkg) {
+uint32_t bpg_pkg_connection_id(bpg_pkg_t pkg) {
     return pkg->m_connection_id;
 }
 
-void bpg_pkg_set_connection_id(bpg_pkg_t pkg, int64_t connection_id) {
+void bpg_pkg_set_connection_id(bpg_pkg_t pkg, uint32_t connection_id) {
     pkg->m_connection_id = connection_id;
 }
 

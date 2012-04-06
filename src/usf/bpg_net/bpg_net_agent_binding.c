@@ -4,7 +4,7 @@
 #include "bpg_net_internal_ops.h"
 
 bpg_net_pkg_next_step_t
-bpg_net_agent_process_recv(bpg_net_agent_t agent, uint64_t client_id, int64_t connection_id) {
+bpg_net_agent_process_recv(bpg_net_agent_t agent, uint64_t client_id, uint32_t connection_id) {
     struct bpg_net_agent_binding * binding;
 
     if (client_id != 0) {
@@ -61,7 +61,7 @@ bpg_net_agent_process_recv(bpg_net_agent_t agent, uint64_t client_id, int64_t co
     }
 }
 
-net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t agent, uint64_t client_id, int64_t connection_id) {
+net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t agent, uint64_t client_id, uint32_t connection_id) {
     net_ep_t ep;
 
     if (connection_id != BPG_INVALID_CONNECTION_ID) {
@@ -102,7 +102,7 @@ net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t agent, uint64_t client_id, 
 int bpg_net_agent_binding_create(
     bpg_net_agent_t mgr,
     uint64_t client_id,
-    int64_t connection_id)
+    uint32_t connection_id)
 {
     struct bpg_net_agent_binding * binding;
 
@@ -156,7 +156,7 @@ bpg_net_agent_binding_find_by_client_id(bpg_net_agent_t mgr, uint64_t client_id)
 }
 
 struct bpg_net_agent_binding *
-bpg_net_agent_binding_find_by_connection_id(bpg_net_agent_t mgr, int64_t connection_id) {
+bpg_net_agent_binding_find_by_connection_id(bpg_net_agent_t mgr, uint32_t connection_id) {
     struct bpg_net_agent_binding key;
     key.m_connection_id = connection_id;
 

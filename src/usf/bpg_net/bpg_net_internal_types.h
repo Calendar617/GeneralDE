@@ -29,7 +29,7 @@ struct bpg_net_agent {
 
 struct bpg_net_agent_binding {
     uint64_t m_client_id;
-    int64_t m_connection_id;
+    uint32_t m_connection_id;
 
     struct cpe_hash_entry m_hh_client;
     struct cpe_hash_entry m_hh_connection;

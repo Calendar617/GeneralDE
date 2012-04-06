@@ -27,7 +27,7 @@ struct bpg_pkg_manage {
 struct bpg_pkg {
     bpg_pkg_manage_t m_mgr;
 
-    int64_t m_connection_id;
+    uint32_t m_connection_id;
 
     LPDRMETA m_carry_data_meta;
     size_t m_carry_data_size;

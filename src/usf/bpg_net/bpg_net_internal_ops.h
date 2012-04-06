@@ -16,7 +16,7 @@ bpg_pkg_t bpg_net_agent_req_buf(bpg_net_agent_t mgr);
 int bpg_net_agent_binding_create(
     bpg_net_agent_t mgr,
     uint64_t client_id,
-    int64_t connection_id);
+    uint32_t connection_id);
 
 void bpg_net_agent_binding_free(bpg_net_agent_t mgr, struct bpg_net_agent_binding * binding);
 
@@ -24,10 +24,10 @@ struct bpg_net_agent_binding *
 bpg_net_agent_binding_find_by_client_id(bpg_net_agent_t mgr, uint64_t client_id);
 
 struct bpg_net_agent_binding *
-bpg_net_agent_binding_find_by_connection_id(bpg_net_agent_t mgr, int64_t connection_id);
+bpg_net_agent_binding_find_by_connection_id(bpg_net_agent_t mgr, uint32_t connection_id);
 
-net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t mgr, uint64_t client_id, int64_t connection_id);
-bpg_net_pkg_next_step_t bpg_net_agent_process_recv(bpg_net_agent_t mgr, uint64_t client_id, int64_t connection_id);
+net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t mgr, uint64_t client_id, uint32_t connection_id);
+bpg_net_pkg_next_step_t bpg_net_agent_process_recv(bpg_net_agent_t mgr, uint64_t client_id, uint32_t connection_id);
 
 uint32_t bpg_net_agent_binding_client_id_hash(
     const struct bpg_net_agent_binding * binding);
