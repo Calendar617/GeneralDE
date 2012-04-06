@@ -211,12 +211,12 @@ void bpg_net_agent_accept(net_listener_t listener, net_ep_t ep, void * ctx) {
     buf_w = mem_alloc(agent->m_alloc, 2048);
     if (buf_r == NULL || buf_w == NULL) goto ERROR;
 
-    chanel_r = net_chanel_queue_create(net_ep_mgr(ep), buf_r, 2048);
+    chanel_r = net_chanel_queue_create(net_ep_mgr(ep), buf_r, agent->m_read_chanel_size);
     if (chanel_r == NULL) goto ERROR;
     net_chanel_queue_set_close(chanel_r, bpg_net_agent_free_chanel_buf, agent);
     buf_r = NULL;
 
-    chanel_w = net_chanel_queue_create(net_ep_mgr(ep), buf_w, 2048);
+    chanel_w = net_chanel_queue_create(net_ep_mgr(ep), buf_w, agent->m_write_chanel_size);
     if (chanel_w == NULL) goto ERROR;
     net_chanel_queue_set_close(chanel_w, bpg_net_agent_free_chanel_buf, agent);
     buf_w = NULL;

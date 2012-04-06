@@ -52,6 +52,10 @@ int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t c
 
     bpg_net_agent->m_req_max_size =
         cfg_get_uint32(cfg, "req-max-size", bpg_net_agent->m_req_max_size);
+    bpg_net_agent->m_read_chanel_size =
+        cfg_get_uint32(cfg, "read-chanel-size", bpg_net_agent->m_read_chanel_size);
+    bpg_net_agent->m_write_chanel_size =
+        cfg_get_uint32(cfg, "write-chanel-size", bpg_net_agent->m_write_chanel_size);
 
     bpg_net_agent->m_debug = cfg_get_int32(cfg, "debug", 0);
 
