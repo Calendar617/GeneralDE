@@ -45,6 +45,8 @@ bpg_net_agent_create(
     mgr->m_req_max_size = 4 * 1024;
     mgr->m_req_buf = NULL;
     mgr->m_debug = 0;
+    mgr->m_read_chanel_size = 2048;
+    mgr->m_write_chanel_size = 2048;
 
     mem_buffer_init(&mgr->m_rsp_buf, alloc);
 

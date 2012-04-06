@@ -19,6 +19,9 @@ struct bpg_net_agent {
     bpg_pkg_t m_req_buf;
     struct mem_buffer m_rsp_buf;
 
+    size_t m_read_chanel_size;
+    size_t m_write_chanel_size;
+
     dp_rsp_t m_reply_rsp;
 
     struct cpe_hash_table m_cliensts;
