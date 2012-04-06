@@ -525,6 +525,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\cpe\cfg\cfg_dump.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\cpe\cfg\cfg_internal_ops.h"
 					>
 				</File>
