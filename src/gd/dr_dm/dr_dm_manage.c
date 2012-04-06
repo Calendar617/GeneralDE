@@ -231,7 +231,7 @@ int dr_dm_manage_create_index(dr_dm_manage_t mgr, const char * name, int is_uniq
         return -1;
     }
 
-    if (dr_dm_data_index_create(mgr, entry, is_uniqure) != 0) {
+    if (dr_dm_data_index_create(mgr, entry, is_uniqure) == NULL) {
         CPE_ERROR(
             mgr->m_em, "%s: create_index: create index fail!",
             dr_dm_manage_name(mgr));
