@@ -281,6 +281,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\..\include\gd\utils\id_generator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gd\utils\utils_types.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -438,6 +450,14 @@
 				</File>
 				<File
 					RelativePath="..\..\src\gd\dr_store\dr_store_manage.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\..\src\gd\utils\id_generator.c"
 					>
 				</File>
 			</Filter>
