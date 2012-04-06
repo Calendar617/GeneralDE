@@ -45,7 +45,8 @@ void SendPoint::send(Usf::Bpg::Package & pkg) {
 
 void SendPoint::send(Cpe::Dr::Data const & data) {
     Usf::Bpg::Package & pkg = pkgBuf() ;
-    pkg.init();
+    pkg.clearData();
+    pkg.setErrCode(0);
     pkg.setCmdAndData(data);
     send(pkg);
 }
@@ -91,7 +92,7 @@ Cpe::Dr::Data SendPoint::dataBuf(const char * metaName) {
             "%s: data-buf is NULL!", name().c_str());
     }
 
-    return Cpe::Dr::Data(buf, meta(metaName));
+    return Cpe::Dr::Data(buf, meta(metaName), bpg_use_sp_buf_capacity(m_sp));
 }
 
 }}

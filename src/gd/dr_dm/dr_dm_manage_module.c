@@ -1,5 +1,7 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
+#include "cpe/utils/buffer.h"
+#include "cpe/utils/stream_buffer.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/nm/nm_manage.h"
 #include "cpe/nm/nm_read.h"
@@ -188,14 +190,37 @@ int dr_dm_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cf
     dr_dm_manage->m_debug = cfg_get_int32(cfg, "debug", 0);
 
     if (dr_dm_manage->m_debug) {
+        struct mem_buffer buffer;
+        mem_buffer_init(&buffer, 0);
+
+        if (cpe_hash_table_count(&dr_dm_manage->m_indexes)) {
+            struct write_stream_buffer stream;
+            struct cpe_hash_it index_it;
+            struct dr_dm_data_index * index;
+
+            write_stream_buffer_init(&stream, &buffer);
+
+            cpe_hash_it_init(&index_it, &dr_dm_manage->m_indexes);
+            index = cpe_hash_it_next(&index_it);
+            stream_printf((write_stream_t)&stream, "%s", index->m_name);
+
+            while((index = cpe_hash_it_next(&index_it))) {
+                stream_printf((write_stream_t)&stream, ", %s", index->m_name);
+            }
+
+            stream_putc((write_stream_t)&stream, 0);
+        }
+        
         CPE_INFO(
             gd_app_em(app),
-            "%s: create: done. meta=%s, key=%s, id-generate=%s",
+            "%s: create: done. meta=%s, key=%s, id-generate=%s, indexes=[%s]",
             gd_app_module_name(module),
             dr_dm_manage_meta(dr_dm_manage) ? dr_meta_name(dr_dm_manage_meta(dr_dm_manage)) : "???",
             dr_dm_manage_id_attr(dr_dm_manage) ? dr_entry_name(dr_dm_manage_id_attr(dr_dm_manage)) : "???",
-            dr_dm_manage_id_generate(dr_dm_manage) ? gd_id_generator_name(dr_dm_manage_id_generate(dr_dm_manage)) : "???"
-            );
+            dr_dm_manage_id_generate(dr_dm_manage) ? gd_id_generator_name(dr_dm_manage_id_generate(dr_dm_manage)) : "???",
+            mem_buffer_size(&buffer) ? (const char *)mem_buffer_make_continuous(&buffer, 0) : "");
+
+        mem_buffer_clear(&buffer);
     }
 
     return 0;

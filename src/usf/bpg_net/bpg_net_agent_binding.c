@@ -15,7 +15,16 @@ bpg_net_agent_process_recv(bpg_net_agent_t agent, uint64_t client_id, int64_t co
                     agent->m_em, "%s: ep %d: binding: client %d no binding, accept incoming!",
                     bpg_net_agent_name(agent), (int)connection_id, (int)client_id);
             }
-            return bpg_net_pkg_next_go_with_connection_id;
+
+            if (bpg_net_agent_binding_create(agent, client_id, connection_id) != 0) {
+                CPE_ERROR(
+                    agent->m_em, "%s: ep %d: binding: create binding fail!",
+                    bpg_net_agent_name(agent), (int)connection_id);
+                return bpg_net_pkg_next_close;
+            }
+            else {
+                return bpg_net_pkg_next_go_with_connection_id;
+            }
         }
         else {
             if (binding->m_connection_id != connection_id) {
@@ -55,14 +64,34 @@ bpg_net_agent_process_recv(bpg_net_agent_t agent, uint64_t client_id, int64_t co
 net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t agent, uint64_t client_id, int64_t connection_id) {
     net_ep_t ep;
 
-    ep = NULL;
-
-    if (ep == NULL && connection_id != BPG_INVALID_CONNECTION_ID) {
+    if (connection_id != BPG_INVALID_CONNECTION_ID) {
         ep = net_ep_find(gd_app_net_mgr(agent->m_app), connection_id);
         if (ep == NULL) {
             CPE_ERROR(
                 agent->m_em, "%s: net_agent_process_reply: connection of id %d not exist!",
                 bpg_net_agent_name(agent), (int)connection_id);
+            return NULL;
+        }
+        else {
+            return ep;
+        }
+    }
+
+    if (client_id != 0) {
+        struct bpg_net_agent_binding * binding =
+            bpg_net_agent_binding_find_by_client_id(agent, client_id);
+        if (binding == NULL) {
+            CPE_ERROR(
+                agent->m_em, "%s: net_agent_process_reply: connection binding of client %d not exist!",
+                bpg_net_agent_name(agent), (int)client_id);
+            return NULL;
+        }
+
+        ep = net_ep_find(gd_app_net_mgr(agent->m_app), binding->m_connection_id);
+        if (ep == NULL) {
+            CPE_ERROR(
+                agent->m_em, "%s: net_agent_process_reply: connection id %d of client %d not exist!",
+                bpg_net_agent_name(agent), (int)binding->m_connection_id, (int)client_id);
             return NULL;
         }
     }
@@ -80,6 +109,9 @@ int bpg_net_agent_binding_create(
     binding = mem_alloc(mgr->m_alloc, sizeof(struct bpg_net_agent_binding));
     if (binding == NULL) return -1;
 
+    binding->m_client_id = client_id;
+    binding->m_connection_id = connection_id;
+
     cpe_hash_entry_init(&binding->m_hh_client);
     cpe_hash_entry_init(&binding->m_hh_connection);
 
@@ -91,13 +123,19 @@ int bpg_net_agent_binding_create(
         return -1;
     }
 
-    if (cpe_hash_table_insert_unique(&mgr->m_cliensts, binding) != 0) {
+    if (cpe_hash_table_insert_unique(&mgr->m_connections, binding) != 0) {
         CPE_ERROR(
             mgr->m_em, "%s: create client binding %d ==> %d: connection is already exist!",
             bpg_net_agent_name(mgr), (int)client_id, (int)connection_id);
         cpe_hash_table_remove_by_ins(&mgr->m_cliensts, binding);
         mem_free(mgr->m_alloc, binding);
         return -1;
+    }
+
+    if (mgr->m_debug) {
+        CPE_INFO(
+            mgr->m_em, "%s: create client binding %d ==> %d: success!",
+            bpg_net_agent_name(mgr), (int)client_id, (int)connection_id);
     }
 
     return 0;

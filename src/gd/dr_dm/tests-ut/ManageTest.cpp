@@ -9,7 +9,6 @@ void ManageTest::SetUp() {
     t_id_generator_create("test-id-generator");
 
     m_manage = t_dr_dm_manage_create("test-dr-dm-manage");
-    dr_dm_manage_free(m_manage);
 }
 
 void ManageTest::setMetaLib(const char * libdef) {
