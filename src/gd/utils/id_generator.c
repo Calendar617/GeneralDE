@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/pal/pal_stdlib.h"
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/pal/pal_external.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/utils/error.h"
