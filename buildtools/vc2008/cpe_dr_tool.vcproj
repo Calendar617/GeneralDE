@@ -61,9 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iconv.lib Ws2_32.lib libzlib.lib"
+				AdditionalDependencies="iconv.lib Ws2_32.lib zlib.lib"
 				OutputFile="$(OutDir)\..\$(ProjectName).exe"
-				AdditionalLibraryDirectories="../../3rdTools/cocos2dx/cocos2dx/platform/third_party/win32/libraries;../../3rdTools/iconv/vc/lib"
+				AdditionalLibraryDirectories="../../3rdTools/zlib/vc/lib;../../3rdTools/iconv/vc/lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -136,9 +136,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="iconv.lib Ws2_32.lib libzlib.lib"
+				AdditionalDependencies="iconv.lib Ws2_32.lib zlib.lib"
 				OutputFile="$(OutDir)\..\$(ProjectName).exe"
-				AdditionalLibraryDirectories="../../3rdTools/cocos2dx/cocos2dx/platform/third_party/win32/libraries;../../3rdTools/iconv/vc/lib"
+				AdditionalLibraryDirectories="../../3rdTools/zlib/vc/lib;../../3rdTools/iconv/vc/lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
