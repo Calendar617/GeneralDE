@@ -245,6 +245,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\..\include\gdpp\utils\IdGenerator.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -259,6 +267,14 @@
 				<File
 					RelativePath="..\..\src\gdpp\app\Random.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\AppRandom.obj"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\..\src\gdpp\app\ReqResponser.cpp"
@@ -287,6 +303,22 @@
 				<File
 					RelativePath="..\..\src\gdpp\om\Manager.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\OmManager.obj"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\OmManager.obj"
+						/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter
@@ -298,6 +330,14 @@
 				</File>
 				<File
 					RelativePath="..\..\src\gdpp\timer\TimerProcessor.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="utils"
+				>
+				<File
+					RelativePath="..\..\src\gdpp\utils\IdGenerator.cpp"
 					>
 				</File>
 			</Filter>
