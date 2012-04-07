@@ -17,7 +17,7 @@ typedef struct bpg_pkg_dsp * bpg_pkg_dsp_t;
 #define BPG_BASEPKG_LIB_NAME "basepkg"
 #define BPG_BASEPKG_META_NAME "basepkg"
 
-#define BPG_INVALID_CONNECTION_ID ((int64_t)-1)
+#define BPG_INVALID_CONNECTION_ID ((int32_t)-1)
 
 #ifdef __cplusplus
 }

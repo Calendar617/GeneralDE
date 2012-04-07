@@ -84,7 +84,7 @@ Usf::Bpg::Package & SendPoint::pkgBuf(void) {
     return Usf::Bpg::Package::_cast(pkg_buf);
 }
 
-Cpe::Dr::Data SendPoint::dataBuf(const char * metaName) {
+Cpe::Dr::Data SendPoint::dataBuf(const char * metaName, size_t capacity) {
     void * buf = bpg_use_sp_data_buf(m_sp);
     if (buf == NULL) {
         APP_CTX_THROW_EXCEPTION(
@@ -92,7 +92,31 @@ Cpe::Dr::Data SendPoint::dataBuf(const char * metaName) {
             "%s: data-buf is NULL!", name().c_str());
     }
 
-    return Cpe::Dr::Data(buf, meta(metaName), bpg_use_sp_buf_capacity(m_sp));
+    size_t buf_capacity = bpg_use_sp_buf_capacity(m_sp);
+
+    Cpe::Dr::Meta const & m = meta(metaName);
+
+    if (capacity == 0) capacity = m.size();
+
+    if (capacity > buf_capacity) {
+        APP_CTX_THROW_EXCEPTION(
+            app(), ::std::runtime_error,
+            "%s: require size overflow! require %d, but only %d",
+            name().c_str(), (int)capacity, (int)buf_capacity);
+    }
+
+    return Cpe::Dr::Data(buf, meta(metaName), capacity);
+}
+
+Cpe::Dr::Data SendPoint::dataBuf(void) {
+    void * buf = bpg_use_sp_data_buf(m_sp);
+    if (buf == NULL) {
+        APP_CTX_THROW_EXCEPTION(
+            app(), ::std::runtime_error,
+            "%s: data-buf is NULL!", name().c_str());
+    }
+
+    return Cpe::Dr::Data(buf, bpg_use_sp_buf_capacity(m_sp));
 }
 
 }}

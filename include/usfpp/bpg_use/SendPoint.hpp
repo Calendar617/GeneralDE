@@ -23,7 +23,9 @@ public:
     Cpe::Dr::MetaLib const & metaLib(void) const;
     Cpe::Dr::Meta const & meta(const char * metaName) const;
 
-    Cpe::Dr::Data dataBuf(const char * metaName);
+    size_t dataBufCapacity(void) const { return bpg_use_sp_buf_capacity(m_sp); }
+    Cpe::Dr::Data dataBuf(const char * metaName, size_t capacity = 0);
+    Cpe::Dr::Data dataBuf(void);
     Usf::Bpg::Package & pkgBuf(void);
 
     void send(Usf::Bpg::Package & pkg);

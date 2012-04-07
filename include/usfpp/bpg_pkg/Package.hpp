@@ -47,6 +47,7 @@ public:
     void mainData(void * buf, size_t capacity, size_t * size = NULL) const;
     template<typename T>
     void mainData(T & buf) { mainData(&buf, sizeof(buf)); }
+    void mainData(Cpe::Dr::Data & data);
 
     /*main data write*/
     void setMainData(void const * data, size_t size, size_t * write_size = NULL);

@@ -81,6 +81,12 @@ void Package::mainData(void * buf, size_t capacity, size_t * size) const {
     if (size) *size = capacity;
 }
 
+void Package::mainData(Cpe::Dr::Data & data) {
+    size_t real_capacity;
+    mainData(data.data(), data.capacity(), &real_capacity);
+    data.setCapacity(real_capacity);
+}
+
 void Package::addAppendData(const char * metaName, void const * data, size_t size, size_t * write_size) {
     addAppendData(dataMetaLib().meta(metaName), data, size, write_size);
 }
