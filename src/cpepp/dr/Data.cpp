@@ -1,8 +1,9 @@
 #include <stdexcept>
 #include "cpepp/utils/ErrorCollector.hpp"
 #include "cpe/dr/dr_data.h"
-#include "cpepp/dr/Meta.hpp"
 #include "cpepp/dr/Data.hpp"
+#include "cpepp/dr/Meta.hpp"
+#include "cpepp/dr/Entry.hpp"
 
 namespace Cpe { namespace Dr {
 
@@ -14,7 +15,7 @@ ConstDataElement::ConstDataElement(const void * data, LPDRMETAENTRY entry, size_
 {
 }
 
-ConstDataElement::operator int8_t(void) {
+ConstDataElement::operator int8_t(void) const {
     int8_t r;
     Utils::ErrorCollector em;
 
@@ -28,7 +29,7 @@ ConstDataElement::operator int8_t(void) {
     return r;
 }
 
-ConstDataElement::operator uint8_t(void) {
+ConstDataElement::operator uint8_t(void) const {
     uint8_t r;
     Utils::ErrorCollector em;
 
@@ -42,7 +43,7 @@ ConstDataElement::operator uint8_t(void) {
     return r;
 }
 
-ConstDataElement::operator int16_t(void) {
+ConstDataElement::operator int16_t(void) const {
     int16_t r;
     Utils::ErrorCollector em;
 
@@ -56,7 +57,7 @@ ConstDataElement::operator int16_t(void) {
     return r;
 }
 
-ConstDataElement::operator uint16_t(void) {
+ConstDataElement::operator uint16_t(void) const {
     uint16_t r;
     Utils::ErrorCollector em;
 
@@ -70,7 +71,7 @@ ConstDataElement::operator uint16_t(void) {
     return r;
 }
 
-ConstDataElement::operator int32_t(void) {
+ConstDataElement::operator int32_t(void) const {
     int32_t r;
     Utils::ErrorCollector em;
 
@@ -84,7 +85,7 @@ ConstDataElement::operator int32_t(void) {
     return r;
 }
 
-ConstDataElement::operator uint32_t(void) {
+ConstDataElement::operator uint32_t(void) const {
     uint32_t r;
     Utils::ErrorCollector em;
 
@@ -98,7 +99,7 @@ ConstDataElement::operator uint32_t(void) {
     return r;
 }
 
-ConstDataElement::operator int64_t(void) {
+ConstDataElement::operator int64_t(void) const {
     int64_t r;
     Utils::ErrorCollector em;
 
@@ -112,7 +113,7 @@ ConstDataElement::operator int64_t(void) {
     return r;
 }
 
-ConstDataElement::operator uint64_t(void) {
+ConstDataElement::operator uint64_t(void) const {
     uint64_t r;
     Utils::ErrorCollector em;
 
@@ -126,7 +127,35 @@ ConstDataElement::operator uint64_t(void) {
     return r;
 }
 
-ConstDataElement::operator const char *(void) {
+ConstDataElement::operator float(void) const {
+    float r;
+    Utils::ErrorCollector em;
+
+    if (dr_entry_try_read_float(&r, m_data, m_entry, em) != 0) {
+        ::std::ostringstream os;
+        os << "read float from " << dr_entry_name(m_entry) << ": ";
+        em.genErrorMsg(os);
+        throw ::std::runtime_error(os.str());
+    }
+
+    return r;
+}
+
+ConstDataElement::operator double(void) const {
+    double r;
+    Utils::ErrorCollector em;
+
+    if (dr_entry_try_read_double(&r, m_data, m_entry, em) != 0) {
+        ::std::ostringstream os;
+        os << "read double from " << dr_entry_name(m_entry) << ": ";
+        em.genErrorMsg(os);
+        throw ::std::runtime_error(os.str());
+    }
+
+    return r;
+}
+
+ConstDataElement::operator const char *(void) const {
     const char * r = dr_entry_read_string(m_data, m_entry);
     if (r == NULL) {
         ::std::ostringstream os;
@@ -262,7 +291,7 @@ DataElement & DataElement::operator=(const char * d) {
 DataElement & DataElement::operator=(ConstDataElement const & o) {
     Utils::ErrorCollector em;
 
-    if (dr_entry_set_from_ctype(const_cast<void *>(m_data), o.data(), dr_entry_type(o.entry()), m_entry, em) != 0) {
+    if (dr_entry_set_from_ctype(const_cast<void *>(m_data), o.data(), o.entry().typeId(), m_entry, em) != 0) {
         ::std::ostringstream os;
         os << "set element to " << dr_entry_name(m_entry) << ": ";
         em.genErrorMsg(os);
@@ -270,6 +299,18 @@ DataElement & DataElement::operator=(ConstDataElement const & o) {
     }
 
     return *this;
+}
+
+void DataElement::copy(const void * data, size_t capacity) {
+    Utils::ErrorCollector em;
+    if (capacity > m_capacity) {
+        ::std::ostringstream os;
+        os << meta().name().c_str() << "." << entry().name().c_str() << ": "
+           << "copy data (size=" << capacity << ") overflow, capacity=" << m_capacity << "!";
+        throw ::std::runtime_error(os.str());
+    }
+
+    memcpy((void*)m_data, data, capacity);
 }
 
 //class ConstData
@@ -281,6 +322,8 @@ ConstData::ConstData(const void * data, LPDRMETA meta, size_t capacity)
 }
 
 ConstDataElement ConstData::operator[](const char * name) const {
+    if (m_meta == NULL) throw ::std::runtime_error("Data::operator[]: meta not exist!");
+
     LPDRMETAENTRY entry;
     int32_t off = dr_meta_path_to_off(m_meta, name, &entry);
     if (off < 0 || entry == NULL) {
@@ -310,11 +353,42 @@ Data::Data(void * data, LPDRMETA meta, size_t capacity)
 {
 }
 
-void Data::copy_same_entries_from(ConstData const & o) {
+Data::Data(void * data, size_t capacity)
+    : ConstData(data, NULL, capacity)
+{
+}
+
+void Data::copy(const void * data, size_t capacity) {
+    if (m_meta == NULL) throw ::std::runtime_error("Data::copy: meta not exist!");
+
+    Utils::ErrorCollector em;
+    if (capacity > m_capacity) {
+        ::std::ostringstream os;
+        os << meta().name().c_str() << ": "
+           << "copy data (size=" << capacity << ") overflow, capacity=" << m_capacity << "!";
+        throw ::std::runtime_error(os.str());
+    }
+
+    memcpy((void*)m_data, data, capacity);
+}
+
+void Data::setMeta(LPDRMETA meta) {
+    m_meta = meta;
+}
+
+void Data::setCapacity(size_t capacity) {
+    m_capacity = capacity;
+}
+
+void Data::copySameEntriesFrom(ConstData const & o) {
+    if (m_meta == NULL) throw ::std::runtime_error("Data::copySameEntriesFrom: meta not exist!");
+
     meta().copy_same_entries(data(), capacity(), o.data(), o.meta(), o.capacity());
 }
 
 DataElement Data::operator[](const char * name) {
+    if (m_meta == NULL) throw ::std::runtime_error("Data::operator[]: meta not exist!");
+
     LPDRMETAENTRY entry;
     int32_t off = dr_meta_path_to_off(m_meta, name, &entry);
     if (off < 0 || entry == NULL) {
