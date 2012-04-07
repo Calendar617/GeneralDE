@@ -26,11 +26,15 @@ public:
     void * carryData(void) { return gd_evt_carry_data(*this); }
     void const * carryData(void) const { return gd_evt_carry_data(*this); }
 
+    void * data(void) { return gd_evt_data(*this); }
+    const void * data(void) const { return gd_evt_data(*this); }
+    size_t capacity(void) const { return gd_evt_data_capacity(*this); }
+
     /*data operations*/
     Cpe::Dr::Meta const & meta(void) const { return Cpe::Dr::Meta::_cast(gd_evt_meta(*this)); }
 
-    Cpe::Dr::ConstData args(void) const { return Cpe::Dr::ConstData(gd_evt_data(*this), meta()); }
-    Cpe::Dr::Data args(void) {return Cpe::Dr::Data(gd_evt_data(*this), meta()); }
+    Cpe::Dr::ConstData args(void) const { return Cpe::Dr::ConstData(data(), meta(), capacity()); }
+    Cpe::Dr::Data args(void) {return Cpe::Dr::Data(data(), meta(), capacity()); }
 
     Cpe::Dr::ConstDataElement operator[] (const char * name) const { return args()[name]; }
     Cpe::Dr::DataElement operator[] (const char * name) { return args()[name]; }
