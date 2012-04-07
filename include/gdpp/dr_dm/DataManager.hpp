@@ -95,10 +95,22 @@ public:
         return d ? (T*)dr_dm_data_data((dr_dm_data_t)d) : NULL;
     }
 
+    template<typename T, typename KeyT>
+    T const * findData(const char * index, KeyT key)  const { 
+        Data const * d = DataManager::findData(index, key);
+        return d ? (T const *)dr_dm_data_data((dr_dm_data_t)d) : NULL;
+    }
+
     template<typename T>
     T * findData(dr_dm_data_id_t id) { 
         Data * d = DataManager::findData(id);
         return d ? (T*)dr_dm_data_data((dr_dm_data_t)d) : NULL;
+    }
+
+    template<typename T>
+    T const * findData(dr_dm_data_id_t id) const { 
+        Data const * d = DataManager::findData(id);
+        return d ? (T const *)dr_dm_data_data((dr_dm_data_t)d) : NULL;
     }
 
     static DataManager & _cast(dr_dm_manage_t data_manage);
