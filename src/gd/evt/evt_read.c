@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/pal/pal_strings.h"
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/dr/dr_metalib_init.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_data.h"
@@ -38,7 +39,7 @@ gd_evt_t gd_evt_create(gd_evt_mgr_t evm, const char * typeName, ssize_t data_cap
     }
     else if (data_capacity < (ssize_t)dr_meta_size(meta)) {
         CPE_ERROR(
-            em, "%s: create event: data_capacity %zd is to small to contain type %s!",
+            em, "%s: create event: data_capacity "  FMT_SIZE_T " is to small to contain type %s!",
             gd_evt_mgr_name(evm), data_capacity, typeName);
         return NULL;
     }

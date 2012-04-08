@@ -23,26 +23,26 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         switch(r_type) {
         case CPE_DR_TYPE_CHAR:
         case CPE_DR_TYPE_INT8:
-            return __value(int8_t, l) - __value(int8_t, r);
+            return (int)(__value(int8_t, l) - __value(int8_t, r));
         case CPE_DR_TYPE_UINT8:
         case CPE_DR_TYPE_UCHAR:
-            return __value(int8_t, l) < 0 ? -1 : __value(uint8_t, l) - __value(uint8_t, r);
+            return (int)(__value(int8_t, l) < 0 ? -1 : __value(uint8_t, l) - __value(uint8_t, r));
         case CPE_DR_TYPE_INT16:
-            return __value_cast(int16_t, int8_t, l) - __value(int16_t, r);
+            return (int)(__value_cast(int16_t, int8_t, l) - __value(int16_t, r));
         case CPE_DR_TYPE_UINT16:
-            return __value(int8_t, l) < 0 ? -1 : __value_cast(uint16_t, int8_t, l) - __value(uint16_t, r);
+            return (int)(__value(int8_t, l) < 0 ? -1 : __value_cast(uint16_t, int8_t, l) - __value(uint16_t, r));
         case CPE_DR_TYPE_INT32:
-            return __value_cast(int32_t, int8_t, l) - __value(int32_t, r);
+            return (int)(__value_cast(int32_t, int8_t, l) - __value(int32_t, r));
         case CPE_DR_TYPE_UINT32:
-            return __value(int8_t, l) < 0 ? -1 : __value_cast(uint32_t, int8_t, l) - __value(uint32_t, r);
+            return (int)(__value(int8_t, l) < 0 ? -1 : __value_cast(uint32_t, int8_t, l) - __value(uint32_t, r));
         case CPE_DR_TYPE_INT64:
-            return __value_cast(int64_t, int8_t, l) - __value(int64_t, r);
+            return (int)(__value_cast(int64_t, int8_t, l) - __value(int64_t, r));
         case CPE_DR_TYPE_UINT64:
-            return __value(int8_t, l) < 0 ? -1 : __value_cast(uint64_t, int8_t, l) - __value(uint64_t, r);
+            return (int)(__value(int8_t, l) < 0 ? -1 : __value_cast(uint64_t, int8_t, l) - __value(uint64_t, r));
         case CPE_DR_TYPE_FLOAT:
-            return __value_cast(float, int8_t, l) - __value(float, r);
+            return (int)(__value_cast(float, int8_t, l) - __value(float, r));
         case CPE_DR_TYPE_DOUBLE:
-            return __value_cast(double, int8_t, l) - __value(double, r);
+            return (int)(__value_cast(double, int8_t, l) - __value(double, r));
         case CPE_DR_TYPE_STRING:
             if (l_type == CPE_DR_TYPE_CHAR) {
                 if (__value(int8_t, l) == __value(int8_t, r)) {
@@ -52,13 +52,13 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
                     else return -1;
                 }
                 else {
-                    return __value(int8_t, l) - __value(int8_t, r);
+                    return (int)(__value(int8_t, l) - __value(int8_t, r));
                 }
             }
             else {
                 int64_t buf;
                 if (dr_ctype_try_read_int64(&buf, r, r_type, 0) == 0) {
-                    return __value_cast(int64_t, int8_t, l) - buf;
+                    return (int)(__value_cast(int64_t, int8_t, l) - buf);
                 }
                 else {
                     return l_type - r_type;
@@ -74,26 +74,26 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         switch(r_type) {
         case CPE_DR_TYPE_CHAR:
         case CPE_DR_TYPE_INT8:
-            return __value(int8_t, r) < 0 ? 1 : __value(uint8_t, l) - __value(uint8_t, r);
+            return (int)(__value(int8_t, r) < 0 ? 1 : __value(uint8_t, l) - __value(uint8_t, r));
         case CPE_DR_TYPE_UINT8:
         case CPE_DR_TYPE_UCHAR:
-            return __value(uint8_t, l) - __value(uint8_t, r);
+            return (int)(__value(uint8_t, l) - __value(uint8_t, r));
         case CPE_DR_TYPE_INT16:
-            return __value(int16_t, r) < 0 ? 1 : __value_cast(int16_t, uint8_t, l) - __value(int16_t, r);
+            return (int)(__value(int16_t, r) < 0 ? 1 : __value_cast(int16_t, uint8_t, l) - __value(int16_t, r));
         case CPE_DR_TYPE_UINT16:
-            return __value_cast(uint16_t, uint8_t, l) - __value(uint16_t, r);
+            return (int)(__value_cast(uint16_t, uint8_t, l) - __value(uint16_t, r));
         case CPE_DR_TYPE_INT32:
-            return __value(int32_t, r) < 0 ? 1 : __value_cast(int32_t, uint8_t, l) - __value(int32_t, r);
+            return (int)(__value(int32_t, r) < 0 ? 1 : __value_cast(int32_t, uint8_t, l) - __value(int32_t, r));
         case CPE_DR_TYPE_UINT32:
-            return __value_cast(uint32_t, uint8_t, l) - __value(uint32_t, r);
+            return (int)(__value_cast(uint32_t, uint8_t, l) - __value(uint32_t, r));
         case CPE_DR_TYPE_INT64:
-            return __value(int64_t, r) < 0 ? 1 : __value_cast(int64_t, uint8_t, l) - __value(int64_t, r);
+            return (int)(__value(int64_t, r) < 0 ? 1 : __value_cast(int64_t, uint8_t, l) - __value(int64_t, r));
         case CPE_DR_TYPE_UINT64:
-            return __value_cast(uint64_t, uint8_t, l) - __value(uint64_t, r);
+            return (int)(__value_cast(uint64_t, uint8_t, l) - __value(uint64_t, r));
         case CPE_DR_TYPE_FLOAT:
-            return __value_cast(float, uint8_t, l) - __value(float, r);
+            return (int)(__value_cast(float, uint8_t, l) - __value(float, r));
         case CPE_DR_TYPE_DOUBLE:
-            return __value_cast(double, uint8_t, l) - __value(double, r);
+            return (int)(__value_cast(double, uint8_t, l) - __value(double, r));
         case CPE_DR_TYPE_STRING:
             if (l_type == CPE_DR_TYPE_UCHAR) {
                 if (__value(uint8_t, l) == __value(uint8_t, r)) {
@@ -103,13 +103,13 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
                     else return -1;
                 }
                 else {
-                    return __value(uint8_t, l) - __value(uint8_t, r);
+                    return (int)(__value(uint8_t, l) - __value(uint8_t, r));
                 }
             }
             else {
                 uint64_t buf;
                 if (dr_ctype_try_read_uint64(&buf, r, r_type, 0) == 0) {
-                    return __value_cast(uint64_t, uint8_t, l) - buf;
+                    return (int)(__value_cast(uint64_t, uint8_t, l) - buf);
                 }
                 else {
                     return l_type - r_type;
@@ -124,30 +124,30 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         switch(r_type) {
         case CPE_DR_TYPE_CHAR:
         case CPE_DR_TYPE_INT8:
-            return __value(int16_t, l) - __value_cast(int16_t, int8_t, r);
+            return (int)(__value(int16_t, l) - __value_cast(int16_t, int8_t, r));
         case CPE_DR_TYPE_UINT8:
         case CPE_DR_TYPE_UCHAR:
-            return __value(int16_t, l) < 0 ? -1 : __value(uint16_t, l) - __value_cast(uint16_t, uint8_t, r);
+            return (int)(__value(int16_t, l) < 0 ? -1 : __value(uint16_t, l) - __value_cast(uint16_t, uint8_t, r));
         case CPE_DR_TYPE_INT16:
-            return __value(int16_t, l) - __value(int16_t, r);
+            return (int)(__value(int16_t, l) - __value(int16_t, r));
         case CPE_DR_TYPE_UINT16:
-            return __value(int16_t, l) < 0 ? -1 : __value(uint16_t, l) - __value(uint16_t, r);
+            return (int)(__value(int16_t, l) < 0 ? -1 : __value(uint16_t, l) - __value(uint16_t, r));
         case CPE_DR_TYPE_INT32:
-            return __value_cast(int32_t, int16_t, l) - __value(int32_t, r);
+            return (int)(__value_cast(int32_t, int16_t, l) - __value(int32_t, r));
         case CPE_DR_TYPE_UINT32:
-            return __value(int16_t, l) < 0 ? -1 : __value_cast(uint32_t, int16_t, l) - __value(uint32_t, r);
+            return (int)(__value(int16_t, l) < 0 ? -1 : __value_cast(uint32_t, int16_t, l) - __value(uint32_t, r));
         case CPE_DR_TYPE_INT64:
-            return __value_cast(int64_t, int16_t, l) - __value(int64_t, r);
+            return (int)(__value_cast(int64_t, int16_t, l) - __value(int64_t, r));
         case CPE_DR_TYPE_UINT64:
-            return __value(int16_t, l) < 0 ? -1 : __value_cast(uint64_t, int16_t, l) - __value(uint64_t, r);
+            return (int)(__value(int16_t, l) < 0 ? -1 : __value_cast(uint64_t, int16_t, l) - __value(uint64_t, r));
         case CPE_DR_TYPE_FLOAT:
-            return __value_cast(float, int16_t, l) - __value(float, r);
+            return (int)(__value_cast(float, int16_t, l) - __value(float, r));
         case CPE_DR_TYPE_DOUBLE:
-            return __value_cast(double, int16_t, l) - __value(double, r);
+            return (int)(__value_cast(double, int16_t, l) - __value(double, r));
         case CPE_DR_TYPE_STRING: {
             int64_t buf;
             if (dr_ctype_try_read_int64(&buf, r, r_type, 0) == 0) {
-                return __value_cast(int64_t, int16_t, l) - buf;
+                return (int)(__value_cast(int64_t, int16_t, l) - buf);
             }
             else {
                 return l_type - r_type;
@@ -162,30 +162,30 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         switch(r_type) {
         case CPE_DR_TYPE_CHAR:
         case CPE_DR_TYPE_INT8:
-            return __value(int8_t, r) < 0 ? 1 : __value(uint16_t, l) - __value_cast(uint16_t, uint8_t, r);
+            return (int)(__value(int8_t, r) < 0 ? 1 : __value(uint16_t, l) - __value_cast(uint16_t, uint8_t, r));
         case CPE_DR_TYPE_UINT8:
         case CPE_DR_TYPE_UCHAR:
-            return __value(uint16_t, l) - __value_cast(uint16_t, uint8_t, r);
+            return (int)(__value(uint16_t, l) - __value_cast(uint16_t, uint8_t, r));
         case CPE_DR_TYPE_INT16:
-            return __value(int16_t, r) < 0 ? 1 : __value(uint16_t, l) - __value(uint16_t, r);
+            return (int)(__value(int16_t, r) < 0 ? 1 : __value(uint16_t, l) - __value(uint16_t, r));
         case CPE_DR_TYPE_UINT16:
-            return __value(uint16_t, l) - __value(uint16_t, r);
+            return (int)(__value(uint16_t, l) - __value(uint16_t, r));
         case CPE_DR_TYPE_INT32:
-            return __value(int32_t, r) < 0 ? 1 : __value_cast(int32_t, uint16_t, l) - __value(int32_t, r);
+            return (int)(__value(int32_t, r) < 0 ? 1 : __value_cast(int32_t, uint16_t, l) - __value(int32_t, r));
         case CPE_DR_TYPE_UINT32:
-            return __value_cast(uint32_t, uint16_t, l) - __value(uint32_t, r);
+            return (int)(__value_cast(uint32_t, uint16_t, l) - __value(uint32_t, r));
         case CPE_DR_TYPE_INT64:
-            return __value(int64_t, r) < 0 ? 1 : __value_cast(int64_t, uint16_t, l) - __value(int64_t, r);
+            return (int)(__value(int64_t, r) < 0 ? 1 : __value_cast(int64_t, uint16_t, l) - __value(int64_t, r));
         case CPE_DR_TYPE_UINT64:
-            return __value_cast(uint64_t, uint16_t, l) - __value(uint64_t, r);
+            return (int)(__value_cast(uint64_t, uint16_t, l) - __value(uint64_t, r));
         case CPE_DR_TYPE_FLOAT:
-            return __value_cast(float, uint16_t, l) - __value(float, r);
+            return (int)(__value_cast(float, uint16_t, l) - __value(float, r));
         case CPE_DR_TYPE_DOUBLE:
-            return __value_cast(double, uint16_t, l) - __value(double, r);
+            return (int)(__value_cast(double, uint16_t, l) - __value(double, r));
         case CPE_DR_TYPE_STRING: {
             uint64_t buf;
             if (dr_ctype_try_read_uint64(&buf, r, r_type, 0) == 0) {
-                return __value_cast(uint64_t, uint16_t, l) - buf;
+                return (int)(__value_cast(uint64_t, uint16_t, l) - buf);
             }
             else {
                 return l_type - r_type;
@@ -200,26 +200,26 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         switch(r_type) {
         case CPE_DR_TYPE_CHAR:
         case CPE_DR_TYPE_INT8:
-            return __value(int32_t, l) - __value_cast(int32_t, int8_t, r);
+            return (int)(__value(int32_t, l) - __value_cast(int32_t, int8_t, r));
         case CPE_DR_TYPE_UINT8:
         case CPE_DR_TYPE_UCHAR:
-            return __value(int32_t, l) < 0 ? -1 : __value(uint32_t, l) - __value_cast(uint32_t, uint8_t, r);
+            return (int)(__value(int32_t, l) < 0 ? -1 : __value(uint32_t, l) - __value_cast(uint32_t, uint8_t, r));
         case CPE_DR_TYPE_INT16:
-            return __value(int32_t, l) - __value_cast(int32_t, int16_t, r);
+            return (int)(__value(int32_t, l) - __value_cast(int32_t, int16_t, r));
         case CPE_DR_TYPE_UINT16:
-            return __value(int32_t, l) < 0 ? -1 : __value(uint32_t, l) - __value_cast(uint32_t, uint16_t, r);
+            return (int)(__value(int32_t, l) < 0 ? -1 : __value(uint32_t, l) - __value_cast(uint32_t, uint16_t, r));
         case CPE_DR_TYPE_INT32:
-            return __value(int32_t, l) - __value(int32_t, r);
+            return (int)(__value(int32_t, l) - __value(int32_t, r));
         case CPE_DR_TYPE_UINT32:
-            return __value(int32_t, l) < 0 ? -1 : __value(uint32_t, l) - __value(uint32_t, r);
+            return (int)(__value(int32_t, l) < 0 ? -1 : __value(uint32_t, l) - __value(uint32_t, r));
         case CPE_DR_TYPE_INT64:
-            return __value_cast(int64_t, int32_t, l) - __value(int64_t, r);
+            return (int)(__value_cast(int64_t, int32_t, l) - __value(int64_t, r));
         case CPE_DR_TYPE_UINT64:
-            return __value(int32_t, l) < 0 ? -1 : __value_cast(uint64_t, int32_t, l) - __value(uint64_t, r);
+            return (int)(__value(int32_t, l) < 0 ? -1 : __value_cast(uint64_t, int32_t, l) - __value(uint64_t, r));
         case CPE_DR_TYPE_FLOAT:
-            return __value_cast(float, int32_t, l) - __value(float, r);
+            return (int)(__value_cast(float, int32_t, l) - __value(float, r));
         case CPE_DR_TYPE_DOUBLE:
-            return __value_cast(double, int32_t, l) - __value(double, r);
+            return (int)(__value_cast(double, int32_t, l) - __value(double, r));
         case CPE_DR_TYPE_STRING: {
             int64_t buf;
             if (dr_ctype_try_read_int64(&buf, r, r_type, 0) == 0) {
@@ -238,26 +238,26 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         switch(r_type) {
         case CPE_DR_TYPE_CHAR:
         case CPE_DR_TYPE_INT8:
-            return __value(int8_t, r) < 0 ? 1 : __value(uint32_t, l) - __value_cast(uint32_t, uint8_t, r);
+            return (int)(__value(int8_t, r) < 0 ? 1 : __value(uint32_t, l) - __value_cast(uint32_t, uint8_t, r));
         case CPE_DR_TYPE_UINT8:
         case CPE_DR_TYPE_UCHAR:
-            return __value(uint32_t, l) - __value_cast(uint32_t, uint8_t, r);
+            return (int)(__value(uint32_t, l) - __value_cast(uint32_t, uint8_t, r));
         case CPE_DR_TYPE_INT16:
-            return __value(int16_t, r) < 0 ? 1 : __value(uint32_t, l) - __value_cast(uint32_t, uint16_t, r);
+            return (int)(__value(int16_t, r) < 0 ? 1 : __value(uint32_t, l) - __value_cast(uint32_t, uint16_t, r));
         case CPE_DR_TYPE_UINT16:
-            return __value(uint32_t, l) - __value_cast(uint32_t, uint16_t, r);
+            return (int)(__value(uint32_t, l) - __value_cast(uint32_t, uint16_t, r));
         case CPE_DR_TYPE_INT32:
-            return __value(int32_t, r) < 0 ? 1 : __value(uint32_t, l) - __value(uint32_t, r);
+            return (int)(__value(int32_t, r) < 0 ? 1 : __value(uint32_t, l) - __value(uint32_t, r));
         case CPE_DR_TYPE_UINT32:
-            return __value(uint32_t, l) - __value(uint32_t, r);
+            return (int)(__value(uint32_t, l) - __value(uint32_t, r));
         case CPE_DR_TYPE_INT64:
-            return __value(int64_t, r) < 0 ? 1 : __value_cast(int64_t, uint32_t, l) - __value(int64_t, r);
+            return (int)(__value(int64_t, r) < 0 ? 1 : __value_cast(int64_t, uint32_t, l) - __value(int64_t, r));
         case CPE_DR_TYPE_UINT64:
-            return __value_cast(uint64_t, uint32_t, l) - __value(uint64_t, r);
+            return (int)(__value_cast(uint64_t, uint32_t, l) - __value(uint64_t, r));
         case CPE_DR_TYPE_FLOAT:
-            return __value_cast(float, uint32_t, l) - __value(float, r);
+            return (int)(__value_cast(float, uint32_t, l) - __value(float, r));
         case CPE_DR_TYPE_DOUBLE:
-            return __value_cast(double, uint32_t, l) - __value(double, r);
+            return (int)(__value_cast(double, uint32_t, l) - __value(double, r));
         case CPE_DR_TYPE_STRING: {
             uint64_t buf;
             if (dr_ctype_try_read_uint64(&buf, r, r_type, 0) == 0) {
@@ -276,26 +276,26 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         switch(r_type) {
         case CPE_DR_TYPE_CHAR:
         case CPE_DR_TYPE_INT8:
-            return __value(int64_t, l) - __value_cast(int64_t, int8_t, r);
+            return (int)(__value(int64_t, l) - __value_cast(int64_t, int8_t, r));
         case CPE_DR_TYPE_UINT8:
         case CPE_DR_TYPE_UCHAR:
-            return __value(int64_t, l) < 0 ? -1 : __value(uint64_t, l) - __value_cast(uint64_t, uint8_t, r);
+            return (int)(__value(int64_t, l) < 0 ? -1 : __value(uint64_t, l) - __value_cast(uint64_t, uint8_t, r));
         case CPE_DR_TYPE_INT16:
-            return __value(int64_t, l) - __value_cast(int64_t, int16_t, r);
+            return (int)(__value(int64_t, l) - __value_cast(int64_t, int16_t, r));
         case CPE_DR_TYPE_UINT16:
-            return __value(int64_t, l) < 0 ? -1 : __value(uint64_t, l) - __value_cast(uint64_t, uint16_t, r);
+            return (int)(__value(int64_t, l) < 0 ? -1 : __value(uint64_t, l) - __value_cast(uint64_t, uint16_t, r));
         case CPE_DR_TYPE_INT32:
-            return __value(int64_t, l) - __value_cast(int64_t, int32_t, r);
+            return (int)(__value(int64_t, l) - __value_cast(int64_t, int32_t, r));
         case CPE_DR_TYPE_UINT32:
-            return __value(int64_t, l) < 0 ? -1 : __value(uint64_t, l) - __value_cast(uint64_t, uint32_t, r);
+            return (int)(__value(int64_t, l) < 0 ? -1 : __value(uint64_t, l) - __value_cast(uint64_t, uint32_t, r));
         case CPE_DR_TYPE_INT64:
-            return __value(int64_t, l) - __value(int64_t, r);
+            return (int)(__value(int64_t, l) - __value(int64_t, r));
         case CPE_DR_TYPE_UINT64:
-            return __value(int64_t, l) < 0 ? -1 : __value(uint64_t, l) - __value(uint64_t, r);
+            return (int)(__value(int64_t, l) < 0 ? -1 : __value(uint64_t, l) - __value(uint64_t, r));
         case CPE_DR_TYPE_FLOAT:
-            return __value_cast(float, int64_t, l) - __value(float, r);
+            return (int)(__value_cast(float, int64_t, l) - __value(float, r));
         case CPE_DR_TYPE_DOUBLE:
-            return __value_cast(double, int64_t, l) - __value(double, r);
+            return (int)(__value_cast(double, int64_t, l) - __value(double, r));
         case CPE_DR_TYPE_STRING: {
             int64_t buf;
             if (dr_ctype_try_read_int64(&buf, r, r_type, 0) == 0) {
@@ -314,26 +314,26 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         switch(r_type) {
         case CPE_DR_TYPE_CHAR:
         case CPE_DR_TYPE_INT8:
-            return __value(int8_t, r) < 0 ? 1 : __value(uint64_t, l) - __value_cast(uint64_t, uint8_t, r);
+            return (int)(__value(int8_t, r) < 0 ? 1 : __value(uint64_t, l) - __value_cast(uint64_t, uint8_t, r));
         case CPE_DR_TYPE_UINT8:
         case CPE_DR_TYPE_UCHAR:
-            return __value(uint64_t, l) - __value_cast(uint64_t, uint8_t, r);
+            return (int)(__value(uint64_t, l) - __value_cast(uint64_t, uint8_t, r));
         case CPE_DR_TYPE_INT16:
-            return __value(int16_t, r) < 0 ? 1 : __value(uint64_t, l) - __value_cast(uint64_t, uint16_t, r);
+            return (int)(__value(int16_t, r) < 0 ? 1 : __value(uint64_t, l) - __value_cast(uint64_t, uint16_t, r));
         case CPE_DR_TYPE_UINT16:
-            return __value(uint64_t, l) - __value_cast(uint64_t, uint16_t, r);
+            return (int)(__value(uint64_t, l) - __value_cast(uint64_t, uint16_t, r));
         case CPE_DR_TYPE_INT32:
-            return __value(int32_t, r) < 0 ? 1 : __value(uint64_t, l) - __value_cast(uint64_t, uint32_t, r);
+            return (int)(__value(int32_t, r) < 0 ? 1 : __value(uint64_t, l) - __value_cast(uint64_t, uint32_t, r));
         case CPE_DR_TYPE_UINT32:
-            return __value(uint64_t, l) - __value_cast(uint64_t, uint32_t, r);
+            return (int)(__value(uint64_t, l) - __value_cast(uint64_t, uint32_t, r));
         case CPE_DR_TYPE_INT64:
-            return __value(int64_t, r) < 0 ? 1 : __value(int64_t, l) - __value(int64_t, r);
+            return (int)(__value(int64_t, r) < 0 ? 1 : __value(int64_t, l) - __value(int64_t, r));
         case CPE_DR_TYPE_UINT64:
-            return __value(uint64_t, l) - __value(uint64_t, r);
+            return (int)(__value(uint64_t, l) - __value(uint64_t, r));
         case CPE_DR_TYPE_FLOAT:
-            return __value_cast(float, uint64_t, l) - __value(float, r);
+            return (int)(__value_cast(float, uint64_t, l) - __value(float, r));
         case CPE_DR_TYPE_DOUBLE:
-            return __value_cast(double, uint64_t, l) - __value(double, r);
+            return (int)(__value_cast(double, uint64_t, l) - __value(double, r));
         case CPE_DR_TYPE_STRING: {
             uint64_t buf;
             if (dr_ctype_try_read_uint64(&buf, r, r_type, 0) == 0) {
@@ -352,26 +352,26 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         switch(r_type) {
         case CPE_DR_TYPE_CHAR:
         case CPE_DR_TYPE_INT8:
-            return __value(float, l) - __value_cast(float, int8_t, r);
+            return (int)(__value(float, l) - __value_cast(float, int8_t, r));
         case CPE_DR_TYPE_UINT8:
         case CPE_DR_TYPE_UCHAR:
-            return __value(float, l) - __value_cast(float, uint8_t, r);
+            return (int)(__value(float, l) - __value_cast(float, uint8_t, r));
         case CPE_DR_TYPE_INT16:
-            return __value(float, l) - __value_cast(float, int16_t, r);
+            return (int)(__value(float, l) - __value_cast(float, int16_t, r));
         case CPE_DR_TYPE_UINT16:
-            return __value(float, l) - __value_cast(float, uint16_t, r);
+            return (int)(__value(float, l) - __value_cast(float, uint16_t, r));
         case CPE_DR_TYPE_INT32:
-            return __value(float, l) - __value_cast(float, int32_t, r);
+            return (int)(__value(float, l) - __value_cast(float, int32_t, r));
         case CPE_DR_TYPE_UINT32:
-            return __value(float, l) - __value_cast(float, uint32_t, r);
+            return (int)(__value(float, l) - __value_cast(float, uint32_t, r));
         case CPE_DR_TYPE_INT64:
-            return __value(float, l) - __value_cast(float, int64_t, r);
+            return (int)(__value(float, l) - __value_cast(float, int64_t, r));
         case CPE_DR_TYPE_UINT64:
-            return __value(float, l) - __value_cast(float, uint64_t, r);
+            return (int)(__value(float, l) - __value_cast(float, uint64_t, r));
         case CPE_DR_TYPE_FLOAT:
-            return __value(float, l) - __value(float, r);
+            return (int)(__value(float, l) - __value(float, r));
         case CPE_DR_TYPE_DOUBLE:
-            return __value_cast(double, float, l) - __value(double, r);
+            return (int)(__value_cast(double, float, l) - __value(double, r));
         case CPE_DR_TYPE_STRING: {
             float buf;
             if (dr_ctype_try_read_float(&buf, r, r_type, 0) == 0) {
@@ -433,7 +433,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_INT8: {
             int64_t buf;
             if (dr_ctype_try_read_int64(&buf, l, l_type, 0) == 0) {
-                return buf - __value_cast(int64_t, int8_t, r);
+                return (int)(buf - __value_cast(int64_t, int8_t, r));
             }
             else {
                 return l_type - r_type;
@@ -442,7 +442,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_INT16: {
             int64_t buf;
             if (dr_ctype_try_read_int64(&buf, l, l_type, 0) == 0) {
-                return buf - __value_cast(int64_t, int16_t, r);
+                return (int)(buf - __value_cast(int64_t, int16_t, r));
             }
             else {
                 return l_type - r_type;
@@ -451,7 +451,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_INT32: {
             int64_t buf;
             if (dr_ctype_try_read_int64(&buf, l, l_type, 0) == 0) {
-                return buf - __value_cast(int64_t, int32_t, r);
+                return (int)(buf - __value_cast(int64_t, int32_t, r));
             }
             else {
                 return l_type - r_type;
@@ -460,7 +460,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_INT64: {
             int64_t buf;
             if (dr_ctype_try_read_int64(&buf, l, l_type, 0) == 0) {
-                return buf - __value(int64_t, r);
+                return (int)(buf - __value(int64_t, r));
             }
             else {
                 return l_type - r_type;
@@ -469,7 +469,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_UINT8: {
             uint64_t buf;
             if (dr_ctype_try_read_uint64(&buf, l, l_type, 0) == 0) {
-                return buf - __value_cast(uint64_t, uint8_t, r);
+                return (int)(buf - __value_cast(uint64_t, uint8_t, r));
             }
             else {
                 return l_type - r_type;
@@ -478,7 +478,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_UINT16: {
             uint64_t buf;
             if (dr_ctype_try_read_uint64(&buf, l, l_type, 0) == 0) {
-                return buf - __value_cast(uint64_t, uint16_t, r);
+                return (int)(buf - __value_cast(uint64_t, uint16_t, r));
             }
             else {
                 return l_type - r_type;
@@ -487,7 +487,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_UINT32: {
             uint64_t buf;
             if (dr_ctype_try_read_uint64(&buf, l, l_type, 0) == 0) {
-                return buf - __value_cast(uint64_t, uint32_t, r);
+                return (int)(buf - __value_cast(uint64_t, uint32_t, r));
             }
             else {
                 return l_type - r_type;
@@ -496,7 +496,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_UINT64: {
             uint64_t buf;
             if (dr_ctype_try_read_uint64(&buf, l, l_type, 0) == 0) {
-                return buf - __value(uint64_t, r);
+                return (int)(buf - __value(uint64_t, r));
             }
             else {
                 return l_type - r_type;
@@ -505,7 +505,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_FLOAT: {
             double buf;
             if (dr_ctype_try_read_double(&buf, l, l_type, 0) == 0) {
-                return buf - __value_cast(double, float, r);
+                return (int)(buf - __value_cast(double, float, r));
             }
             else {
                 return l_type - r_type;
@@ -514,7 +514,7 @@ int dr_ctype_cmp(const void * l, int l_type, const void * r, int r_type) {
         case CPE_DR_TYPE_DOUBLE: {
             double buf;
             if (dr_ctype_try_read_double(&buf, l, l_type, 0) == 0) {
-                return buf - __value(double, r);
+                return (int)(buf - __value(double, r));
             }
             else {
                 return l_type - r_type;

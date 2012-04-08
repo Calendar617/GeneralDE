@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 
+
 #if defined _MSC_VER
 #if _MSC_VER >= 1400  // VC 8.0 and later deprecate snprintf and _snprintf.
 # define snprintf(__buf, __size, __fmt, ...) _snprintf_s(__buf, __size, __size, __fmt, __VA_ARGS__)
@@ -13,6 +14,9 @@ extern "C" {
 #else
 # define snprintf _snprintf
 #endif
+# define FMT_SIZE_T "%u"
+#else
+# define FMT_SIZE_T "%zd"
 #endif
 
 #ifdef __cplusplus

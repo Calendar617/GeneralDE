@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/pal/pal_strings.h"
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/utils/bitarry.h"
 #include "cpe/utils/range_bitarry.h"
 #include "gd/om/om_error.h"
@@ -124,7 +125,7 @@ int gd_om_class_add_with_id(
     assert(className);
 
     if (align != 1 && align != 2 && align != 4 && align != 8) {
-        CPE_ERROR_EX(em, gd_om_invalid_align, "invalid align %zd!", align);
+        CPE_ERROR_EX(em, gd_om_invalid_align, "invalid align "  FMT_SIZE_T "!", align);
         return -1;
     }
 
@@ -152,7 +153,7 @@ int gd_om_class_add_with_id(
     if (page_size > 0x1FFFFFFF) {
         CPE_ERROR_EX(
             em, gd_om_page_size_too_big,
-            "page size(%zd) is bigger then %d!", page_size, 0x1FFFFFFF);
+            "page size("  FMT_SIZE_T ") is bigger then %d!", page_size, 0x1FFFFFFF);
         return -1;
     }
 
@@ -166,7 +167,7 @@ int gd_om_class_add_with_id(
     if (theClass->m_object_per_page < 10) {
         CPE_ERROR_EX(
             em, gd_om_page_size_too_small,
-            "page size(%zd) is too small, only can contain %zd object(s)!",
+            "page size("  FMT_SIZE_T ") is too small, only can contain "  FMT_SIZE_T " object(s)!",
             page_size, theClass->m_object_per_page);
         return -1;
     }
