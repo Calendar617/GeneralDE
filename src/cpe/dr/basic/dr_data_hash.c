@@ -53,7 +53,7 @@ uint32_t dr_entry_hash(const void * input, LPDRMETAENTRY entry) {
             int32_t use_entry_pos;
             dr_entry_try_read_int32(
                 &union_entry_id,
-                input + entry->m_select_data_start_pos,
+                ((const char *)input) + entry->m_select_data_start_pos,
                 select_entry,
                 NULL);
                                 

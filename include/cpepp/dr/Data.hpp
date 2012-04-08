@@ -35,6 +35,8 @@ public:
     double asDouble(void) const { return *this; }
     Cpe::Utils::CString const & asString(void) const { return Cpe::Utils::CString::_cast((const char *)(*this)); }
 
+    ConstData operator[] (size_t pos) const;
+
     const void * data(void) const { return m_data; }
     size_t capacity(void) const { return m_capacity; }
     Entry const & entry(void) const { return *(Entry const *)m_entry; }
@@ -60,6 +62,9 @@ public:
     DataElement & operator=(uint64_t d);
     DataElement & operator=(const char * d);
     DataElement & operator=(ConstDataElement const & o);
+
+    using ConstDataElement::operator[];
+    Data operator[](size_t pos);
 
     void copy(const void * data, size_t capacity);
     void copy(ConstData const & data);
@@ -97,9 +102,10 @@ public:
 
     using ConstData::operator[];
     DataElement operator[](const char * name);
+
     void setMeta(LPDRMETA meta);
     void setCapacity(size_t capacity);
-    void copySameEntriesFrom(ConstData const & o);
+    void copySameEntriesFrom(ConstData const & o, error_monitor_t em = 0);
 
     void copy(const void * data, size_t capacity);
     void copy(ConstData const & data);

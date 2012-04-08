@@ -165,6 +165,24 @@ ConstDataElement::operator const char *(void) const {
     return r;
 }
 
+ConstData ConstDataElement::operator[] (size_t pos) const {
+    size_t element_size = dr_entry_element_size(m_entry);
+    if ((pos + 1) * element_size > m_capacity) {
+        ::std::ostringstream os;
+        os << "read array " << pos << " from " << dr_entry_name(m_entry) << ": pos overflow!";
+        throw ::std::runtime_error(os.str());
+    }
+
+    LPDRMETA element_meta = dr_entry_ref_meta(m_entry);
+    if (element_meta == NULL) {
+        ::std::ostringstream os;
+        os << "read array " << pos << " from " << dr_entry_name(m_entry) << ": no ref type!";
+        throw ::std::runtime_error(os.str());
+    }
+
+    return ConstData(((const char *)data()) + element_size * pos, element_meta, element_size);
+}
+
 //class DataElement
 DataElement::DataElement(void * data, LPDRMETAENTRY entry, size_t capacity) 
     : ConstDataElement(data, entry, capacity)
@@ -313,6 +331,25 @@ void DataElement::copy(const void * data, size_t capacity) {
     memcpy((void*)m_data, data, capacity);
 }
 
+Data DataElement::operator[] (size_t pos) {
+    size_t element_size = dr_entry_element_size(m_entry);
+    if ((pos + 1) * element_size > m_capacity) {
+        ::std::ostringstream os;
+        os << "read array " << pos << " from " << dr_entry_name(m_entry) << ": pos overflow!";
+        throw ::std::runtime_error(os.str());
+    }
+
+    LPDRMETA element_meta = dr_entry_ref_meta(m_entry);
+    if (element_meta == NULL) {
+        ::std::ostringstream os;
+        os << "read array " << pos << " from " << dr_entry_name(m_entry) << ": no ref type!";
+        throw ::std::runtime_error(os.str());
+    }
+
+    return Data(((char *)data()) + element_size * pos, element_meta, element_size);
+}
+
+
 //class ConstData
 ConstData::ConstData(const void * data, LPDRMETA meta, size_t capacity)
     : m_data(data)
@@ -380,10 +417,10 @@ void Data::setCapacity(size_t capacity) {
     m_capacity = capacity;
 }
 
-void Data::copySameEntriesFrom(ConstData const & o) {
+void Data::copySameEntriesFrom(ConstData const & o, error_monitor_t em) {
     if (m_meta == NULL) throw ::std::runtime_error("Data::copySameEntriesFrom: meta not exist!");
 
-    meta().copy_same_entries(data(), capacity(), o.data(), o.meta(), o.capacity());
+    meta().copy_same_entries(data(), capacity(), o.data(), o.meta(), o.capacity(), 0, em);
 }
 
 DataElement Data::operator[](const char * name) {

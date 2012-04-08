@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_strings.h"
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/dr/dr_cfg.h"
 #include "cpe/dr/dr_error.h"
@@ -137,7 +138,7 @@ int dr_cfg_read_entry(
             if (max_count * element_size > entry_capacity) {
                 CPE_ERROR(
                     em,
-                    "process %s.%s, array element overflow, require %zd, capacity is %zd!",
+                    "process %s.%s, array element overflow, require " FMT_SIZE_T ", capacity is " FMT_SIZE_T "!",
                     dr_meta_name(meta), dr_entry_name(entry),
                     max_count * element_size, entry_capacity);
                 max_count = entry_capacity / element_size;
