@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/dr/dr_metalib_init.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dp/dp_request.h"
@@ -152,7 +153,7 @@ static int bpg_rsp_commit_build_pkg_append_info_from_ctx(
 
     if (rsp->m_mgr->m_debug) {
         CPE_INFO(
-            em, "%s.%s: copy_ctx_to_pdu: %s: append data to pkg from context success, write-size=%zd!",
+            em, "%s.%s: copy_ctx_to_pdu: %s: append data to pkg from context success, write-size="  FMT_SIZE_T "!",
             bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), dr_meta_name(data_meta), size);
     }
 

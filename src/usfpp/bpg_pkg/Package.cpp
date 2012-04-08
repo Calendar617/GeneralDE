@@ -51,7 +51,7 @@ Package::mainDataMeta(void) const {
 
 void Package::setCmdAndData(Cpe::Dr::ConstData const & data, size_t * write_size) {
     setCmd(cmdMeta().entry(data.meta().name()).id());
-    setMainData(data.data(), data.meta().size(), write_size);
+    setMainData(data.data(), data.capacity(), write_size);
 }
 
 void Package::setCmdAndData(Cpe::Dr::ConstData const & data, size_t size, size_t * write_size) {
@@ -85,6 +85,7 @@ void Package::mainData(Cpe::Dr::Data & data) {
     size_t real_capacity;
     mainData(data.data(), data.capacity(), &real_capacity);
     data.setCapacity(real_capacity);
+    data.setMeta(mainDataMeta());
 }
 
 void Package::addAppendData(const char * metaName, void const * data, size_t size, size_t * write_size) {

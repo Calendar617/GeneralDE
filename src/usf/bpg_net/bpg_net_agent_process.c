@@ -207,8 +207,8 @@ void bpg_net_agent_accept(net_listener_t listener, net_ep_t ep, void * ctx) {
 
     assert(agent);
 
-    buf_r = mem_alloc(agent->m_alloc, 2048);
-    buf_w = mem_alloc(agent->m_alloc, 2048);
+    buf_r = mem_alloc(agent->m_alloc, agent->m_read_chanel_size);
+    buf_w = mem_alloc(agent->m_alloc, agent->m_write_chanel_size);
     if (buf_r == NULL || buf_w == NULL) goto ERROR;
 
     chanel_r = net_chanel_queue_create(net_ep_mgr(ep), buf_r, agent->m_read_chanel_size);

@@ -1,3 +1,4 @@
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/net/net_endpoint.h"
@@ -79,8 +80,8 @@ int bpg_net_agent_reply(dp_req_t req, void * ctx, error_monitor_t em) {
 
     if (net_ep_send(ep, mem_buffer_make_continuous(&agent->m_rsp_buf, 0), write_size) != 0) {
         CPE_ERROR(
-            agent->m_em, "%s: bpg_net_agent_reply: send data fail, write_size=%zd!",
-            bpg_net_agent_name(agent), write_size);
+            agent->m_em, "%s: bpg_net_agent_reply: send data fail, write_size=%d!",
+            bpg_net_agent_name(agent), (int)write_size);
         net_ep_close(ep);
 
         if (agent->m_debug) {
@@ -93,7 +94,7 @@ int bpg_net_agent_reply(dp_req_t req, void * ctx, error_monitor_t em) {
     if (agent->m_debug) {
         CPE_ERROR(
             agent->m_em,
-            "%s: bpg_net_agent_reply: send one response, write-size=%zd!\n\n",
+            "%s: bpg_net_agent_reply: send one response, write-size=" FMT_SIZE_T " !\n\n",
             bpg_net_agent_name(agent), write_size);
     }
 

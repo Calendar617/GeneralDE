@@ -1,3 +1,4 @@
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/net/net_endpoint.h"
@@ -61,7 +62,7 @@ int bpg_net_client_send(dp_req_t req, void * ctx, error_monitor_t em) {
 
     if (net_ep_send(ep, mem_buffer_make_continuous(&client->m_send_encode_buf, 0), write_size) != 0) {
         CPE_ERROR(
-            client->m_em, "%s: bpg_net_client_send: send data fail, write_size=%zd!",
+            client->m_em, "%s: bpg_net_client_send: send data fail, write_size=" FMT_SIZE_T "!",
             bpg_net_client_name(client), write_size);
         net_ep_close(ep);
         return 0;
@@ -70,7 +71,7 @@ int bpg_net_client_send(dp_req_t req, void * ctx, error_monitor_t em) {
     if (client->m_debug) {
         CPE_ERROR(
             client->m_em,
-            "%s: bpg_net_client_send: send one request, write-size=%zd!",
+            "%s: bpg_net_client_send: send one request, write-size=" FMT_SIZE_T "!",
             bpg_net_client_name(client), write_size);
     }
 

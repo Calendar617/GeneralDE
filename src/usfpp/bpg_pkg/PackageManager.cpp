@@ -39,7 +39,7 @@ bpg_pkg_t PackageManager::createPackage(size_t capacity, LPDRMETA carry_data_met
         APP_CTX_THROW_EXCEPTION(
             app(),
             ::std::runtime_error,
-            "bpg_pkg_manage %s: crate pkg fail, data-capacity=%zd, caary-capacity=%zd!",
+            "bpg_pkg_manage %s: crate pkg fail, data-capacity="  FMT_SIZE_T ", caary-capacity="  FMT_SIZE_T "!",
             name().c_str(),
             capacity, carry_data_capacity);
     }
