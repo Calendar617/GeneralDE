@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/pal/pal_strings.h"
 #include "gd/evt/evt_manage.h"
 #include "evt_internal_ops.h"
@@ -46,7 +47,7 @@ int gd_evt_processor_alloc(gd_evt_mgr_t mgr, evt_processor_id_t * id) {
         mgr->m_processor_page_capacity = newProcessorPageCapacity;
 
         if (mgr->m_debug) {
-            CPE_INFO(mgr->m_em, "%s: gd_evt_processor_alloc: resize processor buf to %zd", gd_evt_mgr_name(mgr), newProcessorPageCapacity);
+            CPE_INFO(mgr->m_em, "%s: gd_evt_processor_alloc: resize processor buf to "  FMT_SIZE_T, gd_evt_mgr_name(mgr), newProcessorPageCapacity);
         }
     }
 
@@ -72,7 +73,7 @@ int gd_evt_processor_alloc(gd_evt_mgr_t mgr, evt_processor_id_t * id) {
     if (mgr->m_debug) {
         CPE_INFO(
             mgr->m_em,
-            "alloc a new processor page[%d,%d), page count is %zd",
+            "alloc a new processor page[%d,%d), page count is "  FMT_SIZE_T,
             (evt_processor_id_t)newStart, (evt_processor_id_t)(newStart + mgr->m_processor_page_count),
             mgr->m_processor_page_count);
     }

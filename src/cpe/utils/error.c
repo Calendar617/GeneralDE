@@ -80,7 +80,7 @@ void cpe_error_log_to_file(struct error_info * info, void * context, const char 
 
 void cpe_error_log_to_consol(struct error_info * info, void * context, const char * fmt, va_list args) {
 #if defined(_MSC_VER)
-	char buf[1024];
+	char buf[10240];
     size_t s;
     s = 0;
 

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "cpe/pal/pal_strings.h"
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/tl/tl_action.h"
 #include "gd/timer/timer_manage.h"
 #include "timer_internal_ops.h"
@@ -47,7 +48,7 @@ int gd_timer_processor_alloc(gd_timer_mgr_t mgr, gd_timer_id_t * id) {
         mgr->m_timer_page_capacity = newProcessorPageCapacity;
 
         if (mgr->m_debug) {
-            CPE_INFO(mgr->m_em, "%s: gd_timer_processor_alloc: resize processor buf to %zd", gd_timer_mgr_name(mgr), newProcessorPageCapacity);
+            CPE_INFO(mgr->m_em, "%s: gd_timer_processor_alloc: resize processor buf to "  FMT_SIZE_T, gd_timer_mgr_name(mgr), newProcessorPageCapacity);
         }
     }
 
@@ -73,7 +74,7 @@ int gd_timer_processor_alloc(gd_timer_mgr_t mgr, gd_timer_id_t * id) {
     if (mgr->m_debug) {
         CPE_INFO(
             mgr->m_em,
-            "alloc a new processor page[%d,%d), page count is %zd",
+            "alloc a new processor page[%d,%d), page count is "  FMT_SIZE_T,
             (gd_timer_id_t)newStart, (gd_timer_id_t)(newStart + mgr->m_timer_page_count),
             mgr->m_timer_page_count);
     }
