@@ -22,7 +22,7 @@ extern "C" {
 #define cpe_getsockname(_fd, _name, _namelen) (getsockname (_get_osfhandle(_fd), _name, _namelen))
 #define cpe_bind(_fd, _addr, _namelen) (bind(_get_osfhandle(_fd), _addr,_namelen))
 #define cpe_listen(_fd, _backlog) (listen(_get_osfhandle(_fd), _backlog))
-#define cpe_accept(_fd, _addr, _addrlen) (accept(_get_osfhandle(_fd), _addr,_addrlen))
+#define cpe_accept(_fd, _addr, _addrlen) (_open_osfhandle(accept(_get_osfhandle(_fd), _addr,_addrlen), 0))
 #define cpe_recv(_fd, _buf, _len, _flags) (recv(_get_osfhandle(_fd), _buf, _len, _flags))
 #define cpe_recvfrom(_fd, _buf, _len,_flags, _from, _fromlen) (recvfrom(_get_osfhandle(_fd), _buf, _len,_flags, _from, _fromlen))
 #define cpe_send(_fd, _buf, _len, _flags) (send(_get_osfhandle(_fd), _buf, _len, _flags))
