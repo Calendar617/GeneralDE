@@ -7,7 +7,7 @@
 
 static
 int net_listener_listen(net_listener_t listener) {
-    listener->m_fd = cpe_socket_open(AF_INET, SOCK_STREAM, 0);
+    listener->m_fd = cpe_socket_open(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (listener->m_fd == -1) {
         CPE_ERROR(listener->m_mgr->m_em, "%s: socket call fail, errno=%d (%s)!", listener->m_name, cpe_sock_errno(), cpe_sock_errstr(cpe_sock_errno()));
         return -1;

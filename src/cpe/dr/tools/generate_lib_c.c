@@ -20,7 +20,7 @@ int cpe_dr_generate_lib_c(write_stream_t stream, const char * arg_name, cpe_dr_g
 
     first_line = 1;
 
-    stream_printf(stream, "char %s[] = {", arg_name);
+    stream_printf(stream, "#include \"cpe/pal/pal_external.h\"\n EXPORT_DIRECTIVE\nchar %s[] = {", arg_name);
 
     while(size > 0) {
         size_t i;
