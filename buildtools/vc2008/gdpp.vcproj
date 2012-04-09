@@ -253,6 +253,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="dr_dm"
+				>
+				<File
+					RelativePath="..\..\include\gdpp\dr_dm\Data.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\dr_dm\DataManager.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\dr_dm\DataManagerGen.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gdpp\dr_dm\System.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -338,6 +358,14 @@
 				>
 				<File
 					RelativePath="..\..\src\gdpp\utils\IdGenerator.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="dr_dm"
+				>
+				<File
+					RelativePath="..\..\src\gdpp\dr_dm\DataManager.cpp"
 					>
 				</File>
 			</Filter>
