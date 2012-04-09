@@ -46,7 +46,7 @@ struct cpe_rand_ctx g_cpe_rand_ctx_dft;
 
 struct cpe_rand_ctx * cpe_rand_ctx_dft(void) {
     if (!g_cpe_rand_ctx_dft_init) {
-        cpe_rand_ctx_init(&g_cpe_rand_ctx_dft, time(0));
+        cpe_rand_ctx_init(&g_cpe_rand_ctx_dft, (int32_t)time(0));
         g_cpe_rand_ctx_dft_init = 1;
     }
 
