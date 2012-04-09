@@ -365,7 +365,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\src\cpe\utils\random.c"
+					RelativePath="..\..\include\cpe\utils\random.h"
 					>
 				</File>
 				<File
@@ -838,6 +838,10 @@
 				</File>
 				<File
 					RelativePath="..\..\src\cpe\utils\memory.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\cpe\utils\random.c"
 					>
 				</File>
 				<File
