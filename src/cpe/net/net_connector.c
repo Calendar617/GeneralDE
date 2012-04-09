@@ -22,13 +22,13 @@ net_connector_create(
     size_t nameLen;
     struct sockaddr_in * inetAddr;
 
-    nameLen = strlen(name);
+    nameLen = CPE_PAL_ALIGN_8(strlen(name) + 1);
 
-    buf = mem_alloc(nmgr->m_alloc, sizeof(struct net_connector) + nameLen + 1);
+    buf = mem_alloc(nmgr->m_alloc, sizeof(struct net_connector) + nameLen);
     if (buf == NULL) return NULL;
 
-    memcpy(buf, name, nameLen + 1);
-    connector = (net_connector_t)(buf + nameLen + 1);
+    memcpy(buf, name, nameLen);
+    connector = (net_connector_t)(buf + nameLen);
 
     connector->m_mgr = nmgr;
     connector->m_name = buf;

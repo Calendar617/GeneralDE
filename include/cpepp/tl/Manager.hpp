@@ -10,6 +10,8 @@ class Manager : public Cpe::Utils::SimulateObject {
 public:
     operator tl_manage_t (void) const { return (tl_manage_t)(this); }
 
+    tl_time_t curTime(void) const { return tl_manage_time(*this); }
+
     int tick(int count = -1) { return tl_manage_tick(*this, count); }
 };
 
