@@ -365,6 +365,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\cpe\utils\random.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\cpe\utils\range.h"
 					>
 				</File>
@@ -584,6 +588,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\..\src\cpe\dr\basic\dr_data_compaire.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\src\cpe\dr\basic\dr_data_convert.c"
 						>
 					</File>
@@ -597,6 +605,10 @@
 					</File>
 					<File
 						RelativePath="..\..\src\cpe\dr\basic\dr_data_from_string.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\src\cpe\dr\basic\dr_data_hash.c"
 						>
 					</File>
 					<File
@@ -858,6 +870,10 @@
 				>
 				<File
 					RelativePath="..\..\src\cpe\net\net_chanel.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\cpe\net\net_chanel_queue.c"
 					>
 				</File>
 				<File

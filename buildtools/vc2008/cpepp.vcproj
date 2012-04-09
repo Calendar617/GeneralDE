@@ -345,6 +345,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\cpepp\utils\Random.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\cpepp\utils\RangeMgr.cpp"
 					>
 				</File>

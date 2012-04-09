@@ -293,6 +293,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="dr_dm"
+				>
+				<File
+					RelativePath="..\..\include\gd\dr_dm\dr_dm_data.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gd\dr_dm\dr_dm_manage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\gd\dr_dm\dr_dm_types.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="src"
@@ -341,7 +357,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\gd\app\app_net_runner.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\gd\app\app_rsp.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\app\app_setup.c"
 					>
 				</File>
 			</Filter>
@@ -458,6 +482,34 @@
 				>
 				<File
 					RelativePath="..\..\src\gd\utils\id_generator.c"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="dr_dm"
+				>
+				<File
+					RelativePath="..\..\src\gd\dr_dm\dr_dm_data.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\dr_dm\dr_dm_index.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\dr_dm\dr_dm_internal_ops.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\dr_dm\dr_dm_internal_types.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\dr_dm\dr_dm_manage.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\dr_dm\dr_dm_manage_module.c"
 					>
 				</File>
 			</Filter>
