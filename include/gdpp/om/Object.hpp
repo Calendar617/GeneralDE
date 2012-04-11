@@ -5,7 +5,7 @@
 
 namespace Gd { namespace Om {
 
-struct Object : public Cpe::Utils::SimulateObject {
+class Object : public Cpe::Utils::SimulateObject {
 };
 
 }}
