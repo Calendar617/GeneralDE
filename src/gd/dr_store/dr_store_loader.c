@@ -197,7 +197,7 @@ static int dr_store_loader_load_from_bin(
     FILE * fp = NULL;
     int rv = 0;
 
-    fp = file_stream_open(arg, "r", gd_app_em(app));
+    fp = file_stream_open(arg, "rb", gd_app_em(app));
     if (fp == NULL) {
         APP_CTX_ERROR(
             app, "%s: read load-from-bin %s: open file error!",
