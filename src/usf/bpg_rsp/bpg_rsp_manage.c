@@ -10,6 +10,7 @@
 #include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/bpg_pkg/bpg_pkg_dsp.h"
 #include "usf/bpg_pkg/bpg_pkg_manage.h"
+#include "usf/bpg_rsp/bpg_rsp.h"
 #include "usf/bpg_rsp/bpg_rsp_manage.h"
 #include "usf/bpg_rsp/bpg_rsp_pkg_builder.h"
 #include "bpg_rsp_internal_ops.h"
