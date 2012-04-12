@@ -34,6 +34,8 @@ dr_dm_data_t dr_dm_data_find_by_index_double(dr_dm_manage_t mgr, const char * id
 dr_dm_data_t dr_dm_data_find_by_index_string(dr_dm_manage_t mgr, const char * idx_name, const char * input);
 dr_dm_data_t dr_dm_data_find_by_index_ctype(dr_dm_manage_t mgr, const char * idx_name, const void * input, int input_type);
 
+void dr_dm_data_it_init(struct dr_dm_data_it * it, dr_dm_manage_t mgr);
+#define dr_dm_data_it_next(__it) ((__it)->next(__it));
 
 #ifdef __cplusplus
 }

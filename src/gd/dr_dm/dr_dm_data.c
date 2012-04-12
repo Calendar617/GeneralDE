@@ -220,3 +220,14 @@ dr_dm_data_find_by_index_ctype(dr_dm_manage_t mgr, const char * idx_name, const 
     return (dr_dm_data_t)cpe_hash_table_find(&index->m_roles, key);
 }
 
+dr_dm_data_t dr_dm_data_do_next(struct dr_dm_data_it * it) {
+    char _check_data_size[sizeof(it->m_data) < sizeof(struct cpe_hash_it) ? -1 : 1];
+    (void)_check_data_size;
+
+    return (dr_dm_data_t)cpe_hash_it_next((struct cpe_hash_it *)(it->m_data));
+}
+
+void dr_dm_data_it_init(struct dr_dm_data_it * it, dr_dm_manage_t mgr) {
+    it->next = dr_dm_data_do_next;
+    cpe_hash_it_init((struct cpe_hash_it *)it->m_data, &mgr->m_id_index->m_roles);
+}
