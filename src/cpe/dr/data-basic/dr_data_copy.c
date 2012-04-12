@@ -155,9 +155,6 @@ void dr_meta_copy_same_entry(
                 size_t des_entry_capacity, des_left_capacity;
                 size_t src_entry_capacity, src_left_capacity;
 
-                printf("%s.%s: pos=%d\n", dr_meta_name(curStack->m_des_meta), dr_entry_name(curStack->m_des_entry), (int)curStack->m_array_pos);
-
-
                 des_entry_data = curStack->m_des_data + curStack->m_des_entry->m_data_start_pos + (des_element_size * curStack->m_array_pos);
                 if ((size_t)(des_entry_data - curStack->m_des_data) > curStack->m_des_capacity) continue;
 
