@@ -7,6 +7,7 @@
 #include "gd/dr_dm/dr_dm_manage.h"
 #include "gd/dr_dm/dr_dm_data.h"
 #include "System.hpp"
+#include "DataIterator.hpp"
 
 namespace Gd { namespace Dr {
 
@@ -20,6 +21,9 @@ public:
     Gd::App::Application const & app(void) const { return Gd::App::Application::_cast(dr_dm_manage_app(*this)); }
 
     Cpe::Dr::Meta const & dataMeta(void) const { return Cpe::Dr::Meta::_cast(dr_dm_manage_meta(*this)); }
+
+    DataIterator datas(void);
+    DataConstIterator datas(void) const;
 
     /*create*/
     Data * createData(const void * data, size_t size, const char ** duplicate_index) {

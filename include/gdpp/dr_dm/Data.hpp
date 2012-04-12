@@ -1,5 +1,5 @@
-#ifndef GDPP_DR_DM_ROLE_H
-#define GDPP_DR_DM_ROLE_H
+#ifndef GDPP_DR_DM_DATA_H
+#define GDPP_DR_DM_DATA_H
 #include "cpepp/utils/ClassCategory.hpp"
 #include "gd/dr_dm/dr_dm_data.h"
 #include "System.hpp"

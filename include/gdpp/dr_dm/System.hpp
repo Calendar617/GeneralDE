@@ -5,6 +5,7 @@
 namespace Gd { namespace Dr {
 
 class Data;
+class DataIterator;
 class DataManager;
 
 }}

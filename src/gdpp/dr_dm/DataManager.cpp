@@ -1,8 +1,21 @@
 #include "gdpp/app/Log.hpp"
 #include "gdpp/dr_dm/Data.hpp"
 #include "gdpp/dr_dm/DataManager.hpp"
+#include "gdpp/dr_dm/DataIterator.hpp"
 
 namespace Gd { namespace Dr {
+
+DataIterator DataManager::datas(void) {
+    DataIterator r;
+    dr_dm_data_it_init(&r.m_it, *this);
+    return r;
+}
+
+DataConstIterator DataManager::datas(void) const {
+    DataConstIterator r;
+    dr_dm_data_it_init(&r.m_it, *this);
+    return r;
+}
 
 Data & DataManager::createData(const void * data, size_t size) {
     const char * duplicate_index;
