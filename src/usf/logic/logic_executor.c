@@ -109,7 +109,9 @@ void logic_executor_free(logic_executor_t executor) {
         logic_executor_t member;
         struct logic_executor_group * group = (struct logic_executor_group *)executor;
 
-        TAILQ_FOREACH(member, &group->m_members, m_next) {
+        while(!TAILQ_EMPTY(&group->m_members)) {
+            member = TAILQ_FIRST(&group->m_members);
+            TAILQ_REMOVE(&group->m_members, member, m_next);
             logic_executor_free(member);
         }
 

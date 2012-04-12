@@ -34,7 +34,7 @@ static int bpg_rsp_read_respons_copy_infos(bpg_rsp_t bpg_rsp, cfg_t cfg) {
             return -1;
         }
 
-        if (bpg_rsp_copy_info_create(bpg_rsp->m_mgr, &bpg_rsp->m_ctx_to_pdu, write_data_name) == NULL) {
+        if (bpg_rsp_copy_info_create(bpg_rsp, write_data_name) == NULL) {
             CPE_ERROR(
                 bpg_rsp->m_mgr->m_em,
                 "%s: create rsp %s: crate response-data %s!",
@@ -140,7 +140,7 @@ bpg_rsp_t bpg_rsp_create(bpg_rsp_manage_t mgr, cfg_t cfg) {
         mgr->m_em);
     if (rsp->m_executor == NULL) {
         CPE_ERROR(mgr->m_em, "%s: create rsp %s: create executor fail!", bpg_rsp_manage_name(mgr), name) ;
-        bpg_rsp_copy_info_clear(rsp->m_mgr, &rsp->m_ctx_to_pdu);
+        bpg_rsp_copy_info_clear(rsp);
         nm_node_free(rsp_node);
         return NULL;
     }
@@ -149,10 +149,12 @@ bpg_rsp_t bpg_rsp_create(bpg_rsp_manage_t mgr, cfg_t cfg) {
 
     if (bpg_rsp_create_dp_rsp_and_bind(rsp, cfg) != 0) {
         logic_executor_free(rsp->m_executor);
-        bpg_rsp_copy_info_clear(rsp->m_mgr, &rsp->m_ctx_to_pdu);
+        bpg_rsp_copy_info_clear(rsp);
         nm_node_free(rsp_node);
         return NULL;
     }
+
+    TAILQ_INSERT_TAIL(&mgr->m_rsps, rsp, m_next);
 
     nm_node_set_type(rsp_node, &s_nm_node_type_bpg_rsp);
     return rsp;
@@ -202,7 +204,9 @@ static void bpg_rsp_clear(nm_node_t node) {
 
     bpg_rsp = (bpg_rsp_t)nm_node_data(node);
 
-    bpg_rsp_copy_info_clear(bpg_rsp->m_mgr, &bpg_rsp->m_ctx_to_pdu);
+    TAILQ_REMOVE(&bpg_rsp->m_mgr->m_rsps, bpg_rsp, m_next);
+
+    bpg_rsp_copy_info_clear(bpg_rsp);
 
     if (bpg_rsp->m_executor) {
         logic_executor_free(bpg_rsp->m_executor);

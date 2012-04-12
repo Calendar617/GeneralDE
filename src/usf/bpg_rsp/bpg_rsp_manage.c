@@ -70,6 +70,7 @@ bpg_rsp_manage_create(
     mgr->m_forward_dsp = NULL;
 
     TAILQ_INIT(&mgr->m_pkg_builders);
+    TAILQ_INIT(&mgr->m_rsps);
 
     nm_node_set_type(mgr_node, &s_nm_node_type_bpg_rsp_manage);
 
@@ -79,6 +80,10 @@ bpg_rsp_manage_create(
 static void bpg_rsp_manage_clear(nm_node_t node) {
     bpg_rsp_manage_t mgr;
     mgr = (bpg_rsp_manage_t)nm_node_data(node);
+
+    while(!TAILQ_EMPTY(&mgr->m_rsps)) {
+        bpg_rsp_free(TAILQ_FIRST(&mgr->m_rsps));
+    }
 
     while(!TAILQ_EMPTY(&mgr->m_pkg_builders)) {
         bpg_rsp_pkg_builder_free(TAILQ_FIRST(&mgr->m_pkg_builders));
