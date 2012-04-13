@@ -169,6 +169,8 @@ static void bpg_net_agent_on_close(bpg_net_agent_t agent, net_ep_t ep, net_ep_ev
                 bpg_net_agent_name(agent), (int)net_ep_id(ep), event);
         }
     }
+
+    net_ep_free(ep);
 }
 
 static void bpg_net_agent_process(net_ep_t ep, void * ctx, net_ep_event_t event) {
