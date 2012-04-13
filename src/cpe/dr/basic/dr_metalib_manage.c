@@ -186,7 +186,6 @@ char * dr_meta_off_to_path(LPDRMETA meta, int a_iOff, char * a_pBuf, size_t a_iB
 
 int dr_meta_path_to_off(LPDRMETA meta, const char * path, LPDRMETAENTRY * entry) {
     char * base;
-    LPDRMETALIB pstLib;
     LPDRMETA pstCurMeta;
     const char * nameBegin;
     const char * nameEnd;
@@ -194,7 +193,6 @@ int dr_meta_path_to_off(LPDRMETA meta, const char * path, LPDRMETAENTRY * entry)
     int off;
 
     base = (char *)(meta) - meta->m_self_pos;
-    pstLib = ((LPDRMETALIB)base) - 1;
 
     off = 0;
     pstCurMeta = meta;
@@ -303,7 +301,6 @@ LPDRMETAENTRY dr_meta_entry_at(LPDRMETA meta, int a_idxEntry) {
 
 LPDRMETAENTRY dr_meta_find_entry_by_path(LPDRMETA meta, const char* entryPath) {
     char * base;
-    LPDRMETALIB pstLib;
     LPDRMETA pstCurMeta;
     const char * nameBegin;
     const char * nameEnd;
@@ -312,7 +309,6 @@ LPDRMETAENTRY dr_meta_find_entry_by_path(LPDRMETA meta, const char* entryPath) {
     assert(entryPath);
 
     base = (char *)(meta) - meta->m_self_pos;
-    pstLib = ((LPDRMETALIB)base) - 1;
 
     pstCurMeta = meta;
     for(nameBegin = entryPath, nameEnd = strchr(nameBegin, '.');
