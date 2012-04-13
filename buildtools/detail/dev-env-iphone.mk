@@ -18,6 +18,10 @@ iphone.make-static-lib-name=lib$1.a
 iphone.make-dynamic-lib-name=lib$1.so
 iphone.make-executable-name=$1
 
+iphone.lib.iconv?=iconv
+iphone.lib.math?=m
+iphone.lib.dl?=dl
+
 # }}}
 # {{{ validate
 iphone.check=$(call assert-not-null,PLATFORM_NAME) \

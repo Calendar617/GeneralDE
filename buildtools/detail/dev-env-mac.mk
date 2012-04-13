@@ -26,3 +26,7 @@ mac.default-lib-type:=dynamic
 mac.make-static-lib-name=lib$1.a
 mac.make-dynamic-lib-name=lib$1.so
 mac.make-executable-name=$1
+
+mac.lib.iconv?=iconv
+mac.lib.math?=m
+mac.lib.dl?=dl
