@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include "cpe/pal/pal_stdio.h"
 #include "cpepp/utils/ToRef.hpp"
 
 namespace Cpe { namespace Utils {

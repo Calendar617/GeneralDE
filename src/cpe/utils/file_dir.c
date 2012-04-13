@@ -37,7 +37,6 @@ int dir_rm_recursion(const char * path, error_monitor_t em, mem_allocrator_t tal
     struct dirent dbuf;
     struct dirent * dp;
     int rv = 0;
-    int haveError;
 
     char * subPath = NULL;
     size_t pathSize;
@@ -48,7 +47,6 @@ int dir_rm_recursion(const char * path, error_monitor_t em, mem_allocrator_t tal
     }
 
     pathSize = strlen(path);
-    haveError = 0;
 
     (void)dbuf;
     /*remove sub entities*/
