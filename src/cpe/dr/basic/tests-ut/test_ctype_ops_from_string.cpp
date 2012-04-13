@@ -1,3 +1,4 @@
+#include <limits.h>
 #include "gtest/gtest.h"
 #include "cpe/dr/dr_ctypes_op.h"
 #include "../../dr_ctype_ops.h"
