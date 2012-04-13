@@ -42,6 +42,7 @@ static int app_setup_build_tickers(gd_app_context_t app, cfg_t cfg) {
         }
 
         assert(ticker_name);
+        (void)ticker_args;
 
         if (strcmp(ticker_name, "tl") == 0) {
             const char * tl_name = cfg_get_string(ticker_cfg, "name", "default");
