@@ -183,6 +183,7 @@ int bpg_rsp_copy_pkg_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, bpg_pkg_t
     if (bpg_rsp_copy_main_to_ctx(rsp, op_context, req, em) != 0) return -1;
     if (bpg_rsp_copy_append_to_ctx(rsp, op_context, req, em) != 0) return -1;
 
+    (void)mgr;
     return 0;
 }
 
