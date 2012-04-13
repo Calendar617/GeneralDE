@@ -29,6 +29,14 @@ struct gd_app_ticker {
 };
 typedef TAILQ_HEAD(gd_app_ticker_list, gd_app_ticker) gd_app_ticker_list_t;
 
+struct gd_app_tl {
+    gd_app_context_t m_app;
+    const char * m_name;
+    tl_manage_t m_tl_mgr;
+    TAILQ_ENTRY(gd_app_tl) m_next;
+};
+typedef TAILQ_HEAD(gd_app_tl_list, gd_app_tl) gd_app_tl_list_t;
+
 struct gd_app_context {
     gd_app_status_t m_state;
     int m_argc;
@@ -45,7 +53,7 @@ struct gd_app_context {
 
     char * m_root;
     cfg_t m_cfg;
-    tl_manage_t m_tl_mgr;
+    gd_app_tl_list_t m_tls;
     dp_mgr_t m_dp_mgr;
     nm_mgr_t m_nm_mgr;
     net_mgr_t m_net_mgr;
