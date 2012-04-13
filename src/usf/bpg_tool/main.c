@@ -39,6 +39,8 @@ int recv_rsp(dp_req_t req, void * ctx, error_monitor_t em) {
 
     pkg = bpg_pkg_from_dp_req(req);
 
+    (void)pkg;
+
     return 0;
 }
 
