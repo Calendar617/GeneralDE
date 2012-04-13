@@ -50,10 +50,9 @@ $(product).c.sources := $(addprefix $(product-base)/, \
                    schematron.c \
                  )
 
-$(product).product.c.libraries:=m
-$(product).c.libraries:=dl
+$(product).product.c.env-libraries:=math
+$(product).c.env-libraries:=dl
 $(product).c.env-includes:=3rdTools/libxml2/src
 $(product).c.flags.cpp:= -DHAVE_CONFIG_H -D_REENTRANT -Wno-format -Wno-unused
-$(product).c.flags.ld:=
 
 $(eval $(call product-def,$(product)))
