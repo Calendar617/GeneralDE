@@ -28,8 +28,8 @@ cfg_t gd_app_cfg(gd_app_context_t context) {
 
 tl_manage_t gd_app_tl_mgr(gd_app_context_t context) {
     return TAILQ_EMPTY(&context->m_tls)
-        ? TAILQ_FIRST(&context->m_tls)->m_tl_mgr
-        : NULL;
+        ? NULL
+        : TAILQ_FIRST(&context->m_tls)->m_tl_mgr;
 }
 
 dp_mgr_t gd_app_dp_mgr(gd_app_context_t context) {
