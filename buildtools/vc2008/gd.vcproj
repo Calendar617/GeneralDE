@@ -181,6 +181,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\gd\app\app_tl.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\gd\app\app_types.h"
 					>
 				</File>
@@ -366,6 +370,10 @@
 				</File>
 				<File
 					RelativePath="..\..\src\gd\app\app_setup.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\gd\app\app_tl.c"
 					>
 				</File>
 			</Filter>
