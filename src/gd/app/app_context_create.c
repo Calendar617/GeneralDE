@@ -4,10 +4,11 @@
 #include "cpe/pal/pal_unistd.h"
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/net/net_manage.h"
-#include "gd/app/app_context.h"
 #include "cpe/nm/nm_manage.h"
 #include "cpe/dp/dp_manage.h"
 #include "cpe/tl/tl_manage.h"
+#include "gd/app/app_context.h"
+#include "gd/app/app_tl.h"
 #include "app_internal_ops.h"
 
 static int gd_app_parse_args(gd_app_context_t context, int argc, char * argv[]) {
@@ -50,6 +51,7 @@ gd_app_context_create(
 
     context->m_alloc = alloc;
     context->m_capacity = capacity;
+    TAILQ_INIT(&context->m_tls);
 
     if (gd_app_parse_args(context, argc, argv) != 0) {
         gd_app_context_free(context);
@@ -70,8 +72,8 @@ gd_app_context_create(
         return NULL;
     }
 
-    context->m_tl_mgr = tl_manage_create(alloc);
-    if (context->m_tl_mgr == NULL) {
+    app_tl_manage_create(context, "default", alloc);
+    if (TAILQ_EMPTY(&context->m_tls)) {
         gd_app_context_free(context);
         return NULL;
     }
@@ -121,9 +123,8 @@ void gd_app_context_free(gd_app_context_t context) {
         context->m_dp_mgr = NULL;
     }
 
-    if (context->m_tl_mgr) {
-        tl_manage_free(context->m_tl_mgr);
-        context->m_tl_mgr = NULL;
+    while(!TAILQ_EMPTY(&context->m_tls)) {
+        gd_app_tl_free(TAILQ_FIRST(&context->m_tls));
     }
 
     if (context->m_cfg) {

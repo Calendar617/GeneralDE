@@ -9,6 +9,9 @@ extern "C" {
 /*tick operations*/
 void gd_app_tick_chain_free(gd_app_context_t context);
 
+/*tl operations*/
+void gd_app_tl_free(struct gd_app_tl * app_tl);
+
 /*lib operations*/
 struct gd_app_lib *
 gd_app_lib_open_for_module(
