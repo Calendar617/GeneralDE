@@ -49,6 +49,8 @@ typedef void (*net_process_fun_t)(net_ep_t ep, void * ctx, net_ep_event_t event)
 
 typedef void (*net_connector_state_monitor_fun_t)(net_connector_t connector, void * ctx);
 
+typedef void (*net_run_tick_fun_t)(void * ctx);
+
 #ifdef __cplusplus
 }
 #endif

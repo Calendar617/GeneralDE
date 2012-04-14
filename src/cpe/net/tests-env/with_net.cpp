@@ -40,8 +40,8 @@ void with_net::t_net_tick() {
     net_mgr_tick(m_net);
 }
 
-void with_net::t_net_run(void) {
-    net_mgr_run(m_net);
+void with_net::t_net_run(net_run_tick_fun_t tick_fun, void * tick_ctx, int64_t span) {
+    net_mgr_run(m_net, span, tick_fun, tick_ctx);
 }
 
 }}}
