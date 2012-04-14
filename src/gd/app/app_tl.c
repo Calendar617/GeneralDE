@@ -1,6 +1,7 @@
 #include "cpe/pal/pal_string.h"
 #include "cpe/tl/tl_manage.h"
 #include "gd/app/app_tl.h"
+#include "gd/app/app_context.h"
 #include "app_internal_ops.h"
 
 tl_manage_t
@@ -56,6 +57,8 @@ void app_tl_manage_free(gd_app_context_t app, tl_manage_t tl_mgr) {
 tl_manage_t
 app_tl_manage_find(gd_app_context_t app, const char * name) {
     struct gd_app_tl * app_tl;
+
+    if (name == NULL) return gd_app_tl_mgr(app);
 
     TAILQ_FOREACH(app_tl, &app->m_tls, m_next) {
         if (strcmp(app_tl->m_name, name) == 0) {
