@@ -56,7 +56,7 @@ int gd_app_run(gd_app_context_t context) {
         return -1;
     }
 
-    rv = context->m_main(context);
+    rv = context->m_main(context, context->m_fun_ctx);
 
     gd_app_modules_unload(context);
     gd_app_tick_chain_free(context);
@@ -66,7 +66,7 @@ int gd_app_run(gd_app_context_t context) {
 }
 
 int gd_app_stop(gd_app_context_t context) {
-    if (context->m_stop) return context->m_stop(context);
+    if (context->m_stop) return context->m_stop(context, context->m_fun_ctx);
     CPE_ERROR(context->m_em, "app no stop function!");
     return -1;
 }

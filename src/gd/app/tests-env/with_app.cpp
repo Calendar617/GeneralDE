@@ -2,6 +2,7 @@
 #include "cpe/utils/error.h"
 #include "cpe/cfg/cfg_manage.h"
 #include "cpe/tl/tl_manage.h"
+#include "cpe/net/net_manage.h"
 #include "gd/app/tests-env/with_app.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
 
@@ -145,6 +146,10 @@ nm_mgr_t with_app::t_nm(void) {
     return gd_app_nm_mgr(t_app());
 }
 
+net_mgr_t with_app::t_net(void) {
+    return gd_app_net_mgr(t_app());
+}
+
 void with_app::t_app_set_timer_source_last_event(void) {
     tl_manage_set_opt(
         gd_app_tl_mgr(t_app()),
@@ -159,6 +164,10 @@ void with_app::t_app_set_timer_source_last_event(void) {
 
 int with_app::t_app_tick(int count) {
     return tl_manage_tick(gd_app_tl_mgr(t_app()), count);
+}
+
+void with_app::t_app_net_run(void) {
+    EXPECT_EQ(0, net_mgr_run(t_net(), 1000, (net_run_tick_fun_t)gd_app_tick, t_app()));
 }
 
 }}}

@@ -16,7 +16,7 @@ gd_app_context_t gd_app_context_create(
 
 void gd_app_context_free(gd_app_context_t context);
 
-void gd_app_set_main(gd_app_context_t context, gd_app_fn_t fn_main, gd_app_fn_t fn_stop);
+void gd_app_set_main(gd_app_context_t context, gd_app_fn_t fn_main, gd_app_fn_t fn_stop, void * fn_ctx);
 
 /*arg operations*/
 int gd_app_argc(gd_app_context_t context);
