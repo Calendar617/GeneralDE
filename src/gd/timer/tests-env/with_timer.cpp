@@ -11,6 +11,7 @@ void with_timer::SetUp() {
         gd_timer_mgr_create(
             envOf<gd::app::testenv::with_app>().t_app(),
             NULL,
+            NULL,
             t_allocrator(),
             NULL);
     EXPECT_TRUE(timer_mgr) << "crate default gd_timer_mgr fail!";

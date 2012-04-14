@@ -12,6 +12,7 @@ gd_timer_mgr_t
 gd_timer_mgr_create(
     gd_app_context_t app,
     const char * name,
+    const char * tl_name,
     mem_allocrator_t alloc,
     error_monitor_t em);
 
