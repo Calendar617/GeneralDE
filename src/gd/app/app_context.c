@@ -5,9 +5,10 @@
 #include "gd/app/app_context.h"
 #include "app_internal_types.h"
 
-void gd_app_set_main(gd_app_context_t context, gd_app_fn_t fn_main, gd_app_fn_t fn_stop) {
+void gd_app_set_main(gd_app_context_t context, gd_app_fn_t fn_main, gd_app_fn_t fn_stop, void * fn_ctx) {
     context->m_main = fn_main;
     context->m_stop = fn_stop;
+    context->m_fun_ctx = fn_ctx;
 }
 
 void gd_app_set_em(gd_app_context_t context, error_monitor_t em) {

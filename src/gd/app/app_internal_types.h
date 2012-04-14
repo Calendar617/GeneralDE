@@ -57,8 +57,10 @@ struct gd_app_context {
     dp_mgr_t m_dp_mgr;
     nm_mgr_t m_nm_mgr;
     net_mgr_t m_net_mgr;
+
     gd_app_fn_t m_main;
     gd_app_fn_t m_stop;
+    void * m_fun_ctx;
 
     gd_app_module_list_t m_runing_modules;
 };

@@ -43,12 +43,13 @@ public:
 
     dp_mgr_t t_dp(void);
     nm_mgr_t t_nm(void);
+    net_mgr_t t_net(void);
 
     gd_app_module_t t_app_find_module(const char * moduleName);
 
     void t_app_set_timer_source_last_event(void);
     int t_app_tick(int count = -1);
-
+    void t_app_net_run(void);
 private:
     gd_app_context_t m_app;
 };

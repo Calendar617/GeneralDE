@@ -16,7 +16,8 @@ public:
 
     void t_net_break();
     void t_net_tick();
-    void t_net_run(void);
+    void t_net_run(net_run_tick_fun_t tick_fun = NULL, void * tick_ctx = NULL, int64_t span = 1000);
+
 private:
     net_mgr_t m_net;
 };
