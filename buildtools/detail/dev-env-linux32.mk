@@ -24,6 +24,7 @@ linux32.default-lib-type:=dynamic
 linux32.make-static-lib-name=lib$1.a
 linux32.make-dynamic-lib-name=lib$1.so
 linux32.make-executable-name=$1
+linux32.export-symbols=$(addprefix -u, $1)
 
 ifeq ($(filter EGLIBC,$(shell iconv --version)),)
 linux32.lib.iconv?=iconv
