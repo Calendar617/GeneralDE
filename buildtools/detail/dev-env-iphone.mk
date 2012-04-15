@@ -17,6 +17,7 @@ iphone.default-lib-type:=static
 iphone.make-static-lib-name=lib$1.a
 iphone.make-dynamic-lib-name=lib$1.so
 iphone.make-executable-name=$1
+iphone.export-symbols=$(addprefix -u ,$(foreach m,$1,_$m))
 
 iphone.lib.iconv?=iconv
 iphone.lib.math?=m
