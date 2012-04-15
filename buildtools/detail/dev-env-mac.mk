@@ -26,6 +26,7 @@ mac.default-lib-type:=dynamic
 mac.make-static-lib-name=lib$1.a
 mac.make-dynamic-lib-name=lib$1.so
 mac.make-executable-name=$1
+mac.export-symbols=$(addprefix -u ,$(foreach m,$1,_$m))
 
 mac.lib.iconv?=iconv
 mac.lib.math?=m
