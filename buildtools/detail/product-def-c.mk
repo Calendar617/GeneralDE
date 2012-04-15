@@ -2,7 +2,7 @@ product-support-types+=lib progn
 product-def-c-env-items:= c.flags.cpp c.flags.ld c.sources c.includes \
                           product.c.includes product.c.flags.ld product.c.defs product.c.ldpathes product.c.libraries 
 
-product-def-all-items+= c.libraries c.frameworks c.ldpathes c.linker    \
+product-def-all-items+= c.libraries c.frameworks c.ldpathes c.linker c.export-symbols \
                         c.flags.lan c.flags.lan.c c.flags.lan.cc c.flags.lan.m c.flags.lan.mm c.lib.type c.env-includes c.env-libraries\
                         product.c.frameworks product.c.env-includes product.c.env-libraries\
                         $(product-def-c-env-items) $(foreach e,$(dev-env-list),$(addprefix $e.,$(product-def-c-env-items)))
@@ -41,7 +41,8 @@ c-generate-depend-ld-flags=$(addprefix -L$(CPDE_OUTPUT_ROOT)/,\
                            $(call product-gen-depend-value-list,$1,product.c.flags.ld) \
                            $(call product-gen-depend-value-list,$1,$($2.env).product.c.flags.ld) \
                            $(call product-gen-depend-value-list,$1,$2.product.c.flags.ld) \
-                           $(r.$1.c.flags.ld) $(r.$1.$($2.env).c.flags.ld) $(r.$1.$2.c.flags.ld) 
+                           $(r.$1.c.flags.ld) $(r.$1.$($2.env).c.flags.ld) $(r.$1.$2.c.flags.ld) \
+                           $(call $($2.env).export-symbols,$(r.$1.c.export-symbols))
 
 # $(call c-generate-depend-cpp-flags,product-name,domain)
 c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
