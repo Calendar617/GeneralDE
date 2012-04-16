@@ -18,6 +18,7 @@ linux32.CFLAGS+=-ggdb
 linux32.CXXFLAGS+=-ggdb
 endif
 
+linux32.LDFLAGS:=-z defs
 linux32.LDFLAGS.share:=--shared -z defs
 
 linux32.default-lib-type:=dynamic
