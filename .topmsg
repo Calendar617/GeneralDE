@@ -1,6 +1,6 @@
-From: Lokiwang <wangjian1009@gmail.com>
-Subject: [PATCH] t/3rdTools/iconv
+From: lokiwang <wangjian1009@gmail.com>
+Subject: [PATCH] t/3rdTools/libxml2
 
-trace iconv in dev env
+trace libxml2 in develop env 
 
-Signed-off-by: Lokiwang <wangjian1009@gmail.com>
+Signed-off-by: lokiwang <wangjian1009@gmail.com>
