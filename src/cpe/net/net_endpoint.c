@@ -194,6 +194,9 @@ int net_ep_set_fd(net_ep_t ep, int fd) {
 
     ep->m_fd = fd;
 
+    ep->m_watcher.data = ep;
+    ev_init(&ep->m_watcher, net_ep_cb);
+
     net_ep_update_events(ep, 0);
 
     return 0;
