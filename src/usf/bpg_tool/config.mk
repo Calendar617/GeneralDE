@@ -3,6 +3,7 @@ $(product).type:=progn
 $(product).depends:=argtable2 \
                     cpe_dr_data_json \
                     gd_app \
+                    gd_net \
                     usf_logic \
                     usf_bpg_pkg \
                     usf_bpg_net \
