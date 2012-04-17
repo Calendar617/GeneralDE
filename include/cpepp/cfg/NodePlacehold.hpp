@@ -1,44 +1,18 @@
-#ifndef CPEPP_CFG_NODE_H
-#define CPEPP_CFG_NODE_H
-#include "cpepp/utils/ClassCategory.hpp"
+#ifndef CPEPP_CFG_NODE_PLACEHOLD_H
+#define CPEPP_CFG_NODE_PLACEHOLD_H
+#include "cpe/cfg/cfg_read.h"
 #include "cpepp/utils/CString.hpp"
-#include "cpe/cfg/cfg.h"
 #include "System.hpp"
-#include "NodePlacehold.hpp"
-#include "NodeIterator.hpp"
 
 namespace Cpe { namespace Cfg {
 
-class Node : public Cpe::Utils::SimulateObject {
+class NodePlacehold {
 public:
-    operator cfg_t (void) const { return (cfg_t)this; }
-    bool isValid(void) const { return this != NULL; }
+    operator Node & (void) { return *(Node*)m_node; }
+    Node & must_exist(void);
 
-    Utils::CString const & name(void) const { return Utils::CString::_cast(cfg_name(*this)); }
-    bool isValue(void) const { return cfg_is_value(*this) ? true : false; }
-    int type(void) const { return cfg_type(*this); }
-
-    Node * parent(void) { return (Node *)cfg_parent(*this); }
-    Node const * parent(void) const { return (Node const *)cfg_parent(*this); }
-
-    NodePlacehold operator[](const char * path) { return NodePlacehold(*this, path, cfg_find_cfg(*this, path)); }
-    Node const & operator[](const char * path) const { return *((Node*)cfg_find_cfg(*this, path)); }
-
-    Node & onlyChild(void);
-    Node const & onlyChild(void) const;
-
-    size_t childCount(void) const { return (size_t)cfg_child_count(*this); }
-
-    NodeConstIterator childs(void) const {
-        NodeConstIterator r;
-        cfg_it_init(&r.m_it, *this);
-        return r;
-    }
-
-    NodeIterator childs(void) {
-        NodeIterator r;
-        cfg_it_init(&r.m_it, *this);
-        return r;
+    NodePlacehold operator[](const char * path) { 
+        return NodePlacehold(*this, path, cfg_find_cfg(m_node, path));
     }
 
     operator int8_t(void) const;
@@ -93,9 +67,40 @@ public:
         return Utils::CString::_cast((const char *)(dft(v)));
     }
 
-    static Node const & invalid(void) { return *(Node const *)0; }
+private:
+    NodePlacehold(NodePlacehold & parent, const char * path, cfg_t node)
+        : m_parent_p(&parent)
+        , m_parent_n(NULL)
+        , m_node(node)
+        , m_path(path)
+    {
+    }
 
-    static Node & _cast(cfg_t cfg) { return  *(Node *)cfg; }
+    NodePlacehold(Node & parent, const char * path, cfg_t node)
+        : m_parent_p(NULL)
+        , m_parent_n(&parent)
+        , m_node(node)
+        , m_path(path)
+    {
+    }
+
+    NodePlacehold(NodePlacehold const & o)
+        : m_parent_p(o.m_parent_p)
+        , m_parent_n(o.m_parent_n)
+        , m_node(o.m_node)
+        , m_path(o.m_path)
+    {
+    }
+
+    NodePlacehold & operator=(NodePlacehold const & o);
+
+private:
+    NodePlacehold * m_parent_p;
+    Node * m_parent_n;
+    cfg_t m_node;
+    const char * m_path;
+
+friend class Node;
 };
 
 }}

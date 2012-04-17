@@ -5,6 +5,7 @@
 namespace Cpe { namespace Cfg {
 
 class Node;
+class NodePlacehold;
 class NodeIterator;
 class NodeConstIterator;
 
