@@ -1,1 +1,1 @@
-$(eval $(call gtest-def,cpepp_cfg))
+$(eval $(call gtest-def,cpepp_cfg,cpepp_cfg))
