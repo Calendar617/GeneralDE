@@ -3,16 +3,27 @@
 #include "cpe/cfg/cfg_read.h"
 #include "cpepp/utils/CString.hpp"
 #include "System.hpp"
+#include "NodeIterator.hpp"
 
 namespace Cpe { namespace Cfg {
 
-class NodePlacehold {
+class ConstNodePlacehold {
 public:
-    operator Node & (void) { return *(Node*)m_node; }
-    Node & must_exist(void);
+    operator cfg_t (void) const { return m_node; }
 
-    NodePlacehold operator[](const char * path) { 
-        return NodePlacehold(*this, path, cfg_find_cfg(m_node, path));
+    operator Node & (void) { return *(Node*)m_node; }
+    operator Node const & (void) const { return *(Node*)m_node; }
+
+    Node const & must_exist(void) const;
+
+    ConstNodePlacehold operator[](const char * path) const { 
+        return ConstNodePlacehold(*this, path, cfg_find_cfg(m_node, path));
+    }
+
+    NodeConstIterator childs(void) const {
+        NodeConstIterator r;
+        cfg_it_init(&r.m_it, m_node);
+        return r;
     }
 
     operator int8_t(void) const;
@@ -68,7 +79,7 @@ public:
     }
 
 private:
-    NodePlacehold(NodePlacehold & parent, const char * path, cfg_t node)
+    ConstNodePlacehold(ConstNodePlacehold const & parent, const char * path, cfg_t node)
         : m_parent_p(&parent)
         , m_parent_n(NULL)
         , m_node(node)
@@ -76,7 +87,7 @@ private:
     {
     }
 
-    NodePlacehold(Node & parent, const char * path, cfg_t node)
+    ConstNodePlacehold(Node const & parent, const char * path, cfg_t node)
         : m_parent_p(NULL)
         , m_parent_n(&parent)
         , m_node(node)
@@ -84,7 +95,7 @@ private:
     {
     }
 
-    NodePlacehold(NodePlacehold const & o)
+    ConstNodePlacehold(ConstNodePlacehold const & o)
         : m_parent_p(o.m_parent_p)
         , m_parent_n(o.m_parent_n)
         , m_node(o.m_node)
@@ -92,13 +103,56 @@ private:
     {
     }
 
-    NodePlacehold & operator=(NodePlacehold const & o);
+    ConstNodePlacehold & operator=(ConstNodePlacehold const & o);
 
 private:
-    NodePlacehold * m_parent_p;
-    Node * m_parent_n;
+    ConstNodePlacehold const * m_parent_p;
+    Node const * m_parent_n;
     cfg_t m_node;
     const char * m_path;
+
+friend class Node;
+friend class NodePlacehold;
+};
+
+class NodePlacehold : public ConstNodePlacehold {
+public:
+    using ConstNodePlacehold::operator Node &;
+    using ConstNodePlacehold::must_exist;
+    using ConstNodePlacehold::operator[];
+    using ConstNodePlacehold::childs;
+    using ConstNodePlacehold::operator=;
+
+    operator Node & (void) { return *(Node*)m_node; }
+    Node & must_exist(void);
+
+    NodePlacehold operator[](const char * path) { 
+        return NodePlacehold(*this, path, cfg_find_cfg(m_node, path));
+    }
+
+    NodeIterator childs(void) {
+        NodeIterator r;
+        cfg_it_init(&r.m_it, m_node);
+        return r;
+    }
+
+private:
+    NodePlacehold(NodePlacehold & parent, const char * path, cfg_t node)
+        : ConstNodePlacehold(parent, parent, node)
+    {
+    }
+
+    NodePlacehold(Node const & parent, const char * path, cfg_t node)
+        : ConstNodePlacehold(parent, path, node)
+    {
+    }
+
+    NodePlacehold(NodePlacehold const & o)
+        : ConstNodePlacehold(o)
+    {
+    }
+
+    NodePlacehold & operator=(NodePlacehold const & o);
 
 friend class Node;
 };

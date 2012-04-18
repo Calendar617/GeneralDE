@@ -5,7 +5,7 @@
 namespace Cpe { namespace Cfg {
 
 #define CPE_CFG_NODEPLACEHOLD_GEN_READ_TYPE(__type_t, __type)                         \
-NodePlacehold::operator __type_t(void) const {                          \
+ConstNodePlacehold::operator __type_t(void) const {                          \
     __type_t rv;                                                        \
     if (cfg_try_as_ ## __type (m_node, &rv) != 0) {                      \
         if (m_node == NULL) {                                             \
@@ -18,7 +18,7 @@ NodePlacehold::operator __type_t(void) const {                          \
                                                                         \
     return rv;                                                          \
 }                                                                       \
-__type_t NodePlacehold::dft(__type_t v) const {                         \
+__type_t ConstNodePlacehold::dft(__type_t v) const {                         \
     return cfg_as_ ## __type(m_node, v);                                 \
 }
 
@@ -33,7 +33,7 @@ CPE_CFG_NODEPLACEHOLD_GEN_READ_TYPE(uint64_t, uint64);
 CPE_CFG_NODEPLACEHOLD_GEN_READ_TYPE(float, float);
 CPE_CFG_NODEPLACEHOLD_GEN_READ_TYPE(double, double);
 
-NodePlacehold::operator const char *(void) const {
+ConstNodePlacehold::operator const char *(void) const {
     const char * r = cfg_as_string(m_node, NULL);
     if (r == NULL) {
         if (this == NULL) {
@@ -46,7 +46,7 @@ NodePlacehold::operator const char *(void) const {
     return r;
 }
 
-const char * NodePlacehold::dft(const char * dft) const {
+const char * ConstNodePlacehold::dft(const char * dft) const {
     return cfg_as_string(m_node, dft); 
 }
 
