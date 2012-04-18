@@ -37,7 +37,7 @@ gd_app_module_create_i(
 
     module = gd_app_module_type_find(type_name);
     if (module == NULL) {
-        module = gd_app_module_type_create(type_name, libName, context->m_em);
+        module = gd_app_module_type_create_from_lib(type_name, libName, context->m_em);
         if (module == NULL) return NULL;
     }
 

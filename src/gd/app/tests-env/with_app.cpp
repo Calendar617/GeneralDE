@@ -170,4 +170,24 @@ void with_app::t_app_net_run(void) {
     EXPECT_EQ(0, net_mgr_run(t_net(), 1000, (net_run_tick_fun_t)gd_app_tick, t_app()));
 }
 
+void with_app::t_app_init_module_type(
+    const char * name,
+    gd_app_module_app_init app_init,
+    gd_app_module_app_fini app_fini,
+    gd_app_module_global_init global_init,
+    gd_app_module_global_fini global_fini)
+{
+    utils::testenv::with_em * env_em = tryEnvOf<utils::testenv::with_em>();
+
+    EXPECT_EQ(
+        0,
+        gd_app_module_type_init(
+            name,
+            app_init,
+            app_fini,
+            global_init,
+            global_fini,
+            env_em ? env_em->t_em() : NULL));
+}
+
 }}}

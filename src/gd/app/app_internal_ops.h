@@ -28,7 +28,7 @@ void gd_app_modules_unload(gd_app_context_t context);
 
 /*module type operations*/
 struct gd_app_module_type *
-gd_app_module_type_create(
+gd_app_module_type_create_from_lib(
     const char * type,
     const char * libName,
     error_monitor_t em);
