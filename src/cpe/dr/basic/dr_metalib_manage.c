@@ -424,6 +424,19 @@ int dr_entry_type(LPDRMETAENTRY entry) {
     return entry->m_type;
 }
 
+int dr_entry_align(LPDRMETAENTRY entry) {
+    if (entry->m_type > CPE_DR_TYPE_COMPOSITE) {
+        const struct tagDRCTypeInfo * typeInfo;
+
+        typeInfo = dr_find_ctype_info_by_type(entry->m_type);
+
+        return typeInfo == NULL ? -1 : typeInfo->m_size;
+    }
+    else {
+        return dr_meta_align(dr_entry_ref_meta(entry));
+    }
+}
+
 int dr_entry_array_count(LPDRMETAENTRY entry) {
     return entry->m_array_count;
 }
