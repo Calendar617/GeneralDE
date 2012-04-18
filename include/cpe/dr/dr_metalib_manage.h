@@ -43,6 +43,7 @@ int dr_entry_id(LPDRMETAENTRY entry);
 size_t dr_entry_size(LPDRMETAENTRY entry);
 size_t dr_entry_element_size(LPDRMETAENTRY entry);
 int dr_entry_type(LPDRMETAENTRY entry);
+int dr_entry_align(LPDRMETAENTRY entry);
 int dr_entry_array_count(LPDRMETAENTRY entry);
 LPDRMETAENTRY dr_entry_array_refer_entry(LPDRMETAENTRY entry);
 LPDRMETAENTRY dr_entry_select_entry(LPDRMETAENTRY entry);
