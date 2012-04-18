@@ -30,6 +30,13 @@ public:
         const char * type_name,
         const char * cfg);
 
+    void t_app_init_module_type(
+        const char * name,
+        gd_app_module_app_init app_init,
+        gd_app_module_app_fini app_fini,
+        gd_app_module_global_init global_init = NULL,
+        gd_app_module_global_fini global_fini = NULL);
+
     int t_app_uninstall_module(
         const char * name);
 

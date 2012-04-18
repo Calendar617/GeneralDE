@@ -12,6 +12,14 @@ const char * gd_app_module_type_name(gd_app_module_t module);
 nm_node_t gd_app_module_data(gd_app_context_t context, const char * moduleName);
 gd_app_lib_t gd_app_module_lib(gd_app_module_t module);
 
+int gd_app_module_type_init(
+    const char * type,
+    gd_app_module_app_init app_init,
+    gd_app_module_app_fini app_fini,
+    gd_app_module_global_init global_init,
+    gd_app_module_global_fini global_fini,
+    error_monitor_t em);
+
 gd_app_module_t
 gd_app_install_module(
     gd_app_context_t context,
