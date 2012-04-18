@@ -18,9 +18,16 @@ public:
 
     Application & t_app_ex(void) { return Application::_cast(t_app()); }
 
+    Cpe::Nm::Manager & t_nm_ex(void) { return t_app_ex().nmManager(); }
+
     void t_app_install_random(const char * name = 0);
     void t_app_install_random(Cpe::Utils::Random & random, const char * name = 0);
 
+    template<typename T>
+    T & namedObject(const char * name) {
+        return dynamic_cast<T &>(t_nm_ex().objectNc(name));
+    }
+        
     template<typename T>
     T & installNamedObject(void) {
         return * new (gd_app_nm_mgr(t_app()), cpe_hs_data(T::NAME))
