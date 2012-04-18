@@ -15,6 +15,8 @@ private:
     mutable cfg_it_t m_it;
 
 friend class Node;
+friend class ConstNodePlacehold;
+friend class NodePlacehold;
 friend class NodeIterator;
 };
 
