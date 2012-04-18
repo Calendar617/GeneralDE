@@ -2,6 +2,20 @@ product-support-types+=cpe-dr
 product-def-all-items+=cpe-dr.modules
 
 cpe-dr-tool=$(CPDE_OUTPUT_ROOT)/$(tools.output)/bin/cpe_dr_tool
+
+define product-def-rule-cpe-dr-c-module-validate
+  .POHEY: $1.$3.cpe-dr.$2.validate
+
+  $(call c-source-to-object,$(r.$1.c.sources),$3): $1.$3.cpe-dr.$2.validate
+
+  $1.$3.cpe-dr.$2.validate:
+	$$(call with_message,cpe-dr validate dr lib $2 ...) \
+	LD_LIBRARY_PATH=$(CPDE_OUTPUT_ROOT)/$(tools.output)/lib:$$$$LD_LIBRARY_PATH \
+	$(cpe-dr-tool) $(addprefix --validate ,$($1.cpe-dr.$2.validate)) \
+                   $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) 
+
+endef
+
 define product-def-rule-cpe-dr-c-module-h
   $(call assert-not-null,$1.cpe-dr.$2.h.output)
 
