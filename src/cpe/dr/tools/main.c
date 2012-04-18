@@ -7,6 +7,7 @@
 #include "cpe/dr/dr_metalib_init.h"
 #include "cpe/dr/dr_metalib_builder.h"
 #include "cpe/dr/dr_metalib_build.h"
+#include "cpe/dr/dr_metalib_validate.h"
 #include "generate_ops.h"
 
 struct arg_file * input;
@@ -15,6 +16,7 @@ struct arg_file * o_lib_c;
 struct arg_str * o_lib_c_arg;
 struct arg_file * o_lib_bin;
 struct arg_lit * help;
+struct arg_str * o_validate;
 struct arg_end *end;
 
 dir_visit_next_op_t
@@ -154,6 +156,30 @@ static int do_generate_h(cpe_dr_generate_ctx_t ctx) {
     return rv;
 }
 
+int do_validate(cpe_dr_generate_ctx_t ctx) {
+    int rv;
+    int i;
+
+    rv = 0;
+
+    for(i = 0; i < o_validate->count; ++i) {
+        const char * validate_name;
+
+        validate_name = o_validate->sval[i];
+        if (strcmp(validate_name, "align") == 0) {
+            if (dr_metalib_validate_align(ctx->m_em, ctx->m_metalib) != 0) {
+                rv = -1;
+            }
+        }
+        else {
+            CPE_ERROR(ctx->m_em, "validate %s is unknown!", validate_name);
+            rv = -1;
+        }
+    }
+
+    return rv;
+}
+
 int tools_main(error_monitor_t em) {
     struct cpe_dr_generate_ctx ctx;
     struct mem_buffer buffer;
@@ -182,7 +208,9 @@ int tools_main(error_monitor_t em) {
             em) == 0)
     {
         ctx.m_metalib = (LPDRMETALIB)mem_buffer_make_continuous(&buffer, 0), mem_buffer_size(&buffer);
+
         if (ctx.m_metalib) {
+            if (do_validate(&ctx) != 0) rv = -1;
             if (do_generate_h(&ctx) != 0) rv = -1;
             if (do_generate_lib_bin(&ctx) != 0) rv = -1;
             if (do_generate_lib_c(&ctx) != 0) rv = -1;
@@ -201,6 +229,7 @@ int tools_main(error_monitor_t em) {
 int main(int argc, char * argv[]) {
     void* argtable[] = {
                 input = arg_filen(   "i",   "input",              "<string>", 0, 100,    "input file")
+        ,  o_validate = arg_strn(   "v",  "validate",     "<string>",         0, 10,   "validate operations")
         ,         o_h = arg_file0(   NULL,  "output-h",           "<string>",            "output h file dir")
         ,     o_lib_c = arg_file0(   NULL,  "output-lib-c",       "<string>",            "output c lib file")
         , o_lib_c_arg = arg_str0(   NULL,  "output-lib-c-arg",    "<string>",            "output c lib file")
