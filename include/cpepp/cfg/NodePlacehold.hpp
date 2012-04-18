@@ -137,8 +137,8 @@ public:
     }
 
 private:
-    NodePlacehold(NodePlacehold & parent, const char * path, cfg_t node)
-        : ConstNodePlacehold(parent, parent, node)
+    NodePlacehold(NodePlacehold const & parent, const char * path, cfg_t node)
+        : ConstNodePlacehold(parent, path, node)
     {
     }
 
