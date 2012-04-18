@@ -3,6 +3,22 @@
 #include "cpe/dr/dr_error.h"
 #include "dr_inbuild.h"
 
+static uint32_t dr_inbuild_macro_hash(const struct DRInBuildMacro * data) {
+    return cpe_hash_str(data->m_name, strlen(data->m_name));
+}
+
+static int dr_inbuild_macro_cmp(const struct DRInBuildMacro * l, const struct DRInBuildMacro * r) {
+    return strcmp(l->m_name, r->m_name) == 0;
+}
+
+static uint32_t dr_inbuild_meta_hash(const struct DRInBuildMeta * data) {
+    return cpe_hash_str(data->m_name, strlen(data->m_name));
+}
+
+static int dr_inbuild_meta_cmp(const struct DRInBuildMeta * l, const struct DRInBuildMeta * r) {
+    return strcmp(l->m_name, r->m_name) == 0;
+}
+
 struct DRInBuildMetaLib * dr_inbuild_create_lib(void) {
     struct DRInBuildMetaLib * inBuildMetaLib = (struct DRInBuildMetaLib *)malloc(sizeof(struct DRInBuildMetaLib));
     if (inBuildMetaLib == NULL) {
@@ -12,6 +28,34 @@ struct DRInBuildMetaLib * dr_inbuild_create_lib(void) {
     bzero(inBuildMetaLib, sizeof(*inBuildMetaLib));
 
     mem_buffer_init(&inBuildMetaLib->m_tmp_buf, NULL);
+
+    if (cpe_hash_table_init(
+            &inBuildMetaLib->m_index_macros, 
+            NULL,
+            (cpe_hash_fun_t) dr_inbuild_macro_hash,
+            (cpe_hash_cmp_t) dr_inbuild_macro_cmp,
+            CPE_HASH_OBJ2ENTRY(DRInBuildMacro, m_hh),
+            -1) != 0)
+    {
+        mem_buffer_clear(&inBuildMetaLib->m_tmp_buf);
+        free(inBuildMetaLib);
+        return NULL;
+    }
+
+    if (cpe_hash_table_init(
+            &inBuildMetaLib->m_index_metas, 
+            NULL,
+            (cpe_hash_fun_t) dr_inbuild_meta_hash,
+            (cpe_hash_cmp_t) dr_inbuild_meta_cmp,
+            CPE_HASH_OBJ2ENTRY(DRInBuildMeta, m_hh),
+            -1) != 0)
+    {
+        mem_buffer_clear(&inBuildMetaLib->m_tmp_buf);
+        cpe_hash_table_fini(&inBuildMetaLib->m_index_macros);
+        free(inBuildMetaLib);
+        return NULL;
+    }
+
 
     inBuildMetaLib->m_data.iID = -1;
     
@@ -27,8 +71,6 @@ void dr_inbuild_free_lib(struct DRInBuildMetaLib * inBuildMetaLib) {
         return;
     }
 
-    mem_buffer_clear(&inBuildMetaLib->m_tmp_buf);
-
     /*free macro list*/
     while(! TAILQ_EMPTY(&inBuildMetaLib->m_macros)) {
         dr_inbuild_metalib_remove_macro(inBuildMetaLib, TAILQ_FIRST(&inBuildMetaLib->m_macros));
@@ -38,6 +80,11 @@ void dr_inbuild_free_lib(struct DRInBuildMetaLib * inBuildMetaLib) {
     while(! TAILQ_EMPTY(&inBuildMetaLib->m_metas)) {
         dr_inbuild_metalib_remove_meta(inBuildMetaLib, TAILQ_FIRST(&inBuildMetaLib->m_metas));
     }
+
+
+    mem_buffer_clear(&inBuildMetaLib->m_tmp_buf);
+    cpe_hash_table_fini(&inBuildMetaLib->m_index_macros);
+    cpe_hash_table_fini(&inBuildMetaLib->m_index_metas);
 
     free(inBuildMetaLib);
 }
@@ -56,20 +103,45 @@ struct DRInBuildMacro * dr_inbuild_metalib_add_macro(struct DRInBuildMetaLib * i
     }
 
     bzero(newMacro, sizeof(struct DRInBuildMacro));
+    cpe_hash_entry_init(&newMacro->m_hh);
 
     TAILQ_INSERT_TAIL(&inBuildMetaLib->m_macros, newMacro, m_next);
 
     return newMacro;
 }
 
+int dr_inbuild_metalib_add_macro_to_index(struct DRInBuildMetaLib * inBuildMetaLib, struct DRInBuildMacro * macro) {
+    return cpe_hash_table_insert_unique(&inBuildMetaLib->m_index_macros, macro);
+}
+
 void dr_inbuild_metalib_remove_macro(struct DRInBuildMetaLib * inBuildMetaLib, struct DRInBuildMacro * macro) {
-    if (macro == NULL) {
-        return;
+    if (macro == NULL) return;
+
+    if (cpe_hash_table_find(&inBuildMetaLib->m_index_macros, macro) == macro) {
+        cpe_hash_table_remove_by_ins(&inBuildMetaLib->m_index_macros, macro);
     }
 
     TAILQ_REMOVE(&inBuildMetaLib->m_macros, macro, m_next);
 
     free(macro);
+}
+
+int dr_inbuild_metalib_find_macro_value(
+    int32_t * value, struct DRInBuildMetaLib * inBuildMetaLib,
+    const char * macro_name, size_t macro_name_len)
+{
+    struct DRInBuildMacro key;
+    struct DRInBuildMacro * macro;
+
+    if ((macro_name_len + 1) > sizeof(key.m_name)) return -1;
+    memcpy(key.m_name, macro_name, macro_name_len);
+    key.m_name[macro_name_len] = 0;
+
+    macro = (struct DRInBuildMacro *)cpe_hash_table_find(&inBuildMetaLib->m_index_macros, &key);
+    if (macro == NULL) return -1;
+
+    *value = macro->m_data.m_value;
+    return 0;
 }
 
 struct DRInBuildMeta *

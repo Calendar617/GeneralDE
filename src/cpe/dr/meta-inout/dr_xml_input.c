@@ -27,8 +27,8 @@ enum DRXmlParseState {
     buf[len] = 0;
 
 #define DR_DO_READ_INT(__d, __e)                                        \
-    if (len >= CPE_INTEGER_BUF_LEN) {                                       \
-        DR_NOTIFY_ERROR(ctx->m_em, (__e));                              \
+    if (len >= CPE_INTEGER_BUF_LEN) {                                   \
+        if (__e) { DR_NOTIFY_ERROR(ctx->m_em, (__e)); }                 \
         return;                                                         \
     }                                                                   \
     DR_COPY_STR(buf, (char const *)valueBegin, len);                    \
@@ -36,6 +36,25 @@ enum DRXmlParseState {
         (__d) = strtol(buf, &endptr, 10);                               \
         if ( !endptr || *endptr != 0) {                                 \
             DR_NOTIFY_ERROR(ctx->m_em, (__e));                          \
+        }                                                               \
+    }
+
+#define DR_DO_READ_INT_OR_MACRO(__d, __e)                               \
+    if (len >= CPE_INTEGER_BUF_LEN) {                                   \
+        if (__e) { DR_NOTIFY_ERROR(ctx->m_em, (__e)); }                 \
+        return;                                                         \
+    }                                                                   \
+    DR_COPY_STR(buf, (char const *)valueBegin, len);                    \
+    { int r = sscanf(buf, "%d", __d);                                   \
+        if (r == 0) {                                                   \
+            if (dr_inbuild_metalib_find_macro_value(                    \
+                    __d, ctx->m_metaLib, buf, len) != 0)                \
+            {                                                           \
+                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_UNDEFINED_MACRO_NAME); \
+            }                                                           \
+        }                                                               \
+        else if (r != len) {                                            \
+            if (__e) { DR_NOTIFY_ERROR(ctx->m_em, (__e)); }             \
         }                                                               \
     }
 
@@ -177,6 +196,8 @@ static void dr_build_xml_process_macro(
             }
 
             DR_COPY_STR(newMacro->m_name, (char const *)valueBegin, len);
+
+            dr_inbuild_metalib_add_macro_to_index(ctx->m_metaLib, newMacro);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_DESCIPTION) == 0) {
             if (len > CPE_DR_DESC_LEN) {
@@ -192,11 +213,7 @@ static void dr_build_xml_process_macro(
             }
             haveValue = 1;
 
-            DR_COPY_STR(
-                buf,
-                (char const *)valueBegin,
-                len >= CPE_INTEGER_BUF_LEN ? CPE_INTEGER_BUF_LEN - 1 : len);
-            sscanf(buf, "%d", &newMacro->m_data.m_value);
+            DR_DO_READ_INT_OR_MACRO(&newMacro->m_data.m_value, 0);
         }
         else {
         }
@@ -281,26 +298,13 @@ static void dr_build_xml_process_meta(
                 return;
             }
 
-            DR_COPY_STR(buf, (char const *)valueBegin, len);
-            sscanf(buf, "%d", &newMeta->m_data.m_id);
+            DR_DO_READ_INT_OR_MACRO(&newMeta->m_data.m_id, 0);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
-            if (len >= CPE_INTEGER_BUF_LEN) {
-                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
-                return;
-            }
-
-            DR_COPY_STR(buf, (char const *)valueBegin, len);
-            sscanf(buf, "%d", &version);
+            DR_DO_READ_INT_OR_MACRO(&version, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_ALIGN) == 0) {
-            if (len >= CPE_INTEGER_BUF_LEN) {
-                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_META_INVALID_ALIGN_VALUE);
-                return;
-            }
-
-            DR_COPY_STR(buf, (char const *)valueBegin, len);
-            sscanf(buf, "%d", &newMeta->m_data.m_align);
+            DR_DO_READ_INT_OR_MACRO(&newMeta->m_data.m_align, CPE_DR_ERROR_META_INVALID_ALIGN_VALUE);
         }
         else {
         }

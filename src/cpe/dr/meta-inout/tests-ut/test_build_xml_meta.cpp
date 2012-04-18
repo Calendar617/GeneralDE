@@ -29,6 +29,20 @@ TEST_F(BuildFromXmlMetaTest, struct_data) {
     EXPECT_EQ(0, dr_meta_find_entry_idx_by_name(head, "a1"));
 }
 
+TEST_F(BuildFromXmlMetaTest, id_use_macro) {
+    EXPECT_EQ(
+        CPE_DR_ERROR_META_NO_ENTRY,
+        parseMeta(
+            "<metalib tagsetversion='1' name='net'  version='10'>"
+            "    <macro name='macro_1' value='100'/>"
+            "    <struct name='PkgHead' desc='PkgHead.desc' version='1' id='macro_1'/>"
+            "</metalib>"
+            ));
+
+    LPDRMETA head = meta("PkgHead");
+    EXPECT_EQ(100, dr_meta_id(head));
+}
+
 TEST_F(BuildFromXmlMetaTest, struct_no_entry) {
     EXPECT_EQ(
         CPE_DR_ERROR_META_NO_ENTRY,
