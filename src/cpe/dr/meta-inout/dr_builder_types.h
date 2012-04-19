@@ -18,7 +18,9 @@ typedef TAILQ_HEAD(dr_metalib_source_element_list, dr_metalib_source_element) dr
 struct dr_metalib_builder {
     mem_allocrator_t m_alloc;
     error_monitor_t m_em;
+
     struct DRInBuildMetaLib * m_inbuild_lib;
+    struct dr_metalib_source_list m_sources_in_order;
     struct cpe_hash_table m_sources;
     struct cpe_hash_table m_elements;
 };
@@ -35,6 +37,8 @@ struct dr_metalib_source {
     dr_metalib_source_relation_list_t m_includes;
     dr_metalib_source_relation_list_t m_include_by;
     dr_metalib_source_element_list_t m_elements;
+
+    TAILQ_ENTRY(dr_metalib_source) m_next;
 
     struct cpe_hash_entry m_hh;
 };

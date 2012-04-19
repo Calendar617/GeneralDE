@@ -6,6 +6,7 @@ class BuildFromXmlEntryTest : public BuildFromXmlTest {
 };
 
 TEST_F(BuildFromXmlEntryTest, array_count_basic) {
+    t_em_set_print();
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'>"
         "    <struct name='PkgHead' version='1'>"
@@ -69,7 +70,7 @@ TEST_F(BuildFromXmlEntryTest, array_count_format_error) {
         "</metalib>"
         );
 
-    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_ENTRY_INVALID_COUNT_VALUE));
+    EXPECT_TRUE(t_em_have_errno(CPE_DR_ERROR_UNDEFINED_MACRO_NAME));
 }
 
 TEST_F(BuildFromXmlEntryTest, array_refer_basic) {

@@ -3,6 +3,7 @@
 #include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/pal/pal_stackbuf.h"
+#include "cpe/utils/string_utils.h"
 #include "cpe/dr/dr_metalib_build.h"
 #include "cpe/dr/dr_metalib_xml.h"
 #include "cpe/dr/dr_error.h"
@@ -20,43 +21,50 @@ enum DRXmlParseState {
     , PS_Error
 };
 
-#define DR_XML_PARSE_ERROR_MSG_LEN 256
-
-#define DR_COPY_STR(buf, str, len) \
-    memcpy(buf, str, len);         \
-    buf[len] = 0;
-
 #define DR_DO_READ_INT(__d, __e)                                        \
-    if (len >= CPE_INTEGER_BUF_LEN) {                                   \
-        if (__e) { DR_NOTIFY_ERROR(ctx->m_em, (__e)); }                 \
-        return;                                                         \
-    }                                                                   \
-    DR_COPY_STR(buf, (char const *)valueBegin, len);                    \
-    { char * endptr = 0;                                                \
-        (__d) = strtol(buf, &endptr, 10);                               \
-        if ( !endptr || *endptr != 0) {                                 \
-            DR_NOTIFY_ERROR(ctx->m_em, (__e));                          \
+    do {                                                                \
+        char * buf = cpe_str_dup_len(                                   \
+            ctx->m_data_buf, sizeof(ctx->m_data_buf),                   \
+            (const char *)valueBegin, len);                             \
+        if (buf == NULL) {                                              \
+            if (__e) {                                                  \
+                DR_NOTIFY_ERROR(ctx->m_em, (__e));                      \
+            }                                                           \
+            return;                                                     \
         }                                                               \
-    }
-
-#define DR_DO_READ_INT_OR_MACRO(__d, __e)                               \
-    if (len >= CPE_INTEGER_BUF_LEN) {                                   \
-        if (__e) { DR_NOTIFY_ERROR(ctx->m_em, (__e)); }                 \
-        return;                                                         \
-    }                                                                   \
-    DR_COPY_STR(buf, (char const *)valueBegin, len);                    \
-    { int r = sscanf(buf, "%d", __d);                                   \
-        if (r == 0) {                                                   \
-            if (dr_inbuild_metalib_find_macro_value(                    \
-                    __d, ctx->m_metaLib, buf, len) != 0)                \
-            {                                                           \
-                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_UNDEFINED_MACRO_NAME); \
+        else { char * endptr = 0;                                       \
+            (__d) = strtol(buf, &endptr, 10);                           \
+            if ( !endptr || *endptr != 0) {                             \
+                if (__e) {                                              \
+                    DR_NOTIFY_ERROR(ctx->m_em, (__e));                  \
+                }                                                       \
             }                                                           \
         }                                                               \
-        else if (r != len) {                                            \
+    } while(0)
+
+#define DR_DO_READ_INT_OR_MACRO(__d, __e)                               \
+    do {                                                                \
+        char * buf = cpe_str_dup_len(                                   \
+            ctx->m_data_buf, sizeof(ctx->m_data_buf),                   \
+            (const char *)valueBegin, len);                             \
+        if (buf == NULL) {                                              \
             if (__e) { DR_NOTIFY_ERROR(ctx->m_em, (__e)); }             \
+            return;                                                     \
         }                                                               \
-    }
+        else { char * endptr = 0;                                       \
+            (__d) = strtol(buf, &endptr, 10);                           \
+            if ( !endptr || *endptr != 0) {                             \
+                struct DRInBuildMacro * macro =                         \
+                    dr_inbuild_metalib_find_macro(ctx->m_metaLib, buf); \
+                if (macro) {                                            \
+                    __d = macro->m_data.m_value;                        \
+                }                                                       \
+                else {                                                  \
+                    DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_UNDEFINED_MACRO_NAME); \
+                }                                                       \
+            }                                                           \
+        }                                                               \
+    } while(0)
 
 #define DR_DO_DUP_STR(buf)                                              \
     buf =  mem_buffer_strdup_len(                                       \
@@ -68,6 +76,7 @@ struct DRXmlParseCtx {
     struct DRInBuildMeta * m_curentMeta;
     enum DRXmlParseState m_state;
     error_monitor_t m_em;
+    char m_data_buf[256];
 };
 
 static void dr_build_xml_process_metalib(
@@ -75,7 +84,6 @@ static void dr_build_xml_process_metalib(
     int nb_attributes,
     const xmlChar** attributes)
 {
-    char buf[CPE_INTEGER_BUF_LEN];
     int indexAttribute = 0;
     int index = 0;
     int haveVersion = 0;
@@ -99,32 +107,17 @@ static void dr_build_xml_process_metalib(
         int len = valueEnd - valueBegin;
 
         if (strcmp((char const *)localname, CPE_DR_TAG_NAME) == 0) {
-            if (len >= CPE_DR_NAME_LEN) {
+            if (cpe_str_dup_len(ctx->m_metaLib->m_data.szName, CPE_DR_NAME_LEN, (char const *)valueBegin, len) == NULL) {
                 DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NAME_LEN_BEYOND_UPLIMIT);
                 return;
             }
-
-            DR_COPY_STR(ctx->m_metaLib->m_data.szName, (char const *)valueBegin, len);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_TAGSET_VERSION) == 0) {
-            if (len >= CPE_INTEGER_BUF_LEN) {
-                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
-                ctx->m_state = PS_Error;
-                return;
-            }
-
-            DR_COPY_STR(buf, (char const *)valueBegin, len);
-            sscanf(buf, "%d", &ctx->m_metaLib->m_data.iTagSetVersion);
+            DR_DO_READ_INT(ctx->m_metaLib->m_data.iTagSetVersion, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
-            if (len > CPE_INTEGER_BUF_LEN - 1) {
-                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_INVALID_VERSION);
-                return;
-            }
-
             haveVersion = 1;
-            DR_COPY_STR(buf, (char const *)valueBegin, len);
-            sscanf(buf, "%d", &ctx->m_metaLib->m_data.iVersion);
+            DR_DO_READ_INT(ctx->m_metaLib->m_data.iVersion, CPE_DR_ERROR_INVALID_VERSION);
         }
         else {
         }
@@ -143,10 +136,6 @@ static void dr_build_xml_process_metalib(
         DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_NO_VERSION);
     }
 
-    if (strlen(ctx->m_metaLib->m_data.szName) == 0) {
-        DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_METALIB_ROOT_NO_NAME);
-    }
-
     if (ctx->m_source) {
         dr_metalib_source_element_create(
             ctx->m_source, dr_metalib_source_element_type_lib, ctx->m_metaLib->m_data.szName);
@@ -160,7 +149,6 @@ static void dr_build_xml_process_macro(
     int nb_attributes,
     const xmlChar** attributes)
 {
-    char buf[CPE_INTEGER_BUF_LEN];
     int indexAttribute = 0;
     int index = 0;
     int haveValue = 0;
@@ -195,16 +183,17 @@ static void dr_build_xml_process_macro(
                 return;
             }
 
-            DR_COPY_STR(newMacro->m_name, (char const *)valueBegin, len);
+            DR_DO_DUP_STR(newMacro->m_name);
 
-            dr_inbuild_metalib_add_macro_to_index(ctx->m_metaLib, newMacro);
+            if (newMacro->m_name) {
+                if (dr_inbuild_metalib_add_macro_to_index(ctx->m_metaLib, newMacro) != 0) {
+                    CPE_ERROR(ctx->m_em, "macro %s name duplicate!", newMacro->m_name);
+                }
+            }
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_DESCIPTION) == 0) {
-            if (len > CPE_DR_DESC_LEN) {
-                len = CPE_DR_DESC_LEN;
-            }
-
-            DR_COPY_STR(newMacro->m_desc, (char const *)valueBegin, len);
+            if (len > CPE_DR_DESC_LEN) len = CPE_DR_DESC_LEN;
+            DR_DO_DUP_STR(newMacro->m_desc);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_MACRO_VALUE) == 0) {
             if (len >= CPE_INTEGER_BUF_LEN) {
@@ -213,13 +202,13 @@ static void dr_build_xml_process_macro(
             }
             haveValue = 1;
 
-            DR_DO_READ_INT_OR_MACRO(&newMacro->m_data.m_value, 0);
+            DR_DO_READ_INT_OR_MACRO(newMacro->m_data.m_value, 0);
         }
         else {
         }
     }
 
-    if (strlen(newMacro->m_name) == 0) {
+    if (newMacro->m_name == NULL) {
         DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_MACRO_NO_NAME_ATTR);
         haveError = 1;
     }
@@ -245,7 +234,6 @@ static void dr_build_xml_process_meta(
     const xmlChar** attributes,
     int32_t metaType)
 {
-    char buf[CPE_INTEGER_BUF_LEN];
     int indexAttribute = 0;
     int index = 0;
     int version = -1;
@@ -283,28 +271,20 @@ static void dr_build_xml_process_meta(
                 return;
             }
 
-            DR_COPY_STR(newMeta->m_name, (char const *)valueBegin, len);
+            DR_DO_DUP_STR(newMeta->m_name);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_DESCIPTION) == 0) {
-            if (len > CPE_DR_DESC_LEN) {
-                len = CPE_DR_DESC_LEN;
-            }
-
-            DR_COPY_STR(newMeta->m_desc, (char const *)valueBegin, len);
+            if (len > CPE_DR_DESC_LEN) len = CPE_DR_DESC_LEN;
+            DR_DO_DUP_STR(newMeta->m_desc);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_ID) == 0) {
-            if (len >= CPE_INTEGER_BUF_LEN) {
-                DR_NOTIFY_ERROR(ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
-                return;
-            }
-
-            DR_DO_READ_INT_OR_MACRO(&newMeta->m_data.m_id, 0);
+            DR_DO_READ_INT_OR_MACRO(newMeta->m_data.m_id, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_VERSION) == 0) {
-            DR_DO_READ_INT_OR_MACRO(&version, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
+            DR_DO_READ_INT_OR_MACRO(version, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_ALIGN) == 0) {
-            DR_DO_READ_INT_OR_MACRO(&newMeta->m_data.m_align, CPE_DR_ERROR_META_INVALID_ALIGN_VALUE);
+            DR_DO_READ_INT_OR_MACRO(newMeta->m_data.m_align, CPE_DR_ERROR_META_INVALID_ALIGN_VALUE);
         }
         else {
         }
@@ -342,7 +322,6 @@ static void dr_build_xml_process_entry(
     int nb_attributes,
     const xmlChar** attributes)
 {
-    char buf[CPE_INTEGER_BUF_LEN];
     int indexAttribute = 0;
     int index = 0;
     int version = -1;
@@ -379,7 +358,7 @@ static void dr_build_xml_process_entry(
                 return;
             }
 
-            DR_COPY_STR(newEntry->m_name, (char const *)valueBegin, len);
+            DR_DO_DUP_STR(newEntry->m_name);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_CNNAME) == 0) {
             if (len >= CPE_DR_CHNAME_LEN) {
@@ -387,7 +366,7 @@ static void dr_build_xml_process_entry(
                 len = CPE_DR_CHNAME_LEN - 1;
             }
 
-            DR_COPY_STR(newEntry->m_cname, (char const *)valueBegin, len);
+            DR_DO_DUP_STR(newEntry->m_cname);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_DESCIPTION) == 0) {
             if (len >= CPE_DR_DESC_LEN) {
@@ -395,7 +374,7 @@ static void dr_build_xml_process_entry(
                 len = CPE_DR_CHNAME_LEN - 1;
             }
 
-            DR_COPY_STR(newEntry->m_desc, (char const *)valueBegin, len);
+            DR_DO_DUP_STR(newEntry->m_desc);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_TYPE) == 0) {
             if (len >= CPE_DR_NAME_LEN) {
@@ -409,29 +388,29 @@ static void dr_build_xml_process_entry(
             DR_DO_READ_INT(version, CPE_DR_ERROR_INVALID_TAGSET_VERSION);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_ID) == 0) {
-            DR_DO_READ_INT(newEntry->m_data.m_id, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
+            DR_DO_READ_INT_OR_MACRO(newEntry->m_data.m_id, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
             newEntry->m_data.m_select_range_max = newEntry->m_data.m_id;
             newEntry->m_data.m_select_range_min = newEntry->m_data.m_id;
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_MAXID) == 0) {
             haveMax = 1;
-            DR_DO_READ_INT(newEntry->m_data.m_select_range_max, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
+            DR_DO_READ_INT_OR_MACRO(newEntry->m_data.m_select_range_max, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_MINID) == 0) {
             haveMin = 1;
-            DR_DO_READ_INT(newEntry->m_data.m_select_range_min, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
+            DR_DO_READ_INT_OR_MACRO(newEntry->m_data.m_select_range_min, CPE_DR_ERROR_ENTRY_INVALID_ID_VALUE);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_SELECT) == 0) {
             DR_DO_DUP_STR(newEntry->m_selector_path);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_SIZE) == 0) {
-            DR_DO_READ_INT(newEntry->m_data.m_size, CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE);
+            DR_DO_READ_INT_OR_MACRO(newEntry->m_data.m_size, CPE_DR_ERROR_ENTRY_INVALID_SIZE_VALUE);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_DEFAULT_VALUE) == 0) {
             DR_DO_DUP_STR(newEntry->m_dft_value);
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_COUNT) == 0) {
-            DR_DO_READ_INT(newEntry->m_data.m_array_count, CPE_DR_ERROR_ENTRY_INVALID_COUNT_VALUE);
+            DR_DO_READ_INT_OR_MACRO(newEntry->m_data.m_array_count, CPE_DR_ERROR_ENTRY_INVALID_COUNT_VALUE);
             if(newEntry->m_data.m_array_count < 0) {
                 CPE_ERROR_EX(
                     ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_COUNT_VALUE,
@@ -469,7 +448,7 @@ static void dr_build_xml_process_entry(
 
     newEntry->m_data.m_version = version;
 
-    if (strlen(newEntry->m_name) == 0) {
+    if (newEntry->m_name == NULL) {
         CPE_ERROR_EX(ctx->m_em, CPE_DR_ERROR_META_NO_NAME, "entry no name");
         haveError = 1;
     }
