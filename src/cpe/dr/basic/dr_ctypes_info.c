@@ -2,31 +2,31 @@
 #include "../dr_ctype_ops.h"
 
 struct tagDRCTypeInfo g_dr_ctypeinfos[] = {
-    {CPE_DR_TYPE_UNION, "union", -1}
-    , {CPE_DR_TYPE_STRUCT, "struct", -1}
-    , {CPE_DR_TYPE_CHAR, "char", 1}
-    , {CPE_DR_TYPE_UCHAR, "uchar", 1}
-    , {CPE_DR_TYPE_INT8, "int8", 1}
-    , {CPE_DR_TYPE_INT16, "int16", 2}
-    , {CPE_DR_TYPE_UINT16, "uint16", 2}
-    , {CPE_DR_TYPE_INT32, "int32", 4}
-    , {CPE_DR_TYPE_UINT32, "uint32", 4}
-    , {CPE_DR_TYPE_INT32, "int32", 4}
-    , {CPE_DR_TYPE_UINT32, "uint32", 4}
-    , {CPE_DR_TYPE_INT64, "int64", 8}
-    , {CPE_DR_TYPE_UINT64, "uint64", 8}
-    , {CPE_DR_TYPE_DATE, "date", 4}
-    , {CPE_DR_TYPE_TIME, "time", 4}
-    , {CPE_DR_TYPE_DATETIME, "datetime", 8}
-    , {CPE_DR_TYPE_MONEY, "money", 4}
-    , {CPE_DR_TYPE_FLOAT, "float", 4}
-    , {CPE_DR_TYPE_DOUBLE, "double", 8}
-    , {CPE_DR_TYPE_IP, "ip", 4}
-    , {CPE_DR_TYPE_CHAR, "char", 1}
-    , {CPE_DR_TYPE_STRING, "string", -1}
-    , {CPE_DR_TYPE_STRING, "string", -1}
-    , {CPE_DR_TYPE_VOID, "void", -1}
-    , {CPE_DR_TYPE_UINT8, "uint8", 1}
+    {CPE_DR_TYPE_UNION, "union", -1, -1}
+    , {CPE_DR_TYPE_STRUCT, "struct", -1, -1}
+    , {CPE_DR_TYPE_CHAR, "char", 1, 1}
+    , {CPE_DR_TYPE_UCHAR, "uchar", 1, 1}
+    , {CPE_DR_TYPE_INT8, "int8", 1, 1}
+    , {CPE_DR_TYPE_INT16, "int16", 2, 2}
+    , {CPE_DR_TYPE_UINT16, "uint16", 2, 2}
+    , {CPE_DR_TYPE_INT32, "int32", 4, 4}
+    , {CPE_DR_TYPE_UINT32, "uint32", 4, 4}
+    , {CPE_DR_TYPE_INT32, "int32", 4, 4}
+    , {CPE_DR_TYPE_UINT32, "uint32", 4, 4}
+    , {CPE_DR_TYPE_INT64, "int64", 8, 8}
+    , {CPE_DR_TYPE_UINT64, "uint64", 8, 8}
+    , {CPE_DR_TYPE_DATE, "date", 4, 4}
+    , {CPE_DR_TYPE_TIME, "time", 4, 4}
+    , {CPE_DR_TYPE_DATETIME, "datetime", 8, 8}
+    , {CPE_DR_TYPE_MONEY, "money", 4, 4}
+    , {CPE_DR_TYPE_FLOAT, "float", 4, 4}
+    , {CPE_DR_TYPE_DOUBLE, "double", 8, 8}
+    , {CPE_DR_TYPE_IP, "ip", 4, 4}
+    , {CPE_DR_TYPE_CHAR, "char", 1, 1}
+    , {CPE_DR_TYPE_STRING, "string", -1, 1}
+    , {CPE_DR_TYPE_STRING, "string", -1, 1}
+    , {CPE_DR_TYPE_VOID, "void", -1, 1}
+    , {CPE_DR_TYPE_UINT8, "uint8", 1, 1}
 };
 
 static const int g_dr_ctypeinfos_count
