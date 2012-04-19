@@ -13,8 +13,6 @@ public:
 
     operator Node const & (void) const { return *(Node*)m_node; }
 
-    Node const & must_exist(void) const;
-
     ConstNodePlacehold operator[](const char * path) const { 
         return ConstNodePlacehold(*this, path, cfg_find_cfg(m_node, path));
     }
@@ -116,13 +114,12 @@ friend class NodePlacehold;
 
 class NodePlacehold : public ConstNodePlacehold {
 public:
-    using ConstNodePlacehold::operator Node const &;
-    using ConstNodePlacehold::must_exist;
     using ConstNodePlacehold::operator[];
     using ConstNodePlacehold::childs;
-    using ConstNodePlacehold::operator=;
 
+    operator Node const & (void) const { return *(Node*)m_node; }
     operator Node & (void) { return *(Node*)m_node; }
+
     Node & must_exist(void);
 
     NodePlacehold operator[](const char * path) { 
@@ -151,6 +148,7 @@ private:
     {
     }
 
+    ConstNodePlacehold & operator=(ConstNodePlacehold const & o);
     NodePlacehold & operator=(NodePlacehold const & o);
 
 friend class Node;
