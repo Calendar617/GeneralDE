@@ -1,14 +1,14 @@
 #include "ReadTest.hpp"
 
-class PathTest : public ReadTest {
+class PathReadTest : public ReadTest {
 };
 
-TEST_F(PathTest, map_root) {
+TEST_F(PathReadTest, map_root) {
     cfg_t cfg = cfg_find_cfg(m_root, "");
     ASSERT_TRUE(cfg == m_root);
 }
 
-TEST_F(PathTest, map_empty_name) {
+TEST_F(PathReadTest, map_empty_name) {
     EXPECT_EQ(
         0, read(
             "'': abc\n"
@@ -20,7 +20,7 @@ TEST_F(PathTest, map_empty_name) {
     EXPECT_STREQ("abc", (const char *)cfg_data(cfg));
 }
 
-TEST_F(PathTest, map_basic) {
+TEST_F(PathReadTest, map_basic) {
     EXPECT_EQ(
         0, read(
             "a: abc\n"
@@ -32,7 +32,7 @@ TEST_F(PathTest, map_basic) {
     EXPECT_STREQ("abc", (const char *)cfg_data(cfg));
 }
 
-TEST_F(PathTest, map_not_exist) {
+TEST_F(PathReadTest, map_not_exist) {
     EXPECT_EQ(
         0, read(
             "a: abc\n"
@@ -42,7 +42,7 @@ TEST_F(PathTest, map_not_exist) {
     ASSERT_FALSE(cfg);
 }
 
-TEST_F(PathTest, map_map) {
+TEST_F(PathReadTest, map_map) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -54,7 +54,7 @@ TEST_F(PathTest, map_map) {
     EXPECT_STREQ("b", cfg_name(cfg));
 }
 
-TEST_F(PathTest, map_map_not_exist) {
+TEST_F(PathReadTest, map_map_not_exist) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -65,7 +65,7 @@ TEST_F(PathTest, map_map_not_exist) {
     ASSERT_FALSE(cfg);
 }
 
-TEST_F(PathTest, map_seq) {
+TEST_F(PathReadTest, map_seq) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -77,7 +77,7 @@ TEST_F(PathTest, map_seq) {
     EXPECT_STREQ("abc", (const char *)cfg_data(cfg));
 }
 
-TEST_F(PathTest, map_seq_seq) {
+TEST_F(PathReadTest, map_seq_seq) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -89,7 +89,7 @@ TEST_F(PathTest, map_seq_seq) {
     ASSERT_TRUE(cfg);
     EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
-TEST_F(PathTest, map_seq_map) {
+TEST_F(PathReadTest, map_seq_map) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -101,7 +101,7 @@ TEST_F(PathTest, map_seq_map) {
     EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 
-TEST_F(PathTest, map_seq_seq_map) {
+TEST_F(PathReadTest, map_seq_seq_map) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -114,7 +114,7 @@ TEST_F(PathTest, map_seq_seq_map) {
     EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 
-TEST_F(PathTest, map_map_seq_no_name) {
+TEST_F(PathReadTest, map_map_seq_no_name) {
     cfg_t subMap = cfg_struct_add_struct(m_root, "a", cfg_replace);
     cfg_seq_add_int8(
         cfg_struct_add_seq(subMap, "", cfg_replace),
@@ -130,7 +130,7 @@ TEST_F(PathTest, map_map_seq_no_name) {
     EXPECT_EQ(33, cfg_as_int32(cfg2, -1));
 }
 
-TEST_F(PathTest, map_noname_seq_seq_map) {
+TEST_F(PathReadTest, map_noname_seq_seq_map) {
     EXPECT_EQ(
         0, read(
             "-\n"
@@ -142,7 +142,7 @@ TEST_F(PathTest, map_noname_seq_seq_map) {
     EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 
-TEST_F(PathTest, map_seq_not_close) {
+TEST_F(PathReadTest, map_seq_not_close) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -153,7 +153,7 @@ TEST_F(PathTest, map_seq_not_close) {
     ASSERT_FALSE(cfg);
 }
 
-TEST_F(PathTest, map_seq_pos_format_error) {
+TEST_F(PathReadTest, map_seq_pos_format_error) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -164,7 +164,7 @@ TEST_F(PathTest, map_seq_pos_format_error) {
     ASSERT_FALSE(cfg);
 }
 
-TEST_F(PathTest, map_seq_name_sep_in) {
+TEST_F(PathReadTest, map_seq_name_sep_in) {
     EXPECT_EQ(
         0, read(
             "a:\n"
@@ -175,7 +175,7 @@ TEST_F(PathTest, map_seq_name_sep_in) {
     ASSERT_FALSE(cfg);
 }
 
-TEST_F(PathTest, map_name_with_space) {
+TEST_F(PathReadTest, map_name_with_space) {
     EXPECT_EQ(
         0, read(
             "a c:\n"
@@ -187,7 +187,7 @@ TEST_F(PathTest, map_name_with_space) {
     EXPECT_EQ(123, cfg_as_int32(cfg, -1));
 }
 
-TEST_F(PathTest, seq_root_map) {
+TEST_F(PathReadTest, seq_root_map) {
     cfg_t r = cfg_struct_add_seq(m_root, "xxx", cfg_replace);
 
     EXPECT_EQ(
