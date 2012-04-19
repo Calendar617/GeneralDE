@@ -11,6 +11,7 @@ struct tagDRCTypeInfo {
     int m_id;
     char m_name[32];
     size_t m_size;
+    size_t m_align;
 };
 
 /*n: >= 0    name-length

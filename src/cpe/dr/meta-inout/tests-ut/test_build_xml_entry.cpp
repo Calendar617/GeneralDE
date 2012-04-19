@@ -30,6 +30,20 @@ TEST_F(BuildFromXmlEntryTest, entry_data) {
     EXPECT_EQ(2, (int)dr_entry_size(e));
 }
 
+TEST_F(BuildFromXmlEntryTest, id_use_macro) {
+    parseMeta(
+        "<metalib tagsetversion='1' name='net'  version='10'>"
+        "    <macro name='macro_1' value='100'/>"
+        "    <struct name='PkgHead' version='1'>"
+        "	     <entry name='a1' type='int16' id='macro_1'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    LPDRMETAENTRY e = entry("PkgHead", "a1");
+    EXPECT_EQ(100, dr_entry_id(e));
+}
+
 TEST_F(BuildFromXmlEntryTest, no_name) {
     parseMeta(
         "<metalib tagsetversion='1' name='net'  version='10'>"

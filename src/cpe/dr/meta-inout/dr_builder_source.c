@@ -57,6 +57,8 @@ dr_metalib_source_create(
         return NULL;
     }
 
+    TAILQ_INSERT_TAIL(&builder->m_sources_in_order, source, m_next);
+
     return source;
 }
 
@@ -136,6 +138,7 @@ void dr_metalib_source_free(dr_metalib_source_t source) {
         dr_metalib_source_relation_free(TAILQ_FIRST(&source->m_include_by));
     }
 
+    TAILQ_REMOVE(&source->m_builder->m_sources_in_order, source, m_next);
     cpe_hash_table_remove_by_ins(&source->m_builder->m_sources, source);
 
     mem_free(source->m_builder->m_alloc, (void *)source->m_name);

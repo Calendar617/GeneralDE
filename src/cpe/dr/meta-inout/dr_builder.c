@@ -48,6 +48,8 @@ dr_metalib_builder_create(mem_allocrator_t alloc, error_monitor_t em) {
         return NULL;
     }
 
+    TAILQ_INIT(&builder->m_sources_in_order);
+
     return builder;
 }
 
@@ -89,11 +91,9 @@ void dr_metalib_builder_free(dr_metalib_builder_t builder) {
 }
 
 void dr_metalib_builder_analize(dr_metalib_builder_t builder) {
-    struct cpe_hash_it sourceIt;
     dr_metalib_source_t source;
 
-    cpe_hash_it_init(&sourceIt, &builder->m_sources);
-    while((source = (dr_metalib_source_t)cpe_hash_it_next(&sourceIt))) {
+    TAILQ_FOREACH(source, &builder->m_sources_in_order, m_next) {
         dr_metalib_source_analize(source);
     }
 }

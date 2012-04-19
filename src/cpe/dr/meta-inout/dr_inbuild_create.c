@@ -283,9 +283,9 @@ static void dr_inbuild_build_calc_basic_type_and_size(struct DRInBuildMetaLib * 
 }
 
 static int dr_inbuild_calc_string_size(const char * data) {
-    return data[0] == 0
-        ? 0
-        : strlen(data) + 1;
+    return data
+        ? strlen(data) + 1
+        : 0;
 }
 
 static int dr_inbuild_calc_strbuf_size(struct DRInBuildMetaLib * inBuildLib) {

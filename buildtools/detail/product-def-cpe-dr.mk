@@ -8,7 +8,7 @@ define product-def-rule-cpe-dr-c-module-validate
 
   $(call c-source-to-object,$(r.$1.c.sources),$3): $1.$3.cpe-dr.$2.validate
 
-  $1.$3.cpe-dr.$2.validate:
+  $1.$3.cpe-dr.$2.validate: $(cpe-dr-tool)
 	$$(call with_message,cpe-dr validate dr lib $2 ...) \
 	LD_LIBRARY_PATH=$(CPDE_OUTPUT_ROOT)/$(tools.output)/lib:$$$$LD_LIBRARY_PATH \
 	$(cpe-dr-tool) $(addprefix --validate ,$($1.cpe-dr.$2.validate)) \
