@@ -4,15 +4,22 @@ product-def-all-items+=cpe-dr.modules
 cpe-dr-tool=$(CPDE_OUTPUT_ROOT)/$(tools.output)/bin/cpe_dr_tool
 
 define product-def-rule-cpe-dr-c-module-validate
-  .POHEY: $1.$3.cpe-dr.$2.validate
+  $(call assert-not-null,$1.cpe-dr.$2.validate.output)
 
-  $(call c-source-to-object,$(r.$1.c.sources),$3): $1.$3.cpe-dr.$2.validate
+  $(eval r.$1.$3.cpe-dr.$2.validate.output:=$($1.cpe-dr.$2.validate.output))
+  $(eval r.$1.$3.cpe-dr.$2.validate.output-dir:=$(call c-source-dir-to-binary-dir,$(r.$1.base)/$(patsubst %/,%,$(dir $(r.$1.$3.cpe-dr.$2.validate.output))),$3))
+  $(eval r.$1.$3.cpe-dr.$2.generated.validate:=$(r.$1.$3.cpe-dr.$2.validate.output-dir)/$(notdir $($1.cpe-dr.$2.validate.output)))
 
-  $1.$3.cpe-dr.$2.validate: $(cpe-dr-tool)
+
+  $(eval r.$1.cleanup += $(r.$1.$3.cpe-dr.$2.generated.validate))
+
+  $(call c-source-to-object,$(r.$1.c.sources),$3): $(r.$1.$3.cpe-dr.$2.generated.validate)
+
+  $(r.$1.$3.cpe-dr.$2.generated.validate): $(r.$1.$3.cpe-dr.$2.source) $(cpe-dr-tool)
 	$$(call with_message,cpe-dr validate dr lib $2 ...) \
 	LD_LIBRARY_PATH=$(CPDE_OUTPUT_ROOT)/$(tools.output)/lib:$$$$LD_LIBRARY_PATH \
 	$(cpe-dr-tool) $(addprefix --validate ,$($1.cpe-dr.$2.validate)) \
-                   $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) 
+                   $(addprefix -i ,$(r.$1.$3.cpe-dr.$2.source)) | tee > $(r.$1.$3.cpe-dr.$2.generated.validate)
 
 endef
 
