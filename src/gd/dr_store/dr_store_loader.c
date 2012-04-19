@@ -6,6 +6,7 @@
 #include "cpe/dr/dr_metalib_builder.h"
 #include "cpe/dr/dr_metalib_build.h"
 #include "cpe/dr/dr_metalib_manage.h"
+#include "cpe/dr/dr_metalib_validate.h"
 #include "gd/app/app_log.h"
 #include "gd/app/app_library.h"
 #include "gd/app/app_module.h"
@@ -256,6 +257,38 @@ FROM_BIN_COMPLETE:
     return rv;
 }
 
+static int dr_store_loader_do_validate(gd_app_context_t app, gd_app_module_t module, LPDRMETALIB metalib, cfg_t cfg) {
+    int rv;
+
+    struct cfg_it child_it;
+    cfg_t child;
+
+    rv = 0;
+
+    cfg_it_init(&child_it, cfg);
+
+    while((child = cfg_it_next(&child_it))) {
+        const char * validate_name = cfg_as_string(child, NULL);
+        if (validate_name == NULL) {
+            APP_CTX_ERROR(app, "%s: validate: NULL valudate name!", gd_app_module_name(module));
+            rv = -1;
+            continue;
+        }
+
+        if (strcmp(validate_name, "align")== 0){
+            if (dr_metalib_validate_align(gd_app_em(app), metalib) != 0) {
+                rv = -1;
+            }
+        }
+        else {
+            APP_CTX_ERROR(app, "%s: validate: unknown valudate name %s!", gd_app_module_name(module), validate_name);
+            rv = -1;
+        }
+    }
+
+    return rv;
+}
+
 EXPORT_DIRECTIVE
 int dr_store_loader_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
     const char * arg;
@@ -281,6 +314,25 @@ int dr_store_loader_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t
     else {
         APP_CTX_ERROR(app, "%s: no any load way!", gd_app_module_name(module));
         rv = -1;
+    }
+
+    if (rv == 0 && (child_cfg = cfg_find_cfg(cfg, "validate"))) {
+        dr_store_t store;
+        LPDRMETALIB metalib;
+
+        store = dr_store_find(mgr, gd_app_module_name(module));
+        assert(store);
+
+        metalib = dr_store_lib(store);
+        if (metalib == NULL) {
+            APP_CTX_ERROR(app, "%s: meta lib not exist!", gd_app_module_name(module));
+            dr_store_free(store);
+            rv = -1;
+        }
+        else if (dr_store_loader_do_validate(app, module, metalib, child_cfg) != 0) {
+            dr_store_free(store);
+            rv = -1;
+        }
     }
 
     if (rv == 0 && cfg_get_int32(cfg, "dump", 0)) {
