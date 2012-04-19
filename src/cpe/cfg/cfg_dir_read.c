@@ -77,15 +77,15 @@ dir_visit_next_op_t cfg_read_dir_on_file(const char * full, const char * base, v
         return dir_visit_next_go;
     }
 
-    CPE_ERROR_SET_FILE(readCtx->m_em, full);
     fp = file_stream_open(full, "r", readCtx->m_em);
-    CPE_ERROR_SET_FILE(readCtx->m_em, NULL);
+    if (fp == NULL) {
+        return dir_visit_next_go;
+    }
 
-    if (fp ==NULL) return dir_visit_next_go;
+    CPE_ERROR_SET_FILE(readCtx->m_em, full);
 
     read_stream_file_init(&fstream, fp, readCtx->m_em);
 
-    
     cfg_read_with_name(
         readCtx->m_curent,
         file_name_base(base, &readCtx->m_tbuffer),
@@ -93,6 +93,8 @@ dir_visit_next_op_t cfg_read_dir_on_file(const char * full, const char * base, v
         readCtx->m_policy,
         readCtx->m_em);
     
+    CPE_ERROR_SET_FILE(readCtx->m_em, NULL);
+
     file_stream_close(fp, readCtx->m_em);
 
     return dir_visit_next_go;

@@ -1,11 +1,10 @@
 #ifndef CPE_DR_DATAJSON_TEST_PRINTTEST_H
 #define CPE_DR_DATAJSON_TEST_PRINTTEST_H
 #include <string.h>
-#include "cpe/utils/tests-env/with_em.hpp"
 #include "CfgTest.hpp"
 
 class MergeTest
-    : public testenv::fixture<LOKI_TYPELIST_1(utils::testenv::with_em), CfgTest>
+    : public testenv::fixture< ::Loki::NullType, CfgTest>
 {
 public:
     MergeTest();
