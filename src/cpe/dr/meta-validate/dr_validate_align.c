@@ -26,11 +26,11 @@ static void dr_metalib_validate_align_i(error_monitor_t em, LPDRMETALIB metalib)
                 continue;
             }
 
-            if (dr_entry_data_start_pos(entry) % align) {
+            if ((int)dr_entry_data_start_pos(entry) % align) {
                 CPE_ERROR(
                     em, "%s.%s: start pos error, align is %d, startpos is %d",
                     dr_meta_name(meta), dr_entry_name(entry),
-                    align, dr_entry_data_start_pos(entry));
+                    align, (int)dr_entry_data_start_pos(entry));
                 continue;
             }
         }

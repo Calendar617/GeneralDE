@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include "cpe/pal/pal_stackbuf.h"
 #include "cpepp/utils/ErrorCollector.hpp"
-#include "gdpp/app/Log.hpp"
 #include "cpepp/dp/Manager.hpp"
 #include "cpepp/dp/Responser.hpp"
 
