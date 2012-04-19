@@ -1,5 +1,6 @@
 #include <assert.h>
-#include <string.h>
+#include "cpe/pal/pal_string.h"
+#include "cpe/pal/pal_stdlib.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/utils/string_utils.h"
 #include "cpe/dr/dr_ctypes_op.h"
@@ -21,7 +22,10 @@ static cfg_t cfg_check_or_create_sub(cfg_t cfg, int type, const char * next_cfg_
         }
     }
     else if (cfg->m_type == CPE_CFG_TYPE_SEQUENCE) {
-        if (next_cfg_str[0] == 0) {
+        int pos;
+        pos = atoi(next_cfg_str);
+
+        if (next_cfg_str[0] == 0 || pos == cfg_seq_count(cfg)) {
             if (type == CPE_CFG_TYPE_STRUCT) {
                 return cfg_seq_add_struct(cfg);
             }
@@ -31,6 +35,9 @@ static cfg_t cfg_check_or_create_sub(cfg_t cfg, int type, const char * next_cfg_
             else {
                 return NULL;
             }
+        }
+        else if (pos < cfg_seq_count(cfg)) {
+            return cfg_seq_at(cfg, pos);
         }
         else {
             return NULL;
@@ -115,7 +122,13 @@ static cfg_t cfg_check_or_create(cfg_t cfg, const char * path, error_monitor_t e
         }
     }
 
-    return next_cfg_str == NULL ? NULL : cfg;
+    if (next_cfg_str == NULL) {
+        CPE_ERROR(em, "cfg_check_or_create: path=%s, pos=%d: no any path", root, (int)(path - root));
+        return NULL;
+    }
+    else {
+        return cfg;
+    }
 }
 
 cfg_t cfg_add_struct(cfg_t c, const char * path, error_monitor_t em) {
@@ -138,28 +151,103 @@ cfg_t cfg_add_seq(cfg_t c, const char * path, error_monitor_t em) {
     return cfg_check_or_create_sub(last_cfg, CPE_CFG_TYPE_SEQUENCE, buf);
 }
 
-cfg_t cfg_add_string(cfg_t c, const char * path, const char * value, error_monitor_t em) {
+#define CFG_DEF_ADD_VALUE_FUN(__str_type, __type)                       \
+    cfg_t cfg_add_ ## __str_type(cfg_t c, const char * path, __type value, error_monitor_t em) { \
+        char buf[256];                                                  \
+        cfg_t last_cfg;                                                 \
+                                                                        \
+        last_cfg = cfg_check_or_create(c, path, em, buf, sizeof(buf));  \
+        if (last_cfg == NULL) return NULL;                              \
+                                                                        \
+        if (last_cfg->m_type == CPE_CFG_TYPE_STRUCT) {                  \
+            return cfg_struct_add_ ## __str_type(last_cfg, buf, value, cfg_replace); \
+        }                                                               \
+        else {                                                          \
+            int pos;                                                    \
+            int seq_count;                                              \
+                                                                        \
+            pos = atoi(buf);                                            \
+            seq_count = cfg_seq_count(last_cfg);                        \
+                                                                        \
+            if (buf[0] == 0 || pos == seq_count) {                      \
+                return cfg_seq_add_ ## __str_type(last_cfg, value);     \
+            }                                                           \
+            else if (pos < seq_count) {                                 \
+                return cfg_seq_add_ ## __str_type(last_cfg, value);     \
+            }                                                           \
+            else {                                                      \
+                return NULL;                                            \
+            }                                                           \
+        }                                                               \
+    }
+
+CFG_DEF_ADD_VALUE_FUN(string, const char *)
+CFG_DEF_ADD_VALUE_FUN(int8, int8_t)
+CFG_DEF_ADD_VALUE_FUN(uint8, uint8_t)
+CFG_DEF_ADD_VALUE_FUN(int16, int16_t)
+CFG_DEF_ADD_VALUE_FUN(uint16, uint16_t)
+CFG_DEF_ADD_VALUE_FUN(int32, int32_t)
+CFG_DEF_ADD_VALUE_FUN(uint32, uint32_t)
+CFG_DEF_ADD_VALUE_FUN(int64, int64_t)
+CFG_DEF_ADD_VALUE_FUN(uint64, uint64_t)
+CFG_DEF_ADD_VALUE_FUN(float, float)
+CFG_DEF_ADD_VALUE_FUN(double, double)
+CFG_DEF_ADD_VALUE_FUN(value_from_string_auto, const char *)
+
+cfg_t cfg_add_value_from_string(cfg_t c, const char * path, int typeId, const char * value, error_monitor_t em) {
     char buf[256];
     cfg_t last_cfg;
 
     last_cfg = cfg_check_or_create(c, path, em, buf, sizeof(buf));
     if (last_cfg == NULL) return NULL;
 
-    if (last_cfg->m_type == CPE_CFG_TYPE_SEQUENCE) {
-        
+    if (last_cfg->m_type == CPE_CFG_TYPE_STRUCT) {
+        return cfg_struct_add_value_from_string(last_cfg, buf, typeId, value, cfg_replace);
+    }
+    else {
+        int pos;
+        int seq_count;
+
+        pos = atoi(buf);
+        seq_count = cfg_seq_count(last_cfg);
+
+        if (buf[0] == 0 || pos == seq_count) {
+            return cfg_seq_add_value_from_string(last_cfg, typeId, value);
+        }
+        else if (pos < seq_count) {
+            return cfg_seq_add_value_from_string(last_cfg, typeId, value);
+        }
+        else {
+            return NULL;
+        }
     }
 }
 
-cfg_t cfg_add_int8(cfg_t c, const char * path, int8_t v, error_monitor_t em);
-cfg_t cfg_add_uint8(cfg_t c, const char * path, uint8_t v, error_monitor_t em);
-cfg_t cfg_add_int16(cfg_t c, const char * path, int16_t v, error_monitor_t em);
-cfg_t cfg_add_uint16(cfg_t c, const char * path, uint16_t v, error_monitor_t em);
-cfg_t cfg_add_int32(cfg_t c, const char * path, int32_t v, error_monitor_t em);
-cfg_t cfg_add_uint32(cfg_t c, const char * path, uint32_t v, error_monitor_t em);
-cfg_t cfg_add_int64(cfg_t c, const char * path, int64_t v, error_monitor_t em);
-cfg_t cfg_add_uint64(cfg_t c, const char * path, uint64_t v, error_monitor_t em);
-cfg_t cfg_add_float(cfg_t c, const char * path, float v, error_monitor_t em);
-cfg_t cfg_add_double(cfg_t c, const char * path, double v, error_monitor_t em);
-cfg_t cfg_add_value_from_string(cfg_t c, const char * path, int typeId, const char * value, error_monitor_t em);
-cfg_t cfg_add_value_from_string_auto(cfg_t c, const char * path, const char * value, error_monitor_t em);
-cfg_t cfg_add_value_from_binary(cfg_t c, const char * path, int typeId, const void * value, error_monitor_t em);
+cfg_t cfg_add_value_from_binary(cfg_t c, const char * path, int typeId, const void * value, error_monitor_t em) {
+    char buf[256];
+    cfg_t last_cfg;
+
+    last_cfg = cfg_check_or_create(c, path, em, buf, sizeof(buf));
+    if (last_cfg == NULL) return NULL;
+
+    if (last_cfg->m_type == CPE_CFG_TYPE_STRUCT) {
+        return cfg_struct_add_value_from_binary(last_cfg, buf, typeId, value, cfg_replace);
+    }
+    else {
+        int pos;
+        int seq_count;
+
+        pos = atoi(buf);
+        seq_count = cfg_seq_count(last_cfg);
+
+        if (buf[0] == 0 || pos == seq_count) {
+            return cfg_seq_add_value_from_binary(last_cfg, typeId, value);
+        }
+        else if (pos < seq_count) {
+            return cfg_seq_add_value_from_binary(last_cfg, typeId, value);
+        }
+        else {
+            return NULL;
+        }
+    }
+}
