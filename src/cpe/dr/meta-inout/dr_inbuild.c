@@ -1,10 +1,11 @@
+#include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_stdlib.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/dr/dr_error.h"
 #include "dr_inbuild.h"
 
 static uint32_t dr_inbuild_macro_hash(const struct DRInBuildMacro * data) {
-    return cpe_hash_str(data->m_name, strlen(data->m_name));
+    return data->m_name ? cpe_hash_str(data->m_name, strlen(data->m_name)) : 1;
 }
 
 static int dr_inbuild_macro_cmp(const struct DRInBuildMacro * l, const struct DRInBuildMacro * r) {
@@ -12,7 +13,7 @@ static int dr_inbuild_macro_cmp(const struct DRInBuildMacro * l, const struct DR
 }
 
 static uint32_t dr_inbuild_meta_hash(const struct DRInBuildMeta * data) {
-    return cpe_hash_str(data->m_name, strlen(data->m_name));
+    return data->m_name ? cpe_hash_str(data->m_name, strlen(data->m_name)) : 1;
 }
 
 static int dr_inbuild_meta_cmp(const struct DRInBuildMeta * l, const struct DRInBuildMeta * r) {
@@ -126,22 +127,15 @@ void dr_inbuild_metalib_remove_macro(struct DRInBuildMetaLib * inBuildMetaLib, s
     free(macro);
 }
 
-int dr_inbuild_metalib_find_macro_value(
-    int32_t * value, struct DRInBuildMetaLib * inBuildMetaLib,
-    const char * macro_name, size_t macro_name_len)
+struct DRInBuildMacro *
+dr_inbuild_metalib_find_macro(
+    struct DRInBuildMetaLib * inBuildMetaLib, const char * macro_name)
 {
     struct DRInBuildMacro key;
-    struct DRInBuildMacro * macro;
 
-    if ((macro_name_len + 1) > sizeof(key.m_name)) return -1;
-    memcpy(key.m_name, macro_name, macro_name_len);
-    key.m_name[macro_name_len] = 0;
+    key.m_name = (char *)macro_name;
 
-    macro = (struct DRInBuildMacro *)cpe_hash_table_find(&inBuildMetaLib->m_index_macros, &key);
-    if (macro == NULL) return -1;
-
-    *value = macro->m_data.m_value;
-    return 0;
+    return (struct DRInBuildMacro *)cpe_hash_table_find(&inBuildMetaLib->m_index_macros, &key);
 }
 
 struct DRInBuildMeta *

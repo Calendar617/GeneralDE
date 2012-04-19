@@ -27,8 +27,8 @@ struct DRInBuildMeta {
     int m_entries_count;
 
     struct tagDRMeta m_data;
-    char m_desc[CPE_DR_DESC_LEN];
-    char m_name[CPE_DR_NAME_LEN];
+    char * m_desc;
+    char * m_name;
 };
 
 struct DRInBuildMetaEntry {
@@ -36,9 +36,9 @@ struct DRInBuildMetaEntry {
 
     struct tagDRMetaEntry m_data;
     int m_ignore;
-    char m_name[CPE_DR_NAME_LEN];
-    char m_desc[CPE_DR_DESC_LEN];
-    char m_cname[CPE_DR_CHNAME_LEN];
+    char * m_name;
+    char * m_desc;
+    char * m_cname;
     char * m_ref_type_name;
     char * m_selector_path;
     char * m_refer_path;
@@ -50,8 +50,8 @@ struct DRInBuildMacro {
     struct cpe_hash_entry m_hh;
 
     struct tagDRMacro m_data;
-    char m_name[CPE_DR_MACRO_LEN];
-    char m_desc[CPE_DR_DESC_LEN];
+    char * m_name;
+    char * m_desc;
 };
 
 #endif
