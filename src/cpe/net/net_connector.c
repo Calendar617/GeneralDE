@@ -20,7 +20,6 @@ net_connector_create(
     net_connector_t connector;
     char * buf;
     size_t nameLen;
-    struct sockaddr_in * inetAddr;
 
     nameLen = CPE_PAL_ALIGN_8(strlen(name) + 1);
 
@@ -36,11 +35,6 @@ net_connector_create(
     connector->m_monitor_fun = NULL;
     connector->m_monitor_ctx = NULL;
 
-    inetAddr = (struct sockaddr_in *)(&connector->m_addr);
-    inetAddr->sin_family = AF_INET;
-    inetAddr->sin_port = htons(port);
-    inetAddr->sin_addr.s_addr = inet_addr(ip);
-
     connector->m_ep = NULL;
     cpe_hash_entry_init(&connector->m_hh);
 
@@ -49,6 +43,9 @@ net_connector_create(
         mem_free(nmgr->m_alloc, buf);
         return NULL;
     }
+
+    net_connector_set_address(connector, ip, port);
+
     return connector;
 }
 
@@ -63,6 +60,19 @@ void net_connector_free(net_connector_t connector) {
 
     cpe_hash_table_remove_by_ins(&connector->m_mgr->m_connectors, connector);
     mem_free(connector->m_mgr->m_alloc, (void*)connector->m_name);
+}
+
+int net_connector_set_address(net_connector_t connector, const char * ip, short port) {
+    struct sockaddr_in * inetAddr;
+
+    if (connector->m_state != net_connector_state_disable) return -1;
+
+    inetAddr = (struct sockaddr_in *)(&connector->m_addr);
+    inetAddr->sin_family = AF_INET;
+    inetAddr->sin_port = htons(port);
+    inetAddr->sin_addr.s_addr = inet_addr(ip);
+
+    return 0;
 }
 
 net_connector_t
