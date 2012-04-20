@@ -38,14 +38,16 @@ int bpg_net_agent_reply(dp_req_t req, void * ctx, error_monitor_t em) {
             if (main_meta) {
                 CPE_ERROR(
                     agent->m_em,
-                    "%s: ==> client=%d, cmd=%s(%d)",
-                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), dr_meta_name(main_meta), bpg_pkg_cmd(pkg));
+                    "%s: ==> client=%d, ep=%d, cmd=%s(%d)",
+                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), (int)bpg_pkg_connection_id(pkg),
+                    dr_meta_name(main_meta), bpg_pkg_cmd(pkg));
             }
             else {
                 CPE_ERROR(
                     agent->m_em,
-                    "%s: ==> client=%d, cmd=%d",
-                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), bpg_pkg_cmd(pkg));
+                    "%s: ==> client=%d, ep=%d, cmd=%d",
+                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), (int)bpg_pkg_connection_id(pkg),
+                    bpg_pkg_cmd(pkg));
             }
 
             break;
@@ -57,16 +59,16 @@ int bpg_net_agent_reply(dp_req_t req, void * ctx, error_monitor_t em) {
             if (main_meta) {
                 CPE_ERROR(
                     agent->m_em,
-                    "%s: ==> client=%d, cmd=%s(%d)\n%s",
-                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), dr_meta_name(main_meta), bpg_pkg_cmd(pkg),
-                    bpg_pkg_dump(pkg, &buffer));
+                    "%s: ==> client=%d, ep=%d, cmd=%s(%d)\n%s",
+                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), (int)bpg_pkg_connection_id(pkg),
+                    dr_meta_name(main_meta), bpg_pkg_cmd(pkg), bpg_pkg_dump(pkg, &buffer));
             }
             else {
                 CPE_ERROR(
                     agent->m_em,
-                    "%s: ==> client=%d, cmd=%d\n%s",
-                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), bpg_pkg_cmd(pkg),
-                    bpg_pkg_dump(pkg, &buffer));
+                    "%s: ==> client=%d, ep=%d, cmd=%d\n%s",
+                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), (int)bpg_pkg_connection_id(pkg),
+                    bpg_pkg_cmd(pkg), bpg_pkg_dump(pkg, &buffer));
             }
 
             mem_buffer_clear(&buffer);

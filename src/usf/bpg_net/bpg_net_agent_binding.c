@@ -7,12 +7,19 @@ bpg_net_pkg_next_step_t
 bpg_net_agent_process_recv(bpg_net_agent_t agent, uint64_t client_id, uint32_t connection_id) {
     struct bpg_net_agent_binding * binding;
 
+    if (connection_id == BPG_INVALID_CONNECTION_ID) {
+        CPE_ERROR(
+            agent->m_em, "%s: ep %d: binding: connection is invalid!",
+            bpg_net_agent_name(agent), (int)connection_id);
+        return bpg_net_pkg_next_close;
+    }
+
     if (client_id != 0) {
-        binding = bpg_net_agent_binding_find_by_client_id(agent, client_id);
+        binding = bpg_net_agent_binding_find_by_connection_id(agent, connection_id);
         if (binding == NULL) {
             if (agent->m_debug) {
                 CPE_INFO(
-                    agent->m_em, "%s: ep %d: binding: client %d no binding, accept incoming!",
+                    agent->m_em, "%s: ep %d: binding: connection no binding, bind to client %d!",
                     bpg_net_agent_name(agent), (int)connection_id, (int)client_id);
             }
 
@@ -27,37 +34,19 @@ bpg_net_agent_process_recv(bpg_net_agent_t agent, uint64_t client_id, uint32_t c
             }
         }
         else {
-            if (binding->m_connection_id != connection_id) {
-                if (agent->m_debug) {
-                    CPE_INFO(
-                        agent->m_em, "%s: ep %d: binding: client %d receive new connection, old id %d!",
-                        bpg_net_agent_name(agent), (int)connection_id, (int)client_id,
-                        (int)binding->m_connection_id);
-                }
-                return bpg_net_pkg_next_go_with_connection_id;
+            if (binding->m_client_id != client_id) {
+                CPE_ERROR(
+                    agent->m_em, "%s: ep %d: binding: connection already bind to client %d, now client is %d!",
+                    bpg_net_agent_name(agent), (int)connection_id, (int)binding->m_client_id, (int)client_id);
+                return bpg_net_pkg_next_close;
             }
             else {
                 return bpg_net_pkg_next_go_without_connection_id;
             }
         }
     }
-    else if (connection_id != BPG_INVALID_CONNECTION_ID) {
-        binding = bpg_net_agent_binding_find_by_connection_id(agent, connection_id);
-        if (binding) {
-            CPE_ERROR(
-                agent->m_em, "%s: ep %d: binding: connection already binding to client %d!",
-                bpg_net_agent_name(agent), (int)connection_id, (int)binding->m_client_id);
-            return bpg_net_pkg_next_close;
-        }
-        else {
-            return bpg_net_pkg_next_go_with_connection_id;
-        }
-    }
     else {
-        CPE_ERROR(
-            agent->m_em, "%s: ep %d: binding: not client_id or connection_id is valid!",
-            bpg_net_agent_name(agent), (int)connection_id);
-        return bpg_net_pkg_next_close;
+        return bpg_net_pkg_next_go_with_connection_id;
     }
 }
 
@@ -79,7 +68,7 @@ net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t agent, uint64_t client_id, 
             if (binding == NULL) {
                 if (agent->m_debug) {
                     CPE_INFO(
-                        agent->m_em, "%s: ep %d: binding: client %d no binding, accept incoming!",
+                        agent->m_em, "%s: ep %d: binding: client %d no binding, accept replay!",
                         bpg_net_agent_name(agent), (int)connection_id, (int)client_id);
                 }
 
@@ -87,6 +76,23 @@ net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t agent, uint64_t client_id, 
                     CPE_ERROR(
                         agent->m_em, "%s: ep %d: binding: create binding fail!",
                         bpg_net_agent_name(agent), (int)connection_id);
+                }
+            }
+            else if (binding->m_client_id != client_id) {
+                uint64_t old_client_id = binding->m_client_id;
+                bpg_net_agent_binding_free(agent, binding);
+
+                if (bpg_net_agent_binding_create(agent, client_id, connection_id) != 0) {
+                    CPE_ERROR(
+                        agent->m_em, "%s: ep %d: binding: create binding fail!",
+                        bpg_net_agent_name(agent), (int)connection_id);
+                }
+                else {
+                    if (agent->m_debug) {
+                        CPE_INFO(
+                            agent->m_em, "%s: ep %d: binding: client %d replace old binding %d!",
+                            bpg_net_agent_name(agent), (int)connection_id, (int)client_id, (int)old_client_id);
+                    }
                 }
             }
         }            
