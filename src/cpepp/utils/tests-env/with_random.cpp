@@ -51,4 +51,17 @@ void with_random::t_random_expect_gen(uint32_t r1, uint32_t r2, uint32_t r3) {
         ;
 }
 
+void with_random::t_random_expect_default( uint32_t r, uint32_t nTime){
+	ON_CALL( m_random_mock,generate(::testing::_))
+		.WillByDefault( ::testing::Return( r ) );
+
+	EXPECT_CALL(m_random_mock, generate(::testing::_))
+		.Times(::testing::AtLeast(nTime));
+}
+
+void with_random::t_random_not_care(){
+	EXPECT_CALL(m_random_mock, generate(::testing::_))
+		.Times(::testing::AtLeast(0));
+}
+
 }}}
