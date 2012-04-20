@@ -17,21 +17,7 @@ bpg_net_agent_process_recv(bpg_net_agent_t agent, uint64_t client_id, uint32_t c
     if (client_id != 0) {
         binding = bpg_net_agent_binding_find_by_connection_id(agent, connection_id);
         if (binding == NULL) {
-            if (agent->m_debug) {
-                CPE_INFO(
-                    agent->m_em, "%s: ep %d: binding: connection no binding, bind to client %d!",
-                    bpg_net_agent_name(agent), (int)connection_id, (int)client_id);
-            }
-
-            if (bpg_net_agent_binding_create(agent, client_id, connection_id) != 0) {
-                CPE_ERROR(
-                    agent->m_em, "%s: ep %d: binding: create binding fail!",
-                    bpg_net_agent_name(agent), (int)connection_id);
-                return bpg_net_pkg_next_close;
-            }
-            else {
-                return bpg_net_pkg_next_go_with_connection_id;
-            }
+            return bpg_net_pkg_next_go_with_connection_id;
         }
         else {
             if (binding->m_client_id != client_id) {
