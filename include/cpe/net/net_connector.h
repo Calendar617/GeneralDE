@@ -21,6 +21,11 @@ net_connector_create_with_ep(
     const char * ip,
     short port);
 
+int net_connector_set_address(
+    net_connector_t connector,
+    const char * ip,
+    short port);
+
 void net_connector_free(net_connector_t connector);
 
 net_connector_t
