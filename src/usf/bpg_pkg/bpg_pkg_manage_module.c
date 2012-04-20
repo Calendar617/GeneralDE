@@ -79,7 +79,7 @@ bpg_pkg_manage_app_load_calc_debug_level(gd_app_context_t app, gd_app_module_t m
 
     if (strcmp(value, "none") == 0) return bpg_pkg_debug_none;
     if (strcmp(value, "summary") == 0) return bpg_pkg_debug_summary;
-    if (strcmp(value, "details") == 0) return bpg_pkg_debug_detail;
+    if (strcmp(value, "detail") == 0) return bpg_pkg_debug_detail;
     if (strcmp(value, "progress") == 0) return bpg_pkg_debug_progress;
 
     CPE_ERROR(
