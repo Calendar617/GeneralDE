@@ -2,5 +2,5 @@ t/3rdTools/gtest
 t/3rdTools/libxml2
 t/3rdTools/yajl
 t/3rdTools/yaml
-t/3rdTools/loki
-t/3rdTools/gmock
+t/support/dr2
+t/3rdTools/libev
