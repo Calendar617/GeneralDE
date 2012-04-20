@@ -1,6 +1,7 @@
 #ifndef CPEPP_CFG_NODE_PLACEHOLD_H
 #define CPEPP_CFG_NODE_PLACEHOLD_H
 #include "cpe/cfg/cfg_read.h"
+#include "cpe/utils/string_utils.h"
 #include "cpepp/utils/CString.hpp"
 #include "System.hpp"
 #include "NodeIterator.hpp"
@@ -12,8 +13,6 @@ public:
     operator cfg_t (void) const { return m_node; }
 
     operator Node const & (void) const { return *(Node*)m_node; }
-
-    Node const & must_exist(void) const;
 
     ConstNodePlacehold operator[](const char * path) const { 
         return ConstNodePlacehold(*this, path, cfg_find_cfg(m_node, path));
@@ -77,6 +76,8 @@ public:
         return Utils::CString::_cast((const char *)(dft(v)));
     }
 
+    cfg_t to_node(cpe_str_buf_t buf) const;
+
 private:
     ConstNodePlacehold(ConstNodePlacehold const & parent, const char * path, cfg_t node)
         : m_parent_p(&parent)
@@ -116,14 +117,26 @@ friend class NodePlacehold;
 
 class NodePlacehold : public ConstNodePlacehold {
 public:
-    using ConstNodePlacehold::operator Node const &;
-    using ConstNodePlacehold::must_exist;
     using ConstNodePlacehold::operator[];
     using ConstNodePlacehold::childs;
-    using ConstNodePlacehold::operator=;
 
+    operator Node const & (void) const { return *(Node*)m_node; }
     operator Node & (void) { return *(Node*)m_node; }
-    Node & must_exist(void);
+
+    Node & createStruct(void);
+    Node & createSeq(void);
+
+    NodePlacehold & operator=(int8_t v);
+    NodePlacehold & operator=(uint8_t v);
+    NodePlacehold & operator=(int16_t v);
+    NodePlacehold & operator=(uint16_t v);
+    NodePlacehold & operator=(int32_t v);
+    NodePlacehold & operator=(uint32_t v);
+    NodePlacehold & operator=(int64_t v);
+    NodePlacehold & operator=(uint64_t v);
+    NodePlacehold & operator=(float v);
+    NodePlacehold & operator=(double v);
+    NodePlacehold & operator=(const char * v);
 
     NodePlacehold operator[](const char * path) { 
         return NodePlacehold(*this, path, cfg_find_cfg(m_node, path));
@@ -151,6 +164,7 @@ private:
     {
     }
 
+    ConstNodePlacehold & operator=(ConstNodePlacehold const & o);
     NodePlacehold & operator=(NodePlacehold const & o);
 
 friend class Node;

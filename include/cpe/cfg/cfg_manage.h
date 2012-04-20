@@ -48,6 +48,23 @@ cfg_t cfg_seq_add_value_from_string(cfg_t s, int typeId, const char * value);
 cfg_t cfg_seq_add_value_from_string_auto(cfg_t s, const char * value);
 cfg_t cfg_seq_add_value_from_binary(cfg_t s, int typeId, const void * value);
 
+cfg_t cfg_add_struct(cfg_t c, const char * path, error_monitor_t em);
+cfg_t cfg_add_seq(cfg_t c, const char * path, error_monitor_t em);
+cfg_t cfg_add_string(cfg_t c, const char * path, const char * value, error_monitor_t em);
+cfg_t cfg_add_int8(cfg_t c, const char * path, int8_t v, error_monitor_t em);
+cfg_t cfg_add_uint8(cfg_t c, const char * path, uint8_t v, error_monitor_t em);
+cfg_t cfg_add_int16(cfg_t c, const char * path, int16_t v, error_monitor_t em);
+cfg_t cfg_add_uint16(cfg_t c, const char * path, uint16_t v, error_monitor_t em);
+cfg_t cfg_add_int32(cfg_t c, const char * path, int32_t v, error_monitor_t em);
+cfg_t cfg_add_uint32(cfg_t c, const char * path, uint32_t v, error_monitor_t em);
+cfg_t cfg_add_int64(cfg_t c, const char * path, int64_t v, error_monitor_t em);
+cfg_t cfg_add_uint64(cfg_t c, const char * path, uint64_t v, error_monitor_t em);
+cfg_t cfg_add_float(cfg_t c, const char * path, float v, error_monitor_t em);
+cfg_t cfg_add_double(cfg_t c, const char * path, double v, error_monitor_t em);
+cfg_t cfg_add_value_from_string(cfg_t c, const char * path, int typeId, const char * value, error_monitor_t em);
+cfg_t cfg_add_value_from_string_auto(cfg_t c, const char * path, const char * value, error_monitor_t em);
+cfg_t cfg_add_value_from_binary(cfg_t c, const char * path, int typeId, const void * value, error_monitor_t em);
+
 int cfg_read(cfg_t cfg, read_stream_t stream, cfg_policy_t policy, error_monitor_t em);
 int cfg_read_with_name(cfg_t cfg, const char * name, read_stream_t stream, cfg_policy_t policy, error_monitor_t em);
 int cfg_write(write_stream_t stream, cfg_t cfg, error_monitor_t em);
