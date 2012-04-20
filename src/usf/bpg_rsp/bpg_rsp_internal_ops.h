@@ -25,6 +25,8 @@ void bpg_rsp_copy_info_clear(bpg_rsp_t rsp);
 
 const char * bpg_rsp_copy_info_data(struct bpg_rsp_copy_info * copy_info);
 
+#define bpg_rsp_pkg_need_debug_detail(_rsp, _pkg) ((_rsp)->m_mgr->m_debug >= 2 || (_pkg && bpg_pkg_debug_level(_pkg) >= bpg_pkg_debug_progress))
+
 #ifdef __cplusplus
 }
 #endif
