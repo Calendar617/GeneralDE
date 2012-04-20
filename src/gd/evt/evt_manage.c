@@ -9,6 +9,7 @@
 #include "cpe/dp/dp_responser.h"
 #include "cpe/dp/dp_request.h"
 #include "cpe/dp/dp_manage.h"
+#include "gd/app/app_log.h"
 #include "gd/app/app_context.h"
 #include "gd/app/app_module.h"
 #include "gd/dr_store/dr_ref.h"
@@ -308,13 +309,13 @@ static void gd_evt_mgr_dispatch_evt(tl_event_t input, void * context) {
     if (dp_dispatch_by_string(gd_evt_target_hs(evt), mgr->m_req, mgr->m_em) != 0) {
         struct write_stream_error stream = CPE_WRITE_STREAM_ERROR_INITIALIZER(mgr->m_em);
         stream_printf((write_stream_t)&stream, "%s: dispatch success, oid=%s, event=", gd_evt_mgr_name(mgr));
-        //gd_evt_duevt->dump((write_stream_t)&stream);
+        gd_evt_dump((write_stream_t)&stream, evt);
     }
     else {
         if (mgr->m_debug) {
             struct write_stream_error stream = CPE_WRITE_STREAM_ERROR_INITIALIZER(mgr->m_em);
             stream_printf((write_stream_t)&stream, "%s: dispatch success, oid=%s, event=", gd_evt_mgr_name(mgr));
-            //gd_evt_duevt->dump((write_stream_t)&stream);
+            gd_evt_dump((write_stream_t)&stream, evt);
         }
     }
 }
@@ -325,20 +326,43 @@ CPE_HS_DEF_VAR(s_gd_evt_mgr_default_name, "gd_evt_mgr");
 CPE_HS_DEF_VAR(gd_evt_req_type_name, "app.event.req");
 
 struct nm_node_type s_nm_node_type_gd_evt_mgr = {
-    "usf_gd_evt_mgr",
+    "gd_evt_mgr",
     gd_evt_mgr_clear
 };
 
 EXPORT_DIRECTIVE
 int gd_evt_mgr_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
     gd_evt_mgr_t gd_evt_mgr;
+    const char * meta;
+
+    meta = cfg_get_string(cfg, "meta", NULL);
+    if (meta == NULL) {
+        APP_CTX_ERROR(
+            app, "%s: create: meta not configured!",
+            gd_app_module_name(module));
+        return -1;
+    }
 
     gd_evt_mgr =
         gd_evt_mgr_create(
             app, gd_app_module_name(module), gd_app_alloc(app), gd_app_em(app));
     if (gd_evt_mgr == NULL) return -1;
 
+    if (gd_evt_mgr_set_metalib(gd_evt_mgr, meta) != 0) {
+        APP_CTX_ERROR(
+            app, "%s: create: set meta %s fail!",
+            gd_app_module_name(module), meta);
+        gd_evt_mgr_free(gd_evt_mgr);
+        return -1;
+    }
+
     gd_evt_mgr->m_debug = cfg_get_int32(cfg, "debug", 0);
+
+    if (gd_evt_mgr->m_debug) {
+        CPE_INFO(
+            gd_app_em(app), "%s: create: done",
+            gd_evt_mgr_name(gd_evt_mgr));
+    }
 
     return 0;
 }
