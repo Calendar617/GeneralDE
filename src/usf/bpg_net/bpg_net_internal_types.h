@@ -22,6 +22,8 @@ struct bpg_net_agent {
     size_t m_read_chanel_size;
     size_t m_write_chanel_size;
 
+    int32_t m_cmd_disconnect;
+
     dp_rsp_t m_reply_rsp;
 
     struct cpe_hash_table m_cliensts;

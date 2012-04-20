@@ -48,6 +48,8 @@ bpg_net_agent_create(
     mgr->m_read_chanel_size = 2048;
     mgr->m_write_chanel_size = 2048;
 
+    mgr->m_cmd_disconnect = 0;
+
     mem_buffer_init(&mgr->m_rsp_buf, alloc);
 
     if (cpe_hash_table_init(

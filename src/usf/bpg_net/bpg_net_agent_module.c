@@ -2,6 +2,7 @@
 #include "cpe/pal/pal_external.h"
 #include "cpe/cfg/cfg_read.h"
 #include "cpe/dr/dr_cvt.h"
+#include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/net/net_listener.h"
 #include "cpe/nm/nm_manage.h"
 #include "cpe/nm/nm_read.h"
@@ -12,6 +13,41 @@
 #include "usf/bpg_pkg/bpg_pkg_manage.h"
 #include "usf/bpg_net/bpg_net_agent.h"
 #include "bpg_net_internal_ops.h"
+
+static int32_t bpg_net_agent_load_cmd(bpg_net_agent_t agent, cfg_t cfg, int32_t dft) {
+    if (cfg == NULL) return dft;
+
+    if(cfg_type(cfg) == CPE_DR_TYPE_STRING) {
+        LPDRMETALIB metalib;
+        int buf;
+
+        metalib = bpg_pkg_manage_data_metalib(agent->m_pkg_manage);
+        if (metalib == NULL) {
+            CPE_ERROR(
+                agent->m_em, "%s: load cmd %s: no meta lib!",
+                bpg_net_agent_name(agent), cfg_name(cfg));
+            return dft;
+        }
+
+        if (dr_lib_find_macro_value(&buf, metalib, cfg_as_string(cfg, "")) != 0) {
+            CPE_ERROR(
+                agent->m_em, "%s: load cmd %s: macro %s not exist!",
+                bpg_net_agent_name(agent), cfg_name(cfg), cfg_as_string(cfg, ""));
+            return dft;
+        }
+
+        return buf;
+    }
+    else {
+        int32_t r;
+        if (cfg_try_as_int32(cfg, &r) != 0) {
+            
+            r = dft;
+        }
+
+        return r;
+    }
+}
 
 EXPORT_DIRECTIVE
 int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
@@ -58,6 +94,11 @@ int bpg_net_agent_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t c
         cfg_get_uint32(cfg, "write-chanel-size", bpg_net_agent->m_write_chanel_size);
 
     bpg_net_agent->m_debug = cfg_get_int32(cfg, "debug", 0);
+    bpg_net_agent->m_cmd_disconnect =
+        bpg_net_agent_load_cmd(
+            bpg_net_agent,
+            cfg_find_cfg(cfg, "cmd-disconnect"),
+            bpg_net_agent->m_cmd_disconnect);
 
     if (dp_rsp_bind_by_cfg(bpg_net_agent->m_reply_rsp, reply_recv_cfg, gd_app_em(app)) != 0) {
         CPE_ERROR(

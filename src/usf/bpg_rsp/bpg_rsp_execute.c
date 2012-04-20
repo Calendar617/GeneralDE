@@ -87,12 +87,14 @@ static int bpg_rsp_copy_main_to_ctx(bpg_rsp_t rsp, logic_context_t op_context, b
 
     mgr = rsp->m_mgr;
 
-    data_meta = bpg_pkg_main_data_meta(req, em);
+    data_meta = bpg_pkg_main_data_meta(req, NULL);
     if (data_meta == NULL) {
-        CPE_ERROR(
-            em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: get data meta fail!",
-            bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp));
-        return -1;
+        if (rsp->m_mgr->m_debug >= 2) {
+            CPE_INFO(
+                em, "%s.%s: bpg_rsp_execute: copy_pkg_to_ctx: get data meta fail!",
+                bpg_rsp_manage_name(mgr), bpg_rsp_name(rsp));
+        }
+        return 0;
     }
 
     data = logic_data_get_or_create(op_context, data_meta, bpg_pkg_body_origin_len(req));
