@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "cpe/pal/pal_external.h"
 #include "cpe/cfg/cfg_read.h"
+#include "cpe/dr/dr_ctypes_op.h"
 #include "cpe/dr/dr_cvt.h"
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/nm/nm_manage.h"
@@ -67,6 +68,93 @@ static int bpg_pkg_manage_app_load_meta(gd_app_context_t app, gd_app_module_t mo
     return 0;
 }
 
+static bpg_pkg_debug_level_t
+bpg_pkg_manage_app_load_calc_debug_level(gd_app_context_t app, gd_app_module_t module, const char * name, const char * value) {
+    if (value == NULL) {
+        CPE_ERROR(
+            gd_app_em(app), "%s: load pkg debug info: %s: no value!",
+            gd_app_module_name(module), name);
+        return -1;
+    }
+
+    if (strcmp(value, "none") == 0) return bpg_pkg_debug_none;
+    if (strcmp(value, "summary") == 0) return bpg_pkg_debug_summary;
+    if (strcmp(value, "details") == 0) return bpg_pkg_debug_detail;
+    if (strcmp(value, "progress") == 0) return bpg_pkg_debug_progress;
+
+    CPE_ERROR(
+        gd_app_em(app), "%s: load pkg debug info: %s: unknown value %s!",
+        gd_app_module_name(module), name, value);
+
+    return -1;
+}
+
+static int bpg_pkg_manage_app_load_pkg_debug_info(gd_app_context_t app, gd_app_module_t module, bpg_pkg_manage_t mgr, cfg_t cfg) {
+    struct cfg_it child_it;
+    cfg_t child;
+    int rv;
+
+    rv = 0;
+
+    cfg_it_init(&child_it, cfg);
+
+    while((child = cfg_it_next(&child_it))) {
+        const char * name;
+        bpg_pkg_debug_level_t level;
+        uint32_t cmd;
+
+        name = cfg_name(child);
+        level = bpg_pkg_manage_app_load_calc_debug_level(app, module, name, cfg_as_string(child, NULL));
+        if (level < 0) {
+            rv = -1;
+            continue;
+        }
+
+        if (strcmp(name, "default") == 0) {
+            mgr->m_pkg_debug_default_level = level;
+            if (mgr->m_debug) {
+                CPE_INFO(
+                    gd_app_em(app), "%s: load pkg debug info: %s => %s",
+                    gd_app_module_name(module), name, cfg_as_string(child, NULL));
+            }
+            continue;
+        }
+
+        if (dr_ctype_try_read_uint32(&cmd, name, CPE_DR_TYPE_STRING, gd_app_em(app)) != 0) {
+            LPDRMETALIB metalib;
+            int buf;
+
+            metalib = bpg_pkg_manage_data_metalib(mgr);
+            if (metalib == NULL) {
+                CPE_ERROR(
+                    gd_app_em(app), "%s: load pkg debug info: %s: no meta lib!",
+                    gd_app_module_name(module), name);
+                rv = -1;
+                continue;
+            }
+
+            if (dr_lib_find_macro_value(&buf, metalib, name) != 0) {
+                CPE_ERROR(
+                    gd_app_em(app), "%s: load pkg debug info: %s: macro not exist!",
+                    gd_app_module_name(module), name);
+                rv = -1;
+                continue;
+            }
+
+            cmd = buf;
+        }
+
+        bpg_pkg_manage_set_debug_level(mgr, cmd, level);
+        if (mgr->m_debug) {
+            CPE_INFO(
+                gd_app_em(app), "%s: load pkg debug info: %s => %s",
+                gd_app_module_name(module), name, cfg_as_string(child, NULL));
+        }
+    }
+
+    return rv;
+}
+
 EXPORT_DIRECTIVE
 int bpg_pkg_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t cfg) {
     bpg_pkg_manage_t bpg_pkg_manage;
@@ -106,6 +194,11 @@ int bpg_pkg_manage_app_init(gd_app_context_t app, gd_app_module_t module, cfg_t 
     if (cfg_get_int32(child_cfg, "validate", 1) != 0
         && bpg_pkg_manage_app_validate_meta(app, module, bpg_pkg_manage) != 0)
     {
+        bpg_pkg_manage_free(bpg_pkg_manage);
+        return -1;
+    }
+
+    if (bpg_pkg_manage_app_load_pkg_debug_info(app, module, bpg_pkg_manage, cfg_find_cfg(cfg, "pkg-debug-infos")) != 0) {
         bpg_pkg_manage_free(bpg_pkg_manage);
         return -1;
     }

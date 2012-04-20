@@ -13,7 +13,7 @@
 static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
     bpg_pkg_t req_buf;
 
-    if(agent->m_debug) {
+    if(agent->m_debug >= 2) {
         CPE_INFO(
             agent->m_em, "%s: ep %d: on read",
             bpg_net_agent_name(agent), (int)net_ep_id(ep));
@@ -56,7 +56,7 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
                 bpg_pkg_base_meta(req_buf),
                 bpg_pkg_pkg_data(req_buf),
                 &output_size,
-                buf, &input_size, agent->m_em, agent->m_debug);
+                buf, &input_size, agent->m_em, agent->m_debug >= 2 ? 1 : 0);
         if (cvt_result == dr_cvt_result_not_enough_input) {
             if(agent->m_debug) {
                 CPE_ERROR(
@@ -74,7 +74,7 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
         }
         net_ep_erase(ep, input_size);
 
-        if(agent->m_debug) {
+        if(agent->m_debug >= 2) {
             CPE_INFO(
                 agent->m_em, "%s: ep %d: decode one package, output-size=%d, buf-origin-size=%d left-size=%d!",
                 bpg_net_agent_name(agent), (int)net_ep_id(ep), (int)output_size, (int)buf_size, (int)net_ep_size(ep));
@@ -88,20 +88,55 @@ static void bpg_net_agent_on_read(bpg_net_agent_t agent, net_ep_t ep) {
             break;
         }
 
-        if(agent->m_debug) {
-            struct mem_buffer buffer;
-            mem_buffer_init(&buffer, NULL);
 
-            CPE_INFO(
-                agent->m_em,
-                "\n\n"
-                "%s: ep %d: read one request, cmd=%d, input-size=%d, output-size=%d!\n"
-                "%s",
-                bpg_net_agent_name(agent), (int)net_ep_id(ep),
-                bpg_pkg_cmd(req_buf), (int)input_size, (int)output_size,
-                bpg_pkg_dump(req_buf, &buffer));
+        if (agent->m_debug) {
+            LPDRMETA main_meta = bpg_pkg_main_data_meta(req_buf, NULL);
 
-            mem_buffer_clear(&buffer);
+            switch (bpg_pkg_debug_level(req_buf)) {
+            case bpg_pkg_debug_summary: {
+                if (main_meta) {
+                    CPE_ERROR(
+                        agent->m_em,
+                        "%s: <== client=%d, ep=%d, cmd=%s(%d), input-size=%d, output-size=%d",
+                        bpg_net_agent_name(agent), (int)bpg_pkg_client_id(req_buf), (int)net_ep_id(ep),
+                        dr_meta_name(main_meta), bpg_pkg_cmd(req_buf), (int)input_size, (int)output_size);
+                }
+                else {
+                    CPE_ERROR(
+                        agent->m_em,
+                        "%s: <== client=%d, ep=%d, cmd=%d, input-size=%d, output-size=%d",
+                        bpg_net_agent_name(agent), (int)bpg_pkg_client_id(req_buf), (int)net_ep_id(ep),
+                        bpg_pkg_cmd(req_buf), (int)input_size, (int)output_size);
+                }
+                break;
+            }
+            case bpg_pkg_debug_detail: {
+                struct mem_buffer buffer;
+                mem_buffer_init(&buffer, NULL);
+
+                if (main_meta) {
+                    CPE_ERROR(
+                        agent->m_em,
+                        "\n\n%s: <== client=%d, ep=%d, cmd=%s(%d), input-size=%d, output-size=%d\n%s",
+                        bpg_net_agent_name(agent), (int)bpg_pkg_client_id(req_buf), (int)net_ep_id(ep),
+                        dr_meta_name(main_meta), bpg_pkg_cmd(req_buf), (int)input_size, (int)output_size,
+                        bpg_pkg_dump(req_buf, &buffer));
+                }
+                else {
+                    CPE_ERROR(
+                        agent->m_em,
+                        "\n\n%s: <== client=%d, ep=%d, cmd=%d, input-size=%d, output-size=%d\n%s",
+                        bpg_net_agent_name(agent), (int)bpg_pkg_client_id(req_buf), (int)net_ep_id(ep),
+                        bpg_pkg_cmd(req_buf), (int)input_size, (int)output_size,
+                        bpg_pkg_dump(req_buf, &buffer));
+                }
+
+                mem_buffer_clear(&buffer);
+                break;
+            }
+            default:
+                break;
+            }
         }
 
         switch(bpg_net_agent_process_recv(agent, bpg_pkg_client_id(req_buf), net_ep_id(ep))) {

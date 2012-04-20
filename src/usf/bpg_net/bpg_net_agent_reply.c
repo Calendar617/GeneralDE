@@ -1,5 +1,6 @@
 #include "cpe/pal/pal_stdio.h"
 #include "cpe/dr/dr_cvt.h"
+#include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/utils/buffer.h"
 #include "cpe/net/net_endpoint.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
@@ -30,17 +31,50 @@ int bpg_net_agent_reply(dp_req_t req, void * ctx, error_monitor_t em) {
     }
 
     if (agent->m_debug) {
-        struct mem_buffer buffer;
-        mem_buffer_init(&buffer, NULL);
+        LPDRMETA main_meta = bpg_pkg_main_data_meta(pkg, NULL);
 
-        CPE_ERROR(
-            agent->m_em,
-            "%s: bpg_net_agent_reply: receive one response!\n"
-            "%s",
-            bpg_net_agent_name(agent),
-            bpg_pkg_dump(pkg, &buffer));
+        switch (bpg_pkg_debug_level(pkg)) {
+        case bpg_pkg_debug_summary: {
+            if (main_meta) {
+                CPE_ERROR(
+                    agent->m_em,
+                    "%s: ==> client=%d, cmd=%s(%d)",
+                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), dr_meta_name(main_meta), bpg_pkg_cmd(pkg));
+            }
+            else {
+                CPE_ERROR(
+                    agent->m_em,
+                    "%s: ==> client=%d, cmd=%d",
+                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), bpg_pkg_cmd(pkg));
+            }
 
-        mem_buffer_clear(&buffer);
+            break;
+        }
+        case bpg_pkg_debug_detail: {
+            struct mem_buffer buffer;
+            mem_buffer_init(&buffer, NULL);
+
+            if (main_meta) {
+                CPE_ERROR(
+                    agent->m_em,
+                    "%s: ==> client=%d, cmd=%s(%d)\n%s",
+                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), dr_meta_name(main_meta), bpg_pkg_cmd(pkg),
+                    bpg_pkg_dump(pkg, &buffer));
+            }
+            else {
+                CPE_ERROR(
+                    agent->m_em,
+                    "%s: ==> client=%d, cmd=%d\n%s",
+                    bpg_net_agent_name(agent), (int)bpg_pkg_client_id(pkg), bpg_pkg_cmd(pkg),
+                    bpg_pkg_dump(pkg, &buffer));
+            }
+
+            mem_buffer_clear(&buffer);
+            break;
+        }
+        default:
+            break;
+        }
     }
     
     ep = bpg_net_agent_process_reply(
@@ -65,7 +99,7 @@ int bpg_net_agent_reply(dp_req_t req, void * ctx, error_monitor_t em) {
             &write_size,
             bpg_pkg_pkg_data(pkg),
             &pkg_size,
-            agent->m_em, agent->m_debug);
+            agent->m_em, agent->m_debug >= 2 ? 1 : 0);
     if (cvt_result != dr_cvt_result_success) {
         CPE_ERROR(
             agent->m_em, "%s: bpg_net_agent_reply: encode package for send fail!",
@@ -91,7 +125,7 @@ int bpg_net_agent_reply(dp_req_t req, void * ctx, error_monitor_t em) {
         return 0;
     }
     
-    if (agent->m_debug) {
+    if (agent->m_debug >= 2) {
         CPE_ERROR(
             agent->m_em,
             "%s: bpg_net_agent_reply: send one response, write-size=" FMT_SIZE_T " !\n\n",

@@ -52,7 +52,7 @@ int bpg_net_client_send(dp_req_t req, void * ctx, error_monitor_t em) {
             &write_size,
             bpg_pkg_pkg_data(pkg),
             &pkg_size,
-            client->m_em, client->m_debug);
+            client->m_em, client->m_debug >= 2 ? 1 : 0);
     if (cvt_result != dr_cvt_result_success) {
         CPE_ERROR(
             client->m_em, "%s: bpg_net_client_send: encode package for send fail!",

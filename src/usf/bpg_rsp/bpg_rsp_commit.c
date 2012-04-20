@@ -52,7 +52,7 @@ void bpg_rsp_commit(logic_context_t op_context, void * user_data) {
 
     bpg_private = (struct bpg_carry_info *)logic_data_data(bpg_private_data);
     if (bpg_private->no_response) {
-        if (bpg_rsp->m_mgr->m_debug) {
+        if (bpg_rsp->m_mgr->m_debug >= 2) {
             CPE_INFO(
                 em, "%s.%s: bpg_rsp_commit: ignore send response!",
                 bpg_rsp_manage_name(bpg_mgr), bpg_rsp_name(bpg_rsp));
@@ -151,7 +151,7 @@ static int bpg_rsp_commit_build_pkg_append_info_from_ctx(
         return 0;
     }
 
-    if (rsp->m_mgr->m_debug) {
+    if (rsp->m_mgr->m_debug >= 2) {
         CPE_INFO(
             em, "%s.%s: copy_ctx_to_pdu: %s: append data to pkg from context success, write-size="  FMT_SIZE_T "!",
             bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), dr_meta_name(data_meta), size);
@@ -170,7 +170,7 @@ static int bpg_rsp_commit_build_pkg_append_info_from_builder(
         if (pkg_builder->m_build_fun) {
             switch(pkg_builder->m_build_fun(pkg, op_context, data_name, pkg_builder->m_build_ctx)) {
             case bpg_pkg_build_result_success: {
-                if (rsp->m_mgr->m_debug) {
+                if (rsp->m_mgr->m_debug >= 2) {
                     CPE_INFO(
                         em, "%s.%s: copy_ctx_to_pdu: %s: append data to pkg from context success!",
                         bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), data_name);
@@ -294,7 +294,7 @@ static int bpg_rsp_commit_build_pkg_main_info(bpg_rsp_t rsp, logic_context_t op_
         return -1;
     }
 
-    if (rsp->m_mgr->m_debug) {
+    if (rsp->m_mgr->m_debug >= 2) {
         CPE_INFO(
             em, "%s.%s: copy_ctx_to_pdu: main: meta = %s, wirte-size=%d!",
             bpg_rsp_manage_name(rsp->m_mgr), bpg_rsp_name(rsp), dr_meta_name(meta), (int)size);

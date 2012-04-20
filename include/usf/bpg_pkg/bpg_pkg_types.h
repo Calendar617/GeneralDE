@@ -19,6 +19,13 @@ typedef struct bpg_pkg_dsp * bpg_pkg_dsp_t;
 
 #define BPG_INVALID_CONNECTION_ID ((int32_t)-1)
 
+typedef enum bpg_pkg_debug_level {
+    bpg_pkg_debug_none
+    , bpg_pkg_debug_summary
+    , bpg_pkg_debug_detail
+    , bpg_pkg_debug_progress
+} bpg_pkg_debug_level_t;
+
 #ifdef __cplusplus
 }
 #endif

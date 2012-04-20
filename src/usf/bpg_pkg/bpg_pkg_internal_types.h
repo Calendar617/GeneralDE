@@ -21,7 +21,16 @@ struct bpg_pkg_manage {
     dr_cvt_t m_base_cvt;
     dr_cvt_t m_data_cvt;
 
+    struct cpe_hash_table m_pkg_debug_infos;
+    bpg_pkg_debug_level_t m_pkg_debug_default_level;
+
     int m_debug;
+};
+
+struct bpg_pkg_debug_info {
+    uint32_t m_cmd;
+    bpg_pkg_debug_level_t m_debug_level;
+    struct cpe_hash_entry m_hh;
 };
 
 struct bpg_pkg {

@@ -89,6 +89,8 @@ int bpg_pkg_get_append_data(bpg_pkg_t pkg, bpg_pkg_append_info_t append_inf, LPD
 const char * bpg_pkg_dump(bpg_pkg_t req, mem_buffer_t buffer);
 int bpg_pkg_build_from_cfg(bpg_pkg_t req, cfg_t cfg, error_monitor_t em);
 
+bpg_pkg_debug_level_t bpg_pkg_debug_level(bpg_pkg_t req);
+
 #ifdef __cplusplus
 }
 #endif

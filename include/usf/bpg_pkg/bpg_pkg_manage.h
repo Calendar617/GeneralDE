@@ -48,6 +48,9 @@ const char * bpg_pkg_manage_cmd_meta_name(bpg_pkg_manage_t mgr);
 const char * bpg_pkg_manage_data_metalib_name(bpg_pkg_manage_t mgr);
 LPDRMETALIB bpg_pkg_manage_data_metalib(bpg_pkg_manage_t mgr);
 
+bpg_pkg_debug_level_t bpg_pkg_manage_debug_level(bpg_pkg_manage_t mgr, uint32_t cmd);
+void bpg_pkg_manage_set_debug_level(bpg_pkg_manage_t mgr, uint32_t cmd, bpg_pkg_debug_level_t level);
+
 #ifdef __cplusplus
 }
 #endif

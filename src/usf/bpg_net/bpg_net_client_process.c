@@ -12,7 +12,7 @@
 static void bpg_net_client_on_read(bpg_net_client_t client, net_ep_t ep) {
     bpg_pkg_t req_buf;
 
-    if(client->m_debug) {
+    if(client->m_debug >= 2) {
         CPE_INFO(
             client->m_em, "%s: ep %d: on read",
             bpg_net_client_name(client), (int)net_ep_id(ep));
@@ -55,7 +55,7 @@ static void bpg_net_client_on_read(bpg_net_client_t client, net_ep_t ep) {
                 bpg_pkg_base_meta(req_buf),
                 bpg_pkg_pkg_data(req_buf),
                 &output_size,
-                buf, &input_size, client->m_em, client->m_debug);
+                buf, &input_size, client->m_em, client->m_debug >= 2 ? 1 : 0);
         if (cvt_result == dr_cvt_result_not_enough_input) {
             if(client->m_debug) {
                 CPE_ERROR(
@@ -73,7 +73,7 @@ static void bpg_net_client_on_read(bpg_net_client_t client, net_ep_t ep) {
         }
         net_ep_erase(ep, input_size);
 
-        if(client->m_debug) {
+        if(client->m_debug >= 2) {
             CPE_INFO(
                 client->m_em, "%s: ep %d: decode one package, output-size=%d, buf-origin-size=%d left-size=%d!",
                 bpg_net_client_name(client), (int)net_ep_id(ep), (int)output_size, (int)buf_size, (int)net_ep_size(ep));

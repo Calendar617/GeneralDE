@@ -11,7 +11,7 @@
 #include "gd/dr_store/dr_store_manage.h"
 #include "usf/bpg_pkg/bpg_pkg.h"
 #include "usf/bpg_pkg/bpg_pkg_manage.h"
-#include "bpg_pkg_internal_types.h"
+#include "bpg_pkg_internal_ops.h"
 
 static void bpg_pkg_manage_clear(nm_node_t node);
 
@@ -48,6 +48,7 @@ bpg_pkg_manage_create(
     mgr->m_base_cvt = NULL;
     mgr->m_data_cvt = NULL;
     mgr->m_metalib_ref = NULL;
+    mgr->m_pkg_debug_default_level = bpg_pkg_debug_none;
 
     mgr->m_cmd_meta_name[0] = 0;
     mgr->m_cmd_meta = NULL;
@@ -58,6 +59,20 @@ bpg_pkg_manage_create(
             BPG_BASEPKG_LIB_NAME);
     if (mgr->m_metalib_basepkg_ref == NULL) {
         CPE_ERROR(em, "%s: create: create basepkg_ref fail!", name);
+        nm_node_free(mgr_node);
+        return NULL;
+    }
+
+    if (cpe_hash_table_init(
+            &mgr->m_pkg_debug_infos,
+            mgr->m_alloc,
+            (cpe_hash_fun_t) bpg_pkg_debug_info_hash,
+            (cpe_hash_cmp_t) bpg_pkg_debug_info_cmp,
+            CPE_HASH_OBJ2ENTRY(bpg_pkg_debug_info, m_hh),
+            -1) != 0)
+    {
+        CPE_ERROR(em, "%s: create: init bpg_pkg_debug_info hash table fail!", name);
+        dr_ref_free(mgr->m_metalib_basepkg_ref);
         nm_node_free(mgr_node);
         return NULL;
     }
@@ -90,6 +105,9 @@ static void bpg_pkg_manage_clear(nm_node_t node) {
         dr_ref_free(mgr->m_metalib_ref);
         mgr->m_metalib_ref = NULL;
     }
+
+    bpg_pkg_debug_info_free_all(mgr);
+    cpe_hash_table_fini(&mgr->m_pkg_debug_infos);
 }
 
 void bpg_pkg_manage_free(bpg_pkg_manage_t mgr) {

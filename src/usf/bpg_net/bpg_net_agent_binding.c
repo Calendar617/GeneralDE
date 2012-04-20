@@ -72,27 +72,26 @@ net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t agent, uint64_t client_id, 
                 bpg_net_agent_name(agent), (int)connection_id);
             return NULL;
         }
-        else {
-            if (client_id != 0) {
-                struct bpg_net_agent_binding * binding =
-                    bpg_net_agent_binding_find_by_connection_id(agent, connection_id);
-                if (binding == NULL) {
-                    if (agent->m_debug) {
-                        CPE_INFO(
-                            agent->m_em, "%s: ep %d: binding: client %d no binding, accept incoming!",
-                            bpg_net_agent_name(agent), (int)connection_id, (int)client_id);
-                    }
 
-                    if (bpg_net_agent_binding_create(agent, client_id, connection_id) != 0) {
-                        CPE_ERROR(
-                            agent->m_em, "%s: ep %d: binding: create binding fail!",
-                            bpg_net_agent_name(agent), (int)connection_id);
-                    }
+        if (client_id != 0) {
+            struct bpg_net_agent_binding * binding =
+                bpg_net_agent_binding_find_by_connection_id(agent, connection_id);
+            if (binding == NULL) {
+                if (agent->m_debug) {
+                    CPE_INFO(
+                        agent->m_em, "%s: ep %d: binding: client %d no binding, accept incoming!",
+                        bpg_net_agent_name(agent), (int)connection_id, (int)client_id);
                 }
-            }            
 
-            return ep;
-        }
+                if (bpg_net_agent_binding_create(agent, client_id, connection_id) != 0) {
+                    CPE_ERROR(
+                        agent->m_em, "%s: ep %d: binding: create binding fail!",
+                        bpg_net_agent_name(agent), (int)connection_id);
+                }
+            }
+        }            
+
+        return ep;
     }
 
     if (client_id != 0) {

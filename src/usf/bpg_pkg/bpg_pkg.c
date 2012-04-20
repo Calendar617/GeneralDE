@@ -341,6 +341,10 @@ uint32_t bpg_pkg_append_info_origin_size(bpg_pkg_append_info_t append_info) {
     return ((struct AppendInfo *)append_info)->originSize;
 }
 
+bpg_pkg_debug_level_t bpg_pkg_debug_level(bpg_pkg_t req) {
+    return bpg_pkg_manage_debug_level(req->m_mgr, bpg_pkg_cmd(req));
+}
+
 const char * bpg_pkg_dump(bpg_pkg_t req, mem_buffer_t buffer) {
     char decode_buf[4 * 1024];
     size_t buf_size;
