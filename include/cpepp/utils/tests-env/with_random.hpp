@@ -22,6 +22,10 @@ public:
     void t_random_expect_gen(uint32_t r1, uint32_t r2);
     void t_random_expect_gen(uint32_t r1, uint32_t r2, uint32_t r3);
 
+	void t_random_expect_default( uint32_t r, uint32_t nTime = 0);
+	//²»¹ØÐÄ
+	void t_random_not_care();
+
 private:
     RandomMock m_random_mock;
 };
