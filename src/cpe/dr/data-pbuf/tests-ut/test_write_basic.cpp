@@ -5,8 +5,9 @@ TEST_F(WriteTest, type_string) {
     installMeta(
         "<metalib tagsetversion='1' name='net'  version='1'>"
         "    <struct name='S' version='1'>"
-        "	     <entry name='a1' type='string' size='5'/>"
+        "	     <entry name='a1' type='int32' id='1'/>"
         "    </struct>"
         "</metalib>"
         );
+    
 }
