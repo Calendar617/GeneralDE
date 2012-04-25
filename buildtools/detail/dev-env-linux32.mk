@@ -5,8 +5,8 @@ linux32.CC=$(linux32.GCC)
 linux32.CXX?=$(shell which g++)
 linux32.AR?=$(shell which ar)
 
-linux32.CFLAGS+=-Wall
-linux32.CXXFLAGS+=-Wall
+linux32.CFLAGS+=-Wall -m32 -fPIC
+linux32.CXXFLAGS+=-Wall -m32 -fPIC
 
 linux32.linker.c:=$(linux32.GCC)
 linux32.linker.cpp:=$(linux32.CXX)
@@ -19,7 +19,7 @@ linux32.CXXFLAGS+=-ggdb
 endif
 
 linux32.LDFLAGS:=-z defs
-linux32.LDFLAGS.share:=--shared -z defs
+linux32.LDFLAGS.share:=--shared -z defs 
 
 linux32.default-lib-type:=dynamic
 linux32.make-static-lib-name=lib$1.a
