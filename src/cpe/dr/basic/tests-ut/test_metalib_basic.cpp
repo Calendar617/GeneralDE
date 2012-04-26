@@ -17,6 +17,10 @@ TEST_F(MetalibManagerTest, Size) {
     ASSERT_EQ((size_t)m_libSize, dr_lib_size(m_lib));
 }
 
+TEST_F(MetalibManagerTest, id) {
+    ASSERT_EQ(123, m_lib->m_id);
+}
+
 TEST_F(MetalibManagerTest, Name) {
     ASSERT_STREQ("net", dr_lib_name(m_lib));
 }
