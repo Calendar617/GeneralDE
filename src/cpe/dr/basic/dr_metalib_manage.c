@@ -42,9 +42,11 @@ LPDRMETA dr_lib_find_meta_by_name(LPDRMETALIB metaLib, const char* name) {
         beginPos < endPos;
         curPos = beginPos + (endPos - beginPos - 1) / 2)
     {
-        struct tagDRMetaIdxByName * curItem = searchStart + curPos;
-        
-        int cmp_result = strcmp(name, base + curItem->m_name_pos);
+        struct tagDRMetaIdxByName * curItem;
+        int cmp_result;
+
+        curItem = searchStart + curPos;
+        cmp_result = strcmp(name, base + (curItem->m_name_pos & 0xFFFFFFFF));
         if (cmp_result == 0) {
             return (LPDRMETA)(base + curItem->m_diff_to_base);
         }
