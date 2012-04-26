@@ -16,7 +16,7 @@ WithInputMetaLibTest::WithInputMetaLibTest()
 void WithInputMetaLibTest::loadLib() {
     ASSERT_TRUE(m_lib == 0) << "lib already loaded!";
 
-    int inputFd = open("input.bin", O_RDONLY);
+    int inputFd = open(CPE_DR_METALIB_SIZE == 64 ? "input.bin.64" : "input.bin.32" , O_RDONLY);
     ASSERT_TRUE(inputFd != -1) << "open input file \"input.bin\" fail!";
 
     struct stat buffer;
