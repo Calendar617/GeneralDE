@@ -38,7 +38,7 @@ struct dr_json_parse_stack_info {
 };
 
 struct dr_json_parse_ctx {
-    struct mem_buffer * m_output;
+    struct mem_buffer * m_output_buf;
     error_monitor_t m_em;
 
     struct dr_json_parse_stack_info m_typeStacks[CPE_DR_MAX_LEVEL];
@@ -69,11 +69,13 @@ static int dr_json_boolean(void * ctx, int boolean) {
     return 1;
 }
 
-char * dr_json_do_parse_calc_write_pos(
+static char * dr_json_do_parse_calc_write_pos(
     struct dr_json_parse_ctx * c, 
     struct dr_json_parse_stack_info * parseType)
 {
-    char * writePos = (char*)parseType->m_data + parseType->m_entry->m_data_start_pos;
+    char * writePos;
+
+    writePos = (char*)parseType->m_data + parseType->m_entry->m_data_start_pos;
 
     if (parseType->m_entry->m_array_count == 1) {
         if (parseType->m_in_array) return NULL;
@@ -126,10 +128,12 @@ char * dr_json_do_parse_calc_write_pos(
         ++parseType->m_array_count;
     }
 
+    if ((writePos - (char*)parseType->m_data) > parseType->m_capacity) return NULL;
+
     return writePos;
 }
  
-void dr_json_do_parse_from_string(
+static void dr_json_do_parse_from_string(
     struct dr_json_parse_ctx * c, 
     struct dr_json_parse_stack_info * parseType,
     const char * s, size_t l)
@@ -261,12 +265,17 @@ static int dr_json_start_map(void * ctx) {
 
         selectEntry = dr_entry_select_entry(curStack->m_entry);
         if (selectEntry) {
-            if (dr_entry_try_read_int32(
-                    &nestStackNode->m_select_data,
-                    (const char *)curStack->m_data + curStack->m_entry->m_select_data_start_pos,
-                    selectEntry, c->m_em) == 0)
-            {
-                nestStackNode->m_select_state = dr_json_read_select_use;
+            if ((dr_entry_element_size(selectEntry) + curStack->m_entry->m_select_data_start_pos) <= curStack->m_capacity) {
+                if (dr_entry_try_read_int32(
+                        &nestStackNode->m_select_data,
+                        (const char *)curStack->m_data + curStack->m_entry->m_select_data_start_pos,
+                        selectEntry, c->m_em) == 0)
+                {
+                    nestStackNode->m_select_state = dr_json_read_select_use;
+                }
+                else {
+                    nestStackNode->m_select_state = dr_json_read_select_error;
+                }
             }
             else {
                 nestStackNode->m_select_state = dr_json_read_select_error;
@@ -313,11 +322,13 @@ static int dr_json_end_array(void * ctx) {
 
     refer = dr_entry_array_refer_entry(curStack->m_entry);
     if (refer) {
-        dr_entry_set_from_int32(
-            (char *)curStack->m_data + curStack->m_entry->m_array_refer_data_start_pos,
-            curStack->m_array_count,
-            refer,
-            c->m_em);
+        if ((dr_entry_element_size(refer) + curStack->m_entry->m_array_refer_data_start_pos) <= curStack->m_capacity) {
+            dr_entry_set_from_int32(
+                (char *)curStack->m_data + curStack->m_entry->m_array_refer_data_start_pos,
+                curStack->m_array_count,
+                refer,
+                c->m_em);
+        }
     }
 
     curStack->m_array_count = 0;
@@ -341,26 +352,38 @@ static yajl_callbacks g_dr_json_callbacks = {
 
 static void dr_json_parse_ctx_init(
     struct dr_json_parse_ctx * ctx,
-    struct mem_buffer * buffer, 
+    void * result,
+    size_t capacity,
+    struct mem_buffer * result_buffer, 
     LPDRMETA meta,
     error_monitor_t em)
 {
     void * p;
+    size_t p_s;
 
     bzero(ctx, sizeof(struct dr_json_parse_ctx));
 
-    ctx->m_output = buffer;
+    ctx->m_output_buf = result_buffer;
 
-    p = mem_buffer_alloc(buffer, dr_meta_size(meta));
+    if (result) {
+        p = result;
+        p_s = capacity;
+    }
+    else {
+        p_s = dr_meta_size(meta);
+        p = mem_buffer_alloc(result_buffer, p_s);
+    }
 
-    dr_json_parse_stack_init(&ctx->m_typeStacks[0], meta, p, dr_meta_size(meta));
+    dr_json_parse_stack_init(&ctx->m_typeStacks[0], meta, p, p_s);
 
     ctx->m_stackPos = -1;
     ctx->m_em = em;
 }
 
-int dr_json_read_i(
-    struct mem_buffer * result, 
+static int dr_json_read_i(
+    void * result,
+    size_t capacity,
+    struct mem_buffer * result_buf, 
     const char * input,
     LPDRMETA meta,
     error_monitor_t em)
@@ -369,7 +392,7 @@ int dr_json_read_i(
     yajl_handle hand;
     yajl_status stat;
 
-    dr_json_parse_ctx_init(&ctx, result, meta, em);
+    dr_json_parse_ctx_init(&ctx, result, capacity, result_buf, meta, em);
 
     hand = yajl_alloc(&g_dr_json_callbacks, NULL, (void *)&ctx);
     if (hand == NULL) {
@@ -388,6 +411,28 @@ int dr_json_read_i(
     return 0;
 }
 
+int dr_json_read(
+    void * result,
+    size_t capacity,
+    const char * input,
+    LPDRMETA meta,
+    error_monitor_t em)
+{
+    int ret = 0;
+
+    if (em) {
+        CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
+        dr_json_read_i(result, capacity, NULL, input, meta, em);
+        CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
+    }
+    else {
+        CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
+        dr_json_read_i(result, capacity, NULL, input, meta, &logError);
+    }
+
+    return ret;
+}
+
 int dr_json_read_to_buffer(
     struct mem_buffer * result, 
     const char * input,
@@ -398,12 +443,12 @@ int dr_json_read_to_buffer(
 
     if (em) {
         CPE_DEF_ERROR_MONITOR_ADD(logError, em, cpe_error_save_last_errno, &ret);
-        dr_json_read_i(result, input, meta, em);
+        dr_json_read_i(NULL, 0, result, input, meta, em);
         CPE_DEF_ERROR_MONITOR_REMOVE(logError, em);
     }
     else {
         CPE_DEF_ERROR_MONITOR(logError, cpe_error_save_last_errno, &ret);
-        dr_json_read_i(result, input, meta, &logError);
+        dr_json_read_i(NULL, 0, result, input, meta, &logError);
     }
 
     return ret;
