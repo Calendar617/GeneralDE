@@ -4,6 +4,7 @@
 #include "with_InputMetaLibTest.hpp"
 
 struct MetaData {
+    int id;
     const char * name;
     const char * desc;
     int type;
@@ -29,6 +30,16 @@ TEST_P(MetaLibManagerMetaTest, CheckData) {
     LPDRMETA pMeta = dr_lib_find_meta_by_name(m_lib, meta.name);
     ASSERT_TRUE(pMeta) << "get meta by name " << meta.name << " fail!";
 
+    if (meta.id != -1) {
+    }
+
+    ASSERT_EQ(meta.id, dr_meta_id(pMeta)) << meta.name << " id error!";
+    if (meta.id != -1) {
+        ASSERT_TRUE(pMeta == dr_lib_find_meta_by_id(m_lib, meta.id))
+            << "get meta by id " << meta.id << " fail!";
+
+    }
+
     ASSERT_STREQ(meta.name, dr_meta_name(pMeta));
 
     ASSERT_STREQ(meta.desc, dr_meta_desc(pMeta)) << meta.name << " desc error!";
@@ -46,11 +57,11 @@ TEST_P(MetaLibManagerMetaTest, CheckData) {
 
 MetaData metaDataCases[] = {
     /*  name       desc             type                size entry_num   current_version  base_version*/
-      {"PkgHead",  "PkgHead.desc",  CPE_DR_TYPE_STRUCT, 20,  6,          1,               1}
-    , {"CmdLogin", "",              CPE_DR_TYPE_STRUCT, 200, 3,          10,              10}
-    , {"CmdLogout","",              CPE_DR_TYPE_STRUCT, 136, 3,          10,              10}
-    , {"PkgBody",  "",              CPE_DR_TYPE_UNION,  200, 2,          10,              10}
-    , {"Pkg",      "",              CPE_DR_TYPE_STRUCT, 220, 2,          10,              10}
+      {1, "PkgHead",  "PkgHead.desc",  CPE_DR_TYPE_STRUCT, 20,  6,          1,               1}
+    , {6, "CmdLogin", "",              CPE_DR_TYPE_STRUCT, 200, 3,          10,              10}
+    , {5, "CmdLogout","",              CPE_DR_TYPE_STRUCT, 136, 3,          10,              10}
+    , {4, "PkgBody",  "",              CPE_DR_TYPE_UNION,  200, 2,          10,              10}
+    , {3, "Pkg",      "",              CPE_DR_TYPE_STRUCT, 220, 2,          10,              10}
 };
 
 INSTANTIATE_TEST_CASE_P(
