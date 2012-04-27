@@ -2,6 +2,7 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_metalib_init.h"
 #include "cpe/dr/dr_metalib_xml.h"
+#include "cpe/dr/dr_json.h"
 #include "cpe/utils/stream_buffer.h"
 
 WriteTest::WriteTest() : m_metaLib(0) {
@@ -36,7 +37,19 @@ void WriteTest::installMeta(const char * def) {
     m_metaLib = (LPDRMETALIB)mem_buffer_make_exactly(&m_metaLib_buffer);
 }
 
-int WriteTest::write(const void * data, size_t data_size, const char * typeName) {
+int WriteTest::write(const char * typeName, const char * defs) {
+    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, typeName);
+    EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
+
+    char buf[1024];
+
+    int r = dr_json_read(buf, sizeof(buf), defs, meta, t_em());
+    EXPECT_GT(r, 0);
+
+    return write(typeName, buf, r);
+}
+
+int WriteTest::write(const char * typeName, const void * data, size_t data_size) {
     LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, typeName);
     EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
 

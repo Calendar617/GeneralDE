@@ -25,7 +25,9 @@ TEST_F(ParseTest, type_union_no_select_use_large) {
     };
 #pragma pack(pop)
 
-    ASSERT_EQ(0, read("{ \"m_s\" : { \"a2\" : 12 }, \"a2\" : 14 }", "S2"));
+    ASSERT_EQ(
+        metaSize("S2"),
+        read("{ \"m_s\" : { \"a2\" : 12 }, \"a2\" : 14 }", "S2"));
 
     struct T * r = (struct T*)result();
     ASSERT_TRUE(r);
@@ -57,7 +59,9 @@ TEST_F(ParseTest, type_union_no_select_use_small) {
     };
 #pragma pack(pop)
 
-    EXPECT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
+    EXPECT_EQ(
+        metaSize("S2"),
+        read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
 
     struct T * r = (struct T*)result();
     ASSERT_TRUE(r);
@@ -89,7 +93,9 @@ TEST_F(ParseTest, type_union_no_select_multi_entry) {
     } expect = { { 13 }, 14  };
 #pragma pack(pop)
 
-    ASSERT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12, \"a2\" : 13 }, \"a2\" : 14 }", "S2"));
+    ASSERT_EQ(
+        metaSize("S2"),
+        read("{ \"m_s\" : { \"a1\" : 12, \"a2\" : 13 }, \"a2\" : 14 }", "S2"));
 
     ASSERT_JSON_READ_RESULT(expect);
 }
@@ -111,7 +117,7 @@ TEST_F(ParseTest, type_union_root) {
     } expect = { 12 };
 #pragma pack(pop)
 
-    ASSERT_EQ(0, read("{ \"a2\" : 12}", "S"));
+    ASSERT_EQ(metaSize("S"), read("{ \"a2\" : 12}", "S"));
 
     ASSERT_JSON_READ_RESULT(expect);
 }
@@ -140,7 +146,9 @@ TEST_F(ParseTest, type_union_selector_basic) {
     };
 #pragma pack(pop)
 
-    ASSERT_EQ(0, read("{ \"s\" : 3, \"u\" : { \"a1\" : 12, \"a2\" : 13 } }", "S2"));
+    ASSERT_EQ(
+        4,
+        read("{ \"s\" : 3, \"u\" : { \"a1\" : 12, \"a2\" : 13 } }", "S2"));
 
     struct T * r = (struct T*)result();
     ASSERT_TRUE(r);

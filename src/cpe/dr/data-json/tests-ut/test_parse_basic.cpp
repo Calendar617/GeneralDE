@@ -15,7 +15,7 @@
         __type a1;                                                      \
     } expect = { __expect };                                            \
                                                                         \
-    ASSERT_EQ(0, read("{ \"a1\" : " __input "}", "S"));                 \
+    ASSERT_EQ(metaSize("S"), read("{ \"a1\" : " __input "}", "S"));     \
     ASSERT_JSON_READ_RESULT(expect);                                    \
 }
 
@@ -36,7 +36,7 @@ TEST_F(ParseTest, type_string) {
         "    </struct>"
         "</metalib>"
         );
-    ASSERT_EQ(0, read("{ \"a1\" : \"abc\"}", "S"));
+    ASSERT_EQ(metaSize("S"), read("{ \"a1\" : \"abc\"}", "S"));
 
     EXPECT_STREQ("abc", (const char *)result());
 }
@@ -49,7 +49,7 @@ TEST_F(ParseTest, type_string_overflow) {
         "    </struct>"
         "</metalib>"
         );
-    ASSERT_EQ(0, read("{ \"a1\" : \"abcde\"}", "S"));
+    ASSERT_EQ(metaSize("S"), read("{ \"a1\" : \"abcde\"}", "S"));
 
     EXPECT_STREQ("abcd", (const char *)result());
 }

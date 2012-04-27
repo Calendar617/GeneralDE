@@ -25,7 +25,7 @@ TEST_F(ParseTest, struct_basic) {
     } expect = { { 12 }, 14  };
 #pragma pack(pop)
 
-    ASSERT_EQ(0, read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
+    ASSERT_EQ(metaSize("S2"), read("{ \"m_s\" : { \"a1\" : 12 }, \"a2\" : 14 }", "S2"));
 
     ASSERT_JSON_READ_RESULT(expect);
 }
@@ -47,7 +47,7 @@ TEST_F(ParseTest, struct_ignore_unknown_key) {
     } expect = { 12, 14  };
 #pragma pack(pop)
 
-    ASSERT_EQ(0, read("{ \"a1\" : 12, \"not-exist\": 15, \"a2\" : 14 }", "S2"));
+    ASSERT_EQ(metaSize("S2"), read("{ \"a1\" : 12, \"not-exist\": 15, \"a2\" : 14 }", "S2"));
 
     ASSERT_JSON_READ_RESULT(expect);
 }
@@ -69,9 +69,11 @@ TEST_F(ParseTest, struct_ignore_unknown_key_with_nest) {
     } expect = { 12, 14  };
 #pragma pack(pop)
 
-    ASSERT_EQ(0, read("{ \"a1\" : 12,"
-                      " \"not-exist\": { \"a2\": 15 },"
-                      " \"a2\" : 14 }", "S2"));
+    ASSERT_EQ(
+        metaSize("S2")
+        , read("{ \"a1\" : 12,"
+               " \"not-exist\": { \"a2\": 15 },"
+               " \"a2\" : 14 }", "S2"));
 
     ASSERT_JSON_READ_RESULT(expect);
 }
@@ -86,8 +88,9 @@ TEST_F(ParseTest, struct_ignore_nest_not_struct) {
         "</metalib>"
         );
 
-    ASSERT_EQ(0, read("{ \"a1\" : { \"a2\": 15 },"
-                      " \"a2\" : 14 }", "S2"));
+    ASSERT_EQ(metaSize("S2")
+              , read("{ \"a1\" : { \"a2\": 15 },"
+                     " \"a2\" : 14 }", "S2"));
 
     EXPECT_EQ(14, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
 }
@@ -102,8 +105,10 @@ TEST_F(ParseTest, struct_ignore_nest_level_2) {
         "</metalib>"
         );
 
-    ASSERT_EQ(0, read("{ \"a1\" : { \"a2\": { \"a2\" : 15 } },"
-                      " \"a2\" : 14 }", "S2"));
+    ASSERT_EQ(
+        metaSize("S2")
+        , read("{ \"a1\" : { \"a2\": { \"a2\" : 15 } },"
+               " \"a2\" : 14 }", "S2"));
 
     EXPECT_EQ(14, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
 }

@@ -348,3 +348,18 @@ int mem_buffer_set_size(mem_buffer_t buffer, size_t size) {
 
     return delta == 0 ? 0 : -1;
 }
+
+void * mem_buffer_at(mem_buffer_t buffer, size_t size) {
+    struct mem_buffer_trunk * trunk;
+
+    if (size > buffer->m_size) return NULL;
+
+    trunk = TAILQ_LAST(&buffer->m_trunks, mem_buffer_trunk_list);
+
+    while(trunk && size > trunk->m_size) {
+        size -= trunk->m_size;
+        trunk = TAILQ_PREV(trunk, mem_buffer_trunk_list, m_next);
+    }
+
+    return trunk ? ((char *)mem_trunk_data(trunk)) + size : 0;
+}

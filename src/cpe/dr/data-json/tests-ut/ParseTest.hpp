@@ -19,6 +19,7 @@ public:
 
     struct mem_buffer m_buffer;
 
+    int metaSize(const char * typeName);
     void installMeta(const char * data);
     int read(const char * data, const char * typeName);
     void * result(int startPos = 0);
