@@ -107,3 +107,13 @@ TEST_F(ParseTest, array_struct_auto_count) {
     EXPECT_EQ(2, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
 }
 
+TEST_F(ParseTest, no_start) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='a1' type='string' size='5'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+    ASSERT_EQ(0, read("\"a1\" : \"abcde\"", "S"));
+}

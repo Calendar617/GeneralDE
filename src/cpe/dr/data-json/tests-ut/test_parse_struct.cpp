@@ -40,16 +40,11 @@ TEST_F(ParseTest, struct_ignore_unknown_key) {
         "</metalib>"
         );
 
-#pragma pack(push,1)
-    struct {
-        int16_t a1;
-        int16_t a2;
-    } expect = { 12, 14  };
-#pragma pack(pop)
 
     ASSERT_EQ(metaSize("S2"), read("{ \"a1\" : 12, \"not-exist\": 15, \"a2\" : 14 }", "S2"));
 
-    ASSERT_JSON_READ_RESULT(expect);
+    EXPECT_EQ(12, dr_ctype_read_int16(result(0), CPE_DR_TYPE_INT16));
+    EXPECT_EQ(14, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
 }
 
 TEST_F(ParseTest, struct_ignore_unknown_key_with_nest) {
