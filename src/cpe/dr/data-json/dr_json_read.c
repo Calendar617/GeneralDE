@@ -260,6 +260,7 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
     struct dr_json_parse_stack_info * curStack;
     LPDRMETAENTRY entry = NULL;
 
+    printf("aaa\n");
     if (c->m_stackPos < 0 || c->m_stackPos >= CPE_DR_MAX_LEVEL) {
         return 1;
     }
