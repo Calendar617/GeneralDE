@@ -260,7 +260,6 @@ static int dr_json_map_key(void * ctx, const unsigned char * stringVal, size_t s
     struct dr_json_parse_stack_info * curStack;
     LPDRMETAENTRY entry = NULL;
 
-    printf("aaa\n");
     if (c->m_stackPos < 0 || c->m_stackPos >= CPE_DR_MAX_LEVEL) {
         return 1;
     }
@@ -318,11 +317,15 @@ static int dr_json_start_map(void * ctx) {
         return 1;
     }
 
-    curStack = &c->m_typeStacks[c->m_stackPos];
+    curStack = NULL;
+    if (c->m_stackPos >= 0 && c->m_stackPos < CPE_DR_MAX_LEVEL) {
+        curStack = &c->m_typeStacks[c->m_stackPos];
+    }
+
     nestStackNode = &c->m_typeStacks[nextStackPos];
 
     ++c->m_stackPos;
-    if (curStack->m_entry == NULL) {
+    if (curStack == NULL  || curStack->m_entry == NULL) {
         return 1;
     }
 
