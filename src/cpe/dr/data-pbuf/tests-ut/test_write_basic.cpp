@@ -9,5 +9,7 @@ TEST_F(WriteTest, type_string) {
         "    </struct>"
         "</metalib>"
         );
-    
+
+    t_em_set_print();
+    write("S", "{a1: 1}");
 }

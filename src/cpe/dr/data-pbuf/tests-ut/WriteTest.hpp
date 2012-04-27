@@ -21,7 +21,8 @@ public:
 
     void installMeta(const char * data);
 
-    int write(const void * data, size_t data_size, const char * typeName);
+    int write(const char * typeName, const char * defs);
+    int write(const char * typeName, const void * data, size_t data_size);
     const char * result(void);
 };
 

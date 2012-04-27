@@ -16,7 +16,8 @@ TEST_F(ParseTest, array_basic) {
 
     EXPECT_TRUE(t_em_no_error());
 
-    ASSERT_EQ(0, read("{ \"count\": 2, \"data\" : [ 12 , 14 ], \"last\": 33 }", "S2"));
+    EXPECT_EQ(
+        metaSize("S2"), read("{ \"count\": 2, \"data\" : [ 12 , 14 ], \"last\": 33 }", "S2"));
 
     EXPECT_EQ(2, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
     EXPECT_EQ(12, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
@@ -36,7 +37,7 @@ TEST_F(ParseTest, array_auto_count) {
 
     EXPECT_TRUE(t_em_no_error());
 
-    ASSERT_EQ(0, read("{ \"data\" : [ 12, 14 ] }", "S2"));
+    EXPECT_EQ(6, read("{ \"data\" : [ 12, 14 ] }", "S2"));
 
     EXPECT_EQ(2, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
 }
@@ -78,7 +79,7 @@ TEST_F(ParseTest, array_struct_basic) {
 
     EXPECT_TRUE(t_em_no_error());
 
-    ASSERT_EQ(0, read("{ \"count\": 2, \"data\" : [ { \"a1\" : 12 }, {\"a1\" : 14 } ], \"last\": 33 }" , "S2"));
+    ASSERT_EQ(metaSize("S2"), read("{ \"count\": 2, \"data\" : [ { \"a1\" : 12 }, {\"a1\" : 14 } ], \"last\": 33 }" , "S2"));
 
     EXPECT_EQ(2, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
     EXPECT_EQ(12, dr_ctype_read_int16(result(2), CPE_DR_TYPE_INT16));
@@ -101,7 +102,7 @@ TEST_F(ParseTest, array_struct_auto_count) {
 
     EXPECT_TRUE(t_em_no_error());
 
-    ASSERT_EQ(0, read("{ \"data\" : [ { \"a1\" : 12 }, {\"a1\" : 14 } ], \"last\": 33 }" , "S2"));
+    ASSERT_EQ(6, read("{ \"data\" : [ { \"a1\" : 12 }, {\"a1\" : 14 } ], \"last\": 33 }" , "S2"));
 
     EXPECT_EQ(2, dr_ctype_read_int16(result(), CPE_DR_TYPE_INT16));
 }

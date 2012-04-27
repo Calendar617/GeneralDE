@@ -32,6 +32,15 @@ void ParseTest::installMeta(const char * def) {
     m_metaLib = (LPDRMETALIB)mem_buffer_make_exactly(&m_metaLib_buffer);
 }
 
+int ParseTest::metaSize(const char * typeName) {
+    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, typeName);
+    EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
+
+    if (meta == NULL) return -1;
+
+    return (int)dr_meta_size(meta);
+}
+
 int ParseTest::read(const char * data, const char * typeName) {
     LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, typeName);
     EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
