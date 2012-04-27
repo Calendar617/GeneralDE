@@ -91,7 +91,7 @@ struct tagDRMetaEntry {
     dr_int_t reserve_4[1];
     /*104*/ /*176 ?*/dr_int_t m_select_data_start_pos;
     /*108*/ /*184*/dr_int_t m_select_entry_pos;
-    dr_int_t reserve_5_1[1];
+    int8_t reserve_5[8];
     /*120*/ /*200*/dr_int_t m_ref_type_pos;
     /*124*/ /*208*/int32_t m_select_range_max;
     /*128*/ /*212*/int32_t m_select_range_min;
