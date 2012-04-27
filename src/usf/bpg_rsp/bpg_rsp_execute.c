@@ -295,7 +295,7 @@ logic_context_t bpg_rsp_manage_create_context(bpg_rsp_manage_t bpg_mgr, bpg_pkg_
         }
     }
 
-    if (bpg_mgr->m_debug >= 2 || bpg_pkg_debug_level(req) >= bpg_pkg_debug_progress) {
+    if (bpg_mgr->m_debug >= 2 || (req && bpg_pkg_debug_level(req) >= bpg_pkg_debug_progress)) {
         logic_context_flag_enable(op_context, logic_context_flag_debug);
     }
 
