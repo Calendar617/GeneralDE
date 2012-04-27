@@ -46,7 +46,7 @@ LPDRMETA dr_lib_find_meta_by_name(LPDRMETALIB metaLib, const char* name) {
         int cmp_result;
 
         curItem = searchStart + curPos;
-        cmp_result = strcmp(name, base + (curItem->m_name_pos & 0xFFFFFFFF));
+        cmp_result = strcmp(name, base + curItem->m_name_pos);
         if (cmp_result == 0) {
             return (LPDRMETA)(base + curItem->m_diff_to_base);
         }
