@@ -45,59 +45,65 @@ struct tagDRMetaLib {
     /*120*/ dr_int_t m_buf_size_macros;
     dr_int_t reserve9[6];
     /*148*/ /*224*/char m_name[CPE_DR_NAME_LEN];
-};
+}; /**/ /*352*/
 
 struct tagDRMeta {
     int8_t reserve_1[4];
     /*004*/ int32_t m_id;
     /*008*/ int32_t m_based_version;
     /*012*/ int32_t m_current_version;
-    /*016*/ dr_int_t m_type;
+    /*016*/ /*016*/dr_int_t m_type;
     dr_int_t reserve_2[2];
     /*028*/ /*040*/ dr_int_t m_data_size;
-    dr_int_t reserve_3[3];
+    int8_t reserve_3_1[8];
+    dr_int_t reserve_3_2[1];
 
 
-    /*044*/ /*064*/int32_t m_entry_count;
-    dr_int_t reserve_4[3];
-    /*060*/ /*088*/int32_t m_self_pos;
+    /*044*/ /*064*/dr_int_t m_entry_count;
+    int8_t reserve_4_1[8];
+    dr_int_t reserve_4_2[1];
+    /*060*/ /*088*/dr_int_t m_self_pos;
     int8_t reserve_5[16];
     /*080*/ /*112*/int32_t m_align;
-    int8_t reserve_6[48];
-    /*132*/ /*208*/int32_t m_name_pos;
-    /*136*/ int32_t m_desc_pos;
-    int8_t reserve_7[44];
-};
+    int8_t reserve_6_1[4];
+    dr_int_t reserve_6_2[11];
+    /*132*/ /*208*/dr_int_t m_name_pos;
+    /*136*/ /*216*/dr_int_t m_desc_pos;
+    int8_t reserve_7_1[8];
+    dr_int_t reserve_7_2[9];
+}; /**/  /*304*/
 
 struct tagDRMetaEntry {
-    /*000*/ int32_t m_id;
-    /*004*/ int32_t m_version;
-    /*008*/ int32_t m_type;
-    /*012*/ int32_t m_name_pos;
-    /*016*/ int32_t m_unitsize;
-    int8_t reserve_2[12];
-    /*032*/ int32_t m_size;
-    /*036*/ int32_t m_array_count;
-    /*040*/ int32_t m_data_start_pos_3; /*same as start pos?*/
-    /*044*/ int32_t m_data_start_pos;
-    int8_t reserve_3[44];
-    /*092*/ int32_t m_array_refer_data_start_pos;
-    /*096*/ int32_t m_array_refer_entry_pos;
-    int8_t reserve_4[4];
-    /*104*/ int32_t m_select_data_start_pos;
-    /*108*/ int32_t m_select_entry_pos;
-    int8_t reserve_5[8];
-    /*120*/ int32_t m_ref_type_pos;
-    /*124*/ int32_t m_select_range_max;
-    /*128*/ int32_t m_select_range_min;
-    int8_t reserve_6[12];
-    /*144*/ int32_t m_desc_pos;
-    /*148*/ int32_t m_cname_pos;
-    /*152*/ int32_t m_dft_value_pos;
-    int8_t reserve_7[8];
-    /*164*/ int32_t m_self_to_meta_pos;
-    int8_t reserve_8[12];
-};/*180*/
+    /*000*/ /*000*/int32_t m_id;
+    /*004*/ /*004*/int32_t m_version;
+    /*008*/ /*008*/dr_int_t m_type;
+    /*012*/ /*016*/dr_int_t m_name_pos;
+    /*016*/ /*024*/dr_int_t m_unitsize;
+    dr_int_t reserve_2[3];
+    /*032*/ /*056*/dr_int_t m_size;
+    /*036*/ /*064*/dr_int_t m_array_count;
+    /*040*/ /*072*/dr_int_t m_data_start_pos_3; /*same as start pos?*/
+    /*044*/ /*080*/dr_int_t m_data_start_pos;
+    int8_t reserve_3_1[24];
+    dr_int_t reserve_3_2[5];
+    /*092*/ /*152*/dr_int_t m_array_refer_data_start_pos;
+    /*096*/ /*160*/dr_int_t m_array_refer_entry_pos;
+    dr_int_t reserve_4[1];
+    /*104*/ /*176 ?*/dr_int_t m_select_data_start_pos;
+    /*108*/ /*184*/dr_int_t m_select_entry_pos;
+    dr_int_t reserve_5_1[1];
+    /*120*/ /*200*/dr_int_t m_ref_type_pos;
+    /*124*/ /*208*/int32_t m_select_range_max;
+    /*128*/ /*212*/int32_t m_select_range_min;
+    int8_t reserve_6[8];
+    dr_int_t reserve_6_2[1];
+    /*144*/ /*232*/dr_int_t m_desc_pos;
+    /*148*/ /*240*/dr_int_t m_cname_pos;
+    /*152*/ /*248*/dr_int_t m_dft_value_pos;
+    dr_int_t reserve_7[2];
+    /*164*/ /*272*/dr_int_t m_self_to_meta_pos;
+    dr_int_t reserve_8[3];
+};/*180*/ /*304*/
 
 struct tagDRMacro {
     dr_int_t m_name_pos;
