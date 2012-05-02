@@ -76,11 +76,11 @@ LPDRMETA dr_lib_find_meta_by_id(LPDRMETALIB metaLib, int id) {
         curPos = beginPos + (endPos - beginPos - 1) / 2)
     {
         struct tagDRMetaIdxById * curItem = searchStart + curPos;
-        
-        if (id == curItem->m_id) {
+
+        if ((int32_t)id == (int32_t)curItem->m_id) {
             return (LPDRMETA)(base + curItem->m_diff_to_base);
         }
-        else if (id < curItem->m_id) {
+        else if ((int32_t)id < (int32_t)curItem->m_id) {
             endPos = curPos;
         }
         else { /*id > curItem->m_id*/
