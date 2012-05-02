@@ -10,6 +10,8 @@ TEST_F(WriteTest, type_string) {
         "</metalib>"
         );
 
-    t_em_set_print();
-    write("S", "{a1: 1}");
+    write("S", "a1: 1");
+
+    EXPECT_STREQ(
+        "0x08 0x96 0x01", result());
 }

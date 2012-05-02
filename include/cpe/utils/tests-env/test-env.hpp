@@ -58,6 +58,7 @@ public:
     void * t_tmp_alloc(size_t size) { return envOf<Test>().t_tmp_alloc(size); }
     char * t_tmp_strdup(const char * str) { return envOf<Test>().t_tmp_strdup(str); }
     void * t_tmp_memdup(void const * buf, size_t size) { return envOf<Test>().t_tmp_memdup(buf, size); }
+    char * t_tmp_hexdup(void const * buf, size_t size) { return envOf<Test>().t_tmp_hexdup(buf, size); }
 
     mem_allocrator_t t_allocrator() { return envOf<Test>().t_allocrator(); }
     void * t_alloc(size_t size) { return envOf<Test>().t_alloc(size); }

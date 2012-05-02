@@ -2,7 +2,7 @@
 #include "cpe/dr/dr_metalib_manage.h"
 #include "cpe/dr/dr_metalib_init.h"
 #include "cpe/dr/dr_metalib_xml.h"
-#include "cpe/dr/dr_json.h"
+#include "cpe/dr/dr_cfg.h"
 #include "cpe/utils/stream_buffer.h"
 
 WriteTest::WriteTest() : m_metaLib(0) {
@@ -43,7 +43,7 @@ int WriteTest::write(const char * typeName, const char * defs) {
 
     char buf[1024];
 
-    int r = dr_json_read(buf, sizeof(buf), defs, meta, t_em());
+    int r = dr_cfg_read(buf, sizeof(buf), t_cfg_parse(defs), meta, 0, t_em());
     EXPECT_GT(r, 0);
 
     return write(typeName, buf, r);
@@ -58,10 +58,11 @@ int WriteTest::write(const char * typeName, const void * data, size_t data_size)
     struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&m_buffer);
 
     int r = dr_pbuf_write((write_stream_t)&stream, data, data_size, meta, t_em());
-    stream_putc((write_stream_t)&stream, 0);
     return r;
 }
 
 const char * WriteTest::result(void) {
-    return (const char *)mem_buffer_make_exactly(&m_buffer);
+    return t_tmp_hexdup(
+        mem_buffer_make_continuous(&m_buffer, 0),
+        mem_buffer_size(&m_buffer));
 }
