@@ -3,10 +3,10 @@
 #include <stddef.h>
 #include <time.h>
 #include <sys/types.h>
-
-#ifndef WIN32
 #include <stdint.h>
 #include <inttypes.h>
+
+#ifndef WIN32
 #include <wchar.h>
 #include <limits.h>
 
