@@ -178,7 +178,7 @@ static int dr_json_do_parse_calc_start_pos(
             typeInfo = dr_find_ctype_info_by_type(parseType->m_entry->m_type);
             if (typeInfo == NULL) {
                 CPE_ERROR(
-                    c->m_em, "process %s.%s, type %d is unknown!",
+                    c->m_em, "process %s.%s, type "FMT_DR_INT_T" is unknown!",
                     dr_meta_name(parseType->m_meta), c->m_buf,
                     parseType->m_entry->m_type);
                 return -1;

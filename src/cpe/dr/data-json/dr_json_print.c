@@ -97,7 +97,9 @@ static void dr_print_print_basic_data(yajl_gen g, LPDRMETAENTRY entry, const voi
         dr_print_print_string(g, entry->m_type, entry->m_unitsize, data, em);
         break;
     default:
-        CPE_ERROR_EX(em, CPE_DR_ERROR_UNSUPPORTED_TYPE, "print basic data not supported type %d!", entry->m_type);
+        CPE_ERROR_EX(
+            em, CPE_DR_ERROR_UNSUPPORTED_TYPE,
+            "print basic data not supported type "FMT_DR_INT_T"!", entry->m_type);
         yajl_gen_null(g);
         break;
     }
@@ -136,7 +138,7 @@ static size_t dr_json_print_get_element_size(LPDRMETA meta, LPDRMETAENTRY entry,
         typeInfo = dr_find_ctype_info_by_type(entry->m_type);
         if (typeInfo == NULL) {
             CPE_ERROR(
-                em, "process %s.%s, type %d is unknown!",
+                em, "process %s.%s, type "FMT_DR_INT_T" is unknown!",
                 dr_meta_name(meta), dr_entry_name(entry),
                 entry->m_type);
             return 0;
@@ -144,7 +146,7 @@ static size_t dr_json_print_get_element_size(LPDRMETA meta, LPDRMETAENTRY entry,
 
         if (typeInfo->m_size <= 0) {
             CPE_ERROR(
-                em, "process %s.%s, type %d size is invalid!",
+                em, "process %s.%s, type "FMT_DR_INT_T" size is invalid!",
                 dr_meta_name(meta), dr_entry_name(entry),
                 entry->m_type);
             return 0;
@@ -271,7 +273,7 @@ static void dr_json_print_composite_type(
         dr_json_print_union(g, meta, parentEntry, data, em, level);
     }
     else {
-        CPE_ERROR(em, "unknown complex type %d!", meta->m_type);
+        CPE_ERROR(em, "unknown complex type "FMT_DR_INT_T"!", meta->m_type);
     }
 
     yajl_gen_map_close(g);

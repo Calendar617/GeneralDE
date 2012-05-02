@@ -415,7 +415,7 @@ static void dr_build_xml_process_entry(
                 CPE_ERROR_EX(
                     ctx->m_em, CPE_DR_ERROR_ENTRY_INVALID_COUNT_VALUE,
                     "invalid ount value %d!",
-                    newEntry->m_data.m_array_count);
+                    (int)newEntry->m_data.m_array_count);
             }
         }
         else if (strcmp((char const *)localname, CPE_DR_TAG_REFER) == 0) {
