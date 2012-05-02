@@ -233,7 +233,7 @@ void dr_meta_add_entry_calc_align(
         }
     }
     else {
-        CPE_ERROR_EX(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE, "unknown meta type %d!", meta->m_type);
+        CPE_ERROR_EX(em, CPE_DR_ERROR_ENTRY_INVALID_TYPE_VALUE, "unknown meta type %d!", (int)meta->m_type);
     }
 }
 
