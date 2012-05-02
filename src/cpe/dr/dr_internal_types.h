@@ -1,5 +1,6 @@
 #ifndef CPE_DR_INTERNALS_TYPES_H
 #define CPE_DR_INTERNALS_TYPES_H
+#include "cpe/pal/pal_stdio.h"
 #include "cpe/dr/dr_types.h"
 #include "cpe/dr/dr_ctypes_info.h"
 
@@ -11,8 +12,10 @@
 
 #if (CPE_DR_METALIB_SIZE == 64)
 typedef int64_t dr_int_t;
+#define FMT_DR_INT_T FMT_INT64_T
 #else
 typedef int32_t dr_int_t;
+#define FMT_DR_INT_T FMT_INT32_T
 #endif
 
 struct tagDRMetaLib {
