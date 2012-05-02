@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/pal_stdio.h"
 #include "gd/om/om_error.h"
 #include "om_buffer.h"
 #include "om_page_head.h"
@@ -108,7 +109,7 @@ gd_om_buffer_mgr_get_buf(
     if (pgm->m_backend && pgm->m_backend->buf_get) {
         buf = pgm->m_backend->buf_get(buf_id, pgm->m_backend_ctx);
         if (buf == NULL) {
-            CPE_ERROR_EX(em, gd_om_buffer_get_fail, "backend get buf %" PTRINT_PREFIX " fail!", buf_id);
+            CPE_ERROR_EX(em, gd_om_buffer_get_fail, "backend get buf "FMT_PTR_INT_T" fail!", buf_id);
         }
     }
     else {

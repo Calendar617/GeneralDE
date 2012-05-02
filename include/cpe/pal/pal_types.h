@@ -356,10 +356,8 @@ typedef unsigned long long ulonglong;
 
 #if (__WORDSIZE == 64)
 typedef int64_t ptr_int_t;
-#define PTRINT_PREFIX "lld" 
 #else
 typedef int32_t ptr_int_t;
-#define PTRINT_PREFIX "d" 
 #endif
 
 #define CPE_PAL_ALIGN_8(__value) ((((__value) >> 3) + 1) << 3)
