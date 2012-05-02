@@ -49,15 +49,6 @@ TEST_F(MetaLibManagerEntryTest, GetPtrByNameExist) {
 }
 
 TEST_F(MetaLibManagerEntryTest, GetPtrByNameNotExist) {
-    LPDRMETA meta = dr_lib_find_meta_by_name(m_lib, "PkgBody");
-    printf("meta-begin=%d, attr-start=%d, account-pos=%d\n"
-           , address_to_start(meta)
-           , address_to_start(dr_meta_entry_at(meta, 0))
-           , address_to_pos(dr_lib_find_meta_by_name(m_lib, "CmdLogin"))
-        );
-
-    printf("entry-size=%d\n", sizeof(tagDRMetaEntry));
-
     LPDRMETAENTRY pEntry = dr_meta_find_entry_by_name(m_pMeta, "version");
     ASSERT_TRUE(pEntry != NULL) << "find entry \"version\" not exist!";
 
