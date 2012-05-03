@@ -17,7 +17,7 @@ char * cpe_hex_dup(read_stream_t input, mem_buffer_t buffer) {
             first_line = 0;
         }
         else {
-            stream_putc((write_stream_t)&output, '\n');
+            stream_putc((write_stream_t)&output, ' ');
         }
 
         for(pos = 0; pos < size; ++pos) {
