@@ -19,8 +19,9 @@ public:
 
     mem_allocrator_t t_tmp_allocrator();
     void * t_tmp_alloc(size_t size);
-    char * t_tmp_strdup(const char * str);
+    char * t_tmp_strdup(char const * str);
     void * t_tmp_memdup(void const * buf, size_t size);
+    char * t_tmp_hexdup(void const * buf, size_t size);
 
     mem_allocrator_t t_allocrator();
     void * t_alloc(size_t size);
@@ -96,6 +97,7 @@ public:
     using BaseT::t_tmp_alloc;
     using BaseT::t_tmp_strdup;
     using BaseT::t_tmp_memdup;
+    using BaseT::t_tmp_hexdup;
 };
 
 template<typename EnvListT, typename BaseT>
@@ -118,6 +120,7 @@ public:
     using BaseT::t_tmp_alloc;
     using BaseT::t_tmp_strdup;
     using BaseT::t_tmp_memdup;
+    using BaseT::t_tmp_hexdup;
 };
 
 }

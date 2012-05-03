@@ -3,10 +3,12 @@
 #include <string.h>
 #include "cpe/utils/tests-env/test-fixture.hpp"
 #include "cpe/utils/tests-env/with_em.hpp"
+#include "cpe/cfg/tests-env/with_cfg.hpp"
 #include "cpe/dr/dr_pbuf.h"
 
-typedef LOKI_TYPELIST_1(
-    utils::testenv::with_em) WriteTestBase;
+typedef LOKI_TYPELIST_2(
+    utils::testenv::with_em,
+    cpe::cfg::testenv::with_cfg) WriteTestBase;
 
 class WriteTest : public testenv::fixture<WriteTestBase> {
 public:
@@ -14,7 +16,8 @@ public:
     virtual void SetUp();
     virtual void TearDown();
 
-    struct mem_buffer m_buffer;
+    char m_buffer[1024];
+    int m_bufffer_len;
 
     LPDRMETALIB m_metaLib;
     struct mem_buffer m_metaLib_buffer;
