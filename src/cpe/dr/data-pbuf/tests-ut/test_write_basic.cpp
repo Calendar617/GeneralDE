@@ -48,3 +48,18 @@ TEST_F(WriteTest, type_struct) {
     EXPECT_STREQ(
         "0x1A 0x03 0x08 0x96 0x01", result());
 }
+
+TEST_F(WriteTest, type_array_uint32_basic) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='a1' type='uint32' id='4' count='3'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ(8, write("S", "a1: [3, 270, 86942]"));
+
+    EXPECT_STREQ(
+        "0x22 0x06 0x03 0x8E 0x02 0x9E 0xA7 0x05", result());
+}
