@@ -16,7 +16,8 @@ public:
     virtual void SetUp();
     virtual void TearDown();
 
-    struct mem_buffer m_buffer;
+    char m_buffer[1024];
+    int m_bufffer_len;
 
     LPDRMETALIB m_metaLib;
     struct mem_buffer m_metaLib_buffer;

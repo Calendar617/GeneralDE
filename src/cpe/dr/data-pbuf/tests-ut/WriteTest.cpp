@@ -11,12 +11,9 @@ WriteTest::WriteTest() : m_metaLib(0) {
 void WriteTest::SetUp() {
     Base::SetUp();
     mem_buffer_init(&m_metaLib_buffer, NULL);
-    mem_buffer_init(&m_buffer, NULL);
 }
 
 void WriteTest::TearDown() {
-    mem_buffer_clear(&m_buffer);
-
     m_metaLib = NULL;
     mem_buffer_clear(&m_metaLib_buffer);
 
@@ -55,14 +52,11 @@ int WriteTest::write(const char * typeName, const void * data, size_t data_size)
 
     t_elist_clear();
 
-    struct write_stream_buffer stream = CPE_WRITE_STREAM_BUFFER_INITIALIZER(&m_buffer);
-
-    int r = dr_pbuf_write((write_stream_t)&stream, data, data_size, meta, t_em());
+    int r = dr_pbuf_write(m_buffer, sizeof(m_buffer), data, data_size, meta, t_em());
+    m_bufffer_len = r >= 0 ? (size_t)r : 0;
     return r;
 }
 
 const char * WriteTest::result(void) {
-    return t_tmp_hexdup(
-        mem_buffer_make_continuous(&m_buffer, 0),
-        mem_buffer_size(&m_buffer));
+    return t_tmp_hexdup(m_buffer, m_bufffer_len);
 }

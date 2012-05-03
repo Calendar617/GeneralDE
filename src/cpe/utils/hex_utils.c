@@ -3,7 +3,7 @@
 #include "cpe/utils/stream_buffer.h" 
 
 char * cpe_hex_dup(read_stream_t input, mem_buffer_t buffer) {
-    char buf[16];
+    unsigned char buf[16];
     size_t size;
     int first_line;
     struct write_stream_buffer output = CPE_WRITE_STREAM_BUFFER_INITIALIZER(buffer);
@@ -25,7 +25,7 @@ char * cpe_hex_dup(read_stream_t input, mem_buffer_t buffer) {
                 stream_putc((write_stream_t)&output, ' ');
             }
 
-            stream_printf((write_stream_t)&output, "0x%02A", buf[pos]);
+            stream_printf((write_stream_t)&output, "0x%02X", buf[pos]);
         }
 
         if (size == sizeof(buf)) {
