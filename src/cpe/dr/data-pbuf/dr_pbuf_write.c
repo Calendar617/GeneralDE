@@ -26,6 +26,8 @@ struct dr_pbuf_write_stack {
     size_t m_input_data_capacity;
 };
 
+#define dr_pbuf_write_size_reserve 1
+
 #define dr_pbuf_write_check_capacity(__capacity)                        \
     if (curStack->m_output_capacity - curStack->m_output_size < (__capacity)) { \
         CPE_ERROR(em, "dr_pbuf_write: not enouth buf!");                \
@@ -107,7 +109,6 @@ int dr_pbuf_write(
             LPDRMETAENTRY refer;
 
         LOOPENTRY:
-
             elementSize = dr_entry_element_size(curStack->m_entry);
             if (elementSize == 0) continue;
 
@@ -135,14 +136,21 @@ int dr_pbuf_write(
                 switch(curStack->m_entry->m_type) {
                 case CPE_DR_TYPE_UNION:
                 case CPE_DR_TYPE_STRUCT: {
+                    dr_pbuf_write_encode_id_and_type(CPE_PBUF_TYPE_LENGTH);
+
                     if (stackPos + 1 < CPE_DR_MAX_LEVEL) {
                         struct dr_pbuf_write_stack * nextStack;
                         nextStack = &processStack[stackPos + 1];
-
                         nextStack->m_meta = dr_entry_ref_meta(curStack->m_entry);
                         if (nextStack->m_meta == 0) break;
 
                         nextStack->m_input_data = entryData;
+                        nextStack->m_input_data_capacity = elementSize;
+
+                        nextStack->m_output_data = curStack->m_output_data + curStack->m_output_size + dr_pbuf_write_size_reserve;
+                        nextStack->m_output_size = 0;
+                        nextStack->m_output_capacity = curStack->m_output_capacity - curStack->m_output_size;
+
                         nextStack->m_entry_pos = 0;
                         nextStack->m_entry_count = nextStack->m_meta->m_entry_count;
 
@@ -241,7 +249,24 @@ int dr_pbuf_write(
             }
         }
 
-        --stackPos;
+        if (--stackPos >= 0) {
+            struct dr_pbuf_write_stack * preStack;
+            unsigned char size_buf[10];
+            int size_size;
+
+            preStack = &processStack[stackPos];
+
+            size_size = cpe_dr_pbuf_encode32(curStack->m_output_size, size_buf);
+
+            memmove(
+                preStack->m_output_data + preStack->m_output_size + size_size,
+                curStack->m_output_data,
+                curStack->m_output_size);
+
+            memcpy(preStack->m_output_data + preStack->m_output_size, size_buf, size_size);
+
+            preStack->m_output_size += (size_size + curStack->m_output_size); 
+        }
     }
 
     return (int)processStack[0].m_output_size;

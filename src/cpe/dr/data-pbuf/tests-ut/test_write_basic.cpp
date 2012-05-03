@@ -30,3 +30,21 @@ TEST_F(WriteTest, type_string) {
     EXPECT_STREQ(
         "0x12 0x07 0x74 0x65 0x73 0x74 0x69 0x6E 0x67", result());
 }
+
+TEST_F(WriteTest, type_struct) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S1' version='1'>"
+        "	     <entry name='a1' type='uint32' id='1'/>"
+        "    </struct>"
+        "    <struct name='S2' version='1'>"
+        "	     <entry name='b1' type='S1' id='3'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ(5, write("S2", "b1: { a1: 150 }"));
+    
+    EXPECT_STREQ(
+        "0x1A 0x03 0x08 0x96 0x01", result());
+}
