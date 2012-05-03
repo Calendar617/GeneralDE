@@ -8,7 +8,7 @@ struct cpe_dr_pbuf_longlong {
 };
 
 int cpe_dr_pbuf_encode32(uint32_t number, uint8_t buffer[10]);
-int cpe_dr_pbuf_encode(uint64_t number, uint8_t buffer[10]);
+int cpe_dr_pbuf_encode64(uint64_t number, uint8_t buffer[10]);
 int cpe_dr_pbuf_zigzag32(int32_t number, uint8_t buffer[10]);
 int cpe_dr_pbuf_zigzag64(int64_t number, uint8_t buffer[10]);
 

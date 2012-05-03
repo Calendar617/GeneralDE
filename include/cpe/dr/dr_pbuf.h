@@ -25,7 +25,8 @@ int dr_pbuf_read_to_buffer(
     error_monitor_t em);
 
 int dr_pbuf_write(
-    write_stream_t output,
+    void * output,
+    size_t output_capacity,
     const void * input,
     size_t input_capacity,
     LPDRMETA meta,
