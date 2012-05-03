@@ -1,5 +1,6 @@
 #include "cpe/utils/stream_buffer.h"
 #include "cpe/utils/memory_debug.h"
+#include "cpe/utils/hex_utils.h"
 #include "cpe/utils/tests-env/test-fixture.hpp"
 
 namespace testenv {
@@ -94,6 +95,17 @@ Test::t_tmp_strdup(const char * str) {
 void * Test::t_tmp_memdup(void const * buf, size_t size) {
     void * r = t_tmp_alloc(size);
     memcpy(r, buf, size);
+    return r;
+}
+
+char * Test::t_tmp_hexdup(void const * buf, size_t size) {
+    struct mem_buffer buffer;
+    mem_buffer_init(&buffer, NULL);
+
+    char * r = t_tmp_strdup(cpe_hex_dup_buf(buf, size, &buffer));
+
+    mem_buffer_clear(&buffer);
+
     return r;
 }
 
