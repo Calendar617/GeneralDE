@@ -251,18 +251,57 @@ int dr_pbuf_write(
                     break;
                 }
                 case CPE_DR_TYPE_FLOAT: {
+                    union {
+                        float v;
+                        uint32_t e;
+                    } u;
+                    unsigned char * buffer;
 
                     if (curStack->m_entry->m_array_count == 1) {
                         dr_pbuf_write_encode_id_and_type(CPE_PBUF_TYPE_32BIT);
                     }
 
+                    dr_pbuf_write_check_capacity(curStack->m_output_size + 4);
+
+                    dr_entry_try_read_float(&u.v, entryData, curStack->m_entry, NULL);
+
+                    buffer = curStack->m_output_data + curStack->m_output_size;
+
+                    buffer[0] = (uint8_t) (u.e & 0xff);
+                    buffer[1] = (uint8_t) (u.e >> 8 & 0xff);
+                    buffer[2] = (uint8_t) (u.e >> 16 & 0xff);
+                    buffer[3] = (uint8_t) (u.e >> 24 & 0xff);
+
+                    curStack->m_output_size += 4;
+
                     break;
                 }
                 case CPE_DR_TYPE_DOUBLE: {
+                    union {
+                        double v;
+                        uint64_t e;
+                    } u;
+                    unsigned char * buffer;
 
                     if (curStack->m_entry->m_array_count == 1) {
                         dr_pbuf_write_encode_id_and_type(CPE_PBUF_TYPE_64BIT);
                     }
+
+                    dr_pbuf_write_check_capacity(curStack->m_output_size + 8);
+
+                    dr_entry_try_read_double(&u.v, entryData, curStack->m_entry, NULL);
+
+                    buffer = curStack->m_output_data + curStack->m_output_size;
+                    buffer[0] = (uint8_t) (u.e & 0xff);
+                    buffer[1] = (uint8_t) (u.e >> 8 & 0xff);
+                    buffer[2] = (uint8_t) (u.e >> 16 & 0xff);
+                    buffer[3] = (uint8_t) (u.e >> 24 & 0xff);
+                    buffer[4] = (uint8_t) (u.e >> 32 & 0xff);
+                    buffer[5] = (uint8_t) (u.e >> 40 & 0xff);
+                    buffer[6] = (uint8_t) (u.e >> 48 & 0xff);
+                    buffer[7] = (uint8_t) (u.e >> 56 & 0xff);
+
+                    curStack->m_output_size += 8;
 
                     break;
                 }
