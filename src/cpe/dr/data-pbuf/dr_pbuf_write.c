@@ -351,8 +351,6 @@ int dr_pbuf_write(
 
                 curStack->m_output_size = total;
             }
-
-
         }
 
         if (--stackPos >= 0) {
