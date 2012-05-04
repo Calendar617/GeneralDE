@@ -12,7 +12,7 @@ int cpe_dr_pbuf_encode64(uint64_t number, uint8_t buffer[10]);
 int cpe_dr_pbuf_zigzag32(int32_t number, uint8_t buffer[10]);
 int cpe_dr_pbuf_zigzag64(int64_t number, uint8_t buffer[10]);
 
-int cpe_dr_pbuf_decode(uint8_t buffer[10], struct cpe_dr_pbuf_longlong *result);
+int cpe_dr_pbuf_decode(uint8_t const buffer[10], struct cpe_dr_pbuf_longlong *result);
 void cpe_dr_pbuf_dezigzag64(struct cpe_dr_pbuf_longlong *r);
 void cpe_dr_pbuf_dezigzag32(struct cpe_dr_pbuf_longlong*r);
 
