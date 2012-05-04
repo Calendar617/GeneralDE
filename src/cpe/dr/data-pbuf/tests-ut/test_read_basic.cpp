@@ -12,8 +12,7 @@ TEST_F(ReadTest, type_uin32) {
     EXPECT_EQ(4, read("S", "a1: 150"));
 
     EXPECT_CFG_EQ(
-        "count: 3\n"
-        "a1: [12, 13, 14]"
+        "a1: 150"
         ,
         result());
 }
