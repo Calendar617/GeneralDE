@@ -26,10 +26,11 @@ int cpe_dr_pbuf_encode32(uint32_t number, uint8_t buffer[10]) {
 }
 
 int cpe_dr_pbuf_encode64(uint64_t number, uint8_t buffer[10]) {
+    int i;
 	if ((number & 0xffffffff) == number) {
 		return cpe_dr_pbuf_encode32((uint32_t)number , buffer);
 	}
-	int i = 0;
+	i = 0;
 	do {
 		buffer[i] = (uint8_t)(number | 0x80);
 		number >>= 7;
@@ -40,14 +41,17 @@ int cpe_dr_pbuf_encode64(uint64_t number, uint8_t buffer[10]) {
 }
 
 int
-cpe_dr_pbuf_decode(uint8_t buffer[10], struct cpe_dr_pbuf_longlong *result) {
+cpe_dr_pbuf_decode(uint8_t const buffer[10], struct cpe_dr_pbuf_longlong *result) {
+    uint32_t r;
+	int i;
+    uint64_t lr;
+
 	if (!(buffer[0] & 0x80)) {
 		result->low = buffer[0];
 		result->hi = 0;
 		return 1;
 	}
-	uint32_t r = buffer[0] & 0x7f;
-	int i;
+	r = buffer[0] & 0x7f;
 	for (i=1;i<4;i++) {
 		r |= ((buffer[i]&0x7f) << (7*i));
 		if (!(buffer[i] & 0x80)) {
@@ -56,7 +60,7 @@ cpe_dr_pbuf_decode(uint8_t buffer[10], struct cpe_dr_pbuf_longlong *result) {
 			return i+1;
 		}
 	}
-	uint64_t lr = 0;
+	lr = 0;
 	for (i=4;i<10;i++) {
 		lr |= ((buffer[i] & 0x7f) << (7*(i-4)));
 		if (!(buffer[i] & 0x80)) {
