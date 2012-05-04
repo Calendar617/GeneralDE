@@ -34,21 +34,21 @@ void ReadTest::installMeta(const char * def) {
     m_metaLib = (LPDRMETALIB)mem_buffer_make_exactly(&m_metaLib_buffer);
 }
 
-int ReadTest::read(const char * typeName, const char * defs) {
-    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, typeName);
-    EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
+int ReadTest::read(const char * encodeTypeName, const char * decodeTypeName, const char * defs) {
+    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, encodeTypeName);
+    EXPECT_TRUE(meta) << "get meta " << encodeTypeName << " error!";
 
     char buf[1024];
 
     int r = dr_cfg_read(buf, sizeof(buf), t_cfg_parse(defs), meta, 0, t_em());
     EXPECT_GT(r, 0);
 
-    return read(typeName, buf, r);
+    return read(decodeTypeName, buf, r);
 }
 
-int ReadTest::read(const char * typeName, const void * data, size_t data_size) {
-    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, typeName);
-    EXPECT_TRUE(meta) << "get meta " << typeName << " error!";
+int ReadTest::read(const char * decodeTypeName, const void * data, size_t data_size) {
+    LPDRMETA meta = dr_lib_find_meta_by_name(m_metaLib, decodeTypeName);
+    EXPECT_TRUE(meta) << "get meta " << decodeTypeName << " error!";
 
     t_elist_clear();
 
