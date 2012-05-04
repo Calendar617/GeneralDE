@@ -255,6 +255,8 @@ static int dr_pbuf_read_i(
             case CPE_DR_TYPE_INT16:
             case CPE_DR_TYPE_INT32: {
                 dr_pbuf_read_decode_varint(buf_i);
+                cpe_dr_pbuf_dezigzag32(&buf_i);
+                dr_entry_set_from_uint32(writeBuf, buf_i.low, entry, em);
                 break;
             }
             case CPE_DR_TYPE_INT64: {
@@ -269,6 +271,8 @@ static int dr_pbuf_read_i(
                 break;
             }
             case CPE_DR_TYPE_UINT64: {
+                dr_pbuf_read_decode_varint(buf_i);
+                dr_entry_set_from_uint32(writeBuf, buf_i.low, entry, em);
                 break;
             }
             case CPE_DR_TYPE_FLOAT: {
