@@ -181,7 +181,12 @@ static int dr_pbuf_read_i(
 {
     struct dr_pbuf_read_ctx ctx;
     struct dr_pbuf_read_stack processStack[CPE_DR_MAX_LEVEL];
-    struct cpe_dr_pbuf_longlong buf_i;
+    union {
+        struct cpe_dr_pbuf_longlong sep;
+        uint64_t u64;
+        int64_t i64;
+    } buf;
+
     int stackPos;
 
     assert(input);
@@ -217,9 +222,9 @@ static int dr_pbuf_read_i(
             size_t writePos;
             char * writeBuf;
 
-            dr_pbuf_read_decode_varint(buf_i);
-            entry_id = buf_i.low >> 3;
-            value_type = buf_i.low & 0x7;
+            dr_pbuf_read_decode_varint(buf.sep);
+            entry_id = buf.sep.low >> 3;
+            value_type = buf.sep.low & 0x7;
 
             /*find entry*/
             entry_pos = dr_meta_find_entry_idx_by_id(curStack->m_meta, (int)entry_id);
@@ -254,34 +259,148 @@ static int dr_pbuf_read_i(
             case CPE_DR_TYPE_INT8:
             case CPE_DR_TYPE_INT16:
             case CPE_DR_TYPE_INT32: {
-                dr_pbuf_read_decode_varint(buf_i);
-                cpe_dr_pbuf_dezigzag32(&buf_i);
-                dr_entry_set_from_uint32(writeBuf, buf_i.low, entry, em);
+                switch(value_type) {
+                case CPE_PBUF_TYPE_VARINT: {
+                    dr_pbuf_read_decode_varint(buf.sep);
+                    cpe_dr_pbuf_dezigzag32(&buf.sep);
+                    dr_entry_set_from_uint32(writeBuf, buf.sep.low, entry, em);
+                    break;
+                }
+                default: 
+                    CPE_ERROR(
+                        em, "dr_pbuf_read: %s.%s: not support read type %d from pbuf type %d!",
+                        dr_meta_name(curStack->m_meta), dr_entry_name(entry), entry->m_type, value_type);
+                    goto DR_PBUF_READ_IGNORE;
+                }
                 break;
             }
             case CPE_DR_TYPE_INT64: {
+                switch(value_type) {
+                case CPE_PBUF_TYPE_VARINT: {
+                    dr_pbuf_read_decode_varint(buf.sep);
+                    cpe_dr_pbuf_dezigzag64(&buf.sep);
+                    dr_entry_set_from_int64(writeBuf, buf.i64, entry, em);
+                    break;
+                }
+                default: 
+                    CPE_ERROR(
+                        em, "dr_pbuf_read: %s.%s: not support read type %d from pbuf type %d!",
+                        dr_meta_name(curStack->m_meta), dr_entry_name(entry), entry->m_type, value_type);
+                    goto DR_PBUF_READ_IGNORE;
+                }
                 break;
             }
             case CPE_DR_TYPE_UCHAR:
             case CPE_DR_TYPE_UINT8:
             case CPE_DR_TYPE_UINT16:
             case CPE_DR_TYPE_UINT32: {
-                dr_pbuf_read_decode_varint(buf_i);
-                dr_entry_set_from_uint32(writeBuf, buf_i.low, entry, em);
+                switch(value_type) {
+                case CPE_PBUF_TYPE_VARINT: {
+                    dr_pbuf_read_decode_varint(buf.sep);
+                    dr_entry_set_from_uint32(writeBuf, buf.sep.low, entry, em);
+                    break;
+                }
+                default: 
+                    CPE_ERROR(
+                        em, "dr_pbuf_read: %s.%s: not support read type %d from pbuf type %d!",
+                        dr_meta_name(curStack->m_meta), dr_entry_name(entry), entry->m_type, value_type);
+                    goto DR_PBUF_READ_IGNORE;
+                }
                 break;
             }
             case CPE_DR_TYPE_UINT64: {
-                dr_pbuf_read_decode_varint(buf_i);
-                dr_entry_set_from_uint32(writeBuf, buf_i.low, entry, em);
+                switch(value_type) {
+                case CPE_PBUF_TYPE_VARINT: {
+                    dr_pbuf_read_decode_varint(buf.sep);
+                    dr_entry_set_from_uint64(writeBuf, buf.u64, entry, em);
+                    break;
+                }
+                default: 
+                    CPE_ERROR(
+                        em, "dr_pbuf_read: %s.%s: not support read type %d from pbuf type %d!",
+                        dr_meta_name(curStack->m_meta), dr_entry_name(entry), entry->m_type, value_type);
+                    goto DR_PBUF_READ_IGNORE;
+                }
                 break;
             }
-            case CPE_DR_TYPE_FLOAT: {
-                break;
-            }
+            case CPE_DR_TYPE_FLOAT:
             case CPE_DR_TYPE_DOUBLE: {
+                switch(value_type) {
+                case CPE_PBUF_TYPE_32BIT: {
+                    union {
+                        uint8_t b[4];
+                        float f;
+                    } u;
+                    uint8_t const * i = curStack->m_input_data + curStack->m_input_size;
+
+                    dr_pbuf_read_check_capacity(4);
+
+                    u.b[0] = i[0];
+                    u.b[1] = i[1];
+                    u.b[2] = i[2];
+                    u.b[3] = i[3];
+
+                    curStack->m_input_size += 4;
+
+                    dr_entry_set_from_float(writeBuf, u.f, entry, em);
+
+                    break;
+                }
+                case CPE_PBUF_TYPE_64BIT: {
+                    union {
+                        uint8_t b[8];
+                        double d;
+                    } u;
+                    uint8_t const * i = curStack->m_input_data + curStack->m_input_size;
+
+                    dr_pbuf_read_check_capacity(8);
+
+                    u.b[0] = i[0];
+                    u.b[1] = i[1];
+                    u.b[2] = i[2];
+                    u.b[3] = i[3];
+                    u.b[4] = i[4];
+                    u.b[5] = i[5];
+                    u.b[6] = i[6];
+                    u.b[7] = i[7];
+
+                    curStack->m_input_size += 8;
+
+                    dr_entry_set_from_double(writeBuf, u.d, entry, em);
+
+                    break;
+                }
+                default: 
+                    CPE_ERROR(
+                        em, "dr_pbuf_read: %s.%s: not support read type %d from pbuf type %d!",
+                        dr_meta_name(curStack->m_meta), dr_entry_name(entry), entry->m_type, value_type);
+                    goto DR_PBUF_READ_IGNORE;
+                }
                 break;
             }
             case CPE_DR_TYPE_STRING: {
+                switch(value_type) {
+                case CPE_PBUF_TYPE_LENGTH: {
+                    size_t len;
+
+                    dr_pbuf_read_decode_varint(buf.sep);
+                    dr_pbuf_read_check_capacity(buf.sep.low);
+
+                    len = buf.sep.low;
+                    if ((len + 1) >= elementSize) len = elementSize - 1;
+
+                    memcpy(writeBuf, curStack->m_input_data + curStack->m_input_size, len);
+                    writeBuf[len] = 0;
+
+                    curStack->m_input_size += buf.sep.low;
+                    break;
+                }
+                default: 
+                    CPE_ERROR(
+                        em, "dr_pbuf_read: %s.%s: not support read type %d from pbuf type %d!",
+                        dr_meta_name(curStack->m_meta), dr_entry_name(entry), entry->m_type, value_type);
+                    goto DR_PBUF_READ_IGNORE;
+                }
                 break;
             }
             case CPE_DR_TYPE_DATE:

@@ -25,9 +25,11 @@ public:
 
     void installMeta(const char * data);
 
-    int read(const char * typeName, const char * defs);
-    int read(const char * typeName, const void * data, size_t data_size);
-    cfg_t result(void);
+    int read(const char * typeName, const char * defs) { return read(typeName, typeName, defs); }
+    int read(const char * encodeTypeName, const char * decodeTypeName, const char * defs);
+    int read(const char * decodeTypeName, const void * data, size_t data_size);
+
+    cfg_t result();
 };
 
 #endif
