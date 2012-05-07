@@ -20,7 +20,8 @@ c-source-to-object = $(call c-source-dir-to-binary-dir,\
 # $(call c-generate-env-arg-name-list,product-name,arg-name)
 c-generate-env-arg-name-list=$2 $($1.env).$2 $1.$2
 
-c-generate-depend-ld-flags=$(addprefix -L$(CPDE_OUTPUT_ROOT)/,\
+c-generate-depend-ld-flags=$(call $($2.env).export-symbols,$(r.$1.c.export-symbols)) \
+                           $(addprefix -L$(CPDE_OUTPUT_ROOT)/,\
 								 $(call merge-list, $(r.$1.c.ldpathes) \
                                                   , $(call product-gen-depend-value-list,$1,\
                                                            $(call c-generate-env-arg-name-list,$2,product.c.ldpathes)) \
@@ -38,11 +39,9 @@ c-generate-depend-ld-flags=$(addprefix -L$(CPDE_OUTPUT_ROOT)/,\
                            $(addprefix -framework ,\
 								 $(sort $(r.$1.c.frameworks) $(r.$1.product.c.frameworks) \
 									$(call product-gen-depend-value-list,$1,product.c.frameworks))) \
-                           $(call product-gen-depend-value-list,$1,product.c.flags.ld) \
-                           $(call product-gen-depend-value-list,$1,$($2.env).product.c.flags.ld) \
-                           $(call product-gen-depend-value-list,$1,$2.product.c.flags.ld) \
-                           $(r.$1.c.flags.ld) $(r.$1.$($2.env).c.flags.ld) $(r.$1.$2.c.flags.ld) \
-                           $(call $($2.env).export-symbols,$(r.$1.c.export-symbols))
+                           $(call revert-list,$(call product-gen-depend-value-list,$1,\
+                                        $(call c-generate-env-arg-name-list,$2,product.c.flags.ld))) \
+                           $(r.$1.c.flags.ld) $(r.$1.$($2.env).c.flags.ld) $(r.$1.$2.c.flags.ld)
 
 # $(call c-generate-depend-cpp-flags,product-name,domain)
 c-generate-depend-cpp-flags=$(addprefix -I$(CPDE_ROOT)/,\
