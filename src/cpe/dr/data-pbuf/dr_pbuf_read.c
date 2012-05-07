@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/pal_string.h"
 #include "cpe/pal/pal_strings.h"
 #include "cpe/dr/dr_pbuf.h"
 #include "cpe/dr/dr_error.h"
@@ -180,7 +181,7 @@ inline static char * dr_pbuf_read_get_read_pos(
 #define dr_pbuf_read_type_error()                                       \
     CPE_ERROR(                                                          \
         em, "dr_pbuf_read: %s.%s: not support read type %d from pbuf type %d!", \
-        dr_meta_name(curStack->m_meta), dr_entry_name(entry), entry->m_type, value_type); \
+        dr_meta_name(curStack->m_meta), dr_entry_name(entry), (int)entry->m_type, value_type); \
     goto DR_PBUF_READ_IGNORE                                            \
 
 #define dr_pbuf_read_by_float() do {                                    \
