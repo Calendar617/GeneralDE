@@ -6,7 +6,7 @@ $(product).c.sources:=$(addprefix $(product-base)/, \
                            encoding.c \
                            numbers.c \
                            )
-$(product).c.flags.cpp:=-D_POSIX_SOURCE
+$(product).c.flags.cpp:=-D_POSIX_SOURCE -DMONGO_HAVE_STDINT
 $(product).c.flags.c:= -O3
 $(product).c.flags.ld:=
 $(product).product.c.defs:=MONGO_HAVE_STDINT
