@@ -6,3 +6,4 @@ t/3rdTools/loki
 t/3rdTools/gmock
 t/3rdTools/libev
 t/3rdTools/argtable2
+t/3rdTools/mongo-c-driver
