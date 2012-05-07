@@ -1,6 +1,1 @@
-t/3rdTools/gtest
-t/3rdTools/libxml2
-t/3rdTools/yajl
-t/3rdTools/yaml
-t/support/dr2
-t/3rdTools/libev
+t/support/game
