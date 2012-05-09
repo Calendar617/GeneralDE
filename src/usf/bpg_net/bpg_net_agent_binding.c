@@ -37,6 +37,8 @@ bpg_net_agent_process_recv(bpg_net_agent_t agent, uint64_t client_id, uint32_t c
 net_ep_t bpg_net_agent_process_reply(bpg_net_agent_t agent, uint64_t client_id, uint32_t connection_id) {
     net_ep_t ep;
 
+    ep = NULL;
+
     if (connection_id != BPG_INVALID_CONNECTION_ID) {
         ep = net_ep_find(gd_app_net_mgr(agent->m_app), connection_id);
         if (ep == NULL) {
