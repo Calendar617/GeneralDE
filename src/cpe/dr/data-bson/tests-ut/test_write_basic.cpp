@@ -35,6 +35,74 @@ TEST_F(WriteTest, type_in32) {
         , result());
 }
 
+TEST_F(WriteTest, type_uin64) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='hello' type='uint64'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ(0x14, write("S", "hello: 123"));
+
+    EXPECT_STREQ(
+        "0x14 0x00 0x00 0x00 0x12 0x68 0x65 0x6C 0x6C 0x6F 0x00"
+        " 0x7B 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00"
+        , result());
+}
+
+TEST_F(WriteTest, type_in64) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='hello' type='int64'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ(0x14, write("S", "hello: -123"));
+
+    EXPECT_STREQ(
+        "0x14 0x00 0x00 0x00 0x12 0x68 0x65 0x6C 0x6C 0x6F 0x00"
+        " 0x85 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0xFF 0x00"
+        , result());
+}
+
+TEST_F(WriteTest, type_float) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='hello' type='float'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ(0x14, write("S", "hello: 123.0"));
+
+    EXPECT_STREQ(
+        "0x14 0x00 0x00 0x00 0x01 0x68 0x65 0x6C 0x6C 0x6F 0x00"
+        " 0x00 0x00 0x00 0x00 0x00 0xC0 0x5E 0x40 0x00"
+        , result());
+}
+
+TEST_F(WriteTest, type_double) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='hello' type='double'/>"
+        "    </struct>"
+        "</metalib>"
+        );
+
+    EXPECT_EQ(0x14, write("S", "hello: 123.0"));
+
+    EXPECT_STREQ(
+        "0x14 0x00 0x00 0x00 0x01 0x68 0x65 0x6C 0x6C 0x6F 0x00"
+        " 0x00 0x00 0x00 0x00 0x00 0xC0 0x5E 0x40 0x00"
+        , result());
+}
+
 TEST_F(WriteTest, type_string) {
     installMeta(
         "<metalib tagsetversion='1' name='net'  version='1'>"
@@ -102,42 +170,71 @@ TEST_F(WriteTest, type_array_refer) {
         , result());
 }
 
-// TEST_F(WriteTest, type_array_string_basic) {
-//     installMeta(
-//         "<metalib tagsetversion='1' name='net'  version='1'>"
-//         "    <struct name='S' version='1'>"
-//         "	     <entry name='a1' type='string' id='2' size='128' count='3'/>"
-//         "    </struct>"
-//         "</metalib>"
-//         );
+TEST_F(WriteTest, type_array_string_basic) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S' version='1'>"
+        "	     <entry name='a1' type='string' size='128' count='3'/>"
+        "    </struct>"
+        "</metalib>"
+        );
 
-//     EXPECT_EQ(30, write("S", "a1: [testing1, testing2, testing3]"));
+    EXPECT_EQ(41, write("S", "a1: [a, b, c]"));
     
-//     EXPECT_STREQ(
-//         "0x12 0x08 0x74 0x65 0x73 0x74 0x69 0x6E 0x67 0x31"
-//         " 0x12 0x08 0x74 0x65 0x73 0x74 0x69 0x6E 0x67 0x32"
-//         " 0x12 0x08 0x74 0x65 0x73 0x74 0x69 0x6E 0x67 0x33"
-//         ,
-//         result());
-// }
+    EXPECT_STREQ(
+        "0x29 0x00 0x00 0x00"
+        " 0x04"
+        " 0x61 0x31 0x00"
+        " 0x20 0x00 0x00 0x00"
+        " 0x02 0x30 0x00 0x02 0x00 0x00 0x00 0x61 0x00" /* '0': a*/
+        " 0x02 0x31 0x00 0x02 0x00 0x00 0x00 0x62 0x00" /* '1': b*/
+        " 0x02 0x32 0x00 0x02 0x00 0x00 0x00 0x63 0x00" /* '2': c*/
+        " 0x00"
+        " 0x00"
+        ,
+        result());
+}
 
-// TEST_F(WriteTest, type_array_struct_basic) {
-//     installMeta(
-//         "<metalib tagsetversion='1' name='net'  version='1'>"
-//         "    <struct name='S1' version='1'>"
-//         "	     <entry name='a1' type='uint32' id='1'/>"
-//         "    </struct>"
-//         "    <struct name='S2' version='1'>"
-//         "	     <entry name='b1' type='S1' id='3' count='3'/>"
-//         "    </struct>"
-//         "</metalib>"
-//         );
+TEST_F(WriteTest, type_array_struct_basic) {
+    installMeta(
+        "<metalib tagsetversion='1' name='net'  version='1'>"
+        "    <struct name='S1' version='1'>"
+        "	     <entry name='a1' type='uint32' id='1'/>"
+        "    </struct>"
+        "    <struct name='S2' version='1'>"
+        "	     <entry name='b1' type='S1' id='3' count='3'/>"
+        "    </struct>"
+        "</metalib>"
+        );
 
-//     EXPECT_EQ(15, write("S2", "b1: [{ a1: 150 }, { a1: 151 }, { a1: 152 }]"));
+    EXPECT_EQ(61, write("S2", "b1: [{ a1: 1 }, { a1: 2 }, { a1: 3 }]"));
     
-//     EXPECT_STREQ(
-//         "0x1A 0x03 0x08 0x96 0x01"
-//         " 0x1A 0x03 0x08 0x97 0x01"
-//         " 0x1A 0x03 0x08 0x98 0x01"
-//         , result());
-// }
+    EXPECT_STREQ(
+        "0x3D 0x00 0x00 0x00"
+        " 0x04" /*b1.type array*/
+        " 0x62 0x31 0x00" /*b1.name*/
+        " 0x20 0x00 0x00 0x00" /*b1.value document size*/
+        " 0x03" /*0.type embered*/
+        " 0x30 0x00" /*0.name*/
+        " 0x0D 0x00 0x00 0x00" /*0.size*/
+        " 0x10" /*0.a1.type*/
+        " 0x61 0x31 0x00" /*0.a1.name*/
+        " 0x01 0x00 0x00 0x00" /*0.a1.value*/
+        " 0x00" /*0.end*/
+        " 0x03" /*1.type embered*/
+        " 0x31 0x00" /*1.name*/
+        " 0x0D 0x00 0x00 0x00" /*1.size*/
+        " 0x10" /*1.a1.type*/
+        " 0x61 0x31 0x00" /*1.a1.name*/
+        " 0x02 0x00 0x00 0x00" /*1.a1.value*/
+        " 0x00" /*1.end*/
+        " 0x03" /*2.type embered*/
+        " 0x32 0x00" /*1.name*/
+        " 0x0D 0x00 0x00 0x00" /*2.size*/
+        " 0x10" /*2.a1.type*/
+        " 0x61 0x31 0x00" /*2.a1.name*/
+        " 0x03 0x00 0x00 0x00" /*2.a1.value*/
+        " 0x00" /*2.end*/
+        " 0x00"
+        , result());
+}

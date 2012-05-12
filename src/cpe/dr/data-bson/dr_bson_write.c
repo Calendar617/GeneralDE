@@ -28,8 +28,6 @@ struct dr_bson_write_stack {
     size_t m_input_data_capacity;
 };
 
-#define dr_bson_write_size_reserve 1
-
 #define dr_bson_write_check_capacity(__capacity)                        \
     if (curStack->m_output_capacity - curStack->m_output_size < (__capacity)) { \
         CPE_ERROR(em, "dr_bson_write: not enouth buf!");                \
@@ -71,6 +69,20 @@ struct dr_bson_write_stack {
         CPE_COPY_HTON32(curStack->m_output_data + curStack->m_output_size, (&len)); \
         memcpy(curStack->m_output_data + curStack->m_output_size + 4, __v, len); \
         curStack->m_output_size += len + 4;                             \
+    } while(0)
+
+#define dr_bson_write_printf(__fmt, __v) do {                           \
+        int32_t s;                                                      \
+        s = snprintf(                                                   \
+            (char *)curStack->m_output_data + curStack->m_output_size,  \
+            curStack->m_output_capacity - curStack->m_output_size,      \
+            __fmt,                                                      \
+            __v);                                                       \
+        if (s < 0) {                                                    \
+            CPE_ERROR(em, "dr_bson_write: not enouth buf!");            \
+            return -1;                                                  \
+        }                                                               \
+        curStack->m_output_size += s + 1;                               \
     } while(0)
 
 static inline char dr_bson_calc_bson_type(LPDRMETAENTRY entry) {
@@ -160,7 +172,7 @@ int dr_bson_write(
             LPDRMETAENTRY refer;
             char type;
 
-            //LOOPENTRY:
+        LOOPENTRY:
             elementSize = dr_entry_element_size(curStack->m_entry);
             if (elementSize == 0) continue;
 
@@ -178,15 +190,19 @@ int dr_bson_write(
                     em);
             }
 
-            if (curStack->m_entry_pos == 0) { /*reserve for write size*/
+            if (curStack->m_array_pos >= array_count) continue;
+
+            if (curStack->m_entry_pos == 0 && curStack->m_array_pos == 0) { /*reserve for write size*/
                 dr_bson_write_check_capacity(4);
                 curStack->m_output_size += 4;
             }
 
-            /*write type*/
-            type = dr_bson_calc_bson_type(curStack->m_entry);
-            dr_bson_write_char(type);
-            dr_bson_write_cstring(dr_entry_name(curStack->m_entry));
+            if (curStack->m_array_pos == 0) {
+                /*write type*/
+                type = dr_bson_calc_bson_type(curStack->m_entry);
+                dr_bson_write_char(type);
+                dr_bson_write_cstring(dr_entry_name(curStack->m_entry));
+            }
 
             if (curStack->m_entry->m_array_count != 1 && curStack->m_array_pos == 0) {
                 dr_bson_write_check_capacity(4);
@@ -202,8 +218,10 @@ int dr_bson_write(
                 switch(curStack->m_entry->m_type) {
                 case CPE_DR_TYPE_UNION:
                 case CPE_DR_TYPE_STRUCT: {
-                    /*
-                    dr_bson_write_encode_id_and_type(CPE_PBUF_TYPE_LENGTH);
+                    if (curStack->m_entry->m_array_count != 1) {
+                        dr_bson_write_char(dr_bson_type_embeded);
+                        dr_bson_write_printf("%d", curStack->m_array_pos);
+                    }
 
                     if (stackPos + 1 < CPE_DR_MAX_LEVEL) {
                         struct dr_bson_write_stack * nextStack;
@@ -214,7 +232,7 @@ int dr_bson_write(
                         nextStack->m_input_data = entryData;
                         nextStack->m_input_data_capacity = elementSize;
 
-                        nextStack->m_output_data = curStack->m_output_data + curStack->m_output_size + dr_bson_write_size_reserve;
+                        nextStack->m_output_data = curStack->m_output_data + curStack->m_output_size;
                         nextStack->m_output_size = 0;
                         nextStack->m_output_capacity = curStack->m_output_capacity - curStack->m_output_size;
                         nextStack->m_array_begin_pos = 0;
@@ -248,7 +266,7 @@ int dr_bson_write(
                         ++stackPos;
                         curStack = nextStack;
                         goto LOOPENTRY;
-                        }*/
+                        }
                     break;
                 }
                 case CPE_DR_TYPE_CHAR:
@@ -257,12 +275,24 @@ int dr_bson_write(
                 case CPE_DR_TYPE_INT32: {
                     int32_t value;
                     dr_entry_try_read_int32(&value, entryData, curStack->m_entry, NULL);
+
+                    if (curStack->m_entry->m_array_count != 1) {
+                        dr_bson_write_char(dr_bson_type_int32);
+                        dr_bson_write_printf("%d", curStack->m_array_pos);
+                    }
+
                     dr_bson_write_int32(value);
                     break;
                 }
                 case CPE_DR_TYPE_INT64: {
                     int64_t value;
                     dr_entry_try_read_int64(&value, entryData, curStack->m_entry, NULL);
+
+                    if (curStack->m_entry->m_array_count != 1) {
+                        dr_bson_write_char(dr_bson_type_int64);
+                        dr_bson_write_printf("%d", curStack->m_array_pos);
+                    }
+
                     dr_bson_write_int64(value);
                     break;
                 }
@@ -274,21 +304,8 @@ int dr_bson_write(
                     dr_entry_try_read_uint32(&value, entryData, curStack->m_entry, NULL);
 
                     if (curStack->m_entry->m_array_count != 1) {
-                        int32_t s;
-
                         dr_bson_write_char(dr_bson_type_int32);
-                        
-                        s = snprintf(
-                            (char *)curStack->m_output_data + curStack->m_output_size,
-                            curStack->m_output_capacity - curStack->m_output_size,
-                            "%d",
-                            curStack->m_array_pos);
-                        if (s < 0) {
-                            CPE_ERROR(em, "dr_bson_write: not enouth buf!");
-                            return -1;
-                        }
-
-                        curStack->m_output_size += s + 1;
+                        dr_bson_write_printf("%d", curStack->m_array_pos);
                     }
 
                     dr_bson_write_int32(value);
@@ -297,16 +314,37 @@ int dr_bson_write(
                 case CPE_DR_TYPE_UINT64: {
                     uint64_t value;
                     dr_entry_try_read_uint64(&value, entryData, curStack->m_entry, NULL);
+
+                    if (curStack->m_entry->m_array_count != 1) {
+                        dr_bson_write_char(dr_bson_type_int64);
+                        dr_bson_write_printf("%d", curStack->m_array_pos);
+                    }
+
                     dr_bson_write_int64(value);
                     break;
                 }
-                case CPE_DR_TYPE_FLOAT: {
-                    break;
-                }
+                case CPE_DR_TYPE_FLOAT:
                 case CPE_DR_TYPE_DOUBLE: {
+                    union {
+                        double d;
+                        int64_t i;
+                    } value;
+                    dr_entry_try_read_double(&value.d, entryData, curStack->m_entry, NULL);
+
+                    if (curStack->m_entry->m_array_count != 1) {
+                        dr_bson_write_char(dr_bson_type_int64);
+                        dr_bson_write_printf("%d", curStack->m_array_pos);
+                    }
+
+                    dr_bson_write_int64(value.i);
                     break;
                 }
                 case CPE_DR_TYPE_STRING: {
+                    if (curStack->m_entry->m_array_count != 1) {
+                        dr_bson_write_char(dr_bson_type_string);
+                        dr_bson_write_printf("%d", curStack->m_array_pos);
+                    }
+
                     dr_bson_write_string(entryData);
                     break;
                 }
@@ -337,7 +375,11 @@ int dr_bson_write(
             CPE_COPY_HTON32(curStack->m_output_data, &curStack->m_output_size);
         }
 
-        --stackPos;
+        if (--stackPos >= 0) {
+            struct dr_bson_write_stack * preStack;
+            preStack = &processStack[stackPos];
+            preStack->m_output_size += curStack->m_output_size; 
+        }
     }
 
     return (int)processStack[0].m_output_size;
