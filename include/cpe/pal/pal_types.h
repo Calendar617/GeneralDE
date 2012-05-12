@@ -68,9 +68,5 @@ typedef int64_t ptr_int_t;
 typedef int32_t ptr_int_t;
 #endif
 
-#define CPE_PAL_ALIGN_8(__value) ((((__value) >> 3) + 1) << 3)
-#define CPE_PAL_ALIGN_4(__value) ((((__value) >> 2) + 1) << 2)
-#define CPE_PAL_ALIGN_2(__value) ((((__value) >> 1) + 1) << 1)
-
 #endif /* TTYPES_H */
 
