@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "cpe/pal/pal_platform.h"
 #include "cpe/pal/pal_socket.h"
 #include "cpe/pal/pal_string.h"
 #include "cpe/utils/error.h"
