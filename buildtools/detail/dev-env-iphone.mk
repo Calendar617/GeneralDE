@@ -1,4 +1,5 @@
 # {{{ global settings
+
 dev-env-list+=iphone
 
 iphone.CFLAGS+=-Wall
@@ -7,8 +8,8 @@ iphone.MFLAGS+=-Wall -pipe -x objective-c
 iphone.MMFLAGS+=-Wall -pipe -x objective-c++
 
 ifneq ($(DEBUG),0)
-iphone.CFLAGS+=-ggdb
-iphone.CXXFLAGS+=-ggdb
+iphone.CFLAGS+=-g
+iphone.CXXFLAGS+=-g
 endif
 
 iphone.LDFLAGS.share:=--shared
@@ -25,6 +26,7 @@ iphone.lib.dl?=dl
 
 # }}}
 # {{{ validate
+
 iphone.check=$(call assert-not-null,PLATFORM_NAME) \
              $(call assert-not-null,PLATFORM_VERSION) \
              $(call assert-not-null,$(PLATFORM_NAME).compiler) \
@@ -41,7 +43,7 @@ iphone.check=$(call assert-not-null,PLATFORM_NAME) \
 
 iphone-os-version-min?=40200
 
-iPhoneSimulator.compiler ?= llvm-$1-4.2
+iPhoneSimulator.compiler ?= $(if $(filter gcc,$1),clang,$(if $(filter g++,$1),clang++,$1))
 
 iPhoneSimulator.TARGET_ARCH ?= -arch i386
 
@@ -95,8 +97,8 @@ PLATFORM_PREFIX:=$(IOS_XCODE_ROOT)/Platforms/$(PLATFORM_NAME).platform
 PLATFORM_BIN_PATH:=$(PLATFORM_PREFIX)/Developer/usr/bin
 SDK_PREFIX:=$(PLATFORM_PREFIX)/Developer/SDKs/$(PLATFORM_NAME)$(PLATFORM_VERSION).sdk
 
-iphone.GCC = $(PLATFORM_BIN_PATH)/$(call $(PLATFORM_NAME).compiler,gcc)
-iphone.CXX = $(PLATFORM_BIN_PATH)/$(call $(PLATFORM_NAME).compiler,g++)
+iphone.GCC = $(call $(PLATFORM_NAME).compiler,gcc)
+iphone.CXX = $(call $(PLATFORM_NAME).compiler,g++)
 iphone.CC = $(iphone.GCC)
 iphone.LD = $(iphone.CC)
 iphone.AR = $(PLATFORM_BIN_PATH)/ar
@@ -134,6 +136,5 @@ iphone.linker.c:=$(iphone.GCC)
 iphone.linker.cpp:=$(iphone.CXX)
 iphone.linker.obj-c:=$(iphone.GCC)
 iphone.linker.obj-cpp:=$(iphone.CXX)
-
 
 # }}}
