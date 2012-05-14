@@ -79,3 +79,8 @@ $(if $1\
           , $(call select-var,$(wordlist 2,$(words $1), $1))) \
      ,)
 endef
+
+compiler-category=$(if $(filter clang,$1),apple,\
+                  $(if $(filter gcc,$1),gcc,\
+                       $(warning unknown compiler $1)))
+
