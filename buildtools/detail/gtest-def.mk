@@ -10,7 +10,7 @@ $(eval $(product).c.sources := $(wildcard $(product-base)/*.cpp)\
                                $(wildcard $(product-base)/*.c) \
                                $3 \
                                )
-$(eval $(product).c.flags.ld:=$$(r.$1.c.flags.ld) -rdynamic)
+$(eval $(product).c.flags.ld:=$$(r.$1.c.flags.ld))
 $(eval $(product).run.path:=$(product-base))
 $(eval $1.ut:=$(product))
 
