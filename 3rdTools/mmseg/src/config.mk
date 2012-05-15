@@ -1,4 +1,4 @@
-product:=mmseg
+product:=libmmseg
 $(product).depends:=
 $(product).type:=lib
 $(product).product.c.includes:=3rdTools/mmseg/include

@@ -1,11 +1,14 @@
 #ifndef _3RDTOOLS_MMSGE_TEST_MMSEG_H
 #define _3RDTOOLS_MMSGE_TEST_MMSEG_H
-#include "cpe/utils/tests-env/test-fixture.hpp"
+#include "gtest/gtest.h"
+#include "../css/SegmenterManager.h"
 
-class MMSegTest : public testenv::fixture<> {
+class MMSegTest : public ::testing::Test {
 public:
     MMSegTest();
     virtual void SetUp();
+
+    css::SegmenterManager m_segmentManage;
 };
 
 #endif
