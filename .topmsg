@@ -1,6 +1,6 @@
-From: lokiwang <wangjian1009@gmail.com>
-Subject: [PATCH] t/3rdTools/libev
+From: Lokiwang <wangjian1009@gmail.com>
+Subject: [PATCH] t/3rdTools/libebb
 
-trace libev in develop env
+trace libebb in dev env
 
-Signed-off-by: lokiwang <wangjian1009@gmail.com>
+Signed-off-by: Lokiwang <wangjian1009@gmail.com>
