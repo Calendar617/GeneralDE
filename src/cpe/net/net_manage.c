@@ -108,3 +108,7 @@ int net_mgr_debug(net_mgr_t nmgr) {
 void net_mgr_set_debug(net_mgr_t nmgr, int debug) {
     nmgr->m_debug = debug;
 }
+
+struct ev_loop * net_mgr_ev_loop(net_mgr_t nmgr) {
+    return nmgr->m_ev_loop;
+}
