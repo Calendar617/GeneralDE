@@ -51,6 +51,8 @@ typedef void (*net_connector_state_monitor_fun_t)(net_connector_t connector, voi
 
 typedef void (*net_run_tick_fun_t)(void * ctx);
 
+struct ev_loop;
+
 #ifdef __cplusplus
 }
 #endif
