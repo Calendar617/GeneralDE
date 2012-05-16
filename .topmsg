@@ -1,6 +1,6 @@
-From: lokiwang <wangjian1009@gmail.com>
-Subject: [PATCH] t/support/game
+From: Lokiwang <wangjian1009@gmail.com>
+Subject: [PATCH] t/support/inet
 
-game develop support component
+封装curl等库的接口，在App框架中提供方便使用的网络数据访问接口
 
-Signed-off-by: lokiwang <wangjian1009@gmail.com>
+Signed-off-by: Lokiwang <wangjian1009@gmail.com>
