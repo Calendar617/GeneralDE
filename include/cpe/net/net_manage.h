@@ -20,6 +20,8 @@ int net_mgr_run(net_mgr_t nmgr, int64_t span, net_run_tick_fun_t tick_fun, void 
 int net_mgr_debug(net_mgr_t nmgr);
 void net_mgr_set_debug(net_mgr_t nmgr, int debug);
 
+struct ev_loop * net_mgr_ev_loop(net_mgr_t nmgr);
+
 #ifdef __cplusplus
 }
 #endif
