@@ -145,24 +145,38 @@ static int dp_do_dispatch_i(struct dp_rsp_it * rsps, dp_req_t req, error_monitor
 
     dp_pbuf_fini(dm, &pbuf);
 
-    if (count == 0) {
-        CPE_INFO(em, "no responser to process cmd");
-        rv = -1;
-    }
-
-    return rv;
+    return rv < 0 ? rv : count;
 }
 
 int dp_dispatch_by_string(cpe_hash_string_t cmd, dp_req_t req, error_monitor_t em) {
     struct dp_rsp_it rspIt;
+    int rv;
+
     dp_rsp_find_by_string(&rspIt, req->m_mgr, cpe_hs_data(cmd));
-    return dp_do_dispatch_i(&rspIt, req, em);
+    
+    rv = dp_do_dispatch_i(&rspIt, req, em);
+
+    if (rv == 0) {
+        CPE_INFO(em, "no responser to process cmd %s", cpe_hs_data(cmd));
+        rv = -1;
+    }
+
+    return rv < 0 ? rv : 0;
 }
 
 int dp_dispatch_by_numeric(int32_t cmd, dp_req_t req, error_monitor_t em) {
     struct dp_rsp_it rspIt;
+    int rv;
+
     dp_rsp_find_by_numeric(&rspIt, req->m_mgr, cmd);
-    return dp_do_dispatch_i(&rspIt, req, em);
+    rv = dp_do_dispatch_i(&rspIt, req, em);
+
+    if (rv == 0) {
+        CPE_INFO(em, "no responser to process cmd %d", cmd);
+        rv = -1;
+    }
+
+    return rv < 0 ? rv : 0;
 }
 
 int dp_dispatch_by_name(const char * name, dp_req_t req, error_monitor_t em) {
